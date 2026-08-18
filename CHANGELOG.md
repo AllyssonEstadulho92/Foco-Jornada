@@ -1,15 +1,11 @@
 # Changelog
 
-## 3.0.0 — consolidação do produto
-
-- Migração definitiva para o repositório público `Foco-Jornada`
-- Aplicação estática autónoma, sem dependências de runtime
-- Jornada, pausas, foco, atividades, café, histórico e definições consolidados
-- Persistência local, backup JSON e diagnóstico de integridade
-- PWA com manifesto, Service Worker e `.nojekyll`
-- Testes automatizados do código de produção
-- Workflow de qualidade para a branch `main`
-
-## Critério de publicação
-
-A branch `main` é a fonte oficial. GitHub Pages deve apontar para `main` / `/(root)`.
+## 4.0.0
+- Reconstrução modular da base.
+- Migração automática dos dados v3.
+- Jornada avançada com edição, reabertura e cancelamento.
+- Atividades com metadados e segmentos de tempo.
+- Pomodoro configurável.
+- Estatísticas e histórico diário.
+- Contextos Trabalho/Pessoal.
+- Testes ampliados e PWA revisto.

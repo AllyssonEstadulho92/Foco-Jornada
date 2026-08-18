@@ -1,11 +1,1 @@
-{
-  "name":"foco-jornada",
-  "version":"3.0.0",
-  "private":true,
-  "description":"Aplicação estática/PWA de produtividade e gestão de tempo.",
-  "scripts":{
-    "test":"node --test tests/app.test.cjs",
-    "check":"node --check sw.js && node --test tests/app.test.cjs"
-  },
-  "engines":{"node":">=20"}
-}
+{"name":"foco-jornada","version":"4.0.0","private":true,"type":"module","scripts":{"test":"node --test tests/core.test.mjs","check":"node --check core.js && node --check app.js && node --check sw.js && node --test tests/core.test.mjs"}}
