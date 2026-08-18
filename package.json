@@ -1,1 +1,1 @@
-{"name":"foco-jornada","version":"4.0.0","private":true,"type":"module","scripts":{"test":"node --test tests/core.test.mjs","check":"node --check core.js && node --check app.js && node --check sw.js && node --test tests/core.test.mjs"}}
+{"name":"foco-jornada","version":"4.1.0","private":true,"type":"module","scripts":{"test":"node --test tests/core.test.mjs","check":"node --check core.js && node --check app.js && node --check enhancements.js && node --check sw.js && node --test tests/core.test.mjs"}}
