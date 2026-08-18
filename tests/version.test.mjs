@@ -9,14 +9,16 @@ const cacheVersion = version.replaceAll('.', '-');
 
 test('versão pública é coerente entre os ficheiros ativos', () => {
   const index = read('index.html');
-  const enhancements = read('enhancements.js');
+  const ux = read('ux.js');
   const sw = read('sw.js');
   const readme = read('README.md');
   const quality = read('QUALITY.md');
 
   assert.match(index, new RegExp(`id="appVersionSide">${version.replaceAll('.', '\\.')}</span>`));
   assert.match(index, new RegExp(`id="appVersion">${version.replaceAll('.', '\\.')}</span>`));
-  assert.ok(enhancements.includes(`const VERSION='${version}'`), 'enhancements.js deve usar a versão do package.json');
+  assert.ok(index.includes('src="./ux.js"'), 'index.html deve iniciar a aplicação pela camada UX ativa');
+  assert.equal(index.includes('src="./enhancements.js"'), false, 'enhancements.js não deve ser o entrypoint público');
+  assert.ok(ux.includes(`const UI_VERSION='${version}'`), 'ux.js deve usar a versão do package.json');
   assert.ok(sw.includes(`v${cacheVersion}`), 'cache do Service Worker deve refletir a versão do package.json');
   assert.ok(readme.startsWith(`# Foco & Jornada ${version}\n`), 'README deve apresentar a versão atual');
   assert.ok(quality.startsWith(`# Qualidade — ${version}\n`), 'QUALITY.md deve apresentar a versão atual');
@@ -24,9 +26,18 @@ test('versão pública é coerente entre os ficheiros ativos', () => {
 
 test('interface ativa não volta a anunciar versões anteriores', () => {
   const index = read('index.html');
-  const enhancements = read('enhancements.js');
-  for (const old of ['4.0.0', '4.1.0']) {
+  const ux = read('ux.js');
+  for (const old of ['4.0.0', '4.1.0', '4.1.1']) {
     assert.equal(index.includes(old), false, `index.html não deve anunciar ${old}`);
-    assert.equal(enhancements.includes(`VERSION='${old}'`), false, `enhancements.js não deve anunciar ${old}`);
+    assert.equal(ux.includes(`UI_VERSION='${old}'`), false, `ux.js não deve anunciar ${old}`);
   }
+});
+
+test('UX mobile inclui notificações e ícones locais sem CDN', () => {
+  const index = read('index.html');
+  const ux = read('ux.js');
+  assert.ok(index.includes('./ux.css'));
+  assert.ok(ux.includes('notificationBell'));
+  assert.ok(ux.includes('ICON_PATHS'));
+  assert.equal(/https?:\/\//.test(ux), false, 'ux.js não deve depender de CDN externa');
 });
