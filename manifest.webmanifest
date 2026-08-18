@@ -1,0 +1,16 @@
+{
+  "name": "Foco & Jornada",
+  "short_name": "Foco Jornada",
+  "description": "Produtividade, jornada, pausas, foco, atividades e pequenos gastos.",
+  "lang": "pt-PT",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#091017",
+  "theme_color": "#091017",
+  "id": "./",
+  "categories": ["productivity", "utilities"],
+  "icons": [
+    {"src": "./icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable"}
+  ]
+}
