@@ -1,0 +1,48 @@
+html.app-like-mobile{-webkit-text-size-adjust:100%;text-size-adjust:100%;overscroll-behavior:none}
+html.app-like-mobile,html.app-like-mobile body{max-width:100%;overflow-x:hidden}
+html.app-like-mobile body{-webkit-tap-highlight-color:transparent}
+html.app-like-mobile button,html.app-like-mobile a,html.app-like-mobile [role="button"]{touch-action:manipulation}
+.toast{opacity:0!important;visibility:hidden!important;pointer-events:none!important;transform:none!important}
+.ui-svg{width:1em;height:1em;display:block;flex:0 0 auto}
+.side-nav>button>span,.bottom-nav>button>span{display:grid;place-items:center}
+.side-nav .ui-svg{width:27px;height:27px}
+.bottom-nav .ui-svg{width:29px;height:29px}
+.quick-grid>button>span .ui-svg{width:38px;height:38px}
+.icon-btn .ui-svg{width:22px;height:22px}
+.button-inline-icon{display:inline-grid;place-items:center;margin-right:8px;vertical-align:-3px}
+.button-inline-icon .ui-svg{width:18px;height:18px}
+.logo>span .ui-svg{width:27px;height:27px}
+[data-nav].on .ui-svg{stroke-width:2.15}
+button:active .ui-svg{transform:scale(.88)}
+.ui-svg{transition:transform .18s ease,opacity .18s ease}
+[data-nav].on .nav-icon{animation:uiIconPop .24s ease-out}
+@keyframes uiIconPop{0%{transform:scale(.82)}70%{transform:scale(1.08)}100%{transform:scale(1)}}
+.notification-bell{position:relative;width:44px;height:44px;border-radius:14px;border:1px solid var(--line);background:var(--surface2);color:var(--text);display:grid;place-items:center;padding:0;cursor:pointer;touch-action:manipulation}
+.notification-bell .ui-svg{width:22px;height:22px}
+.notification-dot{position:absolute;right:8px;top:8px;width:9px;height:9px;border-radius:50%;background:#ff4d57;border:2px solid var(--surface2);opacity:0;transform:scale(.5);transition:.18s ease}
+.notification-dot.on{opacity:1;transform:scale(1)}
+.notification-bell.pulse .ui-svg{animation:bellPulse .55s ease}
+@keyframes bellPulse{0%{transform:rotate(0)}25%{transform:rotate(14deg)}50%{transform:rotate(-12deg)}75%{transform:rotate(7deg)}100%{transform:rotate(0)}}
+.notification-panel{position:fixed;z-index:2500;top:max(76px,calc(env(safe-area-inset-top) + 58px));right:16px;width:min(390px,calc(100vw - 24px));max-height:min(620px,calc(100dvh - 110px));overflow:hidden;border:1px solid var(--line);border-radius:24px;background:color-mix(in srgb,var(--surface) 96%,transparent);box-shadow:0 24px 70px rgba(0,0,0,.34);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+.notification-panel[hidden]{display:none!important}
+.notification-head{display:flex;align-items:center;justify-content:space-between;padding:18px 18px 12px;border-bottom:1px solid var(--line)}
+.notification-head h2{margin:2px 0 0;font-size:20px}
+.notification-close{width:38px;height:38px;border:0;border-radius:12px;background:var(--surface2);color:var(--text);font-size:26px;line-height:1}
+.notification-list{max-height:430px;overflow:auto;padding:8px}
+.notification-item{display:grid;grid-template-columns:8px minmax(0,1fr) auto;gap:11px;align-items:start;padding:13px 10px;border-radius:16px}
+.notification-item+.notification-item{border-top:1px solid var(--line);border-radius:0}
+.notification-state{width:8px;height:8px;border-radius:50%;margin-top:7px;background:var(--primary)}
+.notification-item.success .notification-state{background:#31c780}.notification-item.error .notification-state{background:#ff5f66}
+.notification-copy b{display:block;font-size:14px;line-height:1.35}.notification-copy small{display:block;color:var(--muted);margin-top:4px}
+.notification-action{border:0;background:transparent;color:var(--primary);font-weight:700;padding:5px}
+.notification-empty{padding:28px 14px;text-align:center;color:var(--muted)}
+.notification-footer{padding:10px 16px 14px;border-top:1px solid var(--line);display:flex;justify-content:flex-end}
+@media(max-width:760px){
+  input,select,textarea{font-size:16px!important}
+  .notification-panel{left:12px;right:12px;width:auto;top:max(72px,calc(env(safe-area-inset-top) + 56px));border-radius:22px}
+  .topbar{padding-top:max(12px,env(safe-area-inset-top))}
+  .bottom-nav{padding-bottom:max(8px,env(safe-area-inset-bottom))}
+  .bottom-nav .ui-svg{width:30px;height:30px}
+  .quick-grid>button>span .ui-svg{width:40px;height:40px}
+}
+@media(prefers-reduced-motion:reduce){.ui-svg,.notification-dot{transition:none!important}.nav-icon,.notification-bell.pulse .ui-svg{animation:none!important}}
