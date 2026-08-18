@@ -1,4 +1,4 @@
-# Foco & Jornada 4.0.0
+# Foco & Jornada 4.1.1
 
 Aplicação PWA de produtividade pessoal/profissional, sem dependências de runtime.
 
@@ -15,6 +15,8 @@ Aplicação PWA de produtividade pessoal/profissional, sem dependências de runt
 
 ## Qualidade
 `npm run check`
+
+A versão 4.1.1 inclui a camada de estabilização da interface e cache PWA revisto. A validação automática deve manter coerentes a versão do pacote, interface, camada de estabilidade e Service Worker.
 
 ## Publicação
 GitHub Pages via `.github/workflows/pages.yml`.
