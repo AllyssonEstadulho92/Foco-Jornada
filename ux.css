@@ -3,26 +3,47 @@ html.app-like-mobile,html.app-like-mobile body{max-width:100%;overflow-x:hidden}
 html.app-like-mobile body{-webkit-tap-highlight-color:transparent}
 html.app-like-mobile button,html.app-like-mobile a,html.app-like-mobile [role="button"]{touch-action:manipulation}
 .toast{opacity:0!important;visibility:hidden!important;pointer-events:none!important;transform:none!important}
-.ui-svg{width:1em;height:1em;display:block;flex:0 0 auto}
+
+.ui-svg{width:1em;height:1em;display:block;flex:0 0 auto;transform-origin:center;transition:transform .2s cubic-bezier(.2,.8,.2,1),opacity .18s ease,filter .2s ease}
 .side-nav>button>span,.bottom-nav>button>span{display:grid;place-items:center}
-.side-nav .ui-svg{width:27px;height:27px}
-.bottom-nav .ui-svg{width:29px;height:29px}
-.quick-grid>button>span .ui-svg{width:38px;height:38px}
-.icon-btn .ui-svg{width:22px;height:22px}
+.side-nav .ui-svg{width:29px;height:29px}
+.bottom-nav .ui-svg{width:31px;height:31px}
+.quick-grid>button>span .ui-svg{width:42px;height:42px}
+.icon-btn{display:grid!important;place-items:center!important}
+.icon-btn .ui-svg{width:23px;height:23px;margin:auto}
 .button-inline-icon{display:inline-grid;place-items:center;margin-right:8px;vertical-align:-3px}
-.button-inline-icon .ui-svg{width:18px;height:18px}
-.logo>span .ui-svg{width:27px;height:27px}
-[data-nav].on .ui-svg{stroke-width:2.15}
-button:active .ui-svg{transform:scale(.88)}
-.ui-svg{transition:transform .18s ease,opacity .18s ease}
-[data-nav].on .nav-icon{animation:uiIconPop .24s ease-out}
-@keyframes uiIconPop{0%{transform:scale(.82)}70%{transform:scale(1.08)}100%{transform:scale(1)}}
-.notification-bell{position:relative;width:44px;height:44px;border-radius:14px;border:1px solid var(--line);background:var(--surface2);color:var(--text);display:grid;place-items:center;padding:0;cursor:pointer;touch-action:manipulation}
-.notification-bell .ui-svg{width:22px;height:22px}
+.button-inline-icon .ui-svg{width:19px;height:19px}
+.logo>span .ui-svg{width:29px;height:29px}
+[data-nav].on .ui-svg{stroke-width:2.2;filter:drop-shadow(0 3px 8px color-mix(in srgb,currentColor 24%,transparent))}
+
+button:active .ui-svg{animation:uiTap .32s cubic-bezier(.2,.9,.25,1)}
+[data-nav].on .nav-icon{animation:uiNavPop .34s cubic-bezier(.2,.9,.25,1)}
+.quick-grid>button:active .ui-svg{animation:uiQuickTap .38s cubic-bezier(.18,.9,.25,1)}
+.icon-btn:active .ui-svg{animation:uiActionTap .3s cubic-bezier(.2,.9,.25,1)}
+[data-action="toggleTheme"]:active .ui-svg{animation:uiThemeSpin .42s ease-out}
+.fj-history-delete:active .ui-svg,.icon-btn.danger:active .ui-svg{animation:uiDeleteTap .34s ease-out}
+
+@keyframes uiTap{0%{transform:scale(1)}42%{transform:scale(.78) rotate(-5deg)}72%{transform:scale(1.13) rotate(3deg)}100%{transform:scale(1) rotate(0)}}
+@keyframes uiNavPop{0%{transform:translateY(3px) scale(.78)}58%{transform:translateY(-3px) scale(1.13)}100%{transform:translateY(0) scale(1)}}
+@keyframes uiQuickTap{0%{transform:scale(1)}35%{transform:translateY(3px) scale(.82)}68%{transform:translateY(-4px) scale(1.12)}100%{transform:translateY(0) scale(1)}}
+@keyframes uiActionTap{0%{transform:scale(1)}48%{transform:scale(.72)}78%{transform:scale(1.14)}100%{transform:scale(1)}}
+@keyframes uiThemeSpin{0%{transform:rotate(0) scale(1)}55%{transform:rotate(165deg) scale(.86)}100%{transform:rotate(300deg) scale(1)}}
+@keyframes uiDeleteTap{0%{transform:scale(1) rotate(0)}45%{transform:scale(.76) rotate(-8deg)}75%{transform:scale(1.12) rotate(5deg)}100%{transform:scale(1) rotate(0)}}
+
+@media(hover:hover) and (pointer:fine){
+  .side-nav button:hover .ui-svg,.bottom-nav button:hover .ui-svg{transform:translateY(-2px) scale(1.08)}
+  .quick-grid>button:hover .ui-svg{transform:translateY(-3px) scale(1.08)}
+  .icon-btn:hover .ui-svg,.button-inline-icon:hover .ui-svg{transform:scale(1.1)}
+  .fj-history-delete:hover .ui-svg,.icon-btn.danger:hover .ui-svg{transform:scale(1.1) rotate(-4deg)}
+}
+
+.notification-bell{position:relative;width:46px;height:46px;border-radius:14px;border:1px solid var(--line);background:var(--surface2);color:var(--text);display:grid;place-items:center;padding:0;cursor:pointer;touch-action:manipulation}
+.notification-bell .ui-svg{width:24px;height:24px}
 .notification-dot{position:absolute;right:8px;top:8px;width:9px;height:9px;border-radius:50%;background:#ff4d57;border:2px solid var(--surface2);opacity:0;transform:scale(.5);transition:.18s ease}
 .notification-dot.on{opacity:1;transform:scale(1)}
-.notification-bell.pulse .ui-svg{animation:bellPulse .55s ease}
-@keyframes bellPulse{0%{transform:rotate(0)}25%{transform:rotate(14deg)}50%{transform:rotate(-12deg)}75%{transform:rotate(7deg)}100%{transform:rotate(0)}}
+.notification-bell.pulse .ui-svg{animation:bellPulse .62s ease}
+@keyframes bellPulse{0%{transform:rotate(0) scale(1)}20%{transform:rotate(16deg) scale(1.08)}42%{transform:rotate(-14deg) scale(1.1)}64%{transform:rotate(9deg) scale(1.06)}82%{transform:rotate(-5deg) scale(1.03)}100%{transform:rotate(0) scale(1)}}
+
 .notification-panel{position:fixed;z-index:2500;top:max(76px,calc(env(safe-area-inset-top) + 58px));right:16px;width:min(390px,calc(100vw - 24px));max-height:min(620px,calc(100dvh - 110px));overflow:hidden;border:1px solid var(--line);border-radius:24px;background:color-mix(in srgb,var(--surface) 96%,transparent);box-shadow:0 24px 70px rgba(0,0,0,.34);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
 .notification-panel[hidden]{display:none!important}
 .notification-head{display:flex;align-items:center;justify-content:space-between;padding:18px 18px 12px;border-bottom:1px solid var(--line)}
@@ -37,12 +58,27 @@ button:active .ui-svg{transform:scale(.88)}
 .notification-action{border:0;background:transparent;color:var(--primary);font-weight:700;padding:5px}
 .notification-empty{padding:28px 14px;text-align:center;color:var(--muted)}
 .notification-footer{padding:10px 16px 14px;border-top:1px solid var(--line);display:flex;justify-content:flex-end}
+
+/* Eliminar: maior, centralizado e com área de toque confortável. */
+.fj-history-delete{width:48px!important;height:48px!important;min-width:48px!important;min-height:48px!important;padding:0!important;margin:auto!important;border-radius:15px!important;display:grid!important;place-items:center!important;align-self:center!important;justify-self:center!important;line-height:1!important}
+.fj-history-delete .ui-svg{width:24px!important;height:24px!important;margin:auto!important}
+#historyTimeline .event{align-items:center!important}
+#historyTimeline .event>.fj-history-delete{grid-column:auto;grid-row:auto}
+.icon-btn.danger{min-width:42px;min-height:42px;padding:0!important;display:grid!important;place-items:center!important}
+.icon-btn.danger .ui-svg{margin:auto}
+
 @media(max-width:760px){
   input,select,textarea{font-size:16px!important}
   .notification-panel{left:12px;right:12px;width:auto;top:max(72px,calc(env(safe-area-inset-top) + 56px));border-radius:22px}
   .topbar{padding-top:max(12px,env(safe-area-inset-top))}
   .bottom-nav{padding-bottom:max(8px,env(safe-area-inset-bottom))}
-  .bottom-nav .ui-svg{width:30px;height:30px}
-  .quick-grid>button>span .ui-svg{width:40px;height:40px}
+  .bottom-nav .ui-svg{width:33px;height:33px}
+  .quick-grid>button>span .ui-svg{width:44px;height:44px}
+  .fj-history-delete{width:50px!important;height:50px!important;min-width:50px!important;min-height:50px!important}
+  .fj-history-delete .ui-svg{width:25px!important;height:25px!important}
 }
-@media(prefers-reduced-motion:reduce){.ui-svg,.notification-dot{transition:none!important}.nav-icon,.notification-bell.pulse .ui-svg{animation:none!important}}
+
+@media(prefers-reduced-motion:reduce){
+  .ui-svg,.notification-dot{transition:none!important}
+  .nav-icon,.notification-bell.pulse .ui-svg,button:active .ui-svg,.quick-grid>button:active .ui-svg,.icon-btn:active .ui-svg,[data-action="toggleTheme"]:active .ui-svg,.fj-history-delete:active .ui-svg{animation:none!important}
+}
