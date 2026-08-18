@@ -143,9 +143,9 @@ function applyIcons(){
   const quick={screenBreak:'pause',restBreak:'rest',goFocus:'focus',coffee:'coffee'};
   Object.entries(quick).forEach(([action,name])=>$$(`#quickActions [data-action="${action}"]`).forEach(b=>replaceSpanIcon(b,name)));
   const actionMap={startWork:'play',endWork:'pause',endBreak:'check',extendBreak:'plus',startFocus:'focus',pauseFocus:'pause',resumeFocus:'play',endFocus:'check',startActivity:'play',pauseActivity:'pause',completeActivity:'check',editActivity:'edit',cancelActivity:'trash',editWork:'edit',reopenWork:'undo',cancelWork:'trash'};
-  $$('.icon-btn[data-action]').forEach(b=>{const n=actionMap[b.dataset.action];if(n){b.innerHTML=icon(n);b.setAttribute('aria-label',b.title||b.dataset.action)}});
+  $$('.icon-btn[data-action]').forEach(b=>{const n=actionMap[b.dataset.action];if(n&&b.dataset.uiIconified!==n){b.dataset.uiIconified=n;b.innerHTML=icon(n);b.setAttribute('aria-label',b.title||b.dataset.action)}});
   $$('[data-action]').filter(b=>!b.classList.contains('icon-btn')&&!b.closest('#quickActions')).forEach(b=>{const n=actionMap[b.dataset.action];if(n)prependButtonIcon(b,n)});
-  const theme=$('[data-action="toggleTheme"]');if(theme){theme.innerHTML=icon('theme');theme.setAttribute('aria-label','Alternar tema')}
+  const theme=$('[data-action="toggleTheme"]');if(theme&&theme.dataset.uiIconified!=='theme'){theme.dataset.uiIconified='theme';theme.innerHTML=icon('theme');theme.setAttribute('aria-label','Alternar tema')}
   prependButtonIcon($('#newActivityBtn'),'plus');
   prependButtonIcon($('#exportBtn'),'download');
   prependButtonIcon($('#importBtn'),'upload');
