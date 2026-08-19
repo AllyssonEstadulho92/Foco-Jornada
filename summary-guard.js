@@ -1,3 +1,7 @@
+import './hub-help.js';
+import './hub-about.js';
+import './icon-dedupe.js';
+
 const FEATURE_KEY='foco-jornada-features-v2';
 let raf=0;
 const $=s=>document.querySelector(s);
