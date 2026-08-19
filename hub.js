@@ -1,5 +1,10 @@
 const HUB_VERSION='4.2.0';
 const NOTIFICATION_KEY='foco-jornada-notifications-v1';
+const MOOVIT_APP_URL='moovit://nearby?partner_id=FocoJornada';
+const MOOVIT_FALLBACK_URL='https://moovit.onelink.me/3986059930?pid=Developers&c=FocoJornada';
+const SUPERSHIFT_WEB_URL='https://supershift.app/';
+const SUPERSHIFT_IOS_STORE_URL='https://apps.apple.com/pt/app/supershift-escala-de-trabalho/id1104165041';
+const SUPERSHIFT_ANDROID_STORE_URL='https://play.google.com/store/apps/details?id=app.supershift';
 const $=s=>document.querySelector(s);
 let bypassMore=false;
 let hubOpen=false;
@@ -30,9 +35,9 @@ function ensureHub(){
   root.id='appHub';root.className='app-hub';root.hidden=true;root.setAttribute('aria-label','Menu de aplicações e definições');
   root.innerHTML=`<div class="hub-backdrop" data-hub-close></div><div class="hub-sheet" role="dialog" aria-modal="true" aria-labelledby="hubTitle">
     <header class="hub-head"><div><span class="kicker">CENTRAL</span><h2 id="hubTitle">Foco & Jornada</h2><p>Aplicações, definições e ferramentas.</p></div><button type="button" class="hub-close" data-hub-close aria-label="Fechar">${svg(I.close)}</button></header>
-    <section class="hub-app-section"><div class="hub-section-title"><span>Aplicações</span><small>Ligadas ao teu dia</small></div><div class="hub-app-grid">
-      <button type="button" class="hub-app moovit" data-hub-action="moovit"><span class="hub-app-icon">${svg(I.moovit)}</span><b>Moovit</b><small>Transportes e rotas</small></button>
-      <button type="button" class="hub-app supershift" data-hub-action="supershift"><span class="hub-app-icon">${svg(I.supershift)}</span><b>Supershift</b><small>Escala e calendário</small></button>
+    <section class="hub-app-section"><div class="hub-section-title"><span>Aplicações</span><small>Abrir no dispositivo</small></div><div class="hub-app-grid">
+      <button type="button" class="hub-app moovit" data-hub-action="moovit"><span class="hub-app-icon">${svg(I.moovit)}</span><b>Moovit</b><small>Abrir aplicação</small></button>
+      <button type="button" class="hub-app supershift" data-hub-action="supershift"><span class="hub-app-icon">${svg(I.supershift)}</span><b>Supershift</b><small>Abrir aplicação</small></button>
     </div></section>
     <section class="hub-group"><div class="hub-section-title"><span>Trabalho</span></div>
       ${row('schedule',I.clock,'Horário e pausas','08–17 · domingo 09–18')}
@@ -45,7 +50,7 @@ function ensureHub(){
       ${row('updates',I.update,'Atualizações','Procurar nova versão')}
       ${row('about',I.info,'Sobre','Versão e armazenamento local')}
     </section>
-    <section class="hub-future"><div class="hub-future-icon">${svg(I.modules)}</div><div><b>Preparado para novos módulos</b><small>Novas integrações e ferramentas podem entrar aqui sem aumentar a barra inferior.</small></div></section>
+    <section class="hub-future"><div class="hub-future-icon">${svg(I.modules)}</div><div><b>Preparado para novos módulos</b><small>Novas ferramentas podem entrar aqui apenas quando forem necessárias.</small></div></section>
     <footer class="hub-footer"><span>Foco & Jornada</span><strong>v${HUB_VERSION}</strong></footer>
   </div>`;
   document.body.appendChild(root);
@@ -57,11 +62,41 @@ function openHub(){ensureHub();const root=$('#appHub');if(!root)return;hubOpen=t
 function closeHub(){const root=$('#appHub');if(!root)return;hubOpen=false;root.classList.remove('open');document.body.classList.remove('hub-open');setTimeout(()=>{if(!hubOpen)root.hidden=true},220)}
 function refreshHub(){const dot=$('[data-hub-notification-dot]');if(dot)dot.classList.toggle('on',unread()>0)}
 
+function launchCustomScheme(appUrl,fallbackUrl){
+  closeHub();
+  let leftPage=false;
+  const onVisibility=()=>{if(document.hidden)leftPage=true};
+  document.addEventListener('visibilitychange',onVisibility);
+  location.href=appUrl;
+  setTimeout(()=>{
+    document.removeEventListener('visibilitychange',onVisibility);
+    if(!leftPage&&!document.hidden&&fallbackUrl)location.href=fallbackUrl;
+  },1300);
+}
+
+function openMoovitApp(){
+  launchCustomScheme(MOOVIT_APP_URL,MOOVIT_FALLBACK_URL);
+}
+
+function openSupershiftApp(){
+  closeHub();
+  const ua=navigator.userAgent||'';
+  if(/Android/i.test(ua)){
+    const fallback=encodeURIComponent(SUPERSHIFT_ANDROID_STORE_URL);
+    location.href=`intent://#Intent;package=app.supershift;S.browser_fallback_url=${fallback};end`;
+    return;
+  }
+  // O Supershift não publica um URL scheme/deep link oficial para iOS.
+  // A ligação oficial pode abrir a app se o iOS/Supershift tiver Universal Links ativos;
+  // caso contrário abre o site oficial, sem usar um esquema inventado.
+  location.href=SUPERSHIFT_WEB_URL;
+}
+
 function handleHubClick(e){
   if(e.target.closest('[data-hub-close]')){closeHub();return}
   const action=e.target.closest('[data-hub-action]')?.dataset.hubAction;if(!action)return;
-  if(action==='moovit')openIntegration('jumpMoovit');
-  if(action==='supershift')openIntegration('jumpSupershift');
+  if(action==='moovit'){openMoovitApp();return}
+  if(action==='supershift'){openSupershiftApp();return}
   if(action==='schedule')openIntegration('workScheduleSection');
   if(action==='settings')openMoreAt('#settingsForm');
   if(action==='backup')openMoreAt('#exportBtn');
@@ -90,4 +125,4 @@ function interceptMore(e){const more=e.target.closest?.('[data-nav="more"]');if(
 document.addEventListener('click',interceptMore,true);
 window.addEventListener('storage',refreshHub);
 ensureHub();
-window.FocoHub=Object.freeze({open:openHub,close:closeHub,refresh:refreshHub,version:HUB_VERSION});
+window.FocoHub=Object.freeze({open:openHub,close:closeHub,refresh:refreshHub,openMoovit:openMoovitApp,openSupershift:openSupershiftApp,version:HUB_VERSION});
