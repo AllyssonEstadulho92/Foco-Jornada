@@ -1,4 +1,4 @@
-export const PROFESSIONAL_VERSION='1.0.0';
+export const PROFESSIONAL_VERSION='1.0.1';
 
 export function localDayKey(value=Date.now()){
   const d=value instanceof Date?value:new Date(value);
@@ -40,8 +40,8 @@ export function commandModel(app={},features={},now=Date.now()){
 export function buildSearchIndex(app={},features={}){
   const staticItems=[
     ['today','Hoje','Jornada, ações rápidas e resumo','Principal','nav:today'],
-    ['activities','Atividades','Criar, editar e concluir tarefas','Produtividade','nav:activities'],
-    ['focus','Foco e Pomodoro','Sessões de foco e ciclos','Produtividade','nav:focus'],
+    ['activities','Atividades','Subtarefas, prazos, recorrência e etiquetas','Produtividade','nav:activities'],
+    ['focus','Foco e Pomodoro','Sessões, ciclos automáticos e objetivo diário','Produtividade','nav:focus'],
     ['history','Histórico','Jornadas e linha temporal','Principal','nav:history'],
     ['stats','Estatísticas','Semana, mês e ano','Relatórios','nav:stats'],
     ['shifts','Supershift / Escala','Calendário, turnos, férias e relatórios','Trabalho','shift'],
@@ -53,7 +53,7 @@ export function buildSearchIndex(app={},features={}){
     ['about','Sobre','Versão, armazenamento e estado técnico','Informação','more:about'],
     ['help','Ajuda','Manual e instruções de utilização','Informação','help']
   ].map(([id,title,subtitle,category,action])=>({id,title,subtitle,category,action,keywords:`${title} ${subtitle} ${category}`.toLowerCase()}));
-  const activityItems=(app.activities||[]).filter(a=>a.status!=='CANCELLED').map(a=>({id:`activity:${a.id}`,title:a.title||'Atividade',subtitle:[a.category,a.status].filter(Boolean).join(' · ')||'Atividade',category:'Atividades',action:'nav:activities',keywords:`${a.title||''} ${a.category||''} ${a.description||''} ${a.status||''}`.toLowerCase()}));
+  const activityItems=(app.activities||[]).filter(a=>a.status!=='CANCELLED').map(a=>{const tags=(a.tags||[]).join(' '),subtasks=(a.subtasks||[]).map(s=>s.title).join(' ');return{id:`activity:${a.id}`,title:a.title||'Atividade',subtitle:[a.category,a.status,a.plannedFor].filter(Boolean).join(' · ')||'Atividade',category:'Atividades',action:'nav:activities',keywords:`${a.title||''} ${a.category||''} ${a.description||''} ${a.status||''} ${a.recurrence||''} ${tags} ${subtasks}`.toLowerCase()}});
   const templateItems=(features?.shiftPlanner?.templates||[]).map(t=>({id:`shift:${t.id}`,title:t.name||'Turno',subtitle:[t.start&&t.end?`${t.start}–${t.end}`:'Dia inteiro',t.kind].filter(Boolean).join(' · '),category:'Turnos',action:'shift',keywords:`${t.name||''} ${t.code||''} ${t.kind||''}`.toLowerCase()}));
   return [...staticItems,...activityItems,...templateItems];
 }
