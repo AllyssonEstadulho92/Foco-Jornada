@@ -1,48 +1,33 @@
 import './couple.js';
 
 const STORAGE_KEY='foco-jornada-v4';
-const ALERT_META_KEY='foco-jornada-alert-meta-v1';
+const PREF_KEY='foco-jornada-notification-preference-v1';
+const ALERT_META_KEY='foco-jornada-alert-meta-v2';
 let alertTimer=null;
 
-const $=s=>document.querySelector(s);
 const readState=()=>{try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||'null')}catch{return null}};
 const writeState=s=>localStorage.setItem(STORAGE_KEY,JSON.stringify(s));
 const readMeta=()=>{try{return JSON.parse(localStorage.getItem(ALERT_META_KEY)||'{}')}catch{return{}}};
 const writeMeta=m=>localStorage.setItem(ALERT_META_KEY,JSON.stringify(m));
 const notify=(text,label='',fn=null)=>window.FocoUI?.notify?.(text,label,fn);
 
-function ensureControlStyles(){
-  if($('#settingsControlStyles'))return;
-  const style=document.createElement('style');
-  style.id='settingsControlStyles';
-  style.textContent=`
-    .fj-toggle{grid-column:1/-1!important;display:flex!important;align-items:center!important;justify-content:space-between!important;gap:16px!important;min-height:58px;padding:10px 2px;color:var(--text)!important}
-    .fj-toggle span{font-size:14px!important;line-height:1.35;color:var(--muted)}
-    .fj-toggle input#setNotifications{-webkit-appearance:none!important;appearance:none!important;position:relative!important;flex:0 0 auto!important;width:54px!important;height:32px!important;min-width:54px!important;min-height:32px!important;margin:0!important;padding:0!important;border:1px solid var(--line)!important;border-radius:999px!important;background:var(--surface2)!important;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--line) 55%,transparent)!important;transition:background .18s ease,border-color .18s ease!important}
-    .fj-toggle input#setNotifications::after{content:"";position:absolute;left:3px;top:3px;width:24px;height:24px;border-radius:50%;background:var(--muted);box-shadow:0 2px 7px #0005;transition:transform .18s cubic-bezier(.2,.8,.2,1),background .18s ease}
-    .fj-toggle input#setNotifications:checked{background:color-mix(in srgb,var(--primary) 82%,var(--surface2))!important;border-color:var(--primary)!important}
-    .fj-toggle input#setNotifications:checked::after{transform:translateX(22px);background:#fff}
-    .fj-toggle input#setNotifications:focus-visible{outline:3px solid color-mix(in srgb,var(--primary) 62%,white)!important;outline-offset:3px!important}
-    @media(max-width:760px){.fj-toggle{min-height:64px;padding:12px 0}.fj-toggle span{font-size:16px!important}}
-    @media(prefers-reduced-motion:reduce){.fj-toggle input#setNotifications,.fj-toggle input#setNotifications::after{transition:none!important}}
-  `;
-  document.head.appendChild(style);
+function notificationsEnabled(){
+  const pref=localStorage.getItem(PREF_KEY);
+  if(pref==='1')return true;
+  if(pref==='0')return false;
+  return !!readState()?.settings?.notifications;
 }
 
-function persistNotificationSetting(enabled){
+function syncPersistedFlag(){
+  const pref=localStorage.getItem(PREF_KEY);
+  if(pref!=='1'&&pref!=='0')return;
   const state=readState();
-  if(!state?.settings)return false;
-  state.settings.notifications=!!enabled;
+  if(!state?.settings)return;
+  const enabled=pref==='1';
+  if(!!state.settings.notifications===enabled)return;
+  state.settings.notifications=enabled;
   state.updatedAt=Date.now();
   writeState(state);
-  return true;
-}
-
-async function requestSystemPermission(){
-  if(!('Notification'in window))return'unsupported';
-  if(Notification.permission==='granted')return'granted';
-  if(Notification.permission==='denied')return'denied';
-  try{return await Notification.requestPermission()}catch{return'unsupported'}
 }
 
 async function showSystemNotification(title,body,tag){
@@ -74,65 +59,39 @@ function clearAlertTimer(){if(alertTimer){clearTimeout(alertTimer);alertTimer=nu
 
 function scheduleNextAlert(){
   clearAlertTimer();
-  const state=readState();
-  if(!state?.settings?.notifications)return;
-  const target=currentAlertTarget(state);
+  syncPersistedFlag();
+  if(!notificationsEnabled())return;
+  const target=currentAlertTarget(readState());
   if(!target)return;
   const meta=readMeta();
-  if(meta.lastAlertId===target.id)return;
+  const marker=`${target.kind}:${target.id}:${target.at}`;
+  if(meta.lastAlertMarker===marker)return;
   const delay=Math.max(0,target.at-Date.now());
   alertTimer=setTimeout(()=>fireAlert(target),Math.min(delay,2_147_000_000));
 }
 
 async function fireAlert(target){
   alertTimer=null;
-  const state=readState();
-  if(!state?.settings?.notifications)return;
-  const current=currentAlertTarget(state);
+  syncPersistedFlag();
+  if(!notificationsEnabled())return;
+  const current=currentAlertTarget(readState());
   if(!current||current.id!==target.id||Date.now()<current.at){scheduleNextAlert();return}
+  const marker=`${current.kind}:${current.id}:${current.at}`;
   const meta=readMeta();
-  if(meta.lastAlertId===target.id)return;
-  meta.lastAlertId=target.id;meta.lastAlertAt=Date.now();writeMeta(meta);
-  await showSystemNotification(target.title,target.body,`foco-jornada-${target.kind}-${target.id}`);
-  notify(`${target.title}.`);
+  if(meta.lastAlertMarker===marker)return;
+  meta.lastAlertMarker=marker;meta.lastAlertAt=Date.now();writeMeta(meta);
+  await showSystemNotification(current.title,current.body,`foco-jornada-${current.kind}-${current.id}`);
+  notify(`${current.title}.`);
 }
 
-function syncInitialToggle(){
-  ensureControlStyles();
-  const input=$('#setNotifications');
-  if(!input||input.dataset.controlsReady)return;
-  input.dataset.controlsReady='1';
-  input.setAttribute('role','switch');
-  input.setAttribute('aria-label','Notificações quando foco ou pausa terminar');
-  const state=readState();
-  if(state?.settings)input.checked=!!state.settings.notifications;
-}
+function resyncSoon(){setTimeout(scheduleNextAlert,140)}
 
-document.addEventListener('change',async e=>{
-  const input=e.target.closest?.('#setNotifications');
-  if(!input)return;
-  persistNotificationSetting(input.checked);
-  if(input.checked){
-    const permission=await requestSystemPermission();
-    if(permission==='granted')notify('Notificações de foco e pausa ativadas.');
-    else if(permission==='denied')notify('Alertas internos ativados. As notificações do sistema estão bloqueadas pelo dispositivo.');
-    else notify('Alertas internos ativados. Este navegador não disponibiliza notificações do sistema.');
-  }else notify('Notificações de foco e pausa desativadas.');
-  scheduleNextAlert();
-},true);
+document.addEventListener('click',resyncSoon);
+document.addEventListener('submit',resyncSoon);
+document.addEventListener('change',resyncSoon);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)scheduleNextAlert()});
+window.addEventListener('pageshow',scheduleNextAlert);
+window.addEventListener('storage',e=>{if([STORAGE_KEY,PREF_KEY].includes(e.key))scheduleNextAlert()});
+window.addEventListener('foco-notification-preference-change',scheduleNextAlert);
 
-document.addEventListener('submit',e=>{
-  if(e.target?.id!=='settingsForm')return;
-  const input=$('#setNotifications');
-  if(input)persistNotificationSetting(input.checked);
-  setTimeout(()=>{const latest=$('#setNotifications');if(latest)persistNotificationSetting(latest.checked);scheduleNextAlert()},0);
-},true);
-
-document.addEventListener('click',()=>setTimeout(()=>{syncInitialToggle();scheduleNextAlert()},120));
-document.addEventListener('visibilitychange',()=>{if(!document.hidden){syncInitialToggle();scheduleNextAlert()}});
-window.addEventListener('pageshow',()=>{syncInitialToggle();scheduleNextAlert()});
-window.addEventListener('storage',e=>{if(e.key===STORAGE_KEY){syncInitialToggle();scheduleNextAlert()}});
-
-ensureControlStyles();
-syncInitialToggle();
 scheduleNextAlert();
