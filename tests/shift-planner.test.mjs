@@ -1,0 +1,15 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import {normalizePlanner,assignShift,removeShift,monthReport,applyRotation,exportPlannerIcs,calendarCells,durationMinutes} from '../shift-planner-core.js';
+const ui=fs.readFileSync(new URL('../shift-planner.js',import.meta.url),'utf8');
+test('modelos padrão incluem os tipos da escala',()=>{const p=normalizePlanner();for(const name of ['De manhã','Folga','Feriado','Férias','Falta','Horários intermédios'])assert.ok(p.templates.some(x=>x.name===name));});
+test('turno 08-17 com pausa conta 8 horas',()=>{const p=normalizePlanner(),t=p.templates.find(x=>x.id==='morning');assert.equal(durationMinutes(t),480);});
+test('atribuir e remover turno por dia',()=>{let p=assignShift(normalizePlanner(),'2026-08-19','morning');assert.equal(p.assignments['2026-08-19'].templateId,'morning');p=removeShift(p,'2026-08-19');assert.equal(p.assignments['2026-08-19'],undefined);});
+test('relatório calcula horas e ganhos',()=>{let p=normalizePlanner();p.jobs[0].hourlyRateCents=500;p.jobs[0].targetMonthlyMinutes=480;p=assignShift(p,'2026-08-19','morning');const r=monthReport(p,new Date(2026,7,1));assert.equal(r.workedMinutes,480);assert.equal(r.overtimeMinutes,0);assert.equal(r.earningsCents,4000);});
+test('rotação preenche sequência',()=>{const p=applyRotation(normalizePlanner(),'rotation1','2026-08-01',7);assert.equal(Object.keys(p.assignments).length,7);assert.equal(p.assignments['2026-08-06'].templateId,'off');});
+test('calendário mensal tem seis semanas',()=>assert.equal(calendarCells(new Date(2026,7,1)).length,42));
+test('ICS contém os turnos',()=>{const p=assignShift(normalizePlanner(),'2026-08-19','morning');const ics=exportPlannerIcs(p,new Date(2026,7,1),new Date(2026,7,31));assert.ok(ics.includes('BEGIN:VEVENT'));assert.ok(ics.includes('De manhã'));});
+test('módulo não usa polling contínuo',()=>assert.equal(ui.includes('setInterval('),false));
+test('controlos principais têm ação',()=>{for(const action of ['close','prev-month','next-month','calendar-options','pick-selected','add-shift','add-job','add-rotation','apply-rotation','save-report-settings','export-ics','export-json','print','sort-models'])assert.ok(ui.includes(`action==='${action}'`),action);});
+test('quatro áreas principais estão presentes',()=>{for(const label of ['Calendário','Relatórios','Turnos','Mais'])assert.ok(ui.includes(label));});
