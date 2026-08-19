@@ -1,0 +1,10 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {couplePlan,coupleStateForNow,nextCoupleReminderAt,recordCoupleAction} from '../couple-core.js';
+const local=(y,m,d,h,min=0)=>new Date(y,m-1,d,h,min).getTime();
+test('segunda protege 19:30–21:00',()=>{const p=couplePlan(local(2026,8,17,12));assert.equal(p.start,'19:30');assert.equal(p.end,'21:00')});
+test('quarta é noite do casal',()=>{const p=couplePlan(local(2026,8,19,12));assert.equal(p.title,'Noite do casal');assert.equal(p.end,'22:00')});
+test('sábado tem bloco principal',()=>{const p=couplePlan(local(2026,8,22,12));assert.equal(p.start,'18:30');assert.equal(p.end,'22:30')});
+test('antes da hora fica upcoming',()=>{const s=coupleStateForNow({},local(2026,8,19,18));assert.equal(s.phase,'upcoming');assert.equal(new Date(s.nextAt).getHours(),19)});
+test('adiar move lembrete 30 minutos',()=>{const t=local(2026,8,19,19,30),r=recordCoupleAction({},'snooze',t),n=nextCoupleReminderAt(r,t);assert.equal(n,t+30*60_000)});
+test('concluído não volta a lembrar no mesmo dia',()=>{const t=local(2026,8,19,19,30),r=recordCoupleAction({},'done',t),s=coupleStateForNow(r,t);assert.equal(s.phase,'done');assert.ok(nextCoupleReminderAt(r,t)>t)});
