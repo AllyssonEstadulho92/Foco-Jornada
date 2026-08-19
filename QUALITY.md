@@ -1,18 +1,15 @@
-# Qualidade — 4.1.2
+# Qualidade — 4.2.0
 
-Critérios: sintaxe JS válida, manifesto JSON válido, testes de domínio, coerência da versão pública, IDs HTML únicos, persistência local, timers por timestamp, migração v3→v4 e publicação PWA.
+Critérios: sintaxe JavaScript válida, manifesto JSON válido, testes de domínio, testes das funções de Transportes/previsão, IDs HTML únicos, persistência local, timers por timestamp, migração v3→v4 e coerência da versão pública.
 
-## UX mobile
-- `ux.js` é o entrypoint público e não depende de CDN.
-- Zoom automático dos inputs no iPhone é prevenido e a viewport está configurada em modo de aplicação.
-- Toasts inferiores são ocultados e convertidos em notificações internas.
-- O sino apresenta ponto vermelho enquanto existirem notificações não lidas.
-- Ícones são SVG locais; não existe dependência do Flaticon ou de outro serviço externo.
-- As animações são curtas, acionadas por interação e desativadas com `prefers-reduced-motion`.
+A suite ativa é executada por `npm run check` e inclui `tests/core.test.mjs`, `tests/features.test.mjs` e `tests/version.test.mjs`.
 
-## Validação
-A suite ativa é executada com `npm run check` e inclui testes de domínio e testes de coerência da versão/entrypoint UX.
+## Segurança e estabilidade
+- O runtime público carrega `stability.js` em vez da antiga camada `enhancements.js`.
+- Não existe polling de DOM para ícones ou versão.
+- O módulo Transportes não faz tracking em background.
+- Casa e Trabalho ficam guardados apenas em `localStorage`.
+- O Moovit é aberto através dos deep links oficiais; horários e rotas não são inventados pela Foco & Jornada.
+- O Service Worker 4.2.0 aguarda confirmação do utilizador antes de assumir uma atualização, através do sino de notificações.
 
-O smoke test via Chromium headless ficou anteriormente bloqueado por limitação do ambiente de execução (DBus/processo), pelo que não é marcado como PASS sem nova execução verificável.
-
-A numeração histórica da Especificação Mestre até 1121 não está integralmente disponível no repositório atual. Não devem ser alegados requisitos literais não confrontados com uma fonte recuperável.
+O smoke test visual em dispositivo real continua a ser necessário após cada publicação; testes automatizados não substituem validação no Safari/PWA do iPhone.
