@@ -86,7 +86,8 @@ Estados:
 - ✅ Modelo de Baixa médica
 - ✅ Resumo mensal da escala
 - ✅ Resumo anual da escala
-- 🟡 Teste físico completo de toque/partilha no iPhone
+- ✅ Proteção contra gravações parciais que removam silenciosamente `shiftPlanner`
+- 🟡 Teste físico completo de toque/partilha/persistência no iPhone
 - ⬜ Múltiplos trabalhos com cores no calendário
 - ⬜ Notas por dia
 - ⬜ Importação ICS
@@ -112,10 +113,14 @@ Estados:
 - ✅ Service Worker e modo offline após cache inicial
 - ✅ Atualização controlada do Service Worker
 - ✅ Centro de notificações
+- ✅ Espelho automático de recuperação para estado principal e Supershift
+- ✅ Espelho de recuperação adicional em IndexedDB
+- ✅ Pedido de armazenamento persistente quando suportado pelo browser
+- ✅ Fluxo “Instalar aplicação” com prompt nativo e instruções específicas para iPhone
 - 🟡 Notificações de sistema no iPhone dependem das permissões e do modo PWA
-- ⬜ Histórico de backups
+- ⬜ Histórico de backups manuais
 - ⬜ Backup parcial por módulo
-- ⬜ IndexedDB para dados operacionais
+- 🟡 IndexedDB para dados operacionais — atualmente usado como espelho de recuperação; ainda não é o armazenamento principal
 - ⬜ Sincronização entre dispositivos
 - ⬜ Backend/autenticação
 
@@ -129,6 +134,7 @@ Objetivo: reduzir remendos acumulados, tornar os fluxos críticos testáveis e e
 - ✅ Núcleo puro `shift-advanced-core.js` para cópia, intervalos e resumos da escala
 - ✅ Núcleo puro `professional-core.js` para Centro de Comando, Pesquisa Global e Diagnóstico
 - ✅ Núcleo `productivity-core.js` para recorrência, subtarefas, duplicação e ciclo Pomodoro
+- ✅ Camada `persistence.js` carregada antes do runtime para recuperação e proteção das gravações locais
 - ✅ Remover `enhancements.js` do runtime ativo
 - 🟡 Remover ficheiros legado restantes quando deixarem de ser necessários para caches antigos
 - 🟡 Unificar versão pública e metadados numa única release
@@ -143,9 +149,10 @@ Objetivo: reduzir remendos acumulados, tornar os fluxos críticos testáveis e e
 - ✅ Testes puros para copiar dia/semana, intervalos e resumos da escala
 - ✅ Testes puros para Centro de Comando, Pesquisa Global e Diagnóstico
 - ✅ Testes de fluxo para recorrência, subtarefas, duplicação e transições Pomodoro
+- ✅ Testes estáticos para recuperação de dados e instalação PWA
 - ⬜ Testes DOM de clique/toque
 - ⬜ Smoke test Safari/PWA documentado por release
-- ⬜ Teste de instalação/atualização offline
+- ⬜ Teste de instalação/atualização offline em dispositivo físico
 
 ### Fluxos a fechar na 4.3.0
 - 🟡 Pomodoro e atividades: lógica e handlers principais consolidados; falta validação física no iPhone
@@ -154,6 +161,7 @@ Objetivo: reduzir remendos acumulados, tornar os fluxos críticos testáveis e e
 - 🟡 Atualização PWA com estado instalado/disponível/atualizado
 - 🟡 Relatórios Supershift e impressão A4 validados em mobile
 - 🟡 Moovit com feedback de erro visível
+- 🟡 Persistência e instalação: implementadas; falta smoke test de fechar/reabrir e instalar no iPhone
 
 ### Critério de conclusão da 4.3.0
 A 4.3.0 só deve ser marcada como concluída quando:
@@ -161,7 +169,7 @@ A 4.3.0 só deve ser marcada como concluída quando:
 2. nenhum módulo ativo depender de ficheiros legado desnecessários;
 3. versão, cache, pacote e documentação estiverem coerentes;
 4. `npm run check` estiver verde;
-5. houver smoke test manual no iPhone para Foco, Atividades, Backup, Moovit, Supershift e Atualização.
+5. houver smoke test manual no iPhone para Foco, Atividades, Backup, Moovit, Supershift, Persistência, Instalação e Atualização.
 
 ## 4.4.0 — Planeamento
 - ⬜ Calendário unificado da aplicação
@@ -171,10 +179,11 @@ A 4.3.0 só deve ser marcada como concluída quando:
 - 🟡 Resumos semanais e mensais mais completos — resumo mensal/anual da escala implementado; resumo semanal geral ainda falta
 
 ## 4.5.0 — Dados e robustez
-- ⬜ IndexedDB
+- 🟡 IndexedDB — espelho de recuperação implementado; migração dos dados operacionais ainda falta
 - ⬜ Migração transacional
-- ⬜ Histórico de backups
-- ⬜ Recuperação após estado parcialmente gravado
+- ⬜ Histórico de backups manuais
+- ✅ Recuperação automática quando o estado principal local fica ausente/corrompido e existe espelho válido
+- ✅ Proteção de ramos importantes das features contra gravações parciais
 - 🟡 Diagnóstico técnico avançado — base implementada; ainda falta análise de integridade mais profunda
 
 ## 5.0 — Sincronização opcional
