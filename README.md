@@ -1,30 +1,24 @@
-# Foco & Jornada 4.1.2
+# Foco & Jornada 4.2.0
 
-Aplicação PWA de produtividade pessoal/profissional, sem dependências externas de runtime.
+PWA de produtividade pessoal/profissional, local-first e sem dependências de runtime.
 
 ## Módulos
-- Jornada: entrada, saída, edição, cancelamento, reabertura e estado incompleto.
+- Jornada: entrada, saída, edição, cancelamento, reabertura e cálculo por timestamps.
 - Pausas: ecrã, principal, extensão e retoma de atividade.
 - Atividades: criar, editar, prioridade, categoria, estimativa, iniciar, pausar, concluir e cancelar.
 - Foco/Pomodoro: ciclos, pausa/retoma e associação a atividade.
-- Café: tipos/preços em cêntimos, registo e desfazer.
-- Histórico e timeline por dia.
-- Estatísticas 7 dias, 30 dias e ano sem score arbitrário.
-- Definições, contextos Trabalho/Pessoal, backup/importação e diagnóstico.
-- PWA/offline e modo claro/escuro.
-
-## UX mobile 4.1.2
-- Layout móvel com escala fixa para comportamento semelhante a aplicação instalada.
-- Inputs a 16 px no iPhone para evitar zoom automático ao editar.
-- Centro de notificações com sino, ponto vermelho e histórico local das mensagens da aplicação.
-- Mensagens inferiores antigas ocultadas e encaminhadas para o centro de notificações.
-- Ícones SVG modernos integrados localmente, sem Flaticon/CDN nem dependência de Internet.
-- Microanimações apenas na interação, respeitando `prefers-reduced-motion`.
+- Café: preço configurável em cêntimos, registo e desfazer.
+- Transportes: Casa/Trabalho, localização atual, viagens recentes e integração oficial por deep link com Moovit.
+- Previsão de saída com base no objetivo de trabalho efetivo e pausa principal.
+- Resumo/fecho do dia.
+- Centro de notificações com atualizações PWA controladas.
+- Histórico, estatísticas, backup/importação e diagnóstico.
+- PWA/offline, atalhos e modo claro/escuro.
 
 ## Qualidade
 `npm run check`
 
-A camada pública ativa é `ux.js`, que importa a camada de estabilidade anterior e acrescenta a UX 4.1.2 sem polling visual agressivo.
+A versão 4.2.0 mantém a atualização dos temporizadores sem reconstrução integral do DOM e separa funcionalidades adicionais em `features-core.js`/`features.js`.
 
 ## Publicação
 GitHub Pages via `.github/workflows/pages.yml`.
