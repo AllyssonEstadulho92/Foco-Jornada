@@ -1,26 +1,40 @@
-# Qualidade — 4.2.0
+# Qualidade — base 4.2.x / consolidação 4.3.0
 
-Critérios: sintaxe JavaScript válida, manifesto JSON válido, testes de domínio, testes das funções de Transportes/previsão/horário, testes do hub e notificações, IDs HTML únicos, persistência local, timers por timestamp, migração v3→v4 e coerência da versão pública.
+## Critérios atuais
+- sintaxe JavaScript válida;
+- testes de domínio e migração;
+- testes de horário, transportes e Moovit;
+- testes de hub e controlos;
+- testes de escala, rotações, ICS e relatórios;
+- auditoria estática de botões críticos;
+- coerência da versão pública;
+- timers derivados de timestamps;
+- persistência local e diagnóstico.
 
-A suite ativa é executada por `npm run check` e inclui `tests/core.test.mjs`, `tests/features.test.mjs`, `tests/hub.test.mjs`, `tests/controls.test.mjs` e `tests/version.test.mjs`.
+A suite ativa é executada por `npm run check`.
+
+## O que os testes ainda não provam
+A suite atual não substitui um teste real de interface no Safari/PWA do iPhone. Continuam a exigir validação física:
+- toque e edição do calendário da escala;
+- permissões e apresentação de notificações;
+- importação/exportação de ficheiros;
+- folha de partilha e impressão/PDF A4;
+- abertura do Moovit;
+- atualização do Service Worker e recarregamento da PWA.
 
 ## Segurança e estabilidade
-- O runtime público carrega `stability.js` em vez da antiga camada `enhancements.js`.
-- O hub `hub.js` não cria `setInterval` nem polling contínuo.
-- O botão Mais abre uma camada única e mantém acesso programático à página original de Definições/Backup.
-- O módulo Vida pessoal / Tempo a dois foi retirado do runtime e da suite ativa; o ficheiro `couple.js` é apenas um shim temporário sem side effects para compatibilidade com caches antigos.
-- O módulo Transportes não faz tracking em background.
-- Casa e Trabalho ficam guardados apenas em `localStorage`.
-- O Moovit é aberto através do deep link oficial `moovit://nearby`, com fallback oficial.
-- O Supershift no Android tenta abrir o package público `app.supershift`; no iOS não é inventado qualquer URL scheme não documentado.
-- A pausa principal é apenas sugerida: a aplicação notifica à hora prevista, mas o registo começa apenas após ação explícita do utilizador.
-- O Service Worker 4.2.0 aguarda confirmação do utilizador antes de assumir uma atualização, através do sino de notificações.
+- O runtime usa `stability.js`; a antiga camada `enhancements.js` não faz parte da publicação e deve ser removida do repositório durante a consolidação.
+- O módulo Vida pessoal / Tempo a dois está retirado.
+- A pausa principal é sugerida, não iniciada automaticamente.
+- Casa/Trabalho permanecem em armazenamento local.
+- Não são inventados deep links privados para aplicações externas.
+- O Service Worker aguarda ação do utilizador para assumir uma atualização quando existe uma nova versão em espera.
 
-## Arquitetura do hub
-- Mobile: bottom sheet acima da barra inferior.
-- Desktop: gaveta lateral.
-- Aplicações principais: Moovit e Supershift.
-- Ferramentas: horário/pausas, estatísticas, definições, backup/diagnóstico, notificações, atualizações e sobre.
-- Estrutura preparada para novos módulos sem adicionar mais itens fixos à navegação inferior.
+## Objetivos 4.3.0
+- reduzir módulos corretivos e handlers duplicados;
+- consolidar defaults e versão;
+- adicionar testes DOM/E2E aos botões críticos;
+- documentar um smoke test por release;
+- garantir que `npm run check` e o smoke test mobile estão verdes antes de marcar a 4.3.0 como concluída.
 
-O smoke test visual em dispositivo real continua a ser necessário após cada publicação; testes automatizados não substituem validação no Safari/PWA do iPhone.
+Consultar `ROADMAP.md` e `docs/CONSOLIDATION-4.3.md`.
