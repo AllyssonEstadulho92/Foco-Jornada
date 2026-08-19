@@ -12,6 +12,14 @@ Estados:
 
 ## Base atual
 
+### Experiência profissional
+- ✅ Centro de Comando no ecrã Hoje com próxima ação, turno e atalhos
+- ✅ Pesquisa global por módulos, atividades e modelos de turno
+- ✅ Atalhos contextuais para Atividades, Foco, Supershift e Moovit
+- ✅ Diagnóstico técnico com ligação, modo PWA, Service Worker, notificações, armazenamento e contagens
+- ✅ Atalho de teclado `Ctrl/Cmd + K` para pesquisa global em desktop
+- 🟡 Validação visual final em iPhone
+
 ### Jornada e tempo
 - ✅ Entrada e saída da jornada
 - ✅ Edição, cancelamento e reabertura
@@ -93,6 +101,7 @@ Estados:
 - ✅ Backup JSON
 - ✅ Importação com validação e confirmação
 - ✅ Diagnóstico
+- ✅ Diagnóstico técnico expandido no modo profissional
 - ✅ Reset local
 - ✅ Service Worker e modo offline após cache inicial
 - ✅ Atualização controlada do Service Worker
@@ -111,6 +120,7 @@ Objetivo: reduzir remendos acumulados, tornar os fluxos críticos testáveis e e
 ### Arquitetura
 - 🟡 Incorporar progressivamente regras de `runtime-fixes.js`, `summary-guard.js`, `shift-reports.js` e `shift-mobile-interactions.js` nos módulos definitivos
 - ✅ Núcleo puro `shift-advanced-core.js` para cópia, intervalos e resumos da escala
+- ✅ Núcleo puro `professional-core.js` para Centro de Comando, Pesquisa Global e Diagnóstico
 - ✅ Remover `enhancements.js` do runtime ativo
 - 🟡 Remover ficheiros legado restantes quando deixarem de ser necessários para caches antigos
 - 🟡 Unificar versão pública e metadados numa única release
@@ -123,6 +133,7 @@ Objetivo: reduzir remendos acumulados, tornar os fluxos críticos testáveis e e
 - ✅ Testes do módulo de escala
 - ✅ Testes dos relatórios configuráveis
 - ✅ Testes puros para copiar dia/semana, intervalos e resumos da escala
+- ✅ Testes puros para Centro de Comando, Pesquisa Global e Diagnóstico
 - ⬜ Testes DOM de clique/toque
 - ⬜ Smoke test Safari/PWA documentado por release
 - ⬜ Teste de instalação/atualização offline
@@ -147,7 +158,7 @@ A 4.3.0 só deve ser marcada como concluída quando:
 ## 4.4.0 — Planeamento
 - ⬜ Calendário unificado da aplicação
 - ⬜ Atividades com subtarefas, datas limite e recorrência
-- ⬜ Pesquisa global
+- ✅ Pesquisa global
 - 🟡 Copiar/duplicar turnos e semanas — semana implementada; mês ainda falta
 - 🟡 Resumos semanais e mensais mais completos — resumo mensal/anual da escala implementado; resumo semanal geral ainda falta
 
@@ -156,7 +167,7 @@ A 4.3.0 só deve ser marcada como concluída quando:
 - ⬜ Migração transacional
 - ⬜ Histórico de backups
 - ⬜ Recuperação após estado parcialmente gravado
-- ⬜ Diagnóstico técnico avançado
+- 🟡 Diagnóstico técnico avançado — base implementada; ainda falta análise de integridade mais profunda
 
 ## 5.0 — Sincronização opcional
 - ⬜ Conta/autenticação
