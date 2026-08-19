@@ -1,4 +1,5 @@
 {
+  "id":"./",
   "name":"Foco & Jornada",
   "short_name":"Foco",
   "description":"Jornada, pausas, atividades, foco, café, integrações, transportes, histórico e estatísticas.",
@@ -6,9 +7,14 @@
   "start_url":"./",
   "scope":"./",
   "display":"standalone",
+  "display_override":["standalone","minimal-ui"],
   "background_color":"#091017",
   "theme_color":"#091017",
-  "icons":[{"src":"./icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}],
+  "categories":["productivity","utilities"],
+  "icons":[
+    {"src":"./icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any"},
+    {"src":"./icon.svg","sizes":"any","type":"image/svg+xml","purpose":"maskable"}
+  ],
   "shortcuts":[
     {"name":"Integrações","short_name":"Integrações","url":"./?action=integrations","icons":[{"src":"./icon.svg","sizes":"any","type":"image/svg+xml"}]},
     {"name":"Iniciar foco","short_name":"Foco","url":"./?action=focus","icons":[{"src":"./icon.svg","sizes":"any","type":"image/svg+xml"}]}
