@@ -1,14 +1,19 @@
 # Changelog
 
 ## 4.2.0
-- Nova área Transportes Públicos com Casa, Trabalho, localização atual e viagens recentes.
+- Nova área Integrações com Moovit e Supershift.
+- Segunda a sábado configurados como 08:00–17:00, com pausa prevista 12:00–13:00.
+- Domingo configurado como 09:00–18:00, com pausa prevista 13:00–14:00.
+- Lembrete automático da pausa com confirmação manual para iniciar o registo.
 - Integração oficial com Moovit por `moovit://directions` e `moovit://nearby`.
+- Integração Supershift por exportação de escala `.ics` para calendário externo, sem deep link não documentado.
+- Exportação de 8 semanas de turnos para calendário.
+- Menu extra Integrações no desktop e cartão próprio em Mais no mobile.
+- Casa, Trabalho, localização atual e viagens recentes mantidos no módulo Moovit.
 - Previsão da hora de saída com objetivo diário configurável e pausa principal.
 - Resumo e fecho do dia com trabalho efetivo, pausas, foco, atividades e café.
-- Backup passa a incluir as preferências e histórico do módulo Transportes.
-- Atalhos PWA para Transportes e Foco.
-- Atualização PWA controlada pelo centro de notificações, em vez de ativação silenciosa.
-- Nova camada `stability.js`; `enhancements.js` deixa de fazer parte do runtime público.
+- Backup inclui preferências e histórico das funcionalidades adicionais.
+- Atualização PWA controlada pelo centro de notificações.
 
 ## 4.1.2
 - UX mobile com viewport estática, centro de notificações e ícones SVG locais.
