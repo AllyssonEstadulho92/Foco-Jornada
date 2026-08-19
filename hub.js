@@ -15,7 +15,13 @@ function closeHub(){const r=$('#appHub');if(!r)return;hubOpen=false;r.classList.
 function refreshHub(){const d=$('[data-hub-notification-dot]');if(d)d.classList.toggle('on',unread()>0)}
 function launchCustomScheme(appUrl,fallbackUrl){closeHub();let left=false;const vis=()=>{if(document.hidden)left=true};document.addEventListener('visibilitychange',vis);location.href=appUrl;setTimeout(()=>{document.removeEventListener('visibilitychange',vis);if(!left&&!document.hidden&&fallbackUrl)location.href=fallbackUrl},1300)}
 function openMoovitApp(){launchCustomScheme(MOOVIT_APP_URL,MOOVIT_FALLBACK_URL)}
-async function openShiftPlanner(){closeHub();try{if(window.FocoShiftPlanner?.open)return window.FocoShiftPlanner.open();const mod=await import('./shift-planner.js');mod.open()}catch{notify('Não foi possível abrir a escala de trabalho.')}}
+function ensureShiftPlannerMobileCss(){
+  const existing=$('#shiftPlannerMobileCss');
+  if(existing)return existing.sheet?Promise.resolve():new Promise(resolve=>{existing.addEventListener('load',resolve,{once:true});existing.addEventListener('error',resolve,{once:true})});
+  const link=document.createElement('link');link.id='shiftPlannerMobileCss';link.rel='stylesheet';link.href='./shift-mobile.css';document.head.appendChild(link);
+  return new Promise(resolve=>{link.addEventListener('load',resolve,{once:true});link.addEventListener('error',resolve,{once:true});setTimeout(resolve,1200)});
+}
+async function openShiftPlanner(){closeHub();try{await ensureShiftPlannerMobileCss();if(window.FocoShiftPlanner?.open)return window.FocoShiftPlanner.open();const mod=await import('./shift-planner.js');mod.open()}catch{notify('Não foi possível abrir a escala de trabalho.')}}
 function handleHubClick(e){if(e.target.closest('[data-hub-close]')){closeHub();return}const action=e.target.closest('[data-hub-action]')?.dataset.hubAction;if(!action)return;if(action==='moovit'){openMoovitApp();return}if(action==='supershift'||action==='shifts'){openShiftPlanner();return}if(action==='schedule')openIntegration('workScheduleSection');if(action==='settings')openMoreAt('#settingsForm');if(action==='backup')openMoreAt('#exportBtn');if(action==='about')openMoreAt('#appVersion');if(action==='stats')navigate('stats');if(action==='notifications'){closeHub();setTimeout(()=>window.FocoUI?.toggleNotifications?.(true),140)}if(action==='updates')checkUpdates()}
 function navigate(view){closeHub();const b=$(`.side-nav [data-nav="${view}"]`)||$(`.bottom-nav [data-nav="${view}"]`);b?.click()}
 function openMoreAt(selector){closeHub();bypassMore=true;const b=$('.bottom-nav [data-nav="more"]')||$('.side-nav [data-nav="more"]');b?.click();bypassMore=false;setTimeout(()=>$(selector)?.closest('.panel')?.scrollIntoView({behavior:'smooth',block:'start'}),150)}
