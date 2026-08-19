@@ -24,6 +24,7 @@
 <link rel="stylesheet" href="./flaticon-motion.css">
 <link rel="stylesheet" href="./interaction-fixes.css">
 <link rel="stylesheet" href="./professional.css">
+<link rel="stylesheet" href="./productivity.css">
 </head>
 <body>
 <div class="layout">
@@ -51,7 +52,7 @@
   <section class="panel"><div class="section-head"><h2>Atividade atual</h2><button class="text-btn" data-nav="activities">Ver todas</button></div><div id="currentActivity"></div></section>
   <section class="panel"><div class="section-head"><h2>Timeline de hoje</h2><button class="text-btn" data-nav="history">Histórico</button></div><div id="todayTimeline" class="timeline"></div></section>
 </section>
-<section class="view" data-view="activities"><div class="page-tools"><div class="search-wrap"><input id="activitySearch" type="search" placeholder="Pesquisar atividades" aria-label="Pesquisar atividades"></div><button id="newActivityBtn" class="btn primary">+ Nova atividade</button></div><div class="filters"><button class="on" data-filter="open">Abertas</button><button data-filter="all">Todas</button><button data-filter="completed">Concluídas</button><button data-filter="cancelled">Canceladas</button><span id="activityCount"></span></div><section class="panel"><div id="activityList" class="task-list"></div></section></section>
+<section class="view" data-view="activities"><div class="page-tools"><div class="search-wrap"><input id="activitySearch" type="search" placeholder="Pesquisar atividades" aria-label="Pesquisar atividades"></div><button id="newActivityBtn" class="btn primary">+ Nova atividade</button></div><div class="filters"><button class="on" data-filter="open">Abertas</button><button data-filter="today">Hoje</button><button data-filter="overdue">Atrasadas</button><button data-filter="all">Todas</button><button data-filter="completed">Concluídas</button><button data-filter="cancelled">Canceladas</button><span id="activityCount"></span></div><section class="panel"><div id="activityList" class="task-list"></div></section></section>
 <section class="view" data-view="focus"><div id="focusArea"></div><div id="focusMetrics" class="metric-grid"></div></section>
 <section class="view" data-view="history"><div class="page-tools"><label class="date-picker">Data <input id="historyDate" type="date"></label></div><div id="historyMetrics" class="metric-grid"></div><section class="panel"><div class="section-head"><h2>Linha temporal</h2></div><div id="historyTimeline" class="timeline"></div></section><section class="panel"><div class="section-head"><h2>Jornadas</h2></div><div id="historyWorks"></div></section></section>
 <section class="view" data-view="stats"><div class="segmented"><button class="on" data-period="week">7 dias</button><button data-period="month">30 dias</button><button data-period="year">Ano</button></div><div id="statsGrid" class="stats-grid"></div><section class="panel"><div class="section-head"><h2>Horas efetivas</h2></div><div id="statsChart" class="bars" role="img" aria-label="Gráfico de horas efetivas"></div></section><section class="panel"><div class="section-head"><h2>Resumo factual</h2></div><p id="statsSummary" class="summary"></p></section></section>
