@@ -28,110 +28,143 @@
 .shift-planner .sp-report-lines>div>b:first-child:nth-last-child(2)+strong{grid-column:3}
 
 @media(max-width:520px){
+  .shift-planner{font-size:13px}
   .shift-planner .sp-shell{max-width:100vw}
   .shift-planner .sp-top{
     align-items:center;
-    padding:max(14px,env(safe-area-inset-top)) 13px 10px;
-    gap:7px;
+    padding:max(13px,env(safe-area-inset-top)) 12px 9px;
+    gap:6px;
   }
   .shift-planner .sp-top>div:first-child{min-width:0;flex:1}
-  .shift-planner .sp-kicker{font-size:8px;letter-spacing:.16em}
+  .shift-planner .sp-kicker{font-size:7.5px;letter-spacing:.15em}
   .shift-planner .sp-top h1{
     margin-top:3px;
-    font-size:clamp(21px,6.4vw,28px);
+    font-size:clamp(20px,5.8vw,25px);
     line-height:1.05;
-    letter-spacing:-.03em;
-    font-weight:750;
+    letter-spacing:-.025em;
+    font-weight:740;
     max-width:100%;
     overflow:hidden;
     text-overflow:ellipsis;
     white-space:nowrap;
   }
-  .shift-planner .sp-top-actions{gap:4px;flex:0 0 auto}
+  .shift-planner .sp-top-actions{gap:3px;flex:0 0 auto}
   .shift-planner .sp-top-actions button,
-  .shift-planner .sp-close{width:34px;height:34px;border-radius:17px}
-  .shift-planner .sp-top-actions .sp-icon{width:18px;height:18px}
+  .shift-planner .sp-close{width:32px;height:32px;border-radius:16px}
+  .shift-planner .sp-top-actions .sp-icon{width:17px;height:17px}
 
-  .shift-planner .sp-main{padding:0 9px calc(104px + env(safe-area-inset-bottom));overflow-x:hidden}
+  .shift-planner .sp-main{padding:0 8px calc(100px + env(safe-area-inset-bottom));overflow-x:hidden}
   .shift-planner .sp-calendar-card,
   .shift-planner .sp-list-card,
   .shift-planner .sp-model-card,
   .shift-planner .sp-report-card,
-  .shift-planner .sp-more-card{border-radius:22px}
+  .shift-planner .sp-more-card{border-radius:20px}
 
-  .shift-planner .sp-weekdays span{padding:9px 0 8px;font-size:11px;font-weight:700}
+  .shift-planner .sp-weekdays span{padding:8px 0 7px;font-size:10px;font-weight:700}
   .shift-planner .sp-month-grid{width:100%;min-width:0}
-  .shift-planner .sp-day{min-width:0;min-height:clamp(72px,22vw,88px);padding:6px 3px;overflow:hidden}
-  .shift-planner .sp-day-num{font-size:clamp(13px,3.8vw,16px);padding-left:2px}
+  .shift-planner .sp-day{min-width:0;min-height:clamp(68px,20vw,82px);padding:5px 3px;overflow:hidden}
+  .shift-planner .sp-day-num{font-size:clamp(12px,3.4vw,14px);padding-left:2px}
   .shift-planner .sp-day.today::after{inset:3px;border-width:1.5px;border-radius:8px}
-  .shift-planner .sp-shift-tag{margin-top:8px;padding:4px 2px;border-radius:6px;font-size:clamp(8px,2.35vw,10px);letter-spacing:-.01em}
+  .shift-planner .sp-shift-tag{margin-top:7px;padding:3px 2px;border-radius:6px;font-size:clamp(7.5px,2.15vw,9px);letter-spacing:-.01em}
 
   .shift-planner .sp-view-switch,
-  .shift-planner .sp-segments{margin-bottom:14px;border-radius:22px}
+  .shift-planner .sp-segments{margin-bottom:12px;border-radius:20px}
   .shift-planner .sp-view-switch button,
-  .shift-planner .sp-segments button{height:42px;border-radius:19px;padding:0 5px;font-size:12px;white-space:nowrap}
+  .shift-planner .sp-segments button{height:39px;border-radius:18px;padding:0 4px;font-size:11px;white-space:nowrap}
 
-  .shift-planner .sp-report-stack{gap:13px}
-  .shift-planner .sp-report-card h2{padding:17px 12px;font-size:17px}
-  .shift-planner .sp-report-lines{padding:6px 9px}
-  .shift-planner .sp-report-lines>div{min-height:62px;grid-template-columns:34px minmax(0,1fr) max-content;gap:9px;padding:0 5px}
-  .shift-planner .sp-report-lines b{font-size:14px}
-  .shift-planner .sp-report-lines small{font-size:11.5px;line-height:1.25}
-  .shift-planner .sp-report-lines strong{font-size:clamp(18px,5.2vw,22px);max-width:42vw}
-  .shift-planner .sp-code{width:34px;height:34px;border-radius:17px;font-size:10px}
+  .shift-planner .sp-report-stack{gap:11px}
+  .shift-planner .sp-report-card h2{padding:14px 10px;font-size:15px}
+  .shift-planner .sp-report-lines{padding:5px 8px}
+  .shift-planner .sp-report-lines>div{min-height:56px;grid-template-columns:30px minmax(0,1fr) max-content;gap:8px;padding:0 4px}
+  .shift-planner .sp-report-lines b{font-size:12.5px}
+  .shift-planner .sp-report-lines small{font-size:10.5px;line-height:1.22}
+  .shift-planner .sp-report-lines strong{font-size:clamp(16px,4.6vw,19px);max-width:40vw}
+  .shift-planner .sp-code{width:30px;height:30px;border-radius:15px;font-size:9px}
 
   .shift-planner .sp-agenda-row,
   .shift-planner .sp-model-row,
-  .shift-planner .sp-more-row{gap:10px;padding:14px 5px}
-  .shift-planner .sp-agenda-row time{width:68px;font-size:12px}
+  .shift-planner .sp-more-row{gap:9px;padding:12px 4px}
+  .shift-planner .sp-agenda-row time{width:62px;font-size:11px}
   .shift-planner .sp-model-row div,
   .shift-planner .sp-agenda-row div,
   .shift-planner .sp-more-row>span{min-width:0}
   .shift-planner .sp-model-row b,
-  .shift-planner .sp-agenda-row b{font-size:15px}
+  .shift-planner .sp-agenda-row b,
+  .shift-planner .sp-more-row b{font-size:13.5px;line-height:1.2}
   .shift-planner .sp-model-row small,
   .shift-planner .sp-agenda-row small,
-  .shift-planner .sp-more-row small{font-size:11.5px;line-height:1.3;overflow-wrap:anywhere}
-  .shift-planner .sp-section-title{font-size:18px;margin:18px 6px 11px}
-  .shift-planner .sp-model-card{padding:7px 12px}
+  .shift-planner .sp-more-row small{font-size:10.5px;line-height:1.25;overflow-wrap:anywhere}
+  .shift-planner .sp-section-title{font-size:16px;margin:15px 5px 9px}
+  .shift-planner .sp-model-card{padding:6px 10px}
+  .shift-planner .sp-job-icon{font-size:23px;width:34px}
+  .shift-planner .sp-add{width:34px;height:34px}
 
-  .shift-planner .sp-year-grid{gap:7px}
-  .shift-planner .sp-year-grid button{min-height:78px;border-radius:16px;padding:7px}
-  .shift-planner .sp-year-grid b{font-size:12.5px;line-height:1.15;font-weight:700}
-  .shift-planner .sp-year-grid small{font-size:10px;margin-top:4px}
+  .shift-planner .sp-year-grid{gap:6px}
+  .shift-planner .sp-year-grid button{min-height:70px;border-radius:15px;padding:6px}
+  .shift-planner .sp-year-grid b{font-size:11.5px;line-height:1.12;font-weight:700}
+  .shift-planner .sp-year-grid small{font-size:9.5px;margin-top:3px}
 
-  .shift-planner .sp-more-card{padding:14px;margin-bottom:11px}
-  .shift-planner .sp-more-card h2{font-size:18px}
-  .shift-planner .sp-more-card label{font-size:13px}
+  .shift-planner .sp-more-card{padding:12px;margin-bottom:10px}
+  .shift-planner .sp-more-card h2{font-size:16px;margin-bottom:9px}
+  .shift-planner .sp-more-card label,
+  .shift-planner .sp-time-edit label,
+  .shift-planner .sp-form label{font-size:12px;gap:5px;margin:8px 0}
   .shift-planner .sp-more-card input,
   .shift-planner .sp-form input,
-  .shift-planner .sp-form select{min-height:46px;font-size:16px}
+  .shift-planner .sp-form select{min-height:44px;font-size:16px}
+  .shift-planner .sp-wide-link,
+  .shift-planner .sp-primary,
+  .shift-planner .sp-danger{min-height:46px;border-radius:15px;font-size:12.5px}
+  .shift-planner .sp-check-row{font-size:12.5px;padding:10px 0}
+  .shift-planner .sp-checkbox{width:27px;height:27px;border-radius:7px}
+  .shift-planner .sp-version{font-size:10px}
 
-  .shift-planner .sp-bottom{width:calc(100vw - 18px);max-width:520px;height:68px;bottom:max(8px,env(safe-area-inset-bottom));border-radius:34px;padding:4px}
-  .shift-planner .sp-bottom button{min-width:0;border-radius:30px;gap:1px}
-  .shift-planner .sp-bottom .sp-icon{width:23px;height:23px}
-  .shift-planner .sp-bottom button small{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px;line-height:1.1}
-  .shift-planner .sp-fab{right:16px;bottom:92px;width:50px;height:50px;border-radius:25px}
+  .shift-planner .sp-bottom{width:calc(100vw - 16px);max-width:520px;height:64px;bottom:max(7px,env(safe-area-inset-bottom));border-radius:32px;padding:4px}
+  .shift-planner .sp-bottom button{min-width:0;border-radius:28px;gap:1px}
+  .shift-planner .sp-bottom .sp-icon{width:21px;height:21px}
+  .shift-planner .sp-bottom button small{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:9.5px;line-height:1.05}
+  .shift-planner .sp-fab{right:14px;bottom:86px;width:46px;height:46px;border-radius:23px}
 
-  .shift-planner .sp-modal{width:calc(100vw - 8px);max-height:86dvh;border-radius:25px 25px 0 0;padding:17px 15px calc(20px + env(safe-area-inset-bottom))}
-  .shift-planner .sp-modal-head h2{font-size:20px}
-  .shift-planner .sp-shift-picker{gap:8px;margin:16px 0}
-  .shift-planner .sp-shift-picker button{min-height:78px;border-radius:16px;font-size:12px}
+  .shift-planner .sp-modal{width:calc(100vw - 8px);max-height:86dvh;border-radius:23px 23px 0 0;padding:15px 13px calc(18px + env(safe-area-inset-bottom))}
+  .shift-planner .sp-modal-head span{font-size:9px;letter-spacing:.15em}
+  .shift-planner .sp-modal-head h2{font-size:18px}
+  .shift-planner .sp-modal-head button{width:38px;height:38px}
+  .shift-planner .sp-modal-views button{height:46px;border-radius:15px;font-size:12px}
+  .shift-planner .sp-shift-picker{gap:7px;margin:14px 0}
+  .shift-planner .sp-shift-picker button{min-height:70px;border-radius:15px;font-size:11px}
+  .shift-planner .sp-shift-picker .sp-code{width:30px;height:30px;font-size:9px}
   .shift-planner .sp-time-edit,
-  .shift-planner .sp-form-grid{gap:8px}
+  .shift-planner .sp-form-grid{gap:7px}
 }
 
 @media(max-width:380px){
-  .shift-planner .sp-top{padding-left:10px;padding-right:10px}
-  .shift-planner .sp-top h1{font-size:20px;letter-spacing:-.02em}
+  .shift-planner{font-size:12.5px}
+  .shift-planner .sp-top{padding-left:9px;padding-right:9px}
+  .shift-planner .sp-top h1{font-size:19px;letter-spacing:-.015em}
+  .shift-planner .sp-kicker{font-size:7px}
   .shift-planner .sp-top-actions button,
-  .shift-planner .sp-close{width:32px;height:32px}
-  .shift-planner .sp-main{padding-left:6px;padding-right:6px}
-  .shift-planner .sp-day{min-height:70px;padding-left:2px;padding-right:2px}
-  .shift-planner .sp-shift-tag{font-size:8px;padding-left:1px;padding-right:1px}
-  .shift-planner .sp-report-lines>div{grid-template-columns:30px minmax(0,1fr) max-content;gap:7px}
-  .shift-planner .sp-report-lines strong{font-size:18px;max-width:40vw}
-  .shift-planner .sp-code{width:30px;height:30px;font-size:9px}
-  .shift-planner .sp-year-grid b{font-size:11.5px}
-  .shift-planner .sp-bottom button small{font-size:9.5px}
+  .shift-planner .sp-close{width:30px;height:30px}
+  .shift-planner .sp-main{padding-left:5px;padding-right:5px}
+  .shift-planner .sp-day{min-height:66px;padding-left:2px;padding-right:2px}
+  .shift-planner .sp-day-num{font-size:12px}
+  .shift-planner .sp-shift-tag{font-size:7.5px;padding-left:1px;padding-right:1px}
+  .shift-planner .sp-view-switch button,
+  .shift-planner .sp-segments button{font-size:10.5px;height:37px}
+  .shift-planner .sp-report-card h2{font-size:14px}
+  .shift-planner .sp-report-lines>div{grid-template-columns:28px minmax(0,1fr) max-content;gap:6px;min-height:53px}
+  .shift-planner .sp-report-lines b{font-size:12px}
+  .shift-planner .sp-report-lines small{font-size:10px}
+  .shift-planner .sp-report-lines strong{font-size:16px;max-width:38vw}
+  .shift-planner .sp-code{width:28px;height:28px;font-size:8.5px}
+  .shift-planner .sp-model-row b,
+  .shift-planner .sp-agenda-row b,
+  .shift-planner .sp-more-row b{font-size:13px}
+  .shift-planner .sp-model-row small,
+  .shift-planner .sp-agenda-row small,
+  .shift-planner .sp-more-row small{font-size:10px}
+  .shift-planner .sp-section-title{font-size:15px}
+  .shift-planner .sp-year-grid b{font-size:10.5px}
+  .shift-planner .sp-more-card h2{font-size:15px}
+  .shift-planner .sp-bottom button small{font-size:9px}
+  .shift-planner .sp-modal-head h2{font-size:17px}
 }
