@@ -9,9 +9,15 @@ const manifest=JSON.parse(read('manifest.webmanifest'));
 
 test('persistência protege estado principal e Supershift',()=>{
   for(const token of ['foco-jornada-v4','foco-jornada-features-v2','foco-jornada-recovery-v1','indexedDB','shiftPlanner','foco-shift-planner-change'])assert.ok(persistence.includes(token),token);
+  assert.ok(persistence.includes('preserveFeatureBranches'));
   assert.ok(persistence.includes("Storage.prototype.setItem"));
   assert.ok(persistence.includes("visibilitychange"));
   assert.ok(persistence.includes("pagehide"));
+});
+
+test('persistência inclui preferências auxiliares importantes',()=>{
+  for(const key of ['foco-jornada-notifications-v1','foco-jornada-notification-preference-v1','foco-jornada-focus-activity-v1'])assert.ok(persistence.includes(key),key);
+  assert.ok(persistence.includes('AUX_KEYS'));
 });
 
 test('persistência oferece proteção de armazenamento',()=>{
