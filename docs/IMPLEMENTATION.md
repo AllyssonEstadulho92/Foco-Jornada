@@ -1,27 +1,34 @@
 # Matriz de implementação — estado atual
 
-## Implementado e testado
-- Jornada: entrada, saída, duração por timestamp, meia-noite, edição, reabertura, cancelamento e estado incompleto no domínio.
-- Horário de trabalho: segunda a sábado 08:00–17:00; domingo 09:00–18:00.
-- Pausas: ecrã/principal, duração configurável, extensão, desconto no efetivo, pausa automática da atividade e lembrete da pausa principal com início manual.
-- Atividades: criação, edição, prioridade, categoria, estimativa, filtros, pesquisa, segmentos, iniciar/pausar/concluir/cancelar.
-- Foco/Pomodoro: duração, ciclos, associação a atividade, pausa/retoma e conclusão por timestamp.
-- Café: preço em cêntimos, múltiplos tipos no modelo, registo, gasto e desfazer.
-- Histórico: timeline, resumo diário, eliminação visual de eventos e gestão das jornadas.
-- Estatísticas: 7 dias, 30 dias e ano; foco não é somado ao trabalho.
-- Contextos: Trabalho/Pessoal.
-- Vida pessoal / Tempo a dois: módulo no Hoje e no hub Mais, derivado da saída da jornada, sem pontuação e sem conclusão automática.
-- Tempo a dois: margem padrão 1h30 após a saída; 30 min nos dias normais, 1h30 à quarta, 3h ao sábado e 1h ao domingo; ajusta-se à saída real quando registada.
-- Transportes: Casa/Trabalho, localização atual, viagens recentes e integração Moovit por deep link oficial.
-- Supershift: exportação segura de escala por calendário/ICS, sem deep link privado inventado.
-- Hub Mais: bottom sheet no mobile/gaveta no desktop com aplicações, trabalho, vida pessoal e ferramentas de sistema.
-- Definições: tema, tempos, café e notificações.
-- Dados: migração v3→v4, backup/importação, diagnóstico e reset.
-- PWA: manifesto, Service Worker, .nojekyll, GitHub Pages e atualização controlada.
-- UX: mobile/desktop, navegação, estados vazios, proteção anti-duplo clique, reduced motion, foco de teclado e centro de notificações.
+A referência de evolução passa a ser `ROADMAP.md`. Esta matriz resume apenas o que existe hoje no runtime.
+
+## Implementado
+- Jornada: entrada, saída, edição, reabertura, cancelamento e cálculo por timestamps.
+- Horário semanal: segunda a sábado 08:00–17:00; domingo 09:00–18:00.
+- Pausas: ecrã/principal, duração configurável, desconto no efetivo e lembrete com início manual.
+- Atividades: criação, edição, prioridade, categoria, estimativa, pesquisa, filtros, iniciar, pausar, concluir e cancelar.
+- Foco/Pomodoro: duração, ciclos, associação a atividade, pausa/retoma e conclusão.
+- Café: registo, gasto, desfazer e preço configurável.
+- Histórico e estatísticas.
+- Transportes: Casa/Trabalho, localização atual, recentes e Moovit por deep link oficial.
+- Escala interna: calendário, turnos, trabalhos, rotações, relatórios, ICS e impressão/PDF A4.
+- Hub Mais: aplicações, horário, estatísticas, definições, dados, notificações, atualizações e sobre.
+- Backup/importação, diagnóstico e reset.
+- PWA, cache offline, atualização controlada e GitHub Pages.
+
+## Parcial / em consolidação
+- Pomodoro ainda depende parcialmente de correções em runtime para alguns fluxos.
+- Fecho/resumo diário ainda tem proteção temporária contra renderizações concorrentes.
+- Interação tátil da escala usa um módulo mobile dedicado que deve ser incorporado no planeador.
+- Relatórios da escala usam uma camada de migração/configuração para remover defaults históricos de horas/salário.
+- Testes automatizados cobrem domínio e presença de handlers, mas ainda faltam testes DOM/E2E completos.
+- Notificações de sistema e partilha/ficheiros precisam validação física no iPhone/PWA.
+
+## Retirado
+O módulo **Vida pessoal / Tempo a dois** foi retirado do runtime por decisão do utilizador. Não deve ser contado como funcionalidade ativa nem voltar automaticamente em atualizações.
 
 ## Regra temporal
-Timers e agendas derivadas não são a fonte de verdade. Sempre que existe um timestamp real — por exemplo a saída efetivamente registada da jornada — ele tem prioridade sobre uma hora planeada. O módulo Tempo a dois segue esta mesma regra.
+Timestamps reais têm prioridade sobre previsões e timers visuais. Uma hora planeada nunca deve substituir silenciosamente um registo real.
 
-## Não verificável por numeração
-A redação original dos requisitos numerados até 1121 não está integralmente disponível no contexto recuperável desta execução. Logo, esta matriz não afirma cobertura literal de cada número. Para auditoria 1:1, é necessário anexar/colar a Especificação Mestre numerada.
+## Limitação da especificação numerada
+A redação original dos requisitos 1–1121 não está integralmente disponível no repositório. Não é possível afirmar cobertura literal desses números sem a Especificação Mestre original. Quando esse documento for fornecido, deve ser criada uma auditoria 1:1 separada.
