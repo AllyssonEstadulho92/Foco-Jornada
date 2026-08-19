@@ -3,7 +3,8 @@
 ## 4.2.0
 - Nova área Transportes Públicos com Casa, Trabalho, localização atual e viagens recentes.
 - Integração oficial com Moovit por `moovit://directions` e `moovit://nearby`.
-- Integração Supershift por calendário externo/ICS, sem deep link não documentado.
+- Moovit passa a abrir diretamente a aplicação pelo hub, com fallback oficial quando necessário.
+- Supershift mantém integração por calendário externo/ICS e recebe atalho de abertura: package oficial no Android e ligação oficial no iOS, sem inventar URL scheme privado.
 - Horário semanal: segunda a sábado 08:00–17:00; domingo 09:00–18:00.
 - Pausa prevista: 12:00–13:00 de segunda a sábado e 13:00–14:00 ao domingo.
 - Lembrete automático da pausa com início manual pelo utilizador.
@@ -15,9 +16,8 @@
 - Nova camada `stability.js`; `enhancements.js` deixa de fazer parte do runtime público.
 - Novo hub oculto no botão Mais: Moovit, Supershift, horário, estatísticas, definições, backup/diagnóstico, notificações, atualizações e sobre.
 - Hub apresentado como bottom sheet no mobile e gaveta lateral no desktop, preparado para módulos futuros sem aumentar a barra inferior.
-- Módulo Vida pessoal / Tempo a dois revisto: deixa de usar horários rígidos e passa a derivar o início a partir da saída prevista ou da saída real registada.
-- Tempo a dois usa margem padrão de 1h30 após a jornada; 30 min nos dias normais, 1h30 à quarta, 3h ao sábado e 1h ao domingo.
-- Lembrete do casal ocorre 15 minutos antes, permite concluir, adiar 30 minutos ou ignorar apenas o dia e nunca conclui automaticamente.
+- Módulo Vida pessoal / Tempo a dois removido do runtime, dos estilos e da suite ativa. A gestão pessoal adicional volta a ficar manual.
+- Corrigido o controlo de notificações para manter o estado selecionado e pedir permissão no gesto do utilizador.
 
 ## 4.1.2
 - UX mobile com viewport estática, centro de notificações e ícones SVG locais.
