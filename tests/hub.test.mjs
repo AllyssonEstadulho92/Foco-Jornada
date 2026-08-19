@@ -15,6 +15,21 @@ test('hub contém Moovit, Supershift e ferramentas de sistema',()=>{
   for(const item of ['Moovit','Supershift','Definições','Backup e diagnóstico','Notificações','Atualizações','Horário e pausas'])assert.ok(hub.includes(item),`hub deve incluir ${item}`);
 });
 
+test('Moovit abre por deep link oficial com fallback oficial',()=>{
+  const hub=read('hub.js');
+  assert.ok(hub.includes("moovit://nearby?partner_id=FocoJornada"));
+  assert.ok(hub.includes('moovit.onelink.me/3986059930'));
+  assert.ok(hub.includes('openMoovitApp'));
+});
+
+test('Supershift usa package Android e não inventa scheme iOS',()=>{
+  const hub=read('hub.js');
+  assert.ok(hub.includes('package=app.supershift'));
+  assert.ok(hub.includes('https://supershift.app/'));
+  assert.equal(hub.includes('supershift://'),false);
+  assert.ok(hub.includes('openSupershiftApp'));
+});
+
 test('hub não cria polling contínuo',()=>{
   const hub=read('hub.js');
   assert.equal(hub.includes('setInterval('),false);
@@ -25,4 +40,10 @@ test('hub mantém acesso à página Mais original',()=>{
   assert.ok(hub.includes('bypassMore'));
   assert.ok(hub.includes("openMoreAt('#settingsForm')"));
   assert.ok(hub.includes("openMoreAt('#exportBtn')"));
+});
+
+test('hub não inclui módulo Vida pessoal',()=>{
+  const hub=read('hub.js');
+  assert.equal(hub.includes('Tempo a dois'),false);
+  assert.equal(hub.includes('Vida pessoal'),false);
 });
