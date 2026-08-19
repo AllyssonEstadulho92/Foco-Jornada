@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#091017">
-<meta name="description" content="Foco & Jornada — jornada, pausas, atividades, foco, café, transportes, histórico e estatísticas.">
+<meta name="description" content="Foco & Jornada — jornada, pausas, atividades, foco, café, transportes, escala, histórico e estatísticas.">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Foco & Jornada">
@@ -16,6 +16,7 @@
 <link rel="stylesheet" href="./ux.css">
 <link rel="stylesheet" href="./hub.css">
 <link rel="stylesheet" href="./settings-controller.css">
+<link rel="stylesheet" href="./shift-planner.css">
 </head>
 <body>
 <div class="layout">
@@ -36,57 +37,19 @@
   <div><span class="kicker" id="contextName">Trabalho</span><h1 id="pageTitle">Hoje</h1><p id="dateText"></p></div>
   <div class="top-right"><span id="offline" class="offline" hidden>Offline</span><time id="clock">--:--</time><button class="icon-btn" data-action="toggleTheme" aria-label="Alternar tema">◐</button></div>
 </header>
-
 <section class="view on" data-view="today">
   <div id="todayHero"></div>
   <section class="section"><div class="section-head"><div><span class="kicker">AGORA</span><h2>Ações rápidas</h2></div></div><div id="quickActions" class="quick-grid"></div></section>
-  <div id="resumeCard"></div>
-  <div id="todayMetrics" class="metric-grid"></div>
+  <div id="resumeCard"></div><div id="todayMetrics" class="metric-grid"></div>
   <section class="panel"><div class="section-head"><h2>Atividade atual</h2><button class="text-btn" data-nav="activities">Ver todas</button></div><div id="currentActivity"></div></section>
   <section class="panel"><div class="section-head"><h2>Timeline de hoje</h2><button class="text-btn" data-nav="history">Histórico</button></div><div id="todayTimeline" class="timeline"></div></section>
 </section>
-
-<section class="view" data-view="activities">
-  <div class="page-tools"><div class="search-wrap"><input id="activitySearch" type="search" placeholder="Pesquisar atividades" aria-label="Pesquisar atividades"></div><button id="newActivityBtn" class="btn primary">+ Nova atividade</button></div>
-  <div class="filters"><button class="on" data-filter="open">Abertas</button><button data-filter="all">Todas</button><button data-filter="completed">Concluídas</button><button data-filter="cancelled">Canceladas</button><span id="activityCount"></span></div>
-  <section class="panel"><div id="activityList" class="task-list"></div></section>
-</section>
-
-<section class="view" data-view="focus">
-  <div id="focusArea"></div>
-  <div id="focusMetrics" class="metric-grid"></div>
-</section>
-
-<section class="view" data-view="history">
-  <div class="page-tools"><label class="date-picker">Data <input id="historyDate" type="date"></label></div>
-  <div id="historyMetrics" class="metric-grid"></div>
-  <section class="panel"><div class="section-head"><h2>Linha temporal</h2></div><div id="historyTimeline" class="timeline"></div></section>
-  <section class="panel"><div class="section-head"><h2>Jornadas</h2></div><div id="historyWorks"></div></section>
-</section>
-
-<section class="view" data-view="stats">
-  <div class="segmented"><button class="on" data-period="week">7 dias</button><button data-period="month">30 dias</button><button data-period="year">Ano</button></div>
-  <div id="statsGrid" class="stats-grid"></div>
-  <section class="panel"><div class="section-head"><h2>Horas efetivas</h2></div><div id="statsChart" class="bars" role="img" aria-label="Gráfico de horas efetivas"></div></section>
-  <section class="panel"><div class="section-head"><h2>Resumo factual</h2></div><p id="statsSummary" class="summary"></p></section>
-</section>
-
+<section class="view" data-view="activities"><div class="page-tools"><div class="search-wrap"><input id="activitySearch" type="search" placeholder="Pesquisar atividades" aria-label="Pesquisar atividades"></div><button id="newActivityBtn" class="btn primary">+ Nova atividade</button></div><div class="filters"><button class="on" data-filter="open">Abertas</button><button data-filter="all">Todas</button><button data-filter="completed">Concluídas</button><button data-filter="cancelled">Canceladas</button><span id="activityCount"></span></div><section class="panel"><div id="activityList" class="task-list"></div></section></section>
+<section class="view" data-view="focus"><div id="focusArea"></div><div id="focusMetrics" class="metric-grid"></div></section>
+<section class="view" data-view="history"><div class="page-tools"><label class="date-picker">Data <input id="historyDate" type="date"></label></div><div id="historyMetrics" class="metric-grid"></div><section class="panel"><div class="section-head"><h2>Linha temporal</h2></div><div id="historyTimeline" class="timeline"></div></section><section class="panel"><div class="section-head"><h2>Jornadas</h2></div><div id="historyWorks"></div></section></section>
+<section class="view" data-view="stats"><div class="segmented"><button class="on" data-period="week">7 dias</button><button data-period="month">30 dias</button><button data-period="year">Ano</button></div><div id="statsGrid" class="stats-grid"></div><section class="panel"><div class="section-head"><h2>Horas efetivas</h2></div><div id="statsChart" class="bars" role="img" aria-label="Gráfico de horas efetivas"></div></section><section class="panel"><div class="section-head"><h2>Resumo factual</h2></div><p id="statsSummary" class="summary"></p></section></section>
 <section class="view" data-view="more">
-  <section class="panel"><div class="section-head"><div><span class="kicker">PREFERÊNCIAS</span><h2>Definições</h2></div></div>
-    <form id="settingsForm" class="settings-grid">
-      <label>Tema<select id="setTheme"><option value="system">Automático</option><option value="dark">Escuro</option><option value="light">Claro</option></select></label>
-      <label>Contexto<select id="setContext"><option value="work">Trabalho</option><option value="personal">Pessoal</option></select></label>
-      <label>Pausa de ecrã (min)<input id="setScreen" type="number" min="1" max="120"></label>
-      <label>Pausa principal (min)<input id="setRest" type="number" min="1" max="240"></label>
-      <label>Foco (min)<input id="setFocus" type="number" min="1" max="180"></label>
-      <label>Pausa curta Pomodoro<input id="setShort" type="number" min="1" max="60"></label>
-      <label>Pausa longa Pomodoro<input id="setLong" type="number" min="1" max="120"></label>
-      <label>Ciclos Pomodoro<input id="setCycles" type="number" min="1" max="12"></label>
-      <label>Preço café padrão (€)<input id="setCoffee" type="number" min="0" max="99" step="0.05"></label>
-      <label class="fj-toggle wide"><input id="setNotifications" type="checkbox"><span>Notificações quando foco/pausa terminar</span></label>
-      <div class="wide"><button class="btn primary" type="submit">Guardar definições</button></div>
-    </form>
-  </section>
+  <section class="panel"><div class="section-head"><div><span class="kicker">PREFERÊNCIAS</span><h2>Definições</h2></div></div><form id="settingsForm" class="settings-grid"><label>Tema<select id="setTheme"><option value="system">Automático</option><option value="dark">Escuro</option><option value="light">Claro</option></select></label><label>Contexto<select id="setContext"><option value="work">Trabalho</option><option value="personal">Pessoal</option></select></label><label>Pausa de ecrã (min)<input id="setScreen" type="number" min="1" max="120"></label><label>Pausa principal (min)<input id="setRest" type="number" min="1" max="240"></label><label>Foco (min)<input id="setFocus" type="number" min="1" max="180"></label><label>Pausa curta Pomodoro<input id="setShort" type="number" min="1" max="60"></label><label>Pausa longa Pomodoro<input id="setLong" type="number" min="1" max="120"></label><label>Ciclos Pomodoro<input id="setCycles" type="number" min="1" max="12"></label><label>Preço café padrão (€)<input id="setCoffee" type="number" min="0" max="99" step="0.05"></label><label class="fj-toggle wide"><input id="setNotifications" type="checkbox"><span>Notificações quando foco/pausa terminar</span></label><div class="wide"><button class="btn primary" type="submit">Guardar definições</button></div></form></section>
   <section class="panel"><div class="section-head"><div><span class="kicker">DADOS</span><h2>Backup e diagnóstico</h2></div></div><p class="muted">Os dados são guardados localmente neste browser. Exporta um backup antes de trocar de dispositivo ou limpar dados.</p><div class="button-row"><button id="exportBtn" class="btn">Exportar backup</button><button id="importBtn" class="btn">Importar backup</button><input id="importInput" type="file" accept="application/json" hidden><button id="checkBtn" class="btn">Verificar dados</button><button id="resetBtn" class="btn danger">Apagar dados</button></div><div id="integrity" class="integrity"></div></section>
   <section class="panel"><strong>Foco & Jornada</strong><p class="muted">Versão <span id="appVersion">4.2.0</span> · PWA · armazenamento local · offline após cache inicial.</p></section>
 </section>
@@ -98,6 +61,7 @@
 <script type="module" src="./hub.js"></script>
 <script type="module" src="./controls.js"></script>
 <script type="module" src="./settings-controller.js"></script>
+<script type="module" src="./shift-planner.js"></script>
 <script type="module" src="./app-links.js"></script>
 </body>
 </html>
