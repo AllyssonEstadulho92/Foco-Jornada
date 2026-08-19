@@ -1,3 +1,5 @@
+import './couple.js';
+
 const STORAGE_KEY='foco-jornada-v4';
 const ALERT_META_KEY='foco-jornada-alert-meta-v1';
 let alertTimer=null;
