@@ -2,33 +2,33 @@
 
 PWA de produtividade pessoal/profissional, local-first e sem dependências de runtime.
 
-## Horário de trabalho
-- Segunda a sábado: 08:00–17:00.
-- Pausa principal prevista: 12:00–13:00.
-- Domingo: 09:00–18:00.
-- Pausa principal prevista ao domingo: 13:00–14:00.
-- A aplicação avisa automaticamente à hora prevista, mas a pausa só começa quando o utilizador confirma manualmente.
-
-## Integrações
-### Moovit
-A Foco & Jornada prepara origem/destino e abre o Moovit através dos deep links oficiais `moovit://directions` e `moovit://nearby`, com `partner_id=FocoJornada`. Casa e Trabalho permanecem guardados localmente.
-
-### Supershift
-O Supershift documenta calendários externos configurados no sistema operativo, mas não publica um deep link para inserir turnos diretamente. A Foco & Jornada gera uma escala de 8 semanas em `.ics`; o ficheiro pode ser adicionado ao Calendário do dispositivo e esse calendário pode depois ser selecionado no Supershift.
-
 ## Módulos
 - Jornada: entrada, saída, edição, cancelamento, reabertura e cálculo por timestamps.
-- Pausas: ecrã, principal, extensão e retoma de atividade.
+- Horário semanal: segunda a sábado 08:00–17:00; domingo 09:00–18:00.
+- Pausa principal sugerida após 4 horas: 12:00–13:00 de segunda a sábado e 13:00–14:00 ao domingo, com lembrete automático e início manual.
 - Atividades: criar, editar, prioridade, categoria, estimativa, iniciar, pausar, concluir e cancelar.
 - Foco/Pomodoro: ciclos, pausa/retoma e associação a atividade.
 - Café: preço configurável em cêntimos, registo e desfazer.
-- Integrações: horário semanal, Moovit, Supershift e exportação de escala.
-- Previsão de saída e resumo/fecho do dia.
-- Centro de notificações, histórico, estatísticas, backup/importação e diagnóstico.
+- Moovit: Casa/Trabalho, localização atual, viagens recentes e integração oficial por deep link.
+- Supershift: integração segura por exportação de calendário/ICS e abertura oficial da aplicação/site, sem deep link privado inventado.
+- Previsão de saída com base no objetivo de trabalho efetivo e pausa principal.
+- Resumo/fecho do dia.
+- Centro de notificações com atualizações PWA controladas.
+- Histórico, estatísticas, backup/importação e diagnóstico.
 - PWA/offline, atalhos e modo claro/escuro.
+
+## Hub “Mais”
+O botão **Mais** abre um menu oculto em formato de bottom sheet no mobile e gaveta lateral no desktop. O hub mantém a barra inferior com cinco destinos e concentra:
+- Moovit e Supershift como aplicações principais;
+- Horário e pausas;
+- Estatísticas;
+- Definições;
+- Backup e diagnóstico;
+- Notificações;
+- Atualizações;
+- Sobre.
+
+O hub foi desenhado como ponto de extensão para novos módulos, sem aumentar a barra inferior e sem polling visual contínuo.
 
 ## Qualidade
 `npm run check`
-
-## Publicação
-GitHub Pages via `.github/workflows/pages.yml`.
