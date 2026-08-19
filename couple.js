@@ -2,3 +2,4 @@
 // porque conflitava com o planeador interno. As correções funcionais atuais
 // são carregadas daqui para instalações que ainda importam couple.js.
 import './runtime-fixes.js';
+import './summary-guard.js';
