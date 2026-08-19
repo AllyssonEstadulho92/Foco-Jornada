@@ -1,41 +1,42 @@
-# Foco & Jornada 4.2.0
+# Foco & Jornada
 
-PWA de produtividade pessoal/profissional, local-first e sem dependências de runtime.
+PWA local-first para jornada de trabalho, pausas, atividades, Pomodoro, café, transportes, escala e relatórios.
 
-## Módulos
+**Versão estável pública:** 4.2.x  
+**Próxima fase:** 4.3.0 — consolidação e estabilidade.
+
+## Módulos atuais
 - Jornada: entrada, saída, edição, cancelamento, reabertura e cálculo por timestamps.
 - Horário semanal: segunda a sábado 08:00–17:00; domingo 09:00–18:00.
-- Pausa principal sugerida após 4 horas: 12:00–13:00 de segunda a sábado e 13:00–14:00 ao domingo, com lembrete automático e início manual.
+- Pausa principal sugerida, com aviso automático e início manual.
 - Atividades: criar, editar, prioridade, categoria, estimativa, iniciar, pausar, concluir e cancelar.
 - Foco/Pomodoro: ciclos, pausa/retoma e associação a atividade.
-- Café: preço configurável em cêntimos, registo e desfazer.
-- Moovit: Casa/Trabalho, localização atual, viagens recentes e integração oficial por deep link.
-- Supershift: atalho de abertura e integração segura por calendário externo/ICS; não é usado qualquer URL scheme iOS privado ou inventado.
-- Previsão de saída com base no objetivo de trabalho efetivo e pausa principal.
-- Resumo/fecho do dia.
-- Centro de notificações com atualizações PWA controladas.
-- Histórico, estatísticas, backup/importação e diagnóstico.
-- PWA/offline, atalhos e modo claro/escuro.
+- Café: preço configurável, registo, gasto e desfazer.
+- Moovit: Casa/Trabalho, localização atual, planeamento de rota e transportes próximos através de deep links oficiais.
+- Escala interna: calendário, modelos de turnos, trabalhos, rotações, relatórios, horas/salário configuráveis, ICS e PDF A4.
+- Previsão de saída e resumo diário.
+- Histórico e estatísticas.
+- Backup/importação, diagnóstico e reset.
+- Centro de notificações e atualização PWA controlada.
+- PWA/offline, tema claro/escuro e interface mobile/desktop.
 
 ## Hub “Mais”
-O botão **Mais** abre um menu oculto em formato de bottom sheet no mobile e gaveta lateral no desktop. O hub mantém a barra inferior com cinco destinos e concentra:
-- Moovit e Supershift como aplicações principais;
-- Horário e pausas;
-- Estatísticas;
-- Definições;
-- Backup e diagnóstico;
-- Notificações;
-- Atualizações;
-- Sobre.
+O botão **Mais** concentra Moovit, Supershift/Escala, horário, estatísticas, definições, backup/diagnóstico, notificações, atualizações e sobre sem aumentar a barra inferior.
 
-O módulo **Vida pessoal / Tempo a dois foi retirado do runtime**. Qualquer gestão pessoal adicional fica manual e só deve voltar como módulo se for explicitamente necessária.
+## Vida pessoal
+O antigo módulo **Vida pessoal / Tempo a dois foi retirado do runtime**. Não deve regressar automaticamente em atualizações; qualquer funcionalidade pessoal adicional será implementada apenas quando pedida explicitamente.
 
-### Abertura das aplicações
-- Moovit: usa o deep link oficial `moovit://nearby` e fallback oficial de instalação.
-- Supershift no Android: tenta abrir o package oficial `app.supershift`, com fallback para Google Play.
-- Supershift no iPhone/iPad: como não existe URL scheme/deep link público documentado pelo Supershift, usa-se a ligação oficial do serviço. Se o iOS tiver uma associação Universal Link ativa, pode abrir a app; caso contrário abre o site oficial. Não é utilizado `supershift://` inventado.
-
-O hub foi desenhado como ponto de extensão para novos módulos, sem aumentar a barra inferior e sem polling visual contínuo.
+## Roadmap
+Consultar [`ROADMAP.md`](./ROADMAP.md) para o estado ✅ / 🟡 / ⬜ das funcionalidades e [`docs/CONSOLIDATION-4.3.md`](./docs/CONSOLIDATION-4.3.md) para o plano técnico da 4.3.0.
 
 ## Qualidade
-`npm run check`
+Execute:
+
+```bash
+npm run check
+```
+
+A suite atual cobre domínio, features, hub, controlos, Moovit, escala, relatórios, Flaticon, correções de runtime, auditoria de botões e coerência de versão. Ainda são necessários smoke tests reais no Safari/PWA do iPhone para fluxos que dependem de toque, permissões, ficheiros, impressão ou aplicações externas.
+
+## Privacidade e arquitetura
+Os dados permanecem neste dispositivo através de armazenamento local. A versão atual não possui conta, backend ou sincronização entre dispositivos.
