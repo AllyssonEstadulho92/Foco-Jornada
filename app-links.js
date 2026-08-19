@@ -3,6 +3,7 @@ import {buildMoovitDirectionsUrl,buildMoovitNearbyUrl,validPlace} from './featur
 const FEATURE_KEY='foco-jornada-features-v2';
 const MOOVIT_PARTNER_ID='FocoJornada';
 const SHORTCUT_NAME='Supershift';
+const SHORTCUT_SETUP_KEY='foco-jornada-supershift-shortcut-setup-v2';
 const SHORTCUT_RUN=`shortcuts://run-shortcut?name=${encodeURIComponent(SHORTCUT_NAME)}`;
 const SHORTCUT_CREATE='shortcuts://create-shortcut';
 const SHORTCUT_EDIT=`shortcuts://open-shortcut?name=${encodeURIComponent(SHORTCUT_NAME)}`;
@@ -92,21 +93,34 @@ function ensureSupershiftDirect(){
   if($('#supershiftDirect'))return;
   const block=document.createElement('div');block.id='supershiftDirect';block.className='supershift-direct';
   if(isIOS()){
-    block.innerHTML=`<h4>Abertura do Supershift no iPhone</h4><p>O Supershift não publica um deep link próprio. A forma suportada de o abrir a partir desta PWA é um Atalho da Apple chamado <code>Supershift</code>.</p><div class="button-row"><a class="btn native-app-link" href="${SHORTCUT_CREATE}">1. Criar atalho</a><a class="btn native-app-link" href="${SHORTCUT_EDIT}">Editar atalho</a><a class="btn native-app-link primary-link" href="${SHORTCUT_RUN}">Abrir Supershift</a></div><ol><li>Toca em <b>Criar atalho</b>.</li><li>Adiciona a ação <b>Abrir aplicação</b> e escolhe <b>Supershift</b>.</li><li>Guarda o atalho com o nome exato <b>Supershift</b>.</li><li>Depois usa <b>Abrir Supershift</b> nesta aplicação.</li></ol><p class="app-link-status">Não é possível abrir diretamente o ecrã de planificação do Supershift porque o fabricante não publica um URL para esse ecrã.</p>`;
+    block.innerHTML=`<h4>Abertura do Supershift no iPhone</h4><p>O Supershift não publica um deep link próprio. A forma suportada de o abrir a partir desta PWA é um Atalho da Apple chamado <code>Supershift</code>.</p><div class="button-row"><a id="createSupershiftLink" class="btn native-app-link" href="${SHORTCUT_CREATE}">1. Criar atalho</a><a class="btn native-app-link" href="${SHORTCUT_EDIT}">Editar atalho</a><a class="btn native-app-link primary-link" href="${SHORTCUT_RUN}">Abrir Supershift</a></div><ol><li>Toca em <b>Criar atalho</b>.</li><li>Adiciona a ação <b>Abrir aplicação</b> e escolhe <b>Supershift</b>.</li><li>Guarda o atalho com o nome exato <b>Supershift</b>.</li><li>Depois usa <b>Abrir Supershift</b> nesta aplicação.</li></ol><p class="app-link-status">Não é possível abrir diretamente o ecrã de planificação do Supershift porque o fabricante não publica um URL para esse ecrã.</p>`;
   }else{
     block.innerHTML=`<h4>Abrir Supershift</h4><p>Usa o botão principal para abrir a aplicação. Se não estiver instalada, usa a loja oficial.</p><div class="button-row"><a class="btn native-app-link primary-link" href="${supershiftHref()}">Abrir Supershift</a><a class="btn native-app-link" href="${SUPERSHIFT_STORE}" target="_blank" rel="noopener">App Store</a></div>`;
   }
   const help=section.querySelector('.integration-help');(help||section.lastElementChild)?.after(block);
+  $('#createSupershiftLink')?.addEventListener('click',()=>localStorage.setItem(SHORTCUT_SETUP_KEY,'1'));
 }
 function simplifySupershiftCopy(){
   const section=$('#supershiftSection');if(!section)return;
   const hero=section.querySelector('.supershift-hero');
   if(hero){const b=hero.querySelector('b'),p=hero.querySelector('p');if(b)b.textContent='Supershift instalado no dispositivo';if(p)p.textContent='A Foco & Jornada apenas abre a aplicação ou exporta a escala. A planificação continua dentro do Supershift.'}
 }
+function openSupershiftSetupFromHub(){
+  const opener=$('#integrationsDesktopButton')||$('.integrations-open');
+  if(opener){opener.click();setTimeout(()=>$('#supershiftSection')?.scrollIntoView({behavior:'smooth',block:'start'}),160);return}
+  window.location.href=SHORTCUT_CREATE;
+}
 function enhance(){ensureStyles();replacePlanButton();replaceNearbyButton();replaceSupershiftButton();ensureSupershiftDirect();simplifySupershiftCopy()}
 
 let raf=0;const schedule=()=>{if(raf)return;raf=requestAnimationFrame(()=>{raf=0;enhance()})};
 new MutationObserver(schedule).observe(document.body,{childList:true,subtree:true});
-document.addEventListener('change',e=>{if(e.target?.matches?.('#routeOrigin,#routeDestination,#routeWhen')){const status=$('#appLinkRouteStatus');if(status)status.remove()}},true);
+document.addEventListener('change',e=>{if(e.target?.matches?.('#routeOrigin,#routeDestination,#routeWhen'))$('#appLinkRouteStatus')?.remove()},true);
+document.addEventListener('click',e=>{
+  const hubSup=e.target.closest?.('[data-hub-action="supershift"]');
+  if(!hubSup||!isIOS())return;
+  e.preventDefault();e.stopImmediatePropagation();
+  if(localStorage.getItem(SHORTCUT_SETUP_KEY)==='1')window.location.href=SHORTCUT_RUN;
+  else openSupershiftSetupFromHub();
+},true);
 schedule();
-window.FocoAppLinks=Object.freeze({version:'1.0.0',enhance});
+window.FocoAppLinks=Object.freeze({version:'1.0.1',enhance});
