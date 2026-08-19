@@ -25,3 +25,18 @@ test('alertas de foco e pausa usam Service Worker quando possível',()=>{
   assert.ok(js.includes("kind:'focus'"));
   assert.ok(js.includes("kind:'break'"));
 });
+
+test('planeador Moovit mostra erro visível e abre directions no gesto do utilizador',()=>{
+  const js=read('couple.js');
+  assert.ok(js.includes('buildMoovitDirectionsUrl'));
+  assert.ok(js.includes('routeLaunchStatus'));
+  assert.ok(js.includes('window.location.href=url'));
+  assert.ok(js.includes('Configura primeiro'));
+});
+
+test('Supershift no iPhone usa ponte oficial pelos Atalhos sem inventar supershift scheme',()=>{
+  const js=read('couple.js');
+  assert.ok(js.includes('shortcuts://run-shortcut?name=Supershift'));
+  assert.ok(js.includes('shortcuts://create-shortcut'));
+  assert.equal(js.includes('supershift://'),false);
+});
