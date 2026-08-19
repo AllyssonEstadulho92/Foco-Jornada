@@ -1,3 +1,4 @@
+import './shift-advanced.js';
 import {normalizePlanner} from './shift-planner-core.js';
 
 const FEATURE_KEY='foco-jornada-features-v2';
