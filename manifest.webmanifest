@@ -1,7 +1,7 @@
 {
   "name":"Foco & Jornada",
   "short_name":"Foco",
-  "description":"Jornada, pausas, atividades, foco, café, transportes, histórico e estatísticas.",
+  "description":"Jornada, pausas, atividades, foco, café, integrações, transportes, histórico e estatísticas.",
   "lang":"pt-PT",
   "start_url":"./",
   "scope":"./",
@@ -10,7 +10,7 @@
   "theme_color":"#091017",
   "icons":[{"src":"./icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}],
   "shortcuts":[
-    {"name":"Transportes","short_name":"Transportes","url":"./?action=transport","icons":[{"src":"./icon.svg","sizes":"any","type":"image/svg+xml"}]},
+    {"name":"Integrações","short_name":"Integrações","url":"./?action=integrations","icons":[{"src":"./icon.svg","sizes":"any","type":"image/svg+xml"}]},
     {"name":"Iniciar foco","short_name":"Foco","url":"./?action=focus","icons":[{"src":"./icon.svg","sizes":"any","type":"image/svg+xml"}]}
   ]
 }
