@@ -1,18 +1,20 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {commandModel,buildSearchIndex,searchItems,diagnosticSnapshot,todayShift} from '../professional-core.js';
+import {commandModel,buildSearchIndex,searchItems,diagnosticSnapshot,integrityIssues,todayShift} from '../professional-core.js';
 
-test('centro de comando prioriza pausa, foco e jornada',()=>{
-  assert.equal(commandModel({breakSessions:[{status:'ACTIVE'}]},{}).status,'Em pausa');
-  assert.equal(commandModel({focusSessions:[{status:'ACTIVE'}]},{}).status,'Em foco');
+test('centro de comando prioriza pausa, foco e jornada com comando executável',()=>{
+  assert.equal(commandModel({breakSessions:[{status:'ACTIVE'}]},{}).nextCommand,'endBreak');
+  assert.equal(commandModel({focusSessions:[{status:'PAUSED'}]},{}).nextCommand,'resumeFocus');
+  assert.equal(commandModel({focusSessions:[{status:'ACTIVE'}]},{}).nextTitle,'Abrir foco');
   assert.equal(commandModel({workSessions:[{status:'ACTIVE'}],activities:[{status:'ACTIVE',title:'Inventário'}]},{}).detail,'Inventário');
 });
 
-test('turno do dia é lido da escala',()=>{
+test('turno do dia é lido da escala e sugere iniciar jornada',()=>{
   const f={shiftPlanner:{templates:[{id:'m',name:'Manhã',kind:'work',start:'08:00',end:'17:00'}],assignments:{'2026-08-19':{templateId:'m'}}}};
   const shift=todayShift(f,new Date(2026,7,19,12));
   assert.equal(shift.label,'Manhã');
   assert.equal(shift.start,'08:00');
+  assert.equal(commandModel({},f,new Date(2026,7,19,12)).nextCommand,'startWork');
 });
 
 test('pesquisa global inclui módulos, atividades e turnos',()=>{
@@ -30,4 +32,12 @@ test('diagnóstico agrega contagens sem alterar dados',()=>{
   assert.equal(d.counts.turnos,1);
   assert.equal(d.storageBytes,1234);
   assert.equal(d.standalone,true);
+});
+
+test('verificação de integridade encontra conflitos reais da aplicação e da escala',()=>{
+  const app={settings:{},workSessions:[{id:'w1',status:'ACTIVE'},{id:'w2',status:'ACTIVE'}],breakSessions:[],activities:[],activitySegments:[],focusSessions:[],coffeeEntries:[],events:[]};
+  const features={shiftPlanner:{templates:[{id:'morning'}],assignments:{'2026-08-19':{templateId:'missing'}}}};
+  const issues=integrityIssues(app,features);
+  assert.ok(issues.some(x=>x.code==='MULTIPLE_ACTIVE_WORK'));
+  assert.ok(issues.some(x=>x.code==='SHIFT_TEMPLATE_MISSING'));
 });
