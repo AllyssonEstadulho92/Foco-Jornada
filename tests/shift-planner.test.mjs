@@ -2,7 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {normalizePlanner,assignShift,removeShift,monthReport,applyRotation,exportPlannerIcs,calendarCells,durationMinutes} from '../shift-planner-core.js';
-const ui=fs.readFileSync(new URL('../shift-planner.js',import.meta.url),'utf8');
+const read=path=>fs.readFileSync(new URL(`../${path}`,import.meta.url),'utf8');
+const ui=read('shift-planner.js'),mobileCss=read('shift-mobile.css'),hub=read('hub.js');
 test('modelos padrão incluem os tipos da escala',()=>{const p=normalizePlanner();for(const name of ['De manhã','Folga','Feriado','Férias','Falta','Horários intermédios'])assert.ok(p.templates.some(x=>x.name===name));});
 test('turno 08-17 com pausa conta 8 horas',()=>{const p=normalizePlanner(),t=p.templates.find(x=>x.id==='morning');assert.equal(durationMinutes(t),480);});
 test('atribuir e remover turno por dia',()=>{let p=assignShift(normalizePlanner(),'2026-08-19','morning');assert.equal(p.assignments['2026-08-19'].templateId,'morning');p=removeShift(p,'2026-08-19');assert.equal(p.assignments['2026-08-19'],undefined);});
@@ -13,3 +14,6 @@ test('ICS contém os turnos',()=>{const p=assignShift(normalizePlanner(),'2026-0
 test('módulo não usa polling contínuo',()=>assert.equal(ui.includes('setInterval('),false));
 test('controlos principais têm ação',()=>{for(const action of ['close','prev-month','next-month','calendar-options','pick-selected','add-shift','add-job','add-rotation','apply-rotation','save-report-settings','export-ics','export-json','print','sort-models'])assert.ok(ui.includes(`action==='${action}'`),action);});
 test('quatro áreas principais estão presentes',()=>{for(const label of ['Calendário','Relatórios','Turnos','Mais'])assert.ok(ui.includes(label));});
+test('números usam algarismos tabulares e relatórios alinhados',()=>{assert.ok(mobileCss.includes('font-variant-numeric:tabular-nums'));assert.ok(mobileCss.includes('.sp-report-lines strong'));assert.ok(mobileCss.includes('.sp-day-num'));});
+test('layout tem ajustes específicos para ecrãs mobile',()=>{assert.ok(mobileCss.includes('@media(max-width:520px)'));assert.ok(mobileCss.includes('overflow-x:hidden'));assert.ok(mobileCss.includes('width:calc(100vw - 18px)'));});
+test('hub carrega o polimento mobile antes de abrir a escala',()=>{assert.ok(hub.includes("'./shift-mobile.css'"));assert.ok(hub.includes('ensureShiftPlannerMobileCss'));});
