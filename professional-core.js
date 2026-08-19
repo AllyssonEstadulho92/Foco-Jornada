@@ -1,4 +1,4 @@
-export const PROFESSIONAL_VERSION='1.0.1';
+export const PROFESSIONAL_VERSION='1.1.0';
 
 export function localDayKey(value=Date.now()){
   const d=value instanceof Date?value:new Date(value);
@@ -29,12 +29,12 @@ export function activeState(app={}){
 
 export function commandModel(app={},features={},now=Date.now()){
   const active=activeState(app),shift=todayShift(features,now);
-  let status='Livre',nextTitle='Organizar atividades',nextAction='activities',tone='neutral',detail='Escolhe o que fazer a seguir.';
-  if(active.pause){status='Em pausa';nextTitle='Regressar da pausa';nextAction='today';tone='warning';detail='Existe uma pausa ativa.'}
-  else if(active.focus){status=active.focus.status==='PAUSED'?'Foco pausado':'Em foco';nextTitle=active.focus.status==='PAUSED'?'Retomar foco':'Continuar foco';nextAction='focus';tone='primary';detail='Sessão Pomodoro em curso.'}
-  else if(active.work){status='Em jornada';nextTitle=active.activity?'Continuar atividade':'Escolher atividade';nextAction='activities';tone='success';detail=active.activity?active.activity.title:'Jornada ativa sem atividade em curso.'}
-  else if(shift&&['work','holiday'].includes(shift.kind)){status='Turno previsto';nextTitle='Iniciar jornada';nextAction='today';tone='primary';detail=shift.start&&shift.end?`${shift.start}–${shift.end}`:shift.label}
-  return {status,nextTitle,nextAction,tone,detail,shift,active};
+  let status='Livre',nextTitle='Organizar atividades',nextAction='activities',nextCommand='activities',tone='neutral',detail='Escolhe o que fazer a seguir.';
+  if(active.pause){status='Em pausa';nextTitle='Regressar da pausa';nextAction='today';nextCommand='endBreak';tone='warning';detail='Existe uma pausa ativa.'}
+  else if(active.focus){status=active.focus.status==='PAUSED'?'Foco pausado':'Em foco';nextTitle=active.focus.status==='PAUSED'?'Retomar foco':'Abrir foco';nextAction='focus';nextCommand=active.focus.status==='PAUSED'?'resumeFocus':'openFocus';tone='primary';detail='Sessão Pomodoro em curso.'}
+  else if(active.work){status='Em jornada';nextTitle=active.activity?'Continuar atividade':'Escolher atividade';nextAction='activities';nextCommand='activities';tone='success';detail=active.activity?active.activity.title:'Jornada ativa sem atividade em curso.'}
+  else if(shift&&['work','holiday'].includes(shift.kind)){status='Turno previsto';nextTitle='Iniciar jornada';nextAction='today';nextCommand='startWork';tone='primary';detail=shift.start&&shift.end?`${shift.start}–${shift.end}`:shift.label}
+  return {status,nextTitle,nextAction,nextCommand,tone,detail,shift,active};
 }
 
 export function buildSearchIndex(app={},features={}){
@@ -89,4 +89,25 @@ export function diagnosticSnapshot(app={},features={},env={}){
       modelos:(planner.templates||[]).length
     }
   };
+}
+
+export function integrityIssues(app={},features={}){
+  const issues=[];
+  const arrays=['workSessions','breakSessions','activities','activitySegments','focusSessions','coffeeEntries','events'];
+  for(const key of arrays)if(!Array.isArray(app?.[key]))issues.push({code:`APP_${key.toUpperCase()}_INVALID`,label:`Estrutura inválida: ${key}.`});
+  if(!app?.settings||typeof app.settings!=='object')issues.push({code:'APP_SETTINGS_INVALID',label:'Definições principais inválidas.'});
+  const count=(items,statuses)=>Array.isArray(items)?items.filter(x=>statuses.includes(x?.status)).length:0;
+  if(count(app.workSessions,['ACTIVE'])>1)issues.push({code:'MULTIPLE_ACTIVE_WORK',label:'Existe mais de uma jornada ativa.'});
+  if(count(app.breakSessions,['ACTIVE'])>1)issues.push({code:'MULTIPLE_ACTIVE_BREAK',label:'Existe mais de uma pausa ativa.'});
+  if(count(app.focusSessions,['ACTIVE','PAUSED'])>1)issues.push({code:'MULTIPLE_ACTIVE_FOCUS',label:'Existe mais de uma sessão de foco ativa/pausada.'});
+  if(count(app.activities,['ACTIVE'])>1)issues.push({code:'MULTIPLE_ACTIVE_ACTIVITY',label:'Existe mais de uma atividade ativa.'});
+  const seen=new Set();
+  for(const key of arrays){for(const item of Array.isArray(app?.[key])?app[key]:[]){if(!item?.id)continue;if(seen.has(item.id))issues.push({code:'DUPLICATE_ID',label:`ID duplicado detetado: ${item.id}.`});else seen.add(item.id)}}
+  const planner=features?.shiftPlanner;
+  if(planner&&typeof planner==='object'){
+    const templates=Array.isArray(planner.templates)?planner.templates:[];
+    const ids=new Set(templates.map(t=>t?.id).filter(Boolean));
+    for(const [day,assignment] of Object.entries(planner.assignments||{}))if(assignment?.templateId&&!ids.has(assignment.templateId))issues.push({code:'SHIFT_TEMPLATE_MISSING',label:`Turno de ${day} aponta para um modelo inexistente.`});
+  }
+  return issues;
 }
