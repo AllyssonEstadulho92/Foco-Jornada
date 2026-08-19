@@ -1,0 +1,43 @@
+import {normalizePlanner,templateById,assignShift,removeShift} from './shift-planner-core.js';
+
+const FEATURE_KEY='foco-jornada-features-v2';
+let selectedKey='';
+const $=s=>document.querySelector(s);
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function readFeature(){try{return JSON.parse(localStorage.getItem(FEATURE_KEY)||'{}')||{}}catch{return{}}}
+function readPlanner(){return normalizePlanner(readFeature().shiftPlanner||{})}
+function writePlanner(planner){const f=readFeature();f.shiftPlanner=normalizePlanner(planner);localStorage.setItem(FEATURE_KEY,JSON.stringify(f));window.dispatchEvent(new CustomEvent('foco-shift-planner-change'))}
+function notify(text){window.FocoUI?.notify?.(text)}
+function refresh(){window.FocoShiftPlanner?.render?.()}
+function closeSheet(){$('#spTouchBackdrop')?.remove()}
+function labelDate(key){const [y,m,d]=key.split('-').map(Number);return new Intl.DateTimeFormat('pt-PT',{weekday:'long',day:'numeric',month:'long'}).format(new Date(y,m-1,d))}
+function openDaySheet(key){
+  if(!key)return;selectedKey=key;closeSheet();
+  const p=readPlanner(),current=p.assignments[key],currentT=current?templateById(p,current.templateId):null;
+  const root=document.createElement('div');root.id='spTouchBackdrop';root.className='sp-touch-backdrop';
+  root.innerHTML=`<section class="sp-touch-sheet" role="dialog" aria-modal="true" aria-label="Editar dia"><header class="sp-touch-head"><div><span>SUPERSHIFT · EDITAR DIA</span><h2>${esc(labelDate(key))}</h2></div><button type="button" class="sp-touch-close" data-touch-close aria-label="Fechar">×</button></header><div class="sp-touch-picker">${p.templates.map(t=>`<button type="button" data-touch-template="${esc(t.id)}"><span class="sp-code ${esc(t.color)}">${esc(t.code)}</span><b>${esc(t.name)}</b></button>`).join('')}</div>${currentT?`<div class="sp-touch-current"><b>Atual: ${esc(currentT.name)}</b>${!currentT.allDay?`<div class="sp-touch-time"><label>Início<input type="time" data-touch-time="start" value="${esc(current.start||currentT.start||'')}"></label><label>Fim<input type="time" data-touch-time="end" value="${esc(current.end||currentT.end||'')}"></label></div>`:''}<button type="button" class="sp-touch-remove" data-touch-remove>Eliminar deste dia</button></div>`:''}</section>`;
+  document.body.appendChild(root);
+  root.onclick=e=>{
+    if(e.target===root||e.target.closest('[data-touch-close]')){closeSheet();return}
+    const pick=e.target.closest('[data-touch-template]');if(pick){writePlanner(assignShift(readPlanner(),key,pick.dataset.touchTemplate));closeSheet();refresh();notify('Turno atribuído ao calendário.');return}
+    if(e.target.closest('[data-touch-remove]')){writePlanner(removeShift(readPlanner(),key));closeSheet();refresh();notify('Turno removido do dia.')}
+  };
+  root.onchange=e=>{
+    const input=e.target.closest('[data-touch-time]');if(!input)return;
+    const fresh=readPlanner(),a=fresh.assignments[key];if(!a)return;a[input.dataset.touchTime]=input.value;writePlanner(fresh);refresh();notify('Horário do dia atualizado.');
+  };
+}
+
+document.addEventListener('click',e=>{
+  const planner=e.target.closest?.('#shiftPlanner');if(!planner)return;
+  const day=e.target.closest('[data-sp-day]');
+  if(day&&!e.target.closest('#spModal')){
+    e.preventDefault();e.stopImmediatePropagation();
+    planner.querySelectorAll('[data-sp-day].selected').forEach(x=>x.classList.remove('selected'));
+    day.classList.add('selected');openDaySheet(day.dataset.spDay);return;
+  }
+  const fab=e.target.closest('[data-sp-action="pick-selected"]');
+  if(fab){e.preventDefault();e.stopImmediatePropagation();const active=planner.querySelector('[data-sp-day].selected');openDaySheet(active?.dataset.spDay||selectedKey);}
+},true);
+
+window.FocoShiftMobile=Object.freeze({openDay:openDaySheet,close:closeSheet});
