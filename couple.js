@@ -11,6 +11,7 @@ const check='<path d="m5 12 4 4L19 6"/>';
 const svg=(body,cls='')=>`<svg class="couple-svg ${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${body}</svg>`;
 const dayNames=['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
 
+function ensureStyles(){if($('#coupleStyles'))return;const link=document.createElement('link');link.id='coupleStyles';link.rel='stylesheet';link.href='./couple.css';document.head.appendChild(link)}
 function readFeature(){try{return JSON.parse(localStorage.getItem(FEATURE_KEY)||'{}')||{}}catch{return{}}}
 function writeFeature(feature){localStorage.setItem(FEATURE_KEY,JSON.stringify(feature));window.dispatchEvent(new CustomEvent('foco-feature-change'))}
 function coupleData(){const feature=readFeature(),current=feature.couple&&typeof feature.couple==='object'?feature.couple:{};return{enabled:current.enabled!==false,schedule:{...DEFAULT_COUPLE_SCHEDULE,...(current.schedule||{})},records:{...(current.records||{})}}}
@@ -30,6 +31,6 @@ function renderPanel(){ensurePanel();const sheet=$('#couplePanel .couple-sheet')
 function openCouplePanel(){ensurePanel();renderPanel();const p=$('#couplePanel');p.hidden=false;document.body.classList.add('couple-open')}
 function closeCouplePanel(){const p=$('#couplePanel');if(p)p.hidden=true;document.body.classList.remove('couple-open')}
 function renderAll(){ensureTodayCard();ensureHubItem();if(!$('#couplePanel')?.hidden)renderPanel()}
-function init(){ensurePanel();renderAll();scheduleReminder();document.addEventListener('visibilitychange',()=>{if(!document.hidden){renderAll();scheduleReminder()}});window.addEventListener('storage',e=>{if(e.key===FEATURE_KEY){renderAll();scheduleReminder()}});window.addEventListener('foco-feature-change',()=>{renderAll();scheduleReminder()})}
+function init(){ensureStyles();ensurePanel();renderAll();scheduleReminder();document.addEventListener('visibilitychange',()=>{if(!document.hidden){renderAll();scheduleReminder()}});window.addEventListener('storage',e=>{if(e.key===FEATURE_KEY){renderAll();scheduleReminder()}});window.addEventListener('foco-feature-change',()=>{renderAll();scheduleReminder()})}
 init();
 window.FocoCouple=Object.freeze({open:openCouplePanel,close:closeCouplePanel,version:'1.0.0'});
