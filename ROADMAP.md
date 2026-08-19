@@ -65,13 +65,17 @@ Estados:
 - ✅ Horas normais e salário/hora configuráveis
 - ✅ Exportação ICS
 - ✅ Impressão/PDF A4
+- ✅ Copiar turno para o dia seguinte
+- ✅ Copiar semana para a semana seguinte
+- 🟡 Copiar mês inteiro — ainda não implementado
+- ✅ Férias, Falta, Baixa médica, Folga e Feriado por intervalo de datas
+- ✅ Modelo de Baixa médica
+- ✅ Resumo mensal da escala
+- ✅ Resumo anual da escala
 - 🟡 Teste físico completo de toque/partilha no iPhone
-- ⬜ Copiar semana/mês
 - ⬜ Múltiplos trabalhos com cores no calendário
 - ⬜ Notas por dia
-- ⬜ Intervalos de férias/baixa/falta
 - ⬜ Importação ICS
-- ⬜ Resumo anual da escala
 
 ### Moovit / Transportes
 - ✅ Casa e Trabalho
@@ -106,6 +110,7 @@ Objetivo: reduzir remendos acumulados, tornar os fluxos críticos testáveis e e
 
 ### Arquitetura
 - 🟡 Incorporar progressivamente regras de `runtime-fixes.js`, `summary-guard.js`, `shift-reports.js` e `shift-mobile-interactions.js` nos módulos definitivos
+- ✅ Núcleo puro `shift-advanced-core.js` para cópia, intervalos e resumos da escala
 - ✅ Remover `enhancements.js` do runtime ativo
 - 🟡 Remover ficheiros legado restantes quando deixarem de ser necessários para caches antigos
 - 🟡 Unificar versão pública e metadados numa única release
@@ -117,6 +122,7 @@ Objetivo: reduzir remendos acumulados, tornar os fluxos críticos testáveis e e
 - ✅ Auditoria estática dos botões críticos
 - ✅ Testes do módulo de escala
 - ✅ Testes dos relatórios configuráveis
+- ✅ Testes puros para copiar dia/semana, intervalos e resumos da escala
 - ⬜ Testes DOM de clique/toque
 - ⬜ Smoke test Safari/PWA documentado por release
 - ⬜ Teste de instalação/atualização offline
@@ -142,8 +148,8 @@ A 4.3.0 só deve ser marcada como concluída quando:
 - ⬜ Calendário unificado da aplicação
 - ⬜ Atividades com subtarefas, datas limite e recorrência
 - ⬜ Pesquisa global
-- ⬜ Copiar/duplicar turnos e semanas
-- ⬜ Resumos semanais e mensais mais completos
+- 🟡 Copiar/duplicar turnos e semanas — semana implementada; mês ainda falta
+- 🟡 Resumos semanais e mensais mais completos — resumo mensal/anual da escala implementado; resumo semanal geral ainda falta
 
 ## 4.5.0 — Dados e robustez
 - ⬜ IndexedDB
