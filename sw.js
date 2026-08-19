@@ -1,5 +1,5 @@
-const CACHE='foco-jornada-v4-2-0-shiftplanner2';
-const ASSETS=['./','./index.html','./styles.css','./ux.css','./features.css','./hub.css','./settings-controller.css','./shift-planner.css','./shift-mobile.css','./core.js','./app.js','./stability.js','./ux.js','./features-core.js','./features.js','./hub.js','./controls.js','./settings-controller.js','./shift-planner-core.js','./shift-planner.js','./app-links.js','./couple.js','./manifest.webmanifest','./icon.svg','./.nojekyll'];
+const CACHE='foco-jornada-v4-2-0-flaticon1';
+const ASSETS=['./','./index.html','./styles.css','./ux.css','./features.css','./hub.css','./settings-controller.css','./shift-planner.css','./shift-mobile.css','./flaticon-motion.css','./core.js','./app.js','./stability.js','./ux.js','./features-core.js','./features.js','./hub.js','./controls.js','./settings-controller.js','./shift-planner-core.js','./shift-planner.js','./app-links.js','./flaticon-icons.js','./couple.js','./manifest.webmanifest','./icon.svg','./.nojekyll'];
 self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS))));
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
 self.addEventListener('message',e=>{if(e.data?.type==='SKIP_WAITING')self.skipWaiting()});
