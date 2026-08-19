@@ -125,6 +125,7 @@ Objetivo: reduzir remendos acumulados, tornar os fluxos críticos testáveis e e
 
 ### Arquitetura
 - 🟡 Incorporar progressivamente regras de `runtime-fixes.js`, `summary-guard.js`, `shift-reports.js` e `shift-mobile-interactions.js` nos módulos definitivos
+- ✅ Atividades e Pomodoro têm agora um único proprietário funcional em `app.js` + `productivity-core.js`; `runtime-fixes.js` deixou de interceptar esses fluxos
 - ✅ Núcleo puro `shift-advanced-core.js` para cópia, intervalos e resumos da escala
 - ✅ Núcleo puro `professional-core.js` para Centro de Comando, Pesquisa Global e Diagnóstico
 - ✅ Núcleo `productivity-core.js` para recorrência, subtarefas, duplicação e ciclo Pomodoro
@@ -147,7 +148,7 @@ Objetivo: reduzir remendos acumulados, tornar os fluxos críticos testáveis e e
 - ⬜ Teste de instalação/atualização offline
 
 ### Fluxos a fechar na 4.3.0
-- 🟡 Pomodoro e atividades: lógica principal consolidada; falta validação física e remoção dos handlers corretivos antigos
+- 🟡 Pomodoro e atividades: lógica e handlers principais consolidados; falta validação física no iPhone
 - 🟡 Resumo diário consolidado
 - 🟡 Importação/backup com versão de schema explícita
 - 🟡 Atualização PWA com estado instalado/disponível/atualizado
