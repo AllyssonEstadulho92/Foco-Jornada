@@ -20,7 +20,10 @@ function openFocus(){
   const nav=$('.bottom-nav [data-nav="focus"]')||$('.side-nav [data-nav="focus"]');
   nav?.click();
 }
-function selectedActivity(){return $('#focusActivity')?.value||localStorage.getItem(FOCUS_SELECTION_KEY)||null}
+function selectedActivity(){
+  const select=$('#focusActivity');
+  return select?select.value||null:localStorage.getItem(FOCUS_SELECTION_KEY)||null;
+}
 
 function ensureStyle(){
   if($('#focusEntryStyle'))return;
@@ -51,7 +54,8 @@ function ensureFocusUi(){
     select.closest('label')?.after(tools);
   }
   const available=[...select.options].filter(o=>o.value).length;
-  tools.innerHTML=`<small>${available?`${available} atividade${available===1?'':'s'} disponível${available===1?'':'eis'} para associar.`:'Nenhuma atividade aberta. Podes iniciar sem atividade ou criar uma agora.'}</small><button type="button" class="btn" data-focus-create-activity data-runtime-new-activity="1">+ Criar atividade</button>`;
+  const availableText=available===1?'1 atividade disponível para associar.':`${available} atividades disponíveis para associar.`;
+  tools.innerHTML=`<small>${available?availableText:'Nenhuma atividade aberta. Podes iniciar sem atividade ou criar uma agora.'}</small><button type="button" class="btn" data-focus-create-activity data-runtime-new-activity="1">+ Criar atividade</button>`;
   let note=panel.querySelector('.focus-entry-start-note');
   if(!note){note=document.createElement('small');note.className='focus-entry-start-note';button?.before(note)}
   if(note)note.textContent=pause?'Existe uma pausa ativa. Termina-a primeiro.':work?'A sessão será registada dentro da jornada atual.':'Não existe jornada ativa. Ao iniciar, será pedida confirmação para registar Jornada + Foco.';
@@ -101,6 +105,7 @@ function restoreFocus(){
 function schedule(){if(raf)return;raf=requestAnimationFrame(()=>{raf=0;ensureFocusUi()})}
 
 document.addEventListener('click',e=>{
+  if(e.target.classList?.contains('backdrop')&&sessionStorage.getItem(CREATE_RETURN_KEY)==='1')sessionStorage.removeItem(CREATE_RETURN_KEY);
   const target=e.target.closest('button');
   if(!target)return;
   if(target.matches('[data-focus-create-activity]')){
@@ -119,4 +124,4 @@ document.addEventListener('change',e=>{if(e.target?.id==='focusActivity')localSt
 new MutationObserver(schedule).observe(document.body,{childList:true,subtree:true});
 restoreFocus();
 schedule();
-window.FocoFocusEntry=Object.freeze({version:'1.0.0',refresh:schedule});
+window.FocoFocusEntry=Object.freeze({version:'1.0.1',refresh:schedule});
