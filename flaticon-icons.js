@@ -1,7 +1,6 @@
 const FLATICON_VERSION='3.0.0';
 const CDN_MARK='cdn-uicons.flaticon.com';
 let ready=false,raf=0;
-const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 
 const NAV={today:'home',activities:'checkbox',focus:'bullseye',history:'time-past',stats:'chart-histogram',more:'menu-dots'};
 const ACTION={
@@ -13,7 +12,7 @@ const ACTION={
 const HUB={moovit:'bus',supershift:'calendar',shifts:'calendar',schedule:'clock',stats:'chart-histogram',settings:'settings',backup:'database',notifications:'bell',updates:'refresh',about:'info'};
 const SP_TAB={calendar:'calendar',reports:'chart-histogram',models:'layers',more:'menu-burger'};
 const SP_ACTION={
-  close:'cross',prev-month:'angle-left',next-month:'angle-right','calendar-options':'settings-sliders','pick-selected':'edit','sort-models':'sort-alt',
+  close:'cross','prev-month':'angle-left','next-month':'angle-right','calendar-options':'settings-sliders','pick-selected':'edit','sort-models':'sort-alt',
   'add-shift':'plus','add-job':'plus','add-rotation':'plus','apply-rotation':'refresh','save-report-settings':'disk',print:'print','export-ics':'calendar-lines','export-json':'download'
 };
 const IDS={newActivityBtn:'plus',exportBtn:'download',importBtn:'upload',checkBtn:'shield-check',resetBtn:'trash'};
@@ -80,7 +79,7 @@ function enhance(scope=document){
   replaceTextIcons(scope);
 }
 function schedule(scope=document){
-  if(!ready)return;if(raf)return;
+  if(!ready||raf)return;
   raf=requestAnimationFrame(()=>{raf=0;enhance(scope)});
 }
 function activate(){if(ready)return;ready=true;document.documentElement.classList.add('flaticon-ready');enhance(document)}
