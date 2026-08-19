@@ -15,9 +15,9 @@
 - Nova camada `stability.js`; `enhancements.js` deixa de fazer parte do runtime público.
 - Novo hub oculto no botão Mais: Moovit, Supershift, horário, estatísticas, definições, backup/diagnóstico, notificações, atualizações e sobre.
 - Hub apresentado como bottom sheet no mobile e gaveta lateral no desktop, preparado para módulos futuros sem aumentar a barra inferior.
-- Novo módulo Tempo a dois no Hoje e no hub Mais, com agenda semanal protegida para o casamento.
-- Tempo a dois permite concluir, adiar 30 minutos ou ignorar apenas o dia; não usa pontuação nem inicia automaticamente.
-- Lembretes do casal usam temporizador único e podem usar o sino interno/notificação do sistema quando autorizada.
+- Módulo Vida pessoal / Tempo a dois revisto: deixa de usar horários rígidos e passa a derivar o início a partir da saída prevista ou da saída real registada.
+- Tempo a dois usa margem padrão de 1h30 após a jornada; 30 min nos dias normais, 1h30 à quarta, 3h ao sábado e 1h ao domingo.
+- Lembrete do casal ocorre 15 minutos antes, permite concluir, adiar 30 minutos ou ignorar apenas o dia e nunca conclui automaticamente.
 
 ## 4.1.2
 - UX mobile com viewport estática, centro de notificações e ícones SVG locais.
