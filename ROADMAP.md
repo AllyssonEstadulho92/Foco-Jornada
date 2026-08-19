@@ -33,21 +33,27 @@ Estados:
 ### Atividades
 - ✅ Criar, editar, iniciar, pausar, concluir e cancelar
 - ✅ Prioridade, categoria, estimativa, pesquisa e filtros
-- 🟡 Associação ao Pomodoro — implementada, precisa teste E2E real
-- ⬜ Subtarefas
-- ⬜ Datas limite
-- ⬜ Recorrência
-- ⬜ Etiquetas e ordenação manual
-- ⬜ Duplicar / mover para amanhã
+- ✅ Subtarefas com conclusão/reabertura
+- ✅ Data planeada e data limite
+- ✅ Recorrência diária, semanal e mensal
+- ✅ Etiquetas pesquisáveis
+- ✅ Duplicar atividade
+- ✅ Mover para amanhã
+- ✅ Filtros Hoje e Atrasadas
+- ✅ Contagem de sessões de foco por atividade na lista
+- 🟡 Associação ao Pomodoro — funcional, ainda precisa smoke test físico no iPhone
+- ⬜ Ordenação manual
 
 ### Pomodoro
 - ✅ Foco por timestamp
 - ✅ Pausar e retomar
 - ✅ Associação a atividade
 - ✅ Duração e número de ciclos configuráveis
-- 🟡 Fluxo automático foco → pausa curta → foco → pausa longa
-- ⬜ Histórico detalhado por atividade
-- ⬜ Objetivo diário de sessões
+- ✅ Fluxo automático foco → pausa curta → foco → pausa longa
+- ✅ Ativar/desativar continuação automática
+- ✅ Objetivo diário configurável de sessões
+- ✅ Progresso diário de sessões e minutos
+- 🟡 Histórico por atividade — contagem/resumo implementados; falta vista histórica detalhada
 
 ### Café
 - ✅ Registo e desfazer
@@ -121,6 +127,7 @@ Objetivo: reduzir remendos acumulados, tornar os fluxos críticos testáveis e e
 - 🟡 Incorporar progressivamente regras de `runtime-fixes.js`, `summary-guard.js`, `shift-reports.js` e `shift-mobile-interactions.js` nos módulos definitivos
 - ✅ Núcleo puro `shift-advanced-core.js` para cópia, intervalos e resumos da escala
 - ✅ Núcleo puro `professional-core.js` para Centro de Comando, Pesquisa Global e Diagnóstico
+- ✅ Núcleo `productivity-core.js` para recorrência, subtarefas, duplicação e ciclo Pomodoro
 - ✅ Remover `enhancements.js` do runtime ativo
 - 🟡 Remover ficheiros legado restantes quando deixarem de ser necessários para caches antigos
 - 🟡 Unificar versão pública e metadados numa única release
@@ -134,13 +141,13 @@ Objetivo: reduzir remendos acumulados, tornar os fluxos críticos testáveis e e
 - ✅ Testes dos relatórios configuráveis
 - ✅ Testes puros para copiar dia/semana, intervalos e resumos da escala
 - ✅ Testes puros para Centro de Comando, Pesquisa Global e Diagnóstico
+- ✅ Testes de fluxo para recorrência, subtarefas, duplicação e transições Pomodoro
 - ⬜ Testes DOM de clique/toque
 - ⬜ Smoke test Safari/PWA documentado por release
 - ⬜ Teste de instalação/atualização offline
 
 ### Fluxos a fechar na 4.3.0
-- 🟡 Pomodoro completo e associação de atividade sem camada corretiva
-- 🟡 Atividades sem handlers duplicados
+- 🟡 Pomodoro e atividades: lógica principal consolidada; falta validação física e remoção dos handlers corretivos antigos
 - 🟡 Resumo diário consolidado
 - 🟡 Importação/backup com versão de schema explícita
 - 🟡 Atualização PWA com estado instalado/disponível/atualizado
@@ -157,7 +164,7 @@ A 4.3.0 só deve ser marcada como concluída quando:
 
 ## 4.4.0 — Planeamento
 - ⬜ Calendário unificado da aplicação
-- ⬜ Atividades com subtarefas, datas limite e recorrência
+- 🟡 Atividades avançadas — subtarefas, prazo, recorrência, etiquetas, duplicação e mover amanhã implementados; falta ordenação manual
 - ✅ Pesquisa global
 - 🟡 Copiar/duplicar turnos e semanas — semana implementada; mês ainda falta
 - 🟡 Resumos semanais e mensais mais completos — resumo mensal/anual da escala implementado; resumo semanal geral ainda falta
