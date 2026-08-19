@@ -28,7 +28,7 @@ jobs:
       - name: Preparar site
         run: |
           mkdir -p _site
-          cp index.html styles.css ux.css core.js app.js enhancements.js ux.js manifest.webmanifest sw.js icon.svg .nojekyll _site/
+          cp index.html styles.css ux.css features.css core.js app.js stability.js ux.js features-core.js features.js manifest.webmanifest sw.js icon.svg .nojekyll _site/
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site
