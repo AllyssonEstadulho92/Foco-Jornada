@@ -7,6 +7,8 @@ const install=read('install-app.js');
 const index=read('index.html');
 const bootstrap=read('bootstrap.js');
 const productivity=read('productivity-core.js');
+const app=read('app.js');
+const stability=read('stability.js');
 const sw=read('sw.js');
 const ux=read('ux.js');
 const manifest=JSON.parse(read('manifest.webmanifest'));
@@ -63,33 +65,47 @@ test('bootstrap carrega persistência antes do núcleo leve e mantém correção
   assert.ok(index.includes('./install-app.css'));
 });
 
-test('primeiro paint mantém onboarding isolado dos módulos visuais e integrações',()=>{
+test('primeiro paint entra direto na aplicação e adia módulos opcionais',()=>{
   assert.ok(index.includes('id="startupShell"'));
   assert.ok(index.includes('id="startupStatus"'));
   assert.ok(index.includes('requestAnimationFrame(function()'));
   assert.ok(index.includes('media="print" onload="this.media=\'all\'"'));
   assert.ok(index.includes('id="mainCss"'));
   assert.ok(bootstrap.includes("waitStylesheet('mainCss')"));
-  assert.ok(bootstrap.includes('onboardingPending'));
-  assert.ok(bootstrap.includes('#finishOnboarding,#skipOnboarding'));
+  assert.ok(bootstrap.includes('disableFirstUse'));
+  assert.equal(bootstrap.includes('onboardingPending'),false);
+  assert.equal(bootstrap.includes('#finishOnboarding,#skipOnboarding'),false);
   assert.ok(bootstrap.includes('scheduleExtras()'));
+  assert.ok(bootstrap.includes('requestIdleCallback'));
   assert.ok(bootstrap.includes('const nextFrame='));
   assert.ok(bootstrap.includes("const modules=['./ux.js'"));
   assert.equal(bootstrap.includes("await import('./ux.js');"),false);
-  assert.equal(bootstrap.includes('requestIdleCallback'),false);
   assert.equal(bootstrap.includes('setTimeout(()=>loadShift()'),false);
   for(const heavy of ['src="./shift-planner.js"','src="./shift-advanced.js"','src="./shift-reports.js"','src="./shift-mobile-interactions.js"'])assert.equal(index.includes(heavy),false,heavy);
   for(const heavy of ["import('./shift-planner.js')","import('./shift-advanced.js')","import('./shift-reports.js')","import('./shift-mobile-interactions.js')"])assert.ok(bootstrap.includes(heavy),heavy);
 });
 
-test('service worker abre pelo cache e atualiza pela rede em segundo plano',()=>{
-  assert.ok(sw.includes('fast-cache1-core-startup1'));
+test('runtime não redesenha nem grava toda a aplicação a cada segundo',()=>{
+  const renderBlock=app.slice(app.indexOf('function render(){'),app.indexOf('function renderToday('));
+  assert.equal(renderBlock.includes('save();'),false);
+  assert.equal(app.includes("setInterval(()=>{const r=reconcileTimers"),false);
+  assert.ok(app.includes('function updateLiveUi('));
+  assert.ok(app.includes('function scheduleLiveTick('));
+  assert.ok(app.includes("window.dispatchEvent(new CustomEvent('foco-render'"));
+  assert.equal(stability.includes('window.setInterval='),false);
+  assert.equal(stability.includes('nativeSetInterval'),false);
+  assert.ok(stability.includes("await import('./app.js')"));
+});
+
+test('service worker abre pelo cache sem pré-carregar módulos pesados',()=>{
+  assert.ok(sw.includes('structural-clean1'));
   assert.ok(sw.includes('./bootstrap.js'));
   assert.ok(sw.includes("cache:'no-cache'"));
   assert.ok(sw.includes('cache.match(key)'));
   assert.ok(sw.includes('event.waitUntil(update'));
   assert.ok(sw.includes('self.skipWaiting()'));
   assert.equal(sw.includes("cache:'no-store'"),false);
+  for(const heavy of ['./shift-planner.js','./shift-advanced.js','./runtime-fixes.js','./professional-ui.js'])assert.equal(sw.includes(heavy),false,heavy);
 });
 
 test('interface ignora alterações apenas textuais dos temporizadores',()=>{
