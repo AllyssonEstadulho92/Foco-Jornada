@@ -6,8 +6,8 @@
 |---|---|---|---|
 | 0 | Especificação | Concluída | `PROJECT_SPEC.md` aprovado |
 | 1 | Fundação | Concluída | Typecheck, lint, testes e build verdes |
-| 2 | Jornada | Próxima | Persistência e recuperação validadas |
-| 3 | Pausas | Bloqueada | Cálculo de tempo efetivo validado |
+| 2 | Jornada | Concluída | Persistência, recuperação e concorrência validadas |
+| 3 | Pausas | Próxima | Cálculo de tempo efetivo validado |
 | 4 | Atividades | Bloqueada | Apenas uma atividade ativa |
 | 5 | Foco/Pomodoro | Bloqueada | Timer persistente após refresh |
 | 6 | Café | Bloqueada | Registos e totais consistentes |
@@ -33,31 +33,32 @@ Implementado:
 - páginas Hoje, Atividades, Foco, Histórico, Mais e Definições;
 - CI com typecheck, lint, testes e build.
 
-Validação GitHub Actions da implementação: **PASS** em typecheck, lint, testes e build.
-
-### Fora do escopo, conforme planeado
-
-- Jornada;
-- Pausas;
-- Atividades funcionais;
-- Pomodoro;
-- Café.
+Validação: **PASS** em typecheck, lint, testes e build.
 
 ---
 
-## Fase 2 — Jornada — PRÓXIMA
+## Fase 2 — Jornada — CONCLUÍDA
 
-- Criar/iniciar/terminar jornada.
-- Impedir duas jornadas ativas.
-- Persistir em IndexedDB.
-- Recuperar após refresh/reabertura.
-- Calcular duração por timestamps.
-- Testar regras críticas e idempotência.
+Implementado:
 
-## Fase 3 — Pausas
+- iniciar e terminar jornada;
+- impedir duas jornadas ativas;
+- operações concorrentes protegidas por transações;
+- persistência IndexedDB;
+- recuperação após refresh/reabertura;
+- duração calculada por timestamps;
+- histórico básico diário;
+- interface funcional no ecrã Hoje;
+- testes de domínio/aplicação e persistência.
+
+Validação: **PASS** em typecheck, lint, testes e build.
+
+---
+
+## Fase 3 — Pausas — PRÓXIMA
 
 - 15 min, 60 min e personalizada.
-- Apenas uma pausa ativa.
+- Apenas uma pausa ativa por jornada.
 - Persistência e recuperação.
 - Cálculo de tempo efetivo.
 
