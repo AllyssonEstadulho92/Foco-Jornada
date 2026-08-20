@@ -5,6 +5,7 @@ const read=p=>fs.readFileSync(new URL(`../${p}`,import.meta.url),'utf8');
 const persistence=read('persistence.js');
 const install=read('install-app.js');
 const index=read('index.html');
+const productivity=read('productivity-core.js');
 const app=read('app.js');
 const stability=read('stability.js');
 const sw=read('sw.js');
@@ -55,7 +56,8 @@ test('arranque carrega persistência antes da aplicação e não usa shell bloqu
   const uxPos=index.indexOf('src="./ux.js"');
   assert.ok(persistencePos>=0&&uxPos>persistencePos);
   assert.ok(index.includes('src="./features.js"'));
-  assert.ok(index.includes('src="./focus-entry.js"'));
+  assert.equal(index.includes('src="./focus-entry.js"'),false);
+  assert.ok(productivity.includes("import('./focus-entry.js')"));
   assert.ok(index.includes('src="./install-app.js"'));
   assert.ok(index.includes('./install-app.css'));
   assert.equal(index.includes('id="startupShell"'),false);
@@ -63,7 +65,7 @@ test('arranque carrega persistência antes da aplicação e não usa shell bloqu
 });
 
 test('folhas principais são carregadas diretamente sem media print temporário',()=>{
-  for(const css of ['./styles.css','./ux.css','./features.css','./hub.css','./productivity.css','./stability-ui.css'])assert.ok(index.includes(`rel="stylesheet" href="${css}"`),css);
+  for(const css of ['./styles.css','./ux.css','./features.css','./hub.css','./productivity.css','./stability-ui.css'])assert.ok(index.includes(`rel="stylesheet" href="${css}"`)||index.includes(`rel="stylesheet" href="${css}"`),css);
   assert.equal(index.includes('media="print" onload='),false);
 });
 
