@@ -2,12 +2,13 @@
 
 ## Estado atual
 
-**Fase:** 1 — Fundação, implementação concluída; validação CI pendente  
-**Branch:** `phase/01-fundacao`  
-**PR:** #6  
+**Fase:** 1 — Fundação concluída  
+**Próxima fase:** 2 — Jornada  
+**PR da Fase 1:** #6  
+**Validação CI:** GitHub Actions run `32410154499` — sucesso  
 **Fonte de verdade:** `project/PROJECT_SPEC.md`
 
-## Implementado na Fase 1
+## Implementado e validado na Fase 1
 
 - [x] React + TypeScript + Vite.
 - [x] TypeScript strict.
@@ -21,19 +22,26 @@
 - [x] Navegação responsiva mobile/desktop.
 - [x] Páginas Hoje, Atividades, Foco, Histórico, Mais e Definições.
 - [x] Design tokens e layout escuro base.
-- [x] CI configurada para typecheck + lint + testes + build.
+- [x] CI com typecheck + lint + testes + build.
+- [x] GitHub Actions: typecheck verde.
+- [x] GitHub Actions: lint verde.
+- [x] GitHub Actions: testes verdes.
+- [x] GitHub Actions: build verde.
 
-## Validação necessária antes de concluir a Fase 1
+## Resultado dos quality gates
 
-- [ ] GitHub Actions: typecheck verde.
-- [ ] GitHub Actions: lint verde.
-- [ ] GitHub Actions: testes verdes.
-- [ ] GitHub Actions: build verde.
-- [ ] Revisão técnica final da Fase 1.
+- Typecheck: **PASS**
+- Lint: **PASS**
+- Testes: **PASS**
+- Build: **PASS**
 
-## Fases bloqueadas
+## Próximo trabalho autorizado
 
-As Fases 2 a 9 permanecem bloqueadas até todos os gates acima estarem verdes e este checkpoint ser atualizado para **Fase 1 concluída**.
+A Fase 2 pode iniciar depois de a PR #6 ser integrada em `main`.
+
+Escopo da Fase 2: **Jornada apenas** — iniciar, impedir duplicados, persistir em IndexedDB, recuperar após refresh/reabertura, calcular duração por timestamps e terminar com consistência.
+
+Pausas, Atividades, Foco e Café continuam bloqueados.
 
 ## Regra de continuidade
 
