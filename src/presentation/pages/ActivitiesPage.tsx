@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { getActivityDurationMs, type Activity } from '../../domain/activities/Activity'
 import { formatClockTime, formatDuration } from '../../shared/utils/dateTime'
 import { useActivityController } from '../hooks/useActivityController'
@@ -19,6 +20,7 @@ function statusLabel(status: Activity['status']): string {
 }
 
 export function ActivitiesPage() {
+  const navigate = useNavigate()
   const { activeJourney, isLoading: isJourneyLoading } = useJourneyController()
   const { activities, activeActivity, isLoading, isBusy, error, create, edit, start, complete, cancel } =
     useActivityController(activeJourney?.id)
@@ -32,6 +34,11 @@ export function ActivitiesPage() {
 
   async function handleCreate(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    if (!activeJourney) {
+      navigate('/')
+      return
+    }
+
     const created = await create(name, description)
     if (created) {
       setName('')
@@ -83,7 +90,7 @@ export function ActivitiesPage() {
             <input
               maxLength={120}
               placeholder="Ex.: Tratamento de ocorrências"
-              required
+              required={Boolean(activeJourney)}
               value={name}
               onChange={(event) => setName(event.target.value)}
             />
@@ -101,14 +108,23 @@ export function ActivitiesPage() {
           <button
             className="actionButton actionButtonPrimary"
             type="submit"
-            disabled={!activeJourney || isBusy || isJourneyLoading || !name.trim()}
+            disabled={isBusy || isJourneyLoading || (Boolean(activeJourney) && !name.trim())}
           >
-            {isBusy ? 'A guardar…' : 'Criar atividade'}
+            {isBusy
+              ? 'A guardar…'
+              : activeJourney
+                ? 'Criar atividade'
+                : 'Iniciar jornada para criar'}
           </button>
         </form>
 
         {!activeJourney && !isJourneyLoading ? (
-          <p className="activityHint">Inicia uma jornada no ecrã Hoje para criares atividades.</p>
+          <div className="journeyGateHint">
+            <span aria-hidden="true">→</span>
+            <span>
+              <strong>Primeiro inicia a jornada.</strong> Ao tocar no botão acima voltas ao ecrã Hoje.
+            </span>
+          </div>
         ) : null}
       </section>
 
@@ -190,7 +206,9 @@ export function ActivitiesPage() {
                           {activity.description ? <p>{activity.description}</p> : null}
                           <div className="activityMeta">
                             <span>
-                              {activity.startedAt ? `Início ${formatClockTime(activity.startedAt)}` : 'Ainda não iniciada'}
+                              {activity.startedAt
+                                ? `Início ${formatClockTime(activity.startedAt)}`
+                                : 'Ainda não iniciada'}
                             </span>
                             <span>{formatDuration(getActivityDurationMs(activity, nowIso))}</span>
                           </div>
