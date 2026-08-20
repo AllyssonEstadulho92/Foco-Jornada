@@ -36,11 +36,17 @@ function renderPlanning(){
 }
 function replaceStats(){
   const grid=$('#statsGrid');if(!grid)return;
-  const cards=$$('.big-metric');if(cards.length<2)return;
+  const cards=$$('#statsGrid .big-metric');if(cards.length<2)return;
   const state=readState(),period=$('[data-period].on')?.dataset.period||'week',now=Date.now(),start=period==='year'?new Date(new Date(now).getFullYear(),0,1).getTime():now-(period==='month'?30:7)*86400000;
   const days=new Set((state?.workSessions||[]).filter(w=>w.status!=='CANCELLED'&&Number(w.startedAt)>=start&&Number(w.startedAt)<=now).map(w=>dayKey(w.startedAt)));
   cards[1].querySelector('small').textContent='Jornadas';cards[1].querySelector('strong').textContent=days.size;cards[1].querySelector('span').textContent='Dias registados';
   const summary=$('#statsSummary');if(summary)summary.innerHTML=summary.innerHTML.replace(/ e <b>[^<]*<\/b> de foco/,'');
+}
+function replaceProfessionalUi(){
+  const shortcut=$('#professionalCommandCenter [data-pro-action="focus"] span');if(shortcut&&shortcut.textContent!=='Planeamento')shortcut.textContent='Planeamento';
+  const focusCount=$('#professionalCommandCenter .professional-shift>small:last-child');if(focusCount&&/foco/i.test(focusCount.textContent||''))focusCount.hidden=true;
+  const integrity=$('#integrity span');if(integrity&&/foco/i.test(integrity.textContent||''))integrity.textContent='Jornada, atividades e escala passaram na verificação estrutural.';
+  $$('#professionalDiagnostics .professional-diagnostic-grid div').forEach(cell=>{const label=cell.querySelector('small');if(label?.textContent==='Foco')label.textContent='Sessões antigas'});
 }
 function replaceVisibleFocus(){
   $$('[data-nav="focus"]').forEach(b=>{const small=b.querySelector('small');if(small){const icon=b.querySelector('span');if(icon)icon.textContent='▦';small.textContent='Planeamento'}else b.innerHTML='<span>▦</span>Planeamento'});
@@ -49,10 +55,12 @@ function replaceVisibleFocus(){
   const metrics=$$('#todayMetrics .metric');if(metrics[2]){const state=readState(),count=(state?.activities||[]).filter(isOpen).length;metrics[2].querySelector('small').textContent='Atividades';metrics[2].querySelector('strong').textContent=`${count} abertas`}
   for(const id of ['setFocus','setShort','setLong','setCycles'])$('#'+id)?.closest('label')?.classList.add('focus-setting-hidden');
   const notice=$('#setNotifications')?.closest('label')?.querySelector('span');if(notice)notice.textContent='Notificações quando uma pausa terminar';
-  renderPlanning();replaceStats();
+  renderPlanning();replaceStats();replaceProfessionalUi();
 }
 
 document.addEventListener('foco-render',replaceVisibleFocus);
 window.addEventListener('pageshow',replaceVisibleFocus);
+const professionalObserver=new MutationObserver(mutations=>{if(mutations.some(m=>[...m.addedNodes].some(n=>n.nodeType===1)))queueMicrotask(replaceProfessionalUi)});
+professionalObserver.observe(document.body,{childList:true,subtree:true});
 queueMicrotask(replaceVisibleFocus);
-window.FocoPlanningMode=Object.freeze({version:'1.0.1',render:replaceVisibleFocus});
+window.FocoPlanningMode=Object.freeze({version:'1.1.0',render:replaceVisibleFocus});
