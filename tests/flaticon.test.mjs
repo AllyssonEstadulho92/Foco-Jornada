@@ -3,38 +3,40 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 const read=p=>fs.readFileSync(new URL(`../${p}`,import.meta.url),'utf8');
 
-test('Flaticon UIcons está ligado com atribuição',()=>{
-  const html=read('index.html');
-  assert.ok(html.includes('cdn-uicons.flaticon.com/3.0.0/uicons-regular-rounded/css/uicons-regular-rounded.css'));
-  assert.ok(html.includes('data-flaticon-uicons'));
-  assert.ok(html.includes('UIcons by'));
-  assert.ok(html.includes('flaticon.com/uicons'));
+test('ícones públicos usam SVG local sem CDN bloqueante',()=>{
+  const html=read('index.html'),ux=read('ux.js');
+  assert.equal(html.includes('cdn-uicons.flaticon.com'),false);
+  assert.equal(html.includes('flaticon-motion.css'),false);
+  assert.equal(html.includes('src="./flaticon-icons.js"'),false);
+  assert.ok(html.includes('./stability-ui.css'));
+  assert.ok(ux.includes('const ICON_PATHS='));
+  assert.ok(ux.includes('class="ui-svg'));
 });
 
-test('camada Flaticon não cria polling contínuo',()=>{
-  const js=read('flaticon-icons.js');
-  assert.equal(js.includes('setInterval('),false);
-  assert.ok(js.includes('MutationObserver'));
-  assert.ok(js.includes('flaticon-source-hidden'));
-});
-
-test('ícones mantêm fallback SVG quando UIcon não renderiza',()=>{
-  const js=read('flaticon-icons.js');
-  assert.ok(js.includes('validPseudo'));
-  assert.ok(js.includes('i.remove()'));
-  assert.ok(js.includes("svg.classList.remove('flaticon-source-hidden')"));
-});
-
-test('animações respeitam redução de movimento',()=>{
-  const css=read('flaticon-motion.css');
+test('camada de estabilidade aumenta ícones e alvos de toque',()=>{
+  const css=read('stability-ui.css');
+  for(const value of ['.bottom-nav .ui-svg{width:36px;height:36px}', '.quick-grid>button>span .ui-svg{width:48px;height:48px}', '.icon-btn .ui-svg{width:28px;height:28px}', '.hub-item-icon .hub-svg{width:28px;height:28px}', '.shift-planner .sp-top-actions button,.shift-planner .sp-close{width:44px;height:44px'])assert.ok(css.includes(value),value);
   assert.ok(css.includes('@media(prefers-reduced-motion:reduce)'));
-  assert.ok(css.includes('@keyframes fiTap'));
-  assert.ok(css.includes('@keyframes fiBell'));
-  assert.ok(css.includes('button:active .fi-motion'));
 });
 
-test('Service Worker guarda a camada local Flaticon',()=>{
-  const sw=read('sw.js');
-  assert.ok(sw.includes('./flaticon-motion.css'));
-  assert.ok(sw.includes('./flaticon-icons.js'));
+test('Sobre reutiliza a folha CSS já presente no documento',()=>{
+  const html=read('index.html'),about=read('hub-about.js');
+  assert.ok(html.includes('id="hubAboutCss"'));
+  assert.ok(about.includes("document.querySelector('#hubAboutCss')"));
+});
+
+test('entrada do Pomodoro não é registada duas vezes no HTML',()=>{
+  const html=read('index.html'),productivity=read('productivity-core.js');
+  assert.equal(html.includes('src="./focus-entry.js"'),false);
+  assert.ok(productivity.includes("import('./focus-entry.js')"));
+});
+
+test('Service Worker e Pages publicam apenas a camada local ativa',()=>{
+  const sw=read('sw.js'),pages=read('.github/workflows/pages.yml');
+  assert.ok(sw.includes('./stability-ui.css'));
+  assert.equal(sw.includes('./flaticon-motion.css'),false);
+  assert.equal(sw.includes('./flaticon-icons.js'),false);
+  assert.ok(pages.includes('stability-ui.css'));
+  assert.equal(pages.includes('flaticon-motion.css'),false);
+  assert.equal(pages.includes('flaticon-icons.js'),false);
 });
