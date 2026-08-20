@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 const read=path=>fs.readFileSync(new URL(`../${path}`,import.meta.url),'utf8');
-test('menu Mais carrega o hub oculto',()=>{const index=read('index.html');assert.ok(index.includes('./hub.css'));assert.ok(index.includes('src="./hub.js"'));});
+test('menu Mais mantém CSS e é carregado pelo bootstrap após o núcleo',()=>{const index=read('index.html'),bootstrap=read('bootstrap.js');assert.ok(index.includes('./hub.css'));assert.equal(index.includes('src="./hub.js"'),false);assert.ok(bootstrap.includes("'./hub.js'"));assert.ok(bootstrap.indexOf("'./hub.js'")>bootstrap.indexOf("import('./ux.js')"));});
 test('hub contém todas as categorias principais',()=>{const hub=read('hub.js');for(const item of ['Principal','Trabalho','Produtividade','Transportes','Dados e aplicação','Informação'])assert.ok(hub.includes(item),item);});
 test('hub contém destinos funcionais da aplicação',()=>{const hub=read('hub.js');for(const item of ['Hoje','Atividades','Foco e Pomodoro','Histórico','Estatísticas','Supershift / Escala','Horário e pausas','Moovit','Notificações','Definições','Backup e diagnóstico','Atualizações','Ajuda','Sobre'])assert.ok(hub.includes(item),item);});
 test('pesquisa do menu filtra opções e categorias',()=>{const hub=read('hub.js');assert.ok(hub.includes('id="hubSearch"'));assert.ok(hub.includes('function filterMenu'));assert.ok(hub.includes('data-hub-search'));});
