@@ -1,90 +1,69 @@
 # Foco & Jornada
 
-Aplicação local-first para controlo de jornada, pausas, atividades, foco/Pomodoro, café e produtividade pessoal.
+PWA local-first para controlo pessoal de jornada, pausas, atividades, foco/Pomodoro, café, histórico e produtividade.
 
-## Estado atual
+## Foco & Jornada V1
 
-- **Fase 0 — Especificação: concluída.**
-- **Fase 1 — Fundação: concluída.**
-- **Fase 2 — Jornada: concluída.**
-- **Fase 3 — Pausas: concluída.**
-- **Fase 4 — Atividades: concluída.**
-- **Próxima: Fase 5 — Foco/Pomodoro.**
+A V1 está implementada no repositório. A branch de release só deve ser integrada em `main` quando o GitHub Actions confirmar typecheck, lint, testes e build verdes.
 
-A base técnica inclui React + TypeScript + Vite, Router, Zustand, Dexie/IndexedDB, testes, lint/format, PWA, navegação responsiva e CI. Jornada, Pausas e Atividades já estão implementadas e validadas.
+### Funcionalidades
 
-## Organização do repositório
+- Jornada: iniciar, recuperar após refresh, impedir duplicados e terminar.
+- Pausas: 15 min, 60 min e personalizada; tempo efetivo desconta pausas.
+- Atividades: criar, editar, iniciar, concluir e cancelar; apenas uma ativa.
+- Foco: Pomodoro 25/5/15, 4 ciclos e sessão personalizada, com pausa/retoma.
+- Café: quantidade, preço configurável, custo e histórico diário.
+- Dashboard Hoje: visão integrada dos módulos principais.
+- Histórico: seleção de dia, resumo e timeline persistida.
+- Estatísticas: hoje, últimos 7 dias e últimos 30 dias.
+- Definições: preço de café, moeda e intervalo sugerido para pausas.
+- Exportação: relatório diário em JSON.
+- PWA: instalação e funcionamento offline dos assets da aplicação.
+
+## Organização
 
 ```text
 Foco-Jornada/
-├── .github/              # CI e automações GitHub
-├── project/              # especificação, roadmap, decisões, gates e prompts
+├── .github/                 # CI
+├── project/                 # governação do projeto
 │   ├── docs/
 │   └── prompts/
-├── src/                  # código da aplicação
-│   ├── domain/           # entidades e regras puras
-│   │   ├── journey/
-│   │   ├── breaks/
-│   │   └── activities/
-│   ├── application/      # casos de uso
-│   │   ├── journey/
-│   │   ├── breaks/
-│   │   └── activities/
-│   ├── infrastructure/   # IndexedDB/Dexie e repositórios
-│   ├── presentation/     # páginas, hooks, componentes e providers
-│   ├── shared/
-│   ├── styles/
-│   └── test/             # doubles e setup de testes
-├── index.html
-├── package.json
-├── vite.config.ts
-├── vitest.config.ts
-└── tsconfig*.json
+├── public/                  # assets PWA
+└── src/
+    ├── domain/
+    │   ├── journey/
+    │   ├── breaks/
+    │   ├── activities/
+    │   ├── focus/
+    │   ├── coffee/
+    │   └── settings/
+    ├── application/
+    │   ├── journey/
+    │   ├── breaks/
+    │   ├── activities/
+    │   ├── focus/
+    │   ├── coffee/
+    │   ├── settings/
+    │   └── reports/
+    ├── infrastructure/
+    │   ├── database/
+    │   └── repositories/
+    ├── presentation/
+    │   ├── components/
+    │   ├── hooks/
+    │   ├── layouts/
+    │   ├── pages/
+    │   └── providers/
+    ├── shared/
+    ├── styles/
+    └── test/
 ```
 
-## Funcionalidades disponíveis
+## Persistência
 
-### Jornada
+IndexedDB/Dexie é a fonte de verdade local. Timers são reconstruídos por timestamps persistidos, e não por contadores acumulados em memória.
 
-- iniciar e terminar jornada;
-- impedir duas jornadas ativas;
-- recuperação após refresh/reabertura;
-- duração derivada de timestamps;
-- histórico básico diário.
-
-### Pausas
-
-- pausa curta de 15 min;
-- pausa longa de 60 min;
-- pausa personalizada;
-- apenas uma pausa ativa por jornada;
-- persistência e recuperação via IndexedDB;
-- duração real persistida;
-- tempo efetivo = jornada - pausas;
-- encerramento automático da pausa ao terminar a jornada;
-- histórico da jornada atual.
-
-### Atividades
-
-- criar, editar, iniciar, concluir e cancelar;
-- apenas uma atividade ativa por jornada;
-- duração por timestamps;
-- persistência e recuperação via IndexedDB;
-- atividade atual no ecrã Hoje;
-- encerramento da atividade ativa ao terminar a jornada;
-- ecrã dedicado responsivo.
-
-## Documentação principal
-
-- `project/PROJECT_SPEC.md` — fonte de verdade funcional e arquitetural.
-- `project/ROADMAP.md` — fases e gates de desenvolvimento.
-- `project/CHECKPOINT.md` — ponto exato de continuidade.
-- `project/docs/ARCHITECTURE.md` — regras de arquitetura.
-- `project/docs/QUALITY_GATES.md` — validações obrigatórias.
-- `project/docs/DECISIONS.md` — decisões técnicas.
-- `project/prompts/` — instruções fase a fase para Codex.
-
-## Comandos
+## Desenvolvimento
 
 ```bash
 npm install
@@ -95,6 +74,11 @@ npm run build
 npm run dev
 ```
 
-## Regra de desenvolvimento
+## Documentação
 
-Trabalhar uma fase de cada vez. Nenhuma fase seguinte deve começar antes de o `project/CHECKPOINT.md` e os quality gates confirmarem a fase anterior.
+- `project/PROJECT_SPEC.md` — especificação funcional e arquitetural.
+- `project/ROADMAP.md` — estado das fases.
+- `project/CHECKPOINT.md` — ponto oficial de continuidade.
+- `project/docs/ARCHITECTURE.md` — regras de arquitetura.
+- `project/docs/QUALITY_GATES.md` — gates obrigatórios.
+- `project/docs/DECISIONS.md` — decisões técnicas.
