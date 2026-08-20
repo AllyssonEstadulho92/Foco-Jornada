@@ -24,6 +24,7 @@ test('persistência protege estado principal e Supershift',()=>{
 test('persistência inclui preferências auxiliares importantes',()=>{
   for(const key of ['foco-jornada-notifications-v1','foco-jornada-notification-preference-v1'])assert.ok(persistence.includes(key),key);
   assert.ok(persistence.includes('AUX_KEYS'));
+  assert.ok(persistence.includes("'focusMode'"));
 });
 
 test('persistência oferece proteção de armazenamento',()=>{
@@ -98,7 +99,7 @@ test('runtime renderiza apenas a vista ativa e mantém temporizadores leves',()=
 });
 
 test('service worker usa rede primeiro e inclui Modo Foco e recuperação offline',()=>{
-  assert.ok(sw.includes('focus-mode1'));
+  assert.ok(sw.includes('focus-mode2'));
   assert.ok(sw.includes('./focus-mode-core.js'));
   assert.ok(sw.includes('./focus-mode.js'));
   assert.ok(sw.includes('./focus-mode.css'));
