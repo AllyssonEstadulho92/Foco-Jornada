@@ -5,7 +5,7 @@ const dayKey=t=>{const d=new Date(t),y=d.getFullYear(),m=String(d.getMonth()+1).
 const readState=()=>{try{return JSON.parse(localStorage.getItem(APP_KEY)||'null')}catch{return null}};
 const isOpen=a=>a&&!['COMPLETED','CANCELLED'].includes(a.status);
 const priorityRank=p=>({URGENT:4,HIGH:3,NORMAL:2,LOW:1})[p]||0;
-const PLAN_ICON='<svg class="planning-glyph" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="4" y="4" width="6" height="6" rx="1.2"/><rect x="14" y="4" width="6" height="6" rx="1.2"/><rect x="4" y="14" width="6" height="6" rx="1.2"/><rect x="14" y="14" width="6" height="6" rx="1.2"/></svg>';
+const PLAN_ICON='<svg class="planning-glyph" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M7 3v4M17 3v4M3 10h18"/><path d="M7 14h4M13 14h4M7 18h4M13 18h4"/></svg>';
 
 function navigate(view){const button=$(`.bottom-nav [data-nav="${view}"]`)||$(`.side-nav [data-nav="${view}"]`);button?.click()}
 function openShift(){if(window.FocoShiftPlanner?.open){window.FocoShiftPlanner.open();return}const button=$('#openSupershift');if(button){button.click();return}window.FocoUI?.notify?.('O calendário ainda está a carregar.')}
@@ -37,4 +37,4 @@ window.addEventListener('pageshow',refresh);
 let queued=false;const schedule=()=>{if(queued)return;queued=true;queueMicrotask(()=>{queued=false;refresh()})};
 new MutationObserver(mutations=>{if(mutations.some(m=>[...m.addedNodes].some(n=>n.nodeType===1)))schedule()}).observe(document.body,{childList:true,subtree:true});
 queueMicrotask(refresh);
-window.FocoPlanningMode=Object.freeze({version:'2.0.0',render:refresh,icon:PLAN_ICON});
+window.FocoPlanningMode=Object.freeze({version:'2.1.0',render:refresh,icon:PLAN_ICON});
