@@ -50,6 +50,18 @@ Utilizar este ficheiro para decisões que afetem arquitetura, dados ou comportam
 **Decisão:** pausas concluídas guardam `actualDurationSeconds`, mantendo os timestamps como referência primária e o valor persistido como resultado consolidado.  
 **Motivo:** simplificar agregações futuras e preservar o valor final mesmo depois de alterações de relógio da interface.
 
+## ADR-009 — Apenas uma atividade ativa por jornada
+
+**Estado:** aceite  
+**Decisão:** uma nova atividade só pode ser iniciada quando não existir outra atividade em estado `active` na mesma jornada. O utilizador deve concluir ou cancelar a atividade atual antes de iniciar outra.  
+**Motivo:** evitar sobreposição de tempos e manter a atribuição de trabalho inequívoca.
+
+## ADR-010 — Atividade ativa é concluída ao terminar a jornada
+
+**Estado:** aceite  
+**Decisão:** ao terminar uma jornada, qualquer atividade ativa é concluída no mesmo timestamp antes do encerramento da jornada.  
+**Motivo:** impedir atividades órfãs e manter a duração da atividade limitada à jornada onde foi criada.
+
 ---
 
 ## Modelo para novas decisões
