@@ -7,9 +7,10 @@ Aplicação local-first para controlo de jornada, pausas, atividades, foco/Pomod
 - **Fase 0 — Especificação: concluída.**
 - **Fase 1 — Fundação: concluída.**
 - **Fase 2 — Jornada: concluída.**
-- **Fase 3 — Pausas: em desenvolvimento.**
+- **Fase 3 — Pausas: concluída.**
+- **Próxima: Fase 4 — Atividades.**
 
-A base técnica inclui React + TypeScript + Vite, Router, Zustand, Dexie/IndexedDB, testes, lint/format, PWA, navegação responsiva e CI. O módulo Jornada já está integrado e a Fase 3 acrescenta pausas persistentes e cálculo de tempo efetivo.
+A base técnica inclui React + TypeScript + Vite, Router, Zustand, Dexie/IndexedDB, testes, lint/format, PWA, navegação responsiva e CI. Jornada e Pausas já estão implementadas e validadas.
 
 ## Organização do repositório
 
@@ -38,7 +39,7 @@ Foco-Jornada/
 └── tsconfig*.json
 ```
 
-## Funcionalidades já disponíveis
+## Funcionalidades disponíveis
 
 ### Jornada
 
@@ -48,18 +49,17 @@ Foco-Jornada/
 - duração derivada de timestamps;
 - histórico básico diário.
 
-### Pausas — Fase 3
-
-Em implementação na branch `phase/03-pausas`:
+### Pausas
 
 - pausa curta de 15 min;
 - pausa longa de 60 min;
 - pausa personalizada;
 - apenas uma pausa ativa por jornada;
-- persistência IndexedDB;
-- recuperação após refresh;
+- persistência e recuperação via IndexedDB;
+- duração real persistida;
 - tempo efetivo = jornada - pausas;
-- encerramento automático da pausa ao terminar a jornada.
+- encerramento automático da pausa ao terminar a jornada;
+- histórico da jornada atual.
 
 ## Documentação principal
 
