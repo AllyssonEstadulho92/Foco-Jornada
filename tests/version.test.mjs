@@ -20,9 +20,10 @@ test('runtime público já não carrega a antiga camada enhancements',()=>{
   assert.ok(read('ux.js').includes("import './stability.js'"));
 });
 
-test('manifest inclui atalhos de transportes e foco',()=>{
+test('manifest inclui atalhos de transportes e Planeamento',()=>{
   const manifest=JSON.parse(read('manifest.webmanifest'));
   const urls=(manifest.shortcuts||[]).map(x=>x.url);
   assert.ok(urls.includes('./?action=transport'));
-  assert.ok(urls.includes('./?action=focus'));
+  assert.ok(urls.includes('./?action=planning'));
+  assert.equal(urls.includes('./?action=focus'),false);
 });
