@@ -50,6 +50,7 @@ button,input,select,textarea{letter-spacing:-.005em}
 .settings-grid input[type="hidden"]{display:none!important}
 .fi{font-style:normal;line-height:1;display:inline-flex;align-items:center;justify-content:center}
 .button-inline-icon,.planning-summary .btn{display:inline-flex;align-items:center;gap:8px}
+.planning-glyph{display:block;width:1em;height:1em;stroke:currentColor}
 
 .planning-nav-icon{display:grid!important;place-items:center;font-size:20px;line-height:1}
 .bottom-nav .planning-nav-icon{margin:0 auto;font-size:20px}
