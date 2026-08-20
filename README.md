@@ -4,9 +4,10 @@ Aplicação local-first para controlo de jornada, pausas, atividades, foco/Pomod
 
 ## Estado atual
 
-**Fase 1 — Fundação: em curso.**
+**Fase 1 — Fundação: concluída.**  
+**Próxima fase: Fase 2 — Jornada.**
 
-O repositório já contém a base React + TypeScript + Vite, separação inicial por camadas e design tokens. A Fundação ainda precisa de Router, Zustand, Dexie, testes, lint/format, PWA e navegação responsiva antes de iniciar o módulo Jornada.
+A fundação técnica já inclui React + TypeScript + Vite, Router, Zustand, Dexie/IndexedDB preparado, testes, lint/format, PWA, navegação responsiva e as páginas-base da aplicação.
 
 ## Organização do repositório
 
@@ -22,9 +23,12 @@ Foco-Jornada/
 │   ├── infrastructure/
 │   ├── presentation/
 │   ├── shared/
-│   └── styles/
+│   ├── styles/
+│   └── test/
 ├── index.html
 ├── package.json
+├── vite.config.ts
+├── vitest.config.ts
 └── tsconfig*.json
 ```
 
@@ -38,16 +42,16 @@ Foco-Jornada/
 - `project/docs/DECISIONS.md` — decisões técnicas.
 - `project/prompts/` — instruções de execução fase a fase para Codex.
 
-## Comandos atuais
+## Comandos
 
 ```bash
 npm install
 npm run typecheck
+npm run lint
+npm test
 npm run build
 npm run dev
 ```
-
-Os scripts de lint e testes serão adicionados durante a conclusão da Fase 1.
 
 ## Regra de desenvolvimento
 
