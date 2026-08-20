@@ -26,6 +26,18 @@ Utilizar este ficheiro para decisões que afetem arquitetura, dados ou comportam
 **Decisão:** especificação, roadmap, checkpoints, decisões, quality gates e prompts ficam em `project/`. O código de produção continua em `src/`.  
 **Motivo:** separar claramente código, configuração e governação do projeto sem quebrar a estrutura técnica do Vite.
 
+## ADR-005 — Zustand apenas para estado de interface nesta fundação
+
+**Estado:** aceite  
+**Decisão:** na Fase 1 o Zustand gere apenas estado efémero da interface, como o menu lateral. Dados de negócio persistentes serão introduzidos através de casos de uso e repositórios.  
+**Motivo:** evitar transformar o store de UI na fonte de verdade das regras de negócio.
+
+## ADR-006 — Dexie preparado sem antecipar tabelas de domínio
+
+**Estado:** aceite  
+**Decisão:** a Fundação cria a infraestrutura Dexie e uma tabela neutra de metadados; as tabelas de Jornada, Pausas, Atividades, Foco e Café serão adicionadas na fase correspondente.  
+**Motivo:** evitar desenho prematuro do schema e manter migrações explicitamente ligadas aos módulos que as exigem.
+
 ---
 
 ## Modelo para novas decisões

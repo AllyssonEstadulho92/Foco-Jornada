@@ -5,8 +5,8 @@
 | Fase | Objetivo | Estado | Gate para avançar |
 |---|---|---|---|
 | 0 | Especificação | Concluída | `PROJECT_SPEC.md` aprovado |
-| 1 | Fundação | Em curso | Build, lint e testes verdes |
-| 2 | Jornada | Bloqueada | Persistência e recuperação validadas |
+| 1 | Fundação | Concluída | Typecheck, lint, testes e build verdes |
+| 2 | Jornada | Próxima | Persistência e recuperação validadas |
 | 3 | Pausas | Bloqueada | Cálculo de tempo efetivo validado |
 | 4 | Atividades | Bloqueada | Apenas uma atividade ativa |
 | 5 | Foco/Pomodoro | Bloqueada | Timer persistente após refresh |
@@ -15,48 +15,37 @@
 | 8 | Histórico/Estatísticas/Definições | Bloqueada | Agregações corretas |
 | 9 | Qualidade final/PWA | Bloqueada | V1 cumpre critérios de aceitação |
 
-## Fase 1 — Fundação
+## Fase 1 — Fundação — CONCLUÍDA
 
-### Já existe no repositório
+Implementado:
 
-- React + TypeScript + Vite básicos.
-- TypeScript strict.
-- Estrutura inicial `domain/application/infrastructure/presentation/shared`.
-- Design tokens e CSS base.
-- Workflow inicial de typecheck/build.
+- React + TypeScript + Vite;
+- TypeScript strict;
+- React Router;
+- Zustand;
+- Dexie/IndexedDB preparado;
+- Vitest + React Testing Library;
+- ESLint + Prettier;
+- configuração PWA;
+- separação inicial `domain/application/infrastructure/presentation/shared`;
+- design tokens e CSS responsivo;
+- navegação mobile/desktop;
+- páginas Hoje, Atividades, Foco, Histórico, Mais e Definições;
+- CI com typecheck, lint, testes e build.
 
-### Falta concluir
+Validação GitHub Actions da implementação: **PASS** em typecheck, lint, testes e build.
 
-- React Router.
-- Zustand.
-- Dexie/IndexedDB.
-- Vitest e React Testing Library quando aplicável.
-- ESLint + Prettier.
-- PWA.
-- Layout responsivo definitivo da fundação.
-- Navegação mobile/desktop.
-- Páginas vazias: Hoje, Atividades, Foco, Histórico, Mais e Definições.
-- Atualizar CI para lint + testes + build.
+### Fora do escopo, conforme planeado
 
-### Não fazer nesta fase
-
-- Não implementar Jornada.
-- Não implementar Pausas.
-- Não implementar Atividades reais.
-- Não implementar Pomodoro.
-- Não implementar Café.
-
-### Critérios de saída
-
-- `npm run lint` sem erros.
-- `npm test` sem falhas.
-- `npm run build` sem erros.
-- Navegação funciona em mobile e desktop.
-- Nenhuma regra de domínio relevante fica na UI.
+- Jornada;
+- Pausas;
+- Atividades funcionais;
+- Pomodoro;
+- Café.
 
 ---
 
-## Fase 2 — Jornada
+## Fase 2 — Jornada — PRÓXIMA
 
 - Criar/iniciar/terminar jornada.
 - Impedir duas jornadas ativas.

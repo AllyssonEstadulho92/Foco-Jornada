@@ -20,5 +20,9 @@ jobs:
         run: npm install
       - name: Verificar tipos
         run: npm run typecheck
+      - name: Lint
+        run: npm run lint
+      - name: Testes
+        run: npm test
       - name: Build
         run: npm run build

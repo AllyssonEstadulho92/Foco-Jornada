@@ -2,35 +2,46 @@
 
 ## Estado atual
 
-**Fase:** 1 — Fundação, em curso  
+**Fase:** 1 — Fundação concluída  
+**Próxima fase:** 2 — Jornada  
+**PR da Fase 1:** #6  
+**Validação CI:** GitHub Actions run `32410154499` — sucesso  
 **Fonte de verdade:** `project/PROJECT_SPEC.md`
 
-## Confirmado no repositório
+## Implementado e validado na Fase 1
 
-- [x] React + TypeScript + Vite básicos.
+- [x] React + TypeScript + Vite.
 - [x] TypeScript strict.
-- [x] Camadas iniciais criadas em `src/`.
-- [x] CSS global e design tokens iniciais.
-- [x] Workflow GitHub Actions com typecheck e build.
-- [x] Documentação de governação organizada em `project/`.
-- [x] Roadmap, quality gates e prompts de execução criados.
+- [x] Estrutura por camadas em `src/`.
+- [x] React Router.
+- [x] Zustand para estado de interface.
+- [x] Dexie/IndexedDB preparado.
+- [x] Vitest + Testing Library.
+- [x] ESLint + Prettier.
+- [x] PWA configurada.
+- [x] Navegação responsiva mobile/desktop.
+- [x] Páginas Hoje, Atividades, Foco, Histórico, Mais e Definições.
+- [x] Design tokens e layout escuro base.
+- [x] CI com typecheck + lint + testes + build.
+- [x] GitHub Actions: typecheck verde.
+- [x] GitHub Actions: lint verde.
+- [x] GitHub Actions: testes verdes.
+- [x] GitHub Actions: build verde.
 
-## Pendente para concluir a Fase 1
+## Resultado dos quality gates
 
-- [ ] React Router.
-- [ ] Zustand.
-- [ ] Dexie/IndexedDB.
-- [ ] Vitest.
-- [ ] ESLint + Prettier.
-- [ ] PWA.
-- [ ] Navegação responsiva mobile/desktop.
-- [ ] Páginas Hoje, Atividades, Foco, Histórico, Mais e Definições.
-- [ ] CI com lint + testes + build.
-- [ ] Revisão técnica da Fase 1.
+- Typecheck: **PASS**
+- Lint: **PASS**
+- Testes: **PASS**
+- Build: **PASS**
 
-## Fases bloqueadas
+## Próximo trabalho autorizado
 
-As Fases 2 a 9 permanecem bloqueadas até os gates da Fase 1 estarem verdes.
+A Fase 2 pode iniciar depois de a PR #6 ser integrada em `main`.
+
+Escopo da Fase 2: **Jornada apenas** — iniciar, impedir duplicados, persistir em IndexedDB, recuperar após refresh/reabertura, calcular duração por timestamps e terminar com consistência.
+
+Pausas, Atividades, Foco e Café continuam bloqueados.
 
 ## Regra de continuidade
 
