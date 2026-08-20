@@ -5,6 +5,7 @@ import { FocusPage } from './pages/FocusPage'
 import { HistoryPage } from './pages/HistoryPage'
 import { MorePage } from './pages/MorePage'
 import { SettingsPage } from './pages/SettingsPage'
+import { StatisticsPage } from './pages/StatisticsPage'
 import { TodayPage } from './pages/TodayPage'
 
 export const router = createBrowserRouter([
@@ -17,6 +18,7 @@ export const router = createBrowserRouter([
       { path: 'foco', element: <FocusPage /> },
       { path: 'historico', element: <HistoryPage /> },
       { path: 'mais', element: <MorePage /> },
+      { path: 'estatisticas', element: <StatisticsPage /> },
       { path: 'definicoes', element: <SettingsPage /> },
     ],
   },
