@@ -1,4 +1,4 @@
-export const PROFESSIONAL_VERSION='1.1.0';
+export const PROFESSIONAL_VERSION='1.1.1';
 
 export function localDayKey(value=Date.now()){
   const d=value instanceof Date?value:new Date(value);
@@ -32,7 +32,7 @@ export function commandModel(app={},features={},now=Date.now()){
   let status='Livre',nextTitle='Organizar atividades',nextAction='activities',nextCommand='activities',tone='neutral',detail='Escolhe o que fazer a seguir.';
   if(active.pause){status='Em pausa';nextTitle='Regressar da pausa';nextAction='today';nextCommand='endBreak';tone='warning';detail='Existe uma pausa ativa.'}
   else if(active.focus){status=active.focus.status==='PAUSED'?'Foco pausado':'Em foco';nextTitle=active.focus.status==='PAUSED'?'Retomar foco':'Abrir foco';nextAction='focus';nextCommand=active.focus.status==='PAUSED'?'resumeFocus':'openFocus';tone='primary';detail='Sessão Pomodoro em curso.'}
-  else if(active.work){status='Em jornada';nextTitle=active.activity?'Continuar atividade':'Escolher atividade';nextAction='activities';nextCommand='activities';tone='success';detail=active.activity?active.activity.title:'Jornada ativa sem atividade em curso.'}
+  else if(active.work){status='Em jornada';nextTitle=active.activity?'Abrir atividade':'Escolher atividade';nextAction='activities';nextCommand='activities';tone='success';detail=active.activity?active.activity.title:'Jornada ativa sem atividade em curso.'}
   else if(shift&&['work','holiday'].includes(shift.kind)){status='Turno previsto';nextTitle='Iniciar jornada';nextAction='today';nextCommand='startWork';tone='primary';detail=shift.start&&shift.end?`${shift.start}–${shift.end}`:shift.label}
   return {status,nextTitle,nextAction,nextCommand,tone,detail,shift,active};
 }
