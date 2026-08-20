@@ -78,10 +78,10 @@ export async function startFocusSession({
   })
 
   const created = await focusRepository.createIfNoOpen(session)
-  if (!created) {
-    const concurrent = await focusRepository.getOpenForJourney(journey.id)
-    if (concurrent) return { status: 'already-open', session: concurrent }
-  }
+  if (created) return { status: 'started', session }
 
-  return { status: 'started', session }
+  const concurrent = await focusRepository.getOpenForJourney(journey.id)
+  if (concurrent) return { status: 'already-open', session: concurrent }
+
+  throw new Error('Não foi possível confirmar a sessão de foco após criação concorrente.')
 }
