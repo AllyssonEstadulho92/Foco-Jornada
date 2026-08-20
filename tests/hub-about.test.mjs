@@ -19,9 +19,10 @@ test('Sobre não mantém crédito de uma camada de ícones já removida',()=>{
   assert.equal(about.includes('flaticon.com'),false);
 });
 
-test('Sobre mostra informação real da aplicação e diagnóstico',()=>{
+test('Sobre mostra informação real da aplicação, Modo Foco e diagnóstico',()=>{
   const about=read('hub-about.js');
-  for(const value of ['Foco & Jornada','Service Worker','Notificações','Armazenamento','Jornadas','Atividades','Sessões de foco','Dias com turno','Copiar diagnóstico','Verificar atualização'])assert.ok(about.includes(value),value);
+  for(const value of ['Foco & Jornada','Modo Foco','Service Worker','Notificações','Armazenamento','Jornadas','Atividades','Sessões de foco','Dias com turno','Copiar diagnóstico','Verificar atualização'])assert.ok(about.includes(value),value);
+  assert.equal(about.includes('<span>Pomodoro</span>'),false);
   assert.ok(about.includes("navigator.serviceWorker.getRegistration()"));
   assert.ok(about.includes('localStorage.length'));
   assert.ok(about.includes('[data-hub-action="about"]'));
