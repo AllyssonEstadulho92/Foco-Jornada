@@ -2,35 +2,38 @@
 
 ## Estado atual
 
-**Fase:** 1 — Fundação, em curso  
+**Fase:** 1 — Fundação, implementação concluída; validação CI pendente  
+**Branch:** `phase/01-fundacao`  
+**PR:** #6  
 **Fonte de verdade:** `project/PROJECT_SPEC.md`
 
-## Confirmado no repositório
+## Implementado na Fase 1
 
-- [x] React + TypeScript + Vite básicos.
+- [x] React + TypeScript + Vite.
 - [x] TypeScript strict.
-- [x] Camadas iniciais criadas em `src/`.
-- [x] CSS global e design tokens iniciais.
-- [x] Workflow GitHub Actions com typecheck e build.
-- [x] Documentação de governação organizada em `project/`.
-- [x] Roadmap, quality gates e prompts de execução criados.
+- [x] Estrutura por camadas em `src/`.
+- [x] React Router.
+- [x] Zustand para estado de interface.
+- [x] Dexie/IndexedDB preparado.
+- [x] Vitest + Testing Library.
+- [x] ESLint + Prettier.
+- [x] PWA configurada.
+- [x] Navegação responsiva mobile/desktop.
+- [x] Páginas Hoje, Atividades, Foco, Histórico, Mais e Definições.
+- [x] Design tokens e layout escuro base.
+- [x] CI configurada para typecheck + lint + testes + build.
 
-## Pendente para concluir a Fase 1
+## Validação necessária antes de concluir a Fase 1
 
-- [ ] React Router.
-- [ ] Zustand.
-- [ ] Dexie/IndexedDB.
-- [ ] Vitest.
-- [ ] ESLint + Prettier.
-- [ ] PWA.
-- [ ] Navegação responsiva mobile/desktop.
-- [ ] Páginas Hoje, Atividades, Foco, Histórico, Mais e Definições.
-- [ ] CI com lint + testes + build.
-- [ ] Revisão técnica da Fase 1.
+- [ ] GitHub Actions: typecheck verde.
+- [ ] GitHub Actions: lint verde.
+- [ ] GitHub Actions: testes verdes.
+- [ ] GitHub Actions: build verde.
+- [ ] Revisão técnica final da Fase 1.
 
 ## Fases bloqueadas
 
-As Fases 2 a 9 permanecem bloqueadas até os gates da Fase 1 estarem verdes.
+As Fases 2 a 9 permanecem bloqueadas até todos os gates acima estarem verdes e este checkpoint ser atualizado para **Fase 1 concluída**.
 
 ## Regra de continuidade
 
