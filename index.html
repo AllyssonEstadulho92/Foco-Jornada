@@ -13,6 +13,14 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      if (
+        window.location.hostname.endsWith('github.io') &&
+        !window.location.pathname.includes('/site/')
+      ) {
+        window.location.replace('./site/' + window.location.search + window.location.hash)
+      }
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
