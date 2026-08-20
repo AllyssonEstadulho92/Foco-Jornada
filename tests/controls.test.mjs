@@ -18,6 +18,15 @@ test('preferência visual é controlada por módulo dedicado',()=>{
   assert.ok(js.includes('aria-checked'));
 });
 
+test('controlador de definições ignora mudanças apenas textuais',()=>{
+  const js=read('settings-controller.js');
+  assert.ok(js.includes('settingsObserver'));
+  assert.ok(js.includes('mutation.addedNodes'));
+  assert.ok(js.includes('node.nodeType===1'));
+  assert.equal(js.includes('characterData:true'),false);
+  assert.equal(js.includes("document.addEventListener('click'"),false);
+});
+
 test('alertas de foco e pausa usam Service Worker quando possível',()=>{
   const js=read('controls.js');
   assert.ok(js.includes('navigator.serviceWorker.ready'));
