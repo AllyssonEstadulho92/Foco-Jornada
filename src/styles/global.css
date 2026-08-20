@@ -11,6 +11,7 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  min-height: 100dvh;
   background: var(--bg);
   color: var(--text);
   text-rendering: optimizeLegibility;
@@ -34,13 +35,45 @@ a {
 }
 
 button:focus-visible,
-a:focus-visible {
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
   outline: 2px solid var(--primary);
   outline-offset: 3px;
 }
 
+button:disabled,
+input:disabled,
+textarea:disabled,
+select:disabled {
+  opacity: 0.58;
+}
+
+.skipLink {
+  position: fixed;
+  z-index: 100;
+  top: 10px;
+  left: 10px;
+  padding: 10px 14px;
+  border: 1px solid var(--primary);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: none;
+  transform: translateY(calc(-100% - 20px));
+  transition: transform 140ms ease;
+}
+
+.skipLink:focus {
+  transform: translateY(0);
+}
+
 .appShell {
   min-height: 100vh;
+  min-height: 100dvh;
   display: grid;
   grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
   transition: grid-template-columns 180ms ease;
@@ -57,6 +90,7 @@ a:focus-visible {
   flex-direction: column;
   gap: var(--space-5);
   height: 100vh;
+  height: 100dvh;
   padding: var(--space-5) var(--space-4);
   border-right: 1px solid var(--line);
   background: rgba(17, 25, 38, 0.94);
@@ -199,6 +233,7 @@ a:focus-visible {
   width: 100%;
   min-width: 0;
   padding: 56px clamp(24px, 5vw, 72px);
+  outline: none;
 }
 
 .pagePlaceholder {
@@ -285,14 +320,14 @@ a:focus-visible {
   }
 
   .appContent {
-    padding: 36px 18px calc(var(--bottom-nav-height) + 34px);
+    padding: 36px 18px calc(var(--bottom-nav-height) + 34px + env(safe-area-inset-bottom));
   }
 
   .bottomNav {
     position: fixed;
     z-index: 20;
     right: 10px;
-    bottom: 10px;
+    bottom: max(10px, env(safe-area-inset-bottom));
     left: 10px;
     display: grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -337,6 +372,11 @@ a:focus-visible {
 @media (max-width: 480px) {
   .appContent {
     padding-inline: 14px;
+  }
+
+  .bottomNav {
+    right: 6px;
+    left: 6px;
   }
 
   .emptyState {
