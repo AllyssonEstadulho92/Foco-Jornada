@@ -44,14 +44,10 @@ async function showSystemNotification(title,body,tag){
 
 function currentAlertTarget(state){
   const now=Date.now();
-  const focus=(state?.focusSessions||[]).filter(x=>x.status==='ACTIVE'&&Number.isFinite(x.expectedEndAt)).sort((a,b)=>a.expectedEndAt-b.expectedEndAt)[0];
   const pause=(state?.breakSessions||[]).filter(x=>x.status==='ACTIVE'&&Number.isFinite(x.expectedEndAt)).sort((a,b)=>a.expectedEndAt-b.expectedEndAt)[0];
-  const items=[];
-  if(focus)items.push({id:focus.id,kind:'focus',at:focus.expectedEndAt,title:'Sessão de foco concluída',body:'O tempo de foco terminou.'});
-  if(pause)items.push({id:pause.id,kind:'break',at:pause.expectedEndAt,title:'Pausa terminada',body:'O tempo previsto da pausa terminou.'});
-  items.sort((a,b)=>a.at-b.at);
-  const target=items[0]||null;
-  if(target&&target.at<now-12*60*60*1000)return null;
+  if(!pause)return null;
+  const target={id:pause.id,kind:'break',at:pause.expectedEndAt,title:'Pausa terminada',body:'O tempo previsto da pausa terminou.'};
+  if(target.at<now-12*60*60*1000)return null;
   return target;
 }
 
