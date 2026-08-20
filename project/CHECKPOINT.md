@@ -3,16 +3,17 @@
 ## Estado atual
 
 **Fase:** 1 — Fundação, em curso  
-**Branch de organização:** `chore/organizacao-projeto`  
 **Fonte de verdade:** `project/PROJECT_SPEC.md`
 
-## Confirmado no repositório antes desta organização
+## Confirmado no repositório
 
 - [x] React + TypeScript + Vite básicos.
 - [x] TypeScript strict.
 - [x] Camadas iniciais criadas em `src/`.
 - [x] CSS global e design tokens iniciais.
 - [x] Workflow GitHub Actions com typecheck e build.
+- [x] Documentação de governação organizada em `project/`.
+- [x] Roadmap, quality gates e prompts de execução criados.
 
 ## Pendente para concluir a Fase 1
 
