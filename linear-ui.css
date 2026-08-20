@@ -1,75 +1,81 @@
 :root{
-  --r:14px;
+  --r:12px;
   --shadow:none;
-  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  font-family:"Manrope","Avenir Next",Avenir,"Segoe UI",sans-serif;
 }
-html,body,button,input,select,textarea{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-body{background:var(--bg)!important;letter-spacing:-.005em}
-button,input,select,textarea{letter-spacing:0}
+html,body,button,input,select,textarea{font-family:"Manrope","Avenir Next",Avenir,"Segoe UI",sans-serif!important}
+body{background:var(--bg)!important;letter-spacing:-.012em;font-weight:500}
+button,input,select,textarea{letter-spacing:-.005em}
 .app{max-width:1160px}
 .topbar{padding-bottom:16px;border-bottom:1px solid var(--line)}
-.topbar h1{font-size:clamp(28px,4vw,38px);font-weight:720;letter-spacing:-.035em}
-.top-right time{font-weight:700}
-.kicker{font-size:10px;letter-spacing:.09em;font-weight:700}
-.logo>span{border-radius:10px;font-weight:800}
-.logo b{font-weight:700}
-.side-nav{gap:3px}
-.side-nav button,.sidebar-foot button{border-radius:9px;font-weight:560}
+.topbar h1{font-size:clamp(28px,4vw,38px);font-weight:700;letter-spacing:-.045em}
+.top-right time{font-weight:700;letter-spacing:-.025em}
+.kicker{font-size:10px;letter-spacing:.11em;font-weight:800}
+.logo>span{border-radius:9px;font-weight:800}
+.logo b{font-weight:700;letter-spacing:-.02em}
+.logo small{font-weight:500}
+.side-nav{gap:2px}
+.side-nav button,.sidebar-foot button{border-radius:8px;font-weight:600}
 .side-nav button.on{background:transparent;color:var(--text);font-weight:700;box-shadow:inset 3px 0 0 var(--primary)}
 .hero,.panel,.metric,.big-metric,.quick-grid button,.task-card,.resume-card{box-shadow:none!important}
-.hero{border-radius:16px;padding:22px}
-.hero.idle h2{font-size:26px;font-weight:700;letter-spacing:-.025em}
-.timer{font-weight:760;letter-spacing:-.045em}
+.hero{border-radius:14px;padding:20px}
+.hero.idle h2{font-size:25px;font-weight:700;letter-spacing:-.035em}
+.timer{font-weight:700;letter-spacing:-.055em}
 .section{margin-top:20px}
-.section-head h2{font-size:18px;font-weight:700;letter-spacing:-.015em}
+.section-head h2{font-size:18px;font-weight:700;letter-spacing:-.025em}
 .quick-grid,.metric-grid,.stats-grid{gap:8px}
-.quick-grid button{border-radius:12px;min-height:90px;padding:14px}
-.quick-grid button b{font-weight:680}
-.metric,.big-metric{border-radius:12px;padding:14px}
-.metric strong,.big-metric strong{font-weight:700}
-.panel{border-radius:14px;padding:17px}
-.btn,.mini,.text-btn,.filters button,.segmented button,.icon-btn{border-radius:9px;font-weight:650}
+.quick-grid button{border-radius:11px;min-height:88px;padding:14px}
+.quick-grid button b{font-weight:700;letter-spacing:-.018em}
+.quick-grid button small{font-weight:500}
+.metric,.big-metric{border-radius:11px;padding:14px}
+.metric strong,.big-metric strong{font-weight:700;letter-spacing:-.025em}
+.panel{border-radius:12px;padding:16px}
+.btn,.mini,.text-btn,.filters button,.segmented button,.icon-btn{border-radius:8px;font-weight:650}
 .btn{min-height:42px}
-.search-wrap input,.date-picker input,.settings-grid input,.settings-grid select,.focus-config select,.dialog input,.dialog select,.dialog textarea{border-radius:9px;background:var(--surface);min-height:42px}
+.search-wrap input,.date-picker input,.settings-grid input,.settings-grid select,.dialog input,.dialog select,.dialog textarea{border-radius:8px;background:var(--surface);min-height:42px}
 .filters button,.segmented button{border-radius:999px;font-weight:600}
-.task-card{border-radius:10px;padding:12px}
-.resume-card{border-radius:10px}
-.integrity{border-radius:10px}
-.dialog{border-radius:14px;box-shadow:none}
+.task-card{border-radius:9px;padding:12px}
+.task-title b{font-weight:700;letter-spacing:-.018em}
+.resume-card{border-radius:9px}
+.integrity{border-radius:9px}
+.dialog{border-radius:12px;box-shadow:none}
 .dialog-head button{border-radius:8px}
-.toast{border-radius:10px;font-weight:650}
-.bottom-nav{box-shadow:none!important;border-radius:14px!important;backdrop-filter:blur(12px)}
-.bottom-nav button{border-radius:9px!important}
+.toast{border-radius:9px;font-weight:650}
+.bottom-nav{box-shadow:none!important;border-radius:13px!important;backdrop-filter:blur(12px)}
+.bottom-nav button{border-radius:8px!important;font-weight:600}
 .bottom-nav button.on{background:var(--surface2);font-weight:700}
+.bottom-nav small{font-weight:600;letter-spacing:-.015em}
 :where([class*="hub-"],[class*="sp-"],[class*="professional-"]){box-shadow:none!important;font-family:inherit}
-.focus-setting-hidden,.settings-grid label:has(#setFocus),.settings-grid label:has(#setShort),.settings-grid label:has(#setLong),.settings-grid label:has(#setCycles){display:none!important}
-[data-view="focus"]>#focusArea,[data-view="focus"]>#focusMetrics,[data-view="focus"]>#focusModeRoot{display:none!important}
+.settings-grid input[type="hidden"]{display:none!important}
+.fi{font-style:normal;line-height:1;display:inline-flex;align-items:center;justify-content:center}
+.button-inline-icon,.planning-summary .btn{display:inline-flex;align-items:center;gap:8px}
 
 #planningArea{margin-top:18px}
 .planning-summary{display:flex;align-items:end;justify-content:space-between;gap:18px;padding:4px 2px 14px}
-.planning-summary h2{margin:4px 0 5px;font-size:25px;letter-spacing:-.03em;font-weight:720}
+.planning-summary h2{margin:4px 0 5px;font-size:25px;letter-spacing:-.04em;font-weight:700}
 .planning-summary p{margin:0;color:var(--muted);line-height:1.5}
 .planning-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-.planning-metrics article{min-height:92px;padding:14px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.planning-metrics article{min-height:90px;padding:14px;border:1px solid var(--line);border-radius:11px;background:var(--surface)}
 .planning-metrics small,.planning-metrics strong{display:block}
-.planning-metrics small{color:var(--muted);font-size:12px}
-.planning-metrics strong{margin-top:9px;font-size:18px;font-weight:700;letter-spacing:-.015em}
+.planning-metrics small{color:var(--muted);font-size:12px;font-weight:500}
+.planning-metrics strong{margin-top:9px;font-size:18px;font-weight:700;letter-spacing:-.025em}
 .planning-list{display:grid;margin-top:10px}
 .planning-item{display:grid;grid-template-columns:8px minmax(0,1fr) auto;gap:12px;align-items:center;width:100%;padding:12px 2px;border:0;border-top:1px solid var(--line);background:transparent;color:var(--text);text-align:left}
 .planning-item:first-child{border-top:0}
 .planning-item b,.planning-item small{display:block}
-.planning-item b{font-weight:650}
-.planning-item small{margin-top:3px;color:var(--muted);font-size:12px}
+.planning-item b{font-weight:700;letter-spacing:-.018em}
+.planning-item small{margin-top:3px;color:var(--muted);font-size:12px;font-weight:500}
 .planning-dot{width:7px;height:7px;border-radius:50%;background:var(--primary)}
 .planning-dot.low{background:var(--muted)}
 .planning-dot.high{background:var(--warning)}
 .planning-dot.urgent{background:var(--danger)}
-.planning-arrow{color:var(--muted)}
+.planning-arrow{color:var(--muted);font-size:16px}
 .planning-action-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
-.planning-action-grid button{min-height:86px;padding:13px;border:1px solid var(--line);border-radius:11px;background:var(--surface2);color:var(--text);text-align:left}
+.planning-action-grid button{display:grid;grid-template-columns:26px 1fr;align-items:center;gap:10px;min-height:82px;padding:13px;border:1px solid var(--line);border-radius:10px;background:var(--surface2);color:var(--text);text-align:left}
+.planning-action-grid button>.fi{font-size:21px;color:var(--muted)}
 .planning-action-grid b,.planning-action-grid small{display:block}
-.planning-action-grid b{font-weight:680}
-.planning-action-grid small{margin-top:5px;color:var(--muted);font-size:12px}
+.planning-action-grid b{font-weight:700;letter-spacing:-.018em}
+.planning-action-grid small{margin-top:4px;color:var(--muted);font-size:12px;font-weight:500}
 
 @media(max-width:900px){.topbar{padding-bottom:13px}.app{padding-top:16px}.planning-summary{align-items:flex-start}.planning-metrics{grid-template-columns:1fr 1fr}.planning-action-grid{grid-template-columns:1fr 1fr}}
-@media(max-width:520px){.topbar h1{font-size:28px}.hero{padding:18px}.planning-summary{display:grid}.planning-summary .btn{width:100%}.planning-metrics article{min-height:82px}.planning-action-grid button{min-height:76px}.panel{padding:15px}}
+@media(max-width:520px){.topbar h1{font-size:28px}.hero{padding:18px}.planning-summary{display:grid}.planning-summary .btn{width:100%;justify-content:center}.planning-metrics article{min-height:80px}.planning-action-grid button{min-height:74px}.panel{padding:15px}}
