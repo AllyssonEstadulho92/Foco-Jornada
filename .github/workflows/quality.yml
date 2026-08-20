@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: read
+  pages: read
 
 jobs:
   quality:
@@ -26,3 +27,15 @@ jobs:
         run: npm test
       - name: Build
         run: npm run build
+      - name: Verificar artefacto do Pages
+        run: |
+          test -f dist/index.html
+          grep -q '/Foco-Jornada/assets/' dist/index.html
+          if grep -q '/src/main.tsx' dist/index.html; then
+            echo 'ERRO: o index de produção ainda referencia o código-fonte.'
+            exit 1
+          fi
+      - name: Diagnosticar configuração atual do GitHub Pages
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api "repos/${GITHUB_REPOSITORY}/pages"

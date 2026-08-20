@@ -24,7 +24,7 @@ jobs:
       - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
       - name: Instalar dependências
@@ -42,20 +42,17 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Garantir GitHub Pages em modo Actions
-        env:
-          GH_TOKEN: ${{ github.token }}
+      - name: Validar artefacto de produção
         run: |
-          if gh api "repos/${GITHUB_REPOSITORY}/pages" >/dev/null 2>&1; then
-            gh api --method PUT "repos/${GITHUB_REPOSITORY}/pages" -f build_type=workflow
-          else
-            gh api --method POST "repos/${GITHUB_REPOSITORY}/pages" -f build_type=workflow
+          test -f dist/index.html
+          grep -q '/Foco-Jornada/assets/' dist/index.html
+          if grep -q '/src/main.tsx' dist/index.html; then
+            echo 'ERRO: o index de produção ainda referencia o código-fonte.'
+            exit 1
           fi
 
       - name: Configurar Pages
         uses: actions/configure-pages@v5
-        with:
-          enablement: true
 
       - name: Carregar artefacto
         uses: actions/upload-pages-artifact@v3
