@@ -1,4 +1,4 @@
-const CACHE='foco-jornada-v4-2-0-structural-clean1';
+const CACHE='foco-jornada-v4-2-0-brand-splash1';
 const CORE_ASSETS=[
   './','./index.html','./bootstrap.js',
   './styles.css','./ux.css','./features.css','./hub.css','./hub-about.css','./settings-controller.css',
