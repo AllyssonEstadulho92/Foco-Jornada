@@ -62,20 +62,24 @@ test('bootstrap carrega persistência antes do núcleo e mantém correção Pomo
   assert.ok(index.includes('./install-app.css'));
 });
 
-test('primeiro paint não depende de folhas externas nem módulos pesados',()=>{
+test('primeiro paint mantém onboarding responsivo antes dos módulos opcionais',()=>{
   assert.ok(index.includes('id="startupShell"'));
   assert.ok(index.includes('id="startupStatus"'));
   assert.ok(index.includes('requestAnimationFrame(function()'));
   assert.ok(index.includes('media="print" onload="this.media=\'all\'"'));
   assert.ok(index.includes('id="mainCss"'));
   assert.ok(bootstrap.includes("waitStylesheet('mainCss')"));
-  assert.ok(bootstrap.includes("requestAnimationFrame(()=>setTimeout(loadExtras,0))"));
+  assert.ok(bootstrap.includes('onboardingPending'));
+  assert.ok(bootstrap.includes('#finishOnboarding,#skipOnboarding'));
+  assert.ok(bootstrap.includes('scheduleExtras()'));
+  assert.equal(bootstrap.includes('requestIdleCallback'),false);
+  assert.equal(bootstrap.includes('setTimeout(()=>loadShift()'),false);
   for(const heavy of ['src="./shift-planner.js"','src="./shift-advanced.js"','src="./shift-reports.js"','src="./shift-mobile-interactions.js"'])assert.equal(index.includes(heavy),false,heavy);
   for(const heavy of ["import('./shift-planner.js')","import('./shift-advanced.js')","import('./shift-reports.js')","import('./shift-mobile-interactions.js')"])assert.ok(bootstrap.includes(heavy),heavy);
 });
 
 test('service worker abre pelo cache e atualiza pela rede em segundo plano',()=>{
-  assert.ok(sw.includes('fast-cache1-first-paint1'));
+  assert.ok(sw.includes('fast-cache1-onboarding-fix1'));
   assert.ok(sw.includes('./bootstrap.js'));
   assert.ok(sw.includes("cache:'no-cache'"));
   assert.ok(sw.includes('cache.match(key)'));
