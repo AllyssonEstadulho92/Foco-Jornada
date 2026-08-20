@@ -1,6 +1,6 @@
-/* Flaticon UIcons — uma única linguagem de ícones, sem animações contínuas */
-.fi-motion{display:none;align-items:center;justify-content:center;line-height:1;font-size:1em;font-style:normal;transform-origin:50% 50%;will-change:transform;transition:transform .2s cubic-bezier(.2,.8,.2,1),color .2s ease}
-.fi-motion::before{display:block;line-height:1}
+/* Flaticon UIcons — melhoria opcional sobre SVG local, sem dependência funcional do CDN */
+.fi-motion{display:none;width:1em;height:1em;flex:0 0 1em;align-items:center;justify-content:center;line-height:1;font-size:1em;font-style:normal;overflow:visible;transform-origin:50% 50%;will-change:transform;transition:transform .2s cubic-bezier(.2,.8,.2,1),color .2s ease}
+.fi-motion::before{display:block;width:1em;height:1em;line-height:1;text-align:center}
 .fi-motion.flaticon-live{display:inline-flex}
 .flaticon-source-hidden{display:none!important}
 button:active .fi-motion.flaticon-live,a:active .fi-motion.flaticon-live,[role="button"]:active .fi-motion.flaticon-live{animation:fiTap .32s cubic-bezier(.2,.9,.25,1)}
