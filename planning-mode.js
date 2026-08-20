@@ -22,6 +22,25 @@ function statusLabel(state){
   if(work)return 'Jornada em curso';
   return 'Jornada por iniciar';
 }
+function enforceVisibleLabels(){
+  $$('[data-nav="focus"]').forEach(b=>{
+    const small=b.querySelector('small');
+    if(small){
+      const icon=b.querySelector('span');if(icon&&icon.textContent!=='▦')icon.textContent='▦';
+      if(small.textContent!=='Planeamento')small.textContent='Planeamento';
+    }else if(!/Planeamento/.test(b.textContent||''))b.innerHTML='<span>▦</span>Planeamento';
+  });
+  const title=$('#pageTitle');if(title&&$('[data-view="focus"]')?.classList.contains('on')&&title.textContent!=='Planeamento')title.textContent='Planeamento';
+  const quick=$('#quickActions [data-action="goFocus"]');
+  if(quick){
+    const b=quick.querySelector('b'),small=quick.querySelector('small'),icon=quick.querySelector('span');
+    if(icon&&icon.textContent!=='▦')icon.textContent='▦';
+    if(b&&b.textContent!=='Planeamento')b.textContent='Planeamento';
+    if(small&&small.textContent!=='Organizar o dia')small.textContent='Organizar o dia';
+    if(quick.disabled)quick.disabled=false;
+    if(!quick.dataset.planningBound){quick.dataset.planningBound='1';quick.onclick=e=>{e.preventDefault();e.stopImmediatePropagation();navigate('focus')}}
+  }
+}
 function renderPlanning(){
   const view=$('[data-view="focus"]');if(!view)return;
   let area=$('#planningArea');if(!area){area=document.createElement('div');area.id='planningArea';view.appendChild(area)}
@@ -49,9 +68,7 @@ function replaceProfessionalUi(){
   $$('#professionalDiagnostics .professional-diagnostic-grid div').forEach(cell=>{const label=cell.querySelector('small');if(label?.textContent==='Foco')label.textContent='Sessões antigas'});
 }
 function replaceVisibleFocus(){
-  $$('[data-nav="focus"]').forEach(b=>{const small=b.querySelector('small');if(small){const icon=b.querySelector('span');if(icon)icon.textContent='▦';small.textContent='Planeamento'}else b.innerHTML='<span>▦</span>Planeamento'});
-  const title=$('#pageTitle');if(title&&$('[data-view="focus"]')?.classList.contains('on'))title.textContent='Planeamento';
-  const quick=$('#quickActions [data-action="goFocus"]');if(quick){quick.disabled=false;quick.innerHTML='<span>▦</span><b>Planeamento</b><small>Organizar o dia</small>';quick.onclick=e=>{e.preventDefault();e.stopImmediatePropagation();navigate('focus')}}
+  enforceVisibleLabels();
   const metrics=$$('#todayMetrics .metric');if(metrics[2]){const state=readState(),count=(state?.activities||[]).filter(isOpen).length;metrics[2].querySelector('small').textContent='Atividades';metrics[2].querySelector('strong').textContent=`${count} abertas`}
   for(const id of ['setFocus','setShort','setLong','setCycles'])$('#'+id)?.closest('label')?.classList.add('focus-setting-hidden');
   const notice=$('#setNotifications')?.closest('label')?.querySelector('span');if(notice)notice.textContent='Notificações quando uma pausa terminar';
@@ -60,7 +77,9 @@ function replaceVisibleFocus(){
 
 document.addEventListener('foco-render',replaceVisibleFocus);
 window.addEventListener('pageshow',replaceVisibleFocus);
-const professionalObserver=new MutationObserver(mutations=>{if(mutations.some(m=>[...m.addedNodes].some(n=>n.nodeType===1)))queueMicrotask(replaceProfessionalUi)});
-professionalObserver.observe(document.body,{childList:true,subtree:true});
+let enforcementQueued=false;
+const scheduleEnforcement=()=>{if(enforcementQueued)return;enforcementQueued=true;queueMicrotask(()=>{enforcementQueued=false;enforceVisibleLabels();replaceProfessionalUi()})};
+const visibleObserver=new MutationObserver(scheduleEnforcement);
+visibleObserver.observe(document.body,{childList:true,subtree:true,characterData:true});
 queueMicrotask(replaceVisibleFocus);
-window.FocoPlanningMode=Object.freeze({version:'1.1.0',render:replaceVisibleFocus});
+window.FocoPlanningMode=Object.freeze({version:'1.2.0',render:replaceVisibleFocus});
