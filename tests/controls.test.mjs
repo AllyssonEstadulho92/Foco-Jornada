@@ -35,9 +35,11 @@ test('alertas de foco e pausa usam Service Worker quando possível',()=>{
   assert.ok(js.includes("kind:'break'"));
 });
 
-test('couple é apenas compatibilidade e não reintroduz Atalhos antigos',()=>{
+test('couple é apenas compatibilidade neutra e não antecipa handlers',()=>{
   const js=read('couple.js');
-  assert.ok(js.includes("import './runtime-fixes.js'"));
+  assert.ok(js.includes('FocoLegacyBridge'));
+  assert.ok(js.includes('active:false'));
+  assert.equal(js.includes("import './runtime-fixes.js'"),false);
   assert.equal(js.includes('shortcuts://'),false);
   assert.equal(js.includes('supershift://'),false);
 });
