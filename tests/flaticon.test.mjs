@@ -27,10 +27,12 @@ test('folhas dinâmicas principais já chegam carregadas uma única vez',()=>{
   assert.ok(about.includes("document.querySelector('#hubAboutCss')"));
 });
 
-test('entrada do Pomodoro não é registada duas vezes no HTML',()=>{
+test('Modo Foco substitui a entrada Pomodoro antiga',()=>{
   const html=read('index.html'),productivity=read('productivity-core.js');
   assert.equal(html.includes('src="./focus-entry.js"'),false);
-  assert.ok(productivity.includes("import('./focus-entry.js')"));
+  assert.equal(productivity.includes("import('./focus-entry.js')"),false);
+  assert.ok(html.includes('src="./focus-mode.js"'));
+  assert.ok(html.includes('./focus-mode.css'));
 });
 
 test('Service Worker e Pages publicam apenas a camada local ativa',()=>{
@@ -41,4 +43,6 @@ test('Service Worker e Pages publicam apenas a camada local ativa',()=>{
   assert.ok(pages.includes('stability-ui.css'));
   assert.equal(pages.includes('flaticon-motion.css'),false);
   assert.equal(pages.includes('flaticon-icons.js'),false);
+  assert.ok(sw.includes('./focus-mode.js'));
+  assert.ok(pages.includes('focus-mode.js'));
 });
