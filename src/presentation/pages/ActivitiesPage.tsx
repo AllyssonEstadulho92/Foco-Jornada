@@ -19,7 +19,12 @@ function statusLabel(status: Activity['status']): string {
 }
 
 export function ActivitiesPage() {
-  const { activeJourney, isLoading: isJourneyLoading } = useJourneyController()
+  const {
+    activeJourney,
+    isLoading: isJourneyLoading,
+    isBusy: isJourneyBusy,
+    start: startJourneyIfNeeded,
+  } = useJourneyController()
   const { activities, activeActivity, isLoading, isBusy, error, create, edit, start, complete, cancel } =
     useActivityController(activeJourney?.id)
   const [name, setName] = useState('')
@@ -32,6 +37,12 @@ export function ActivitiesPage() {
 
   async function handleCreate(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
+
+    if (!activeJourney) {
+      const journey = await startJourneyIfNeeded()
+      if (!journey) return
+    }
+
     const created = await create(name, description)
     if (created) {
       setName('')
@@ -101,14 +112,14 @@ export function ActivitiesPage() {
           <button
             className="actionButton actionButtonPrimary"
             type="submit"
-            disabled={!activeJourney || isBusy || isJourneyLoading || !name.trim()}
+            disabled={isBusy || isJourneyBusy || isJourneyLoading || !name.trim()}
           >
-            {isBusy ? 'A guardar…' : 'Criar atividade'}
+            {isBusy || isJourneyBusy ? 'A guardar…' : 'Criar atividade'}
           </button>
         </form>
 
         {!activeJourney && !isJourneyLoading ? (
-          <p className="activityHint">Inicia uma jornada no ecrã Hoje para criares atividades.</p>
+          <p className="activityHint">Ao criar a primeira atividade, a jornada é iniciada automaticamente.</p>
         ) : null}
       </section>
 
