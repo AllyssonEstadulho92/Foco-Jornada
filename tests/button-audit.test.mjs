@@ -31,7 +31,7 @@ test('Foco e Pomodoro não regressam às superfícies públicas principais',()=>
 test('Planeamento usa família Flaticon coerente',()=>{
   assert.ok(icons.includes("planning:'calendar-lines'"));
   assert.ok(icons.includes("goFocus:'calendar-lines'"));
-  assert.ok(planning.includes('fi fi-rr-calendar-lines'));
+  assert.ok(planning.includes("fi('calendar-lines')"));
   assert.ok(index.includes('data-flaticon-uicons'));
 });
 
