@@ -4,11 +4,12 @@ import fs from 'node:fs';
 const read=p=>fs.readFileSync(new URL(`../${p}`,import.meta.url),'utf8');
 
 test('menu usa SVG local sem camada de deduplicação remota',()=>{
-  const hub=read('hub.js'),couple=read('couple.js'),html=read('index.html');
+  const hub=read('hub.js'),couple=read('couple.js'),summary=read('summary-guard.js'),html=read('index.html');
   assert.ok(hub.includes('hub-svg'));
   assert.ok(hub.includes('hub-item-icon'));
   assert.ok(hub.includes('hub-item-arrow'));
   assert.equal(couple.includes("import './icon-dedupe.js'"),false);
+  assert.equal(summary.includes("import './icon-dedupe.js'"),false);
   assert.equal(html.toLowerCase().includes('flaticon'),false);
 });
 
