@@ -5,8 +5,6 @@ const read=p=>fs.readFileSync(new URL(`../${p}`,import.meta.url),'utf8');
 const persistence=read('persistence.js');
 const install=read('install-app.js');
 const index=read('index.html');
-const bootstrap=read('bootstrap.js');
-const productivity=read('productivity-core.js');
 const app=read('app.js');
 const stability=read('stability.js');
 const sw=read('sw.js');
@@ -52,39 +50,21 @@ test('instalador não mantém observador global permanente',()=>{
   assert.ok(install.includes('setTimeout(schedule,100)'));
 });
 
-test('bootstrap carrega persistência antes do núcleo leve e mantém correção Pomodoro ativa sem duplicação',()=>{
-  const persistencePos=bootstrap.indexOf("loadClassic('./persistence.js')");
-  const stabilityPos=bootstrap.indexOf("import('./stability.js')");
-  assert.ok(persistencePos>=0&&stabilityPos>persistencePos);
-  assert.ok(productivity.includes("import('./focus-entry.js')"));
-  assert.equal(index.includes('src="./focus-entry.js"'),false);
-  assert.equal(index.includes('src="./ux.js"'),false);
-  assert.ok(index.includes("import('./bootstrap.js')"));
-  assert.ok(bootstrap.includes("'./ux.js'"));
-  assert.ok(bootstrap.includes("'./install-app.js'"));
+test('arranque carrega persistência antes da aplicação e não usa shell bloqueante',()=>{
+  const persistencePos=index.indexOf('src="./persistence.js"');
+  const uxPos=index.indexOf('src="./ux.js"');
+  assert.ok(persistencePos>=0&&uxPos>persistencePos);
+  assert.ok(index.includes('src="./features.js"'));
+  assert.ok(index.includes('src="./focus-entry.js"'));
+  assert.ok(index.includes('src="./install-app.js"'));
   assert.ok(index.includes('./install-app.css'));
+  assert.equal(index.includes('id="startupShell"'),false);
+  assert.equal(index.includes("import('./bootstrap.js')"),false);
 });
 
-test('primeiro paint entra direto na aplicação, tem watchdog e adia módulos opcionais',()=>{
-  assert.ok(index.includes('id="startupShell"'));
-  assert.ok(index.includes('id="startupStatus"'));
-  assert.ok(index.includes('requestAnimationFrame(function()'));
-  assert.ok(index.includes('media="print" onload="this.media=\'all\'"'));
-  assert.ok(index.includes('id="mainCss"'));
-  assert.ok(bootstrap.includes("waitStylesheet('mainCss')"));
-  assert.ok(bootstrap.includes('disableFirstUse'));
-  assert.ok(bootstrap.includes('withTimeout(bootCore(),12000'));
-  assert.ok(bootstrap.includes('useInstallIcon'));
-  assert.equal(bootstrap.includes('onboardingPending'),false);
-  assert.equal(bootstrap.includes('#finishOnboarding,#skipOnboarding'),false);
-  assert.ok(bootstrap.includes('scheduleExtras()'));
-  assert.ok(bootstrap.includes('requestIdleCallback'));
-  assert.ok(bootstrap.includes('const nextFrame='));
-  assert.ok(bootstrap.includes("const modules=['./ux.js'"));
-  assert.equal(bootstrap.includes("await import('./ux.js');"),false);
-  assert.equal(bootstrap.includes('setTimeout(()=>loadShift()'),false);
-  for(const heavy of ['src="./shift-planner.js"','src="./shift-advanced.js"','src="./shift-reports.js"','src="./shift-mobile-interactions.js"'])assert.equal(index.includes(heavy),false,heavy);
-  for(const heavy of ["import('./shift-planner.js')","import('./shift-advanced.js')","import('./shift-reports.js')","import('./shift-mobile-interactions.js')"])assert.ok(bootstrap.includes(heavy),heavy);
+test('folhas principais são carregadas diretamente sem media print temporário',()=>{
+  for(const css of ['./styles.css','./ux.css','./features.css','./hub.css','./productivity.css','./stability-ui.css'])assert.ok(index.includes(`rel="stylesheet" href="${css}"`),css);
+  assert.equal(index.includes('media="print" onload='),false);
 });
 
 test('runtime renderiza apenas a vista ativa e mantém temporizadores leves',()=>{
@@ -98,24 +78,22 @@ test('runtime renderiza apenas a vista ativa e mantém temporizadores leves',()=
   assert.ok(app.includes('function updateLiveUi('));
   assert.ok(app.includes('function scheduleLiveTick('));
   assert.ok(app.includes("window.dispatchEvent(new CustomEvent('foco-render'"));
-  assert.equal(app.includes('function openOnboarding()'),false);
   assert.equal(stability.includes('window.setInterval='),false);
   assert.equal(stability.includes('nativeSetInterval'),false);
   assert.ok(stability.includes("await import('./app.js')"));
 });
 
-test('service worker abre pelo cache sem pré-carregar módulos pesados',()=>{
-  assert.ok(sw.includes('active-view-icons1'));
-  assert.ok(sw.includes('./bootstrap.js'));
+test('service worker usa rede primeiro e mantém aplicação completa offline',()=>{
+  assert.ok(sw.includes('direct-boot1'));
+  assert.ok(sw.includes('./features.js'));
+  assert.ok(sw.includes('./shift-planner.js'));
+  assert.ok(sw.includes('./runtime-fixes.js'));
+  assert.ok(sw.includes('./professional-ui.js'));
   assert.ok(sw.includes('./apple-touch-icon.png'));
   assert.ok(sw.includes('./icon-192.png'));
   assert.ok(sw.includes('./icon-512.png'));
   assert.ok(sw.includes("cache:'no-cache'"));
-  assert.ok(sw.includes('cache.match(key)'));
-  assert.ok(sw.includes('event.waitUntil(update'));
   assert.ok(sw.includes('self.skipWaiting()'));
-  assert.equal(sw.includes("cache:'no-store'"),false);
-  for(const heavy of ['./shift-planner.js','./shift-advanced.js','./runtime-fixes.js','./professional-ui.js'])assert.equal(sw.includes(heavy),false,heavy);
 });
 
 test('interface ignora alterações apenas textuais dos temporizadores',()=>{
