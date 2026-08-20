@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, type CSSProperties } from 'react'
 import {
   getFocusElapsedMs,
   getFocusRemainingMs,
@@ -25,7 +25,12 @@ function sessionStatusLabel(session: FocusSession): string {
 }
 
 export function FocusPage() {
-  const { activeJourney, isLoading: journeyLoading } = useJourneyController()
+  const {
+    activeJourney,
+    isLoading: journeyLoading,
+    isBusy: journeyBusy,
+    start: startJourneyIfNeeded,
+  } = useJourneyController()
   const { activeActivity } = useActivityController(activeJourney?.id)
   const {
     sessions,
@@ -43,6 +48,7 @@ export function FocusPage() {
   } = useFocusController(activeJourney?.id)
   const [customMinutes, setCustomMinutes] = useState('50')
   const [associateActivity, setAssociateActivity] = useState(true)
+  const [startMode, setStartMode] = useState<'pomodoro' | 'custom'>('pomodoro')
   const now = useNow()
   const nowIso = now.toISOString()
 
@@ -56,10 +62,7 @@ export function FocusPage() {
   }, [activeSession?.status, complete, isBusy, remainingMs])
 
   const completedFocusCount = useMemo(
-    () =>
-      sessions.filter(
-        (session) => session.segmentType === 'focus' && session.status === 'completed',
-      ).length,
+    () => sessions.filter((session) => session.segmentType === 'focus' && session.status === 'completed').length,
     [sessions],
   )
 
@@ -70,13 +73,35 @@ export function FocusPage() {
 
   const customActivityId = associateActivity && activeActivity ? activeActivity.id : undefined
 
+  const progress = activeSession
+    ? Math.min(100, (elapsedMs / (activeSession.plannedDurationSeconds * 1000)) * 100)
+    : 0
+  const dialStyle = { '--focus-progress': `${progress * 3.6}deg` } as CSSProperties
+
+  async function ensureJourney(): Promise<boolean> {
+    if (activeJourney) return true
+    return Boolean(await startJourneyIfNeeded())
+  }
+
+  async function handleStartPomodoro() {
+    if (!(await ensureJourney())) return
+    await startPomodoro(recommendedStep, associatedActivityId)
+  }
+
+  async function handleStartCustom() {
+    const minutes = Number(customMinutes)
+    if (!Number.isFinite(minutes) || minutes <= 0 || minutes > 480) return
+    if (!(await ensureJourney())) return
+    await startCustom(minutes, customActivityId)
+  }
+
   return (
     <section className="focusPage" aria-labelledby="focus-title">
       <header className="focusHeader">
         <div>
           <span className="eyebrow">FOCO</span>
-          <h1 id="focus-title">Foco & Pomodoro</h1>
-          <p>Temporizador persistente, ciclos Pomodoro e sessões personalizadas.</p>
+          <h1 id="focus-title">Foco</h1>
+          <p>Concentra-te numa tarefa de cada vez.</p>
         </div>
         <span className={`focusJourneyState ${activeJourney ? 'focusJourneyStateActive' : ''}`}>
           {activeJourney ? 'Jornada ativa' : 'Sem jornada ativa'}
@@ -90,43 +115,38 @@ export function FocusPage() {
       ) : null}
 
       {activeSession ? (
-        <section className="focusTimerPanel" aria-labelledby="active-focus-title">
+        <section className="focusTimerPanel focusPrototypePanel" aria-labelledby="active-focus-title">
           <div className="focusTimerTop">
             <div>
               <span className="sectionKicker">
                 {activeSession.mode === 'pomodoro' ? `POMODORO · CICLO ${activeSession.cycle}/4` : 'PERSONALIZADO'}
               </span>
               <h2 id="active-focus-title">{segmentLabel(activeSession.segmentType)}</h2>
-              <p>
-                {activeSession.status === 'paused'
-                  ? 'Temporizador pausado. O tempo não avança até retomares.'
-                  : `Iniciada às ${formatClockTime(activeSession.startedAt)}`}
-              </p>
             </div>
             <span className={`focusSessionStatus focusSessionStatus-${activeSession.status}`}>
               {sessionStatusLabel(activeSession)}
             </span>
           </div>
 
-          <div className="focusClock" aria-live="polite">
-            {formatDuration(remainingMs)}
-          </div>
-
-          <div className="focusProgress" aria-label="Progresso da sessão">
-            <span
-              style={{
-                width: `${Math.min(100, (elapsedMs / (activeSession.plannedDurationSeconds * 1000)) * 100)}%`,
-              }}
-            />
+          <div className="focusDial" style={dialStyle} aria-live="polite">
+            <div className="focusDialInner">
+              <span>{segmentLabel(activeSession.segmentType).toUpperCase()}</span>
+              <strong>{formatDuration(remainingMs)}</strong>
+              <small>Ciclo {activeSession.cycle} / 4</small>
+            </div>
           </div>
 
           {activeSession.activityId ? (
-            <p className="focusAssociation">
-              Associada à atividade: <strong>{activeActivity?.name ?? 'atividade registada'}</strong>
+            <p className="focusAssociation focusAssociationCentered">
+              {activeActivity?.name ?? 'Atividade registada'}
             </p>
-          ) : null}
+          ) : (
+            <p className="focusAssociation focusAssociationCentered">
+              Iniciada às {formatClockTime(activeSession.startedAt)}
+            </p>
+          )}
 
-          <div className="focusTimerActions">
+          <div className="focusTimerActions focusPrototypeActions">
             {activeSession.status === 'running' ? (
               <button type="button" disabled={isBusy} onClick={() => void pause()}>
                 Pausar
@@ -137,115 +157,123 @@ export function FocusPage() {
               </button>
             )}
             <button
-              className="focusCompleteAction"
-              type="button"
-              disabled={isBusy}
-              onClick={() => void complete()}
-            >
-              Concluir
-            </button>
-            <button
               className="focusCancelAction"
               type="button"
               disabled={isBusy}
               onClick={() => void cancel()}
             >
-              Cancelar
+              Terminar sessão
             </button>
           </div>
         </section>
       ) : (
-        <div className="focusStartGrid">
-          <section className="focusStartPanel" aria-labelledby="pomodoro-title">
-            <div className="sectionHeadingRow">
-              <div>
-                <span className="sectionKicker">POMODORO</span>
-                <h2 id="pomodoro-title">Próximo segmento</h2>
-              </div>
-              <span className="pomodoroCycle">{recommendedStep.cycle}/4</span>
-            </div>
-
-            <div className="recommendedFocus">
-              <strong>{segmentLabel(recommendedStep.segmentType)}</strong>
-              <span>{formatDuration(recommendedStep.plannedDurationSeconds * 1000)}</span>
-              <p>25 min de foco · 5 min pausa curta · 15 min pausa longa após o 4.º ciclo.</p>
-            </div>
-
-            {activeActivity && recommendedStep.segmentType === 'focus' ? (
-              <label className="focusAssociateToggle">
-                <input
-                  type="checkbox"
-                  checked={associateActivity}
-                  onChange={(event) => setAssociateActivity(event.target.checked)}
-                />
-                Associar a “{activeActivity.name}”
-              </label>
-            ) : null}
-
+        <section className="focusStartPanel focusPrototypePanel" aria-label="Iniciar sessão de foco">
+          <div className="focusModeTabs" role="tablist" aria-label="Modo de foco">
             <button
-              className="actionButton actionButtonPrimary focusStartButton"
               type="button"
-              disabled={!activeJourney || isBusy || journeyLoading || isLoading}
-              onClick={() => void startPomodoro(recommendedStep, associatedActivityId)}
+              role="tab"
+              aria-selected={startMode === 'pomodoro'}
+              className={startMode === 'pomodoro' ? 'focusModeTab focusModeTabActive' : 'focusModeTab'}
+              onClick={() => setStartMode('pomodoro')}
             >
-              Iniciar {segmentLabel(recommendedStep.segmentType).toLowerCase()}
+              Pomodoro
             </button>
-          </section>
-
-          <section className="focusStartPanel" aria-labelledby="custom-focus-title">
-            <div className="sectionHeadingRow">
-              <div>
-                <span className="sectionKicker">PERSONALIZADO</span>
-                <h2 id="custom-focus-title">Sessão livre</h2>
-              </div>
-            </div>
-
-            <label className="customFocusInput">
-              <span>Duração em minutos</span>
-              <input
-                type="number"
-                min="1"
-                max="480"
-                inputMode="numeric"
-                value={customMinutes}
-                onChange={(event) => setCustomMinutes(event.target.value)}
-              />
-            </label>
-
-            {activeActivity ? (
-              <label className="focusAssociateToggle">
-                <input
-                  type="checkbox"
-                  checked={associateActivity}
-                  onChange={(event) => setAssociateActivity(event.target.checked)}
-                />
-                Associar a “{activeActivity.name}”
-              </label>
-            ) : null}
-
             <button
-              className="actionButton actionButtonPrimary focusStartButton"
               type="button"
-              disabled={
-                !activeJourney ||
-                isBusy ||
-                journeyLoading ||
-                isLoading ||
-                !Number.isFinite(Number(customMinutes)) ||
-                Number(customMinutes) <= 0 ||
-                Number(customMinutes) > 480
-              }
-              onClick={() => void startCustom(Number(customMinutes), customActivityId)}
+              role="tab"
+              aria-selected={startMode === 'custom'}
+              className={startMode === 'custom' ? 'focusModeTab focusModeTabActive' : 'focusModeTab'}
+              onClick={() => setStartMode('custom')}
             >
-              Iniciar sessão personalizada
+              Personalizado
             </button>
-          </section>
-        </div>
+          </div>
+
+          {startMode === 'pomodoro' ? (
+            <>
+              <div className="focusDial focusDialReady">
+                <div className="focusDialInner">
+                  <span>{segmentLabel(recommendedStep.segmentType).toUpperCase()}</span>
+                  <strong>{formatDuration(recommendedStep.plannedDurationSeconds * 1000)}</strong>
+                  <small>Ciclo {recommendedStep.cycle} / 4</small>
+                </div>
+              </div>
+
+              {activeActivity && recommendedStep.segmentType === 'focus' ? (
+                <label className="focusAssociateToggle focusAssociateCentered">
+                  <input
+                    type="checkbox"
+                    checked={associateActivity}
+                    onChange={(event) => setAssociateActivity(event.target.checked)}
+                  />
+                  Associar a “{activeActivity.name}”
+                </label>
+              ) : null}
+
+              <p className="focusPrototypeDescription">
+                25 min de foco · 5 min pausa curta · 15 min pausa longa após o 4.º ciclo.
+              </p>
+
+              <button
+                className="actionButton actionButtonPrimary focusStartButton"
+                type="button"
+                disabled={isBusy || journeyBusy || journeyLoading || isLoading}
+                onClick={() => void handleStartPomodoro()}
+              >
+                Iniciar foco
+              </button>
+            </>
+          ) : (
+            <>
+              <div className="customFocusCompact">
+                <label className="customFocusInput">
+                  <span>Duração em minutos</span>
+                  <input
+                    type="number"
+                    min="1"
+                    max="480"
+                    inputMode="numeric"
+                    value={customMinutes}
+                    onChange={(event) => setCustomMinutes(event.target.value)}
+                  />
+                </label>
+              </div>
+
+              {activeActivity ? (
+                <label className="focusAssociateToggle focusAssociateCentered">
+                  <input
+                    type="checkbox"
+                    checked={associateActivity}
+                    onChange={(event) => setAssociateActivity(event.target.checked)}
+                  />
+                  Associar a “{activeActivity.name}”
+                </label>
+              ) : null}
+
+              <button
+                className="actionButton actionButtonPrimary focusStartButton"
+                type="button"
+                disabled={
+                  isBusy ||
+                  journeyBusy ||
+                  journeyLoading ||
+                  isLoading ||
+                  !Number.isFinite(Number(customMinutes)) ||
+                  Number(customMinutes) <= 0 ||
+                  Number(customMinutes) > 480
+                }
+                onClick={() => void handleStartCustom()}
+              >
+                Iniciar sessão personalizada
+              </button>
+            </>
+          )}
+
+          {!activeJourney && !journeyLoading ? (
+            <p className="focusHint focusHintCentered">Ao iniciar o foco, a jornada começa automaticamente.</p>
+          ) : null}
+        </section>
       )}
-
-      {!activeJourney && !journeyLoading ? (
-        <p className="focusHint">Inicia uma jornada no ecrã Hoje para utilizares o temporizador de foco.</p>
-      ) : null}
 
       <section className="focusHistoryPanel" aria-labelledby="focus-history-title">
         <div className="sectionHeadingRow">
