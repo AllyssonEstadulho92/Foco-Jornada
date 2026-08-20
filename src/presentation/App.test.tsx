@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
+import { InMemoryActivityRepository } from '../test/InMemoryActivityRepository'
 import { InMemoryBreakRepository } from '../test/InMemoryBreakRepository'
 import { InMemoryJourneyRepository } from '../test/InMemoryJourneyRepository'
 import { App } from './App'
@@ -11,6 +12,7 @@ describe('App', () => {
         services={{
           journeyRepository: new InMemoryJourneyRepository(),
           breakRepository: new InMemoryBreakRepository(),
+          activityRepository: new InMemoryActivityRepository(),
         }}
       />,
     )
