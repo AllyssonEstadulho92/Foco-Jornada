@@ -8,7 +8,7 @@
 | 1 | Fundação | Concluída | Typecheck, lint, testes e build verdes |
 | 2 | Jornada | Concluída | Persistência, recuperação e concorrência validadas |
 | 3 | Pausas | Concluída | Tempo efetivo, persistência e CI verdes |
-| 4 | Atividades | Próxima | Apenas uma atividade ativa e persistência validadas |
+| 4 | Atividades | Em validação | Apenas uma atividade ativa, persistência e CI verdes |
 | 5 | Foco/Pomodoro | Bloqueada | Timer persistente após refresh |
 | 6 | Café | Bloqueada | Registos e totais consistentes |
 | 7 | Dashboard | Bloqueada | Integração sem duplicação de lógica |
@@ -75,15 +75,27 @@ Validação GitHub Actions: **PASS** em typecheck, lint, testes e build.
 
 ---
 
-## Fase 4 — Atividades — PRÓXIMA
+## Fase 4 — Atividades — EM VALIDAÇÃO
 
-- CRUD e estados.
-- Apenas uma atividade ativa.
-- Persistência e duração por timestamps.
-- Integração com jornada sem misturar regras na UI.
-- Testes de concorrência e regras críticas.
+Implementado:
 
-## Fase 5 — Foco/Pomodoro
+- criar, editar, iniciar, concluir e cancelar atividades;
+- estados pendente, em curso, concluída e cancelada;
+- apenas uma atividade ativa por jornada;
+- proteção contra início concorrente;
+- persistência IndexedDB no schema v4;
+- recuperação após refresh/reabertura;
+- duração calculada por timestamps;
+- ecrã Atividades funcional e responsivo;
+- atividade atual apresentada no Hoje;
+- encerramento consistente da atividade ativa ao terminar a jornada;
+- testes de domínio, casos de uso, duração, persistência e concorrência.
+
+Gate atual: GitHub Actions e revisão final.
+
+---
+
+## Fase 5 — Foco/Pomodoro — BLOQUEADA
 
 - Pomodoro padrão e personalizado.
 - Pausar/retomar/ciclos.
