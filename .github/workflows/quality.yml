@@ -6,53 +6,29 @@ on:
   pull_request:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   quality:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
-          fetch-depth: 0
-
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
-
       - name: Instalar dependências
-        run: npm ci
-
+        run: npm install
       - name: Verificar tipos
         run: npm run typecheck
-
       - name: Lint
         run: npm run lint
-
       - name: Testes
         run: npm test
-
       - name: Build
         run: npm run build
-
-      - name: Preparar build estático da PR
-        if: github.event_name == 'pull_request'
-        run: |
-          rm -rf site
-          mkdir -p site
-          cp -R dist/. site/
-
-      - name: Guardar build na branch da PR
-        if: github.event_name == 'pull_request'
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A site
-          if git diff --cached --quiet; then
-            echo "Build sem alterações."
-            exit 0
-          fi
-          git commit -m "deploy: gerar site compilado"
-          git push origin HEAD:${{ github.head_ref }}
+      - name: Guardar build como artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: site-build
+          path: dist
+          if-no-files-found: error
