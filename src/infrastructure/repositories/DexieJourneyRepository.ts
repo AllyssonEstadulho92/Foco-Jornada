@@ -26,8 +26,17 @@ export class DexieJourneyRepository implements JourneyRepository {
     })
   }
 
-  async update(journey: Journey): Promise<void> {
-    await this.database.journeys.put(journey)
+  async finishIfActive(journey: Journey): Promise<boolean> {
+    return this.database.transaction('rw', this.database.journeys, async () => {
+      const current = await this.database.journeys.get(journey.id)
+
+      if (!current || current.status !== 'active') {
+        return false
+      }
+
+      await this.database.journeys.put(journey)
+      return true
+    })
   }
 
   async listByDate(date: string): Promise<Journey[]> {
