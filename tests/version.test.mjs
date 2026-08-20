@@ -14,15 +14,6 @@ test('versão 4.2.0 é coerente nos ficheiros públicos ativos',()=>{
   assert.ok(sw.includes(`v${cacheVersion}`));
 });
 
-test('runtime público já não carrega a antiga camada enhancements',()=>{
-  assert.equal(read('index.html').includes('enhancements.js'),false);
-  assert.equal(read('ux.js').includes("import './enhancements.js'"),false);
-  assert.ok(read('ux.js').includes("import './stability.js'"));
-});
+test('runtime público já não carrega a antiga camada enhancements',()=>{assert.equal(read('index.html').includes('enhancements.js'),false);assert.equal(read('ux.js').includes("import './enhancements.js'"),false);assert.ok(read('ux.js').includes("import './stability.js'"));});
 
-test('manifest inclui atalhos de transportes e foco',()=>{
-  const manifest=JSON.parse(read('manifest.webmanifest'));
-  const urls=(manifest.shortcuts||[]).map(x=>x.url);
-  assert.ok(urls.includes('./?action=transport'));
-  assert.ok(urls.includes('./?action=focus'));
-});
+test('manifest inclui atalhos de transportes e Planeamento',()=>{const manifest=JSON.parse(read('manifest.webmanifest'));const urls=(manifest.shortcuts||[]).map(x=>x.url);assert.ok(urls.includes('./?action=transport'));assert.ok(urls.includes('./?action=planning'));assert.equal(urls.includes('./?action=focus'),false);});

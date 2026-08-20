@@ -1,15 +1,15 @@
 # Auditoria de botões — Foco & Jornada
 
-Estado após a revisão de 19/08/2026.
+Estado após a revisão de 20/08/2026.
 
 ## Corrigido e verificado no código
 
-- [x] Navegação principal: Hoje, Atividades, Foco, Histórico, Estatísticas e Mais.
+- [x] Navegação principal: Hoje, Atividades, Planeamento, Histórico, Estatísticas e Mais.
 - [x] Jornada: iniciar, terminar, pausas, regressar da pausa e café.
 - [x] Atividades: criar, editar, iniciar, pausar, concluir, cancelar, duplicar, mover para amanhã e subtarefas.
-- [x] Pomodoro: iniciar, pausar, retomar, terminar fase e iniciar jornada + foco.
-- [x] Centro de Comando: “Regressar da pausa” executa `endBreak`; “Retomar foco” executa `resumeFocus`; “Iniciar jornada” executa `startWork`.
-- [x] “Verificar dados” executa verificação estrutural real de jornada, pausas, foco, atividades, IDs e referências da escala.
+- [x] Planeamento: abrir pela navegação, ação rápida, Hub e Pesquisa; prioridades e atalhos operacionais.
+- [x] Centro de Comando: “Regressar da pausa” executa `endBreak`; “Iniciar jornada” executa `startWork`; estado livre encaminha para Planeamento.
+- [x] “Verificar dados” executa verificação estrutural real de jornada, pausas, atividades, IDs, compatibilidade antiga e referências da escala.
 - [x] Moovit: menu, Planear, Perto de mim e atalhos rápidos passam pelo handler autoritativo de `app-links.js`, carregado antes do runtime.
 - [x] Teste de notificações: `interaction-fixes.js` é o proprietário efetivo e bloqueia a segunda captura do runtime.
 - [x] Supershift desktop: calendário, turnos, relatórios, exportação e impressão.
@@ -18,6 +18,7 @@ Estado após a revisão de 19/08/2026.
 - [x] Backup: exportar, importar e reset com confirmação.
 - [x] Instalação PWA: instalar quando suportado e instruções específicas para iPhone.
 - [x] Pesquisa global e diagnóstico profissional.
+- [x] Módulos públicos antigos retirados do HTML, cache e workflow de publicação.
 
 ## Ainda requer validação física
 
