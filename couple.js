@@ -3,5 +3,4 @@
 // são carregadas daqui para instalações que ainda importam couple.js.
 import './runtime-fixes.js';
 import './summary-guard.js';
-import './icon-dedupe.js';
 import './hub-about.js';
