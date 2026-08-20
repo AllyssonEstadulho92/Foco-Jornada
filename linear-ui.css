@@ -43,7 +43,7 @@ button,input,select,textarea{letter-spacing:0}
 .bottom-nav button.on{background:var(--surface2);font-weight:700}
 :where([class*="hub-"],[class*="sp-"],[class*="professional-"]){box-shadow:none!important;font-family:inherit}
 .focus-setting-hidden,.settings-grid label:has(#setFocus),.settings-grid label:has(#setShort),.settings-grid label:has(#setLong),.settings-grid label:has(#setCycles){display:none!important}
-[data-view="focus"]>#focusArea,[data-view="focus"]>#focusMetrics{display:none!important}
+[data-view="focus"]>#focusArea,[data-view="focus"]>#focusMetrics,[data-view="focus"]>#focusModeRoot{display:none!important}
 
 #planningArea{margin-top:18px}
 .planning-summary{display:flex;align-items:end;justify-content:space-between;gap:18px;padding:4px 2px 14px}
