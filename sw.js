@@ -1,13 +1,13 @@
-const CACHE='foco-jornada-v4-2-0-planning-clean1';
+const CACHE='foco-jornada-v4-2-0-planning-flaticon1';
 const ASSETS=[
   './','./index.html',
-  './styles.css','./ux.css','./features.css','./hub.css','./hub-about.css','./settings-controller.css','./linear-ui.css',
+  './styles.css','./ux.css','./features.css','./hub.css','./hub-about.css','./settings-controller.css','./linear-ui.css','./flaticon-motion.css',
   './shift-planner.css','./shift-mobile.css','./shift-compact.css','./runtime-fixes.css','./interaction-fixes.css',
   './professional.css','./productivity.css','./install-app.css','./stability-ui.css',
   './core.js','./productivity-core.js','./planning-mode.js','./persistence.js','./boot-recovery.js','./install-app.js','./app.js','./stability.js','./ux.js',
   './features-core.js','./features.js','./hub.js','./hub-help.js','./hub-about.js','./controls.js','./settings-controller.js',
   './shift-planner-core.js','./shift-planner.js','./shift-advanced-core.js','./shift-advanced.js','./shift-reports.js','./shift-mobile-interactions.js',
-  './app-links.js','./interaction-fixes.js','./runtime-fixes.js','./summary-guard.js','./professional-core.js','./professional-ui.js','./couple.js',
+  './app-links.js','./interaction-fixes.js','./runtime-fixes.js','./summary-guard.js','./professional-core.js','./professional-ui.js','./flaticon-icons.js','./couple.js',
   './manifest.webmanifest','./icon.svg','./apple-touch-icon.png','./icon-192.png','./icon-512.png','./.nojekyll'
 ];
 const INDEX_URL=new URL('./index.html',self.location.href).href;
