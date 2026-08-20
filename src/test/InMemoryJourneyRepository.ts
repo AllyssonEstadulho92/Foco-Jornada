@@ -21,8 +21,15 @@ export class InMemoryJourneyRepository implements JourneyRepository {
     return true
   }
 
-  async update(journey: Journey): Promise<void> {
+  async finishIfActive(journey: Journey): Promise<boolean> {
+    const current = this.journeys.get(journey.id)
+
+    if (!current || current.status !== 'active') {
+      return false
+    }
+
     this.journeys.set(journey.id, journey)
+    return true
   }
 
   async listByDate(date: string): Promise<Journey[]> {
