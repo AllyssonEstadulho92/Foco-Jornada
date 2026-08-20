@@ -43,6 +43,12 @@ test('menu recebe Instalar aplicação e ferramentas de proteção',()=>{
   assert.ok(install.includes('Criar backup'));
 });
 
+test('instalador não mantém observador global permanente',()=>{
+  assert.equal(install.includes('new MutationObserver'),false);
+  assert.ok(install.includes('menuRetries'));
+  assert.ok(install.includes('setTimeout(schedule,100)'));
+});
+
 test('bootstrap carrega persistência antes dos módulos e mantém correção Pomodoro ativa sem duplicar script',()=>{
   const persistencePos=index.indexOf('./persistence.js');
   const uxPos=index.indexOf('./ux.js');
@@ -54,10 +60,11 @@ test('bootstrap carrega persistência antes dos módulos e mantém correção Po
 });
 
 test('service worker abre pelo cache e atualiza pela rede em segundo plano',()=>{
-  assert.ok(sw.includes("fast-cache1"));
+  assert.ok(sw.includes('fast-cache1'));
   assert.ok(sw.includes("cache:'no-cache'"));
   assert.ok(sw.includes('cache.match(key)'));
   assert.ok(sw.includes('event.waitUntil(update'));
+  assert.ok(sw.includes('self.skipWaiting()'));
   assert.equal(sw.includes("cache:'no-store'"),false);
 });
 

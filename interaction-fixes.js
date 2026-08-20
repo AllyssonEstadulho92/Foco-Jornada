@@ -119,6 +119,7 @@ document.addEventListener('click',e=>{
   const test=e.target.closest('[data-runtime-test-notification]');if(test){e.preventDefault();e.stopImmediatePropagation();runNotificationTest(test);return}
   const work=e.target.closest('[data-action="cancelWork"],[data-fj-delete-work]');if(work){e.preventDefault();e.stopImmediatePropagation();confirmDeleteWork(work.dataset.id||work.dataset.fjDeleteWork);return}
 },true);
-new MutationObserver(schedule).observe(document.body,{childList:true,subtree:true,characterData:true});
+const interactionObserver=new MutationObserver(mutations=>{for(const mutation of mutations){if([...mutation.addedNodes].some(node=>node.nodeType===1)){schedule();break}}});
+interactionObserver.observe(document.body,{childList:true,subtree:true});
 window.addEventListener('pageshow',schedule);schedule();
 window.FocoInteractionFixes=Object.freeze({enhance,deleteWork:hardDeleteWork,testNotification:runNotificationTest});

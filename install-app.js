@@ -1,8 +1,8 @@
 (function(){
 'use strict';
-const VERSION='1.0.0';
+const VERSION='1.0.1';
 const $=s=>document.querySelector(s);
-let deferredPrompt=null,raf=0;
+let deferredPrompt=null,raf=0,menuRetries=0;
 const isIos=()=>/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
 const isStandalone=()=>matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
 const icon='<svg class="hub-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4"/><path d="M5 19h14"/><rect x="4" y="2" width="16" height="20" rx="4" opacity=".25"/></svg>';
@@ -15,10 +15,9 @@ async function storageState(){const api=window.FocoPersistence;if(!api?.persiste
 async function openInstall(){window.FocoHub?.close?.();closeInstall();const persistent=await storageState(),root=document.createElement('section');root.id='fjInstall';root.className='fj-install-backdrop';root.innerHTML=`<div class="fj-install-sheet" role="dialog" aria-modal="true" aria-labelledby="fjInstallTitle"><header class="fj-install-head"><div><span class="kicker">APLICAÇÃO</span><h2 id="fjInstallTitle">Foco & Jornada no telemóvel</h2></div><button type="button" class="fj-install-close" data-install-close aria-label="Fechar">×</button></header><div class="fj-install-status"><div><span>Modo atual</span><b>${isStandalone()?'Aplicação instalada':'Browser'}</b></div><div><span>Dados</span><b>Gravação local + recuperação</b></div><div><span>Proteção do armazenamento</span><b id="fjPersistState">${persistent.supported?(persistent.persisted?'Ativa':'Disponível'):'Gerida pelo sistema'}</b></div></div><div class="fj-install-steps">${steps()}</div><div class="fj-install-actions">${!isStandalone()?`<button type="button" class="btn primary" id="fjInstallNow">${deferredPrompt?'Instalar agora':isIos()?'Ver passos no Safari':'Como instalar'}</button>`:''}<button type="button" class="btn" id="fjProtectData">Proteger dados</button><button type="button" class="btn" id="fjBackupNow">Criar backup</button></div><p class="fj-install-note">A aplicação é local-first. A recuperação automática protege contra gravações incompletas, mas limpar os dados do browser/dispositivo pode apagar o armazenamento local. Mantém backups quando os dados forem importantes.</p></div>`;document.body.appendChild(root);root.onclick=e=>{if(e.target===root||e.target.closest('[data-install-close]'))closeInstall()};$('#fjInstallNow')?.addEventListener('click',installNow);$('#fjProtectData').onclick=protectData;$('#fjBackupNow').onclick=()=>{window.FocoPersistence?.snapshot?.();closeInstall();setTimeout(()=>$('#exportBtn')?.click(),80)}}
 async function installNow(){if(isStandalone()){notify('A aplicação já está instalada.');return}if(deferredPrompt){const prompt=deferredPrompt;deferredPrompt=null;try{await prompt.prompt();const choice=await prompt.userChoice;if(choice?.outcome==='accepted')notify('Instalação iniciada.');else notify('Instalação cancelada.')}catch{notify('O browser não conseguiu iniciar a instalação.')}closeInstall();return}if(isIos()){notify('No Safari: Partilhar → Adicionar ao ecrã principal.');return}notify('Usa o menu do browser e escolhe Instalar aplicação ou Adicionar ao ecrã principal.')}
 async function protectData(){const api=window.FocoPersistence;if(!api?.requestPersistentStorage){notify('A proteção adicional é gerida pelo browser neste dispositivo.');return}const result=await api.requestPersistentStorage(),label=$('#fjPersistState');if(label)label.textContent=result.persisted?'Ativa':'Não concedida';notify(result.persisted?'Proteção de armazenamento ativada.':'O browser não concedeu proteção adicional. Os dados continuam guardados localmente.')}
-function schedule(){if(raf)return;raf=requestAnimationFrame(()=>{raf=0;ensureMenuItem()})}
+function schedule(){if(raf)return;raf=requestAnimationFrame(()=>{raf=0;ensureMenuItem();if(!$('#appHub')&&menuRetries<6){menuRetries++;setTimeout(schedule,100)}})}
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;schedule()});
 window.addEventListener('appinstalled',()=>{deferredPrompt=null;notify('Foco & Jornada instalada.');schedule()});
-new MutationObserver(schedule).observe(document.body,{childList:true,subtree:true});
 schedule();
 window.FocoInstall=Object.freeze({version:VERSION,open:openInstall,isInstalled:isStandalone});
 })();
