@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
-import { finishJourneyWithBreaks } from '../../application/journey/finishJourneyWithBreaks'
+import { finishJourneyWithWorkState } from '../../application/journey/finishJourneyWithWorkState'
 import { startJourney } from '../../application/journey/startJourney'
 import type { Journey } from '../../domain/journey/Journey'
 import { toLocalDateKey } from '../../shared/utils/dateTime'
 import { useAppServices } from '../providers/AppServicesProvider'
 
 export function useJourneyController() {
-  const { journeyRepository, breakRepository } = useAppServices()
+  const { journeyRepository, breakRepository, activityRepository } = useAppServices()
   const [activeJourney, setActiveJourney] = useState<Journey | undefined>()
   const [todayJourneys, setTodayJourneys] = useState<Journey[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -80,9 +80,10 @@ export function useJourneyController() {
     try {
       setIsBusy(true)
       setError(null)
-      const result = await finishJourneyWithBreaks({
+      const result = await finishJourneyWithWorkState({
         journeyRepository,
         breakRepository,
+        activityRepository,
         journeyId: activeJourney.id,
       })
 
@@ -101,7 +102,7 @@ export function useJourneyController() {
     } finally {
       setIsBusy(false)
     }
-  }, [activeJourney, breakRepository, isBusy, journeyRepository, refresh])
+  }, [activeJourney, activityRepository, breakRepository, isBusy, journeyRepository, refresh])
 
   return {
     activeJourney,
