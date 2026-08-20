@@ -22,7 +22,7 @@ test('persistência protege estado principal e Supershift',()=>{
 });
 
 test('persistência inclui preferências auxiliares importantes',()=>{
-  for(const key of ['foco-jornada-notifications-v1','foco-jornada-notification-preference-v1','foco-jornada-focus-activity-v1'])assert.ok(persistence.includes(key),key);
+  for(const key of ['foco-jornada-notifications-v1','foco-jornada-notification-preference-v1'])assert.ok(persistence.includes(key),key);
   assert.ok(persistence.includes('AUX_KEYS'));
 });
 
@@ -52,15 +52,18 @@ test('instalador não mantém observador global permanente',()=>{
   assert.ok(install.includes('setTimeout(schedule,100)'));
 });
 
-test('arranque carrega app diretamente depois da persistência',()=>{
+test('arranque carrega app e Modo Foco depois da persistência',()=>{
   const persistencePos=index.indexOf('src="./persistence.js"');
   const recoveryPos=index.indexOf('src="./boot-recovery.js"');
   const appPos=index.indexOf('src="./app.js"');
+  const focusPos=index.indexOf('src="./focus-mode.js"');
   const uxPos=index.indexOf('src="./ux.js"');
-  assert.ok(persistencePos>=0&&recoveryPos>persistencePos&&appPos>recoveryPos&&uxPos>appPos);
+  assert.ok(persistencePos>=0&&recoveryPos>persistencePos&&appPos>recoveryPos&&focusPos>appPos&&uxPos>focusPos);
   assert.ok(index.includes('src="./features.js"'));
   assert.equal(index.includes('src="./focus-entry.js"'),false);
-  assert.ok(productivity.includes("import('./focus-entry.js')"));
+  assert.equal(productivity.includes("import('./focus-entry.js')"),false);
+  assert.ok(index.includes('src="./focus-mode.js"'));
+  assert.ok(index.includes('./focus-mode.css'));
   assert.ok(index.includes('src="./install-app.js"'));
   assert.ok(index.includes('./install-app.css'));
   assert.equal(index.includes('id="startupShell"'),false);
@@ -74,7 +77,7 @@ test('recuperador remove bloqueios antigos e mantém fallback de navegação',()
 });
 
 test('folhas principais são carregadas diretamente sem media print temporário',()=>{
-  for(const css of ['./styles.css','./ux.css','./features.css','./hub.css','./productivity.css','./stability-ui.css'])assert.ok(index.includes(`rel="stylesheet" href="${css}"`),css);
+  for(const css of ['./styles.css','./ux.css','./features.css','./hub.css','./productivity.css','./focus-mode.css','./stability-ui.css'])assert.ok(index.includes(`rel="stylesheet" href="${css}"`),css);
   assert.equal(index.includes('media="print" onload='),false);
 });
 
@@ -94,8 +97,12 @@ test('runtime renderiza apenas a vista ativa e mantém temporizadores leves',()=
   assert.ok(stability.includes("await import('./app.js')"));
 });
 
-test('service worker usa rede primeiro e inclui recuperação offline',()=>{
-  assert.ok(sw.includes('interaction-recovery1'));
+test('service worker usa rede primeiro e inclui Modo Foco e recuperação offline',()=>{
+  assert.ok(sw.includes('focus-mode1'));
+  assert.ok(sw.includes('./focus-mode-core.js'));
+  assert.ok(sw.includes('./focus-mode.js'));
+  assert.ok(sw.includes('./focus-mode.css'));
+  assert.equal(sw.includes('./focus-entry.js'),false);
   assert.ok(sw.includes('./boot-recovery.js'));
   assert.ok(sw.includes('./features.js'));
   assert.ok(sw.includes('./shift-planner.js'));
