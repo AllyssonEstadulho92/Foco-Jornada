@@ -5,7 +5,7 @@ import {commandModel,buildSearchIndex,searchItems,diagnosticSnapshot,integrityIs
 test('centro de comando prioriza pausa, foco e jornada com comando executável',()=>{
   assert.equal(commandModel({breakSessions:[{status:'ACTIVE'}]},{}).nextCommand,'endBreak');
   assert.equal(commandModel({focusSessions:[{status:'PAUSED'}]},{}).nextCommand,'resumeFocus');
-  assert.equal(commandModel({focusSessions:[{status:'ACTIVE'}]},{}).nextTitle,'Abrir foco');
+  assert.equal(commandModel({focusSessions:[{status:'ACTIVE'}]},{}).nextTitle,'Abrir Modo Foco');
   assert.equal(commandModel({workSessions:[{status:'ACTIVE'}],activities:[{status:'ACTIVE',title:'Inventário'}]},{}).detail,'Inventário');
 });
 
@@ -17,13 +17,14 @@ test('turno do dia é lido da escala e sugere iniciar jornada',()=>{
   assert.equal(commandModel({},f,new Date(2026,7,19,12)).nextCommand,'startWork');
 });
 
-test('pesquisa global inclui módulos, atividades e turnos',()=>{
+test('pesquisa global inclui Modo Foco, módulos, atividades e turnos',()=>{
   const app={activities:[{id:'a1',title:'Contar stock',category:'Trabalho',status:'PLANNED'}]};
   const features={shiftPlanner:{templates:[{id:'t1',name:'Horário intermédio',code:'HO',kind:'work'}]}};
   const index=buildSearchIndex(app,features);
   assert.ok(searchItems(index,'stock').some(x=>x.title==='Contar stock'));
   assert.ok(searchItems(index,'intermédio').some(x=>x.title==='Horário intermédio'));
   assert.ok(searchItems(index,'backup').some(x=>x.id==='backup'));
+  assert.ok(searchItems(index,'foco').some(x=>x.title==='Modo Foco'));
 });
 
 test('diagnóstico agrega contagens sem alterar dados',()=>{
