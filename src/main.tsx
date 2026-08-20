@@ -5,6 +5,7 @@ import { DexieJourneyRepository } from './infrastructure/repositories/DexieJourn
 import { App } from './presentation/App'
 import './styles/tokens.css'
 import './styles/global.css'
+import './styles/journey.css'
 
 const root = document.getElementById('root')
 
