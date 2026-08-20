@@ -1,0 +1,28 @@
+import { createContext, type ReactNode, useContext } from 'react'
+import type { JourneyRepository } from '../../application/journey/JourneyRepository'
+
+export interface AppServices {
+  journeyRepository: JourneyRepository
+}
+
+const AppServicesContext = createContext<AppServices | null>(null)
+
+export function AppServicesProvider({
+  services,
+  children,
+}: {
+  services: AppServices
+  children: ReactNode
+}) {
+  return <AppServicesContext.Provider value={services}>{children}</AppServicesContext.Provider>
+}
+
+export function useAppServices(): AppServices {
+  const services = useContext(AppServicesContext)
+
+  if (!services) {
+    throw new Error('AppServicesProvider não foi configurado.')
+  }
+
+  return services
+}
