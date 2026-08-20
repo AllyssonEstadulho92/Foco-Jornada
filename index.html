@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#07111f">
-<meta name="description" content="Foco & Jornada — jornada, pausas, atividades, foco, café, transportes, escala, histórico e estatísticas.">
+<meta name="description" content="Foco & Jornada — jornada, pausas, atividades, planeamento, café, transportes, escala, histórico e estatísticas.">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Foco & Jornada">
@@ -27,6 +27,7 @@
 <link id="focusModeCss" rel="stylesheet" href="./focus-mode.css">
 <link id="installAppCss" rel="stylesheet" href="./install-app.css">
 <link id="stabilityUiCss" rel="stylesheet" href="./stability-ui.css">
+<link id="linearUiCss" rel="stylesheet" href="./linear-ui.css">
 </head>
 <body>
 <div class="layout">
@@ -35,7 +36,7 @@
   <nav class="side-nav" aria-label="Navegação principal">
     <button class="on" data-nav="today"><span>⌂</span>Hoje</button>
     <button data-nav="activities"><span>☑</span>Atividades</button>
-    <button data-nav="focus"><span>◎</span>Foco</button>
+    <button data-nav="focus"><span>▦</span>Planeamento</button>
     <button data-nav="history"><span>≡</span>Histórico</button>
     <button data-nav="stats"><span>▥</span>Estatísticas</button>
     <button data-nav="more"><span>⋯</span>Mais</button>
@@ -59,7 +60,7 @@
   <div class="filters"><button class="on" data-filter="open">Abertas</button><button data-filter="today">Hoje</button><button data-filter="overdue">Atrasadas</button><button data-filter="all">Todas</button><button data-filter="completed">Concluídas</button><button data-filter="cancelled">Canceladas</button><span id="activityCount"></span></div>
   <section class="panel"><div id="activityList" class="task-list"></div></section>
 </section>
-<section class="view" data-view="focus"><div id="focusArea"></div><div id="focusMetrics" class="metric-grid"></div></section>
+<section class="view" data-view="focus"><div id="planningArea"></div><div id="focusArea"></div><div id="focusMetrics" class="metric-grid"></div></section>
 <section class="view" data-view="history">
   <div class="page-tools"><label class="date-picker">Data <input id="historyDate" type="date"></label></div>
   <div id="historyMetrics" class="metric-grid"></div>
@@ -73,13 +74,13 @@
   <section class="panel"><div class="section-head"><h2>Resumo factual</h2></div><p id="statsSummary" class="summary"></p></section>
 </section>
 <section class="view" data-view="more">
-  <section class="panel"><div class="section-head"><div><span class="kicker">PREFERÊNCIAS</span><h2>Definições</h2></div></div><form id="settingsForm" class="settings-grid"><label>Tema<select id="setTheme"><option value="system">Automático</option><option value="dark">Escuro</option><option value="light">Claro</option></select></label><label>Contexto<select id="setContext"><option value="work">Trabalho</option><option value="personal">Pessoal</option></select></label><label>Pausa de ecrã (min)<input id="setScreen" type="number" min="1" max="120"></label><label>Pausa principal (min)<input id="setRest" type="number" min="1" max="240"></label><label>Duração do Modo Foco (min)<input id="setFocus" type="number" min="5" max="180"></label><label>Pausa curta Pomodoro<input id="setShort" type="number" min="1" max="60"></label><label>Pausa longa Pomodoro<input id="setLong" type="number" min="1" max="120"></label><label>Ciclos Pomodoro<input id="setCycles" type="number" min="1" max="12"></label><label>Preço café padrão (€)<input id="setCoffee" type="number" min="0" max="99" step="0.05"></label><label class="fj-toggle wide"><input id="setNotifications" type="checkbox"><span>Notificações quando foco/pausa terminar</span></label><div class="wide"><button class="btn primary" type="submit">Guardar definições</button></div></form></section>
+  <section class="panel"><div class="section-head"><div><span class="kicker">PREFERÊNCIAS</span><h2>Definições</h2></div></div><form id="settingsForm" class="settings-grid"><label>Tema<select id="setTheme"><option value="system">Automático</option><option value="dark">Escuro</option><option value="light">Claro</option></select></label><label>Contexto<select id="setContext"><option value="work">Trabalho</option><option value="personal">Pessoal</option></select></label><label>Pausa de ecrã (min)<input id="setScreen" type="number" min="1" max="120"></label><label>Pausa principal (min)<input id="setRest" type="number" min="1" max="240"></label><label>Duração do Modo Foco (min)<input id="setFocus" type="number" min="5" max="180"></label><label>Pausa curta Pomodoro<input id="setShort" type="number" min="1" max="60"></label><label>Pausa longa Pomodoro<input id="setLong" type="number" min="1" max="120"></label><label>Ciclos Pomodoro<input id="setCycles" type="number" min="1" max="12"></label><label>Preço café padrão (€)<input id="setCoffee" type="number" min="0" max="99" step="0.05"></label><label class="fj-toggle wide"><input id="setNotifications" type="checkbox"><span>Notificações quando uma pausa terminar</span></label><div class="wide"><button class="btn primary" type="submit">Guardar definições</button></div></form></section>
   <section class="panel"><div class="section-head"><div><span class="kicker">DADOS</span><h2>Backup e diagnóstico</h2></div></div><p class="muted">Os dados são guardados localmente neste browser. Exporta um backup antes de trocar de dispositivo ou limpar dados.</p><div class="button-row"><button id="exportBtn" class="btn">Exportar backup</button><button id="importBtn" class="btn">Importar backup</button><input id="importInput" type="file" accept="application/json" hidden><button id="checkBtn" class="btn">Verificar dados</button><button id="resetBtn" class="btn danger">Apagar dados</button></div><div id="integrity" class="integrity"></div></section>
   <section class="panel"><strong>Foco & Jornada</strong><p class="muted">Versão <span id="appVersion">4.2.0</span> · PWA · armazenamento local · offline após cache inicial.</p></section>
 </section>
 </main>
 </div>
-<nav class="bottom-nav" aria-label="Navegação móvel"><button class="on" data-nav="today"><span>⌂</span><small>Hoje</small></button><button data-nav="activities"><span>☑</span><small>Atividades</small></button><button data-nav="focus"><span>◎</span><small>Foco</small></button><button data-nav="history"><span>≡</span><small>Histórico</small></button><button data-nav="more"><span>⋯</span><small>Mais</small></button></nav>
+<nav class="bottom-nav" aria-label="Navegação móvel"><button class="on" data-nav="today"><span>⌂</span><small>Hoje</small></button><button data-nav="activities"><span>☑</span><small>Atividades</small></button><button data-nav="focus"><span>▦</span><small>Planeamento</small></button><button data-nav="history"><span>≡</span><small>Histórico</small></button><button data-nav="more"><span>⋯</span><small>Mais</small></button></nav>
 <div id="toast" class="toast" role="status" aria-live="polite"></div><div id="dialogRoot"></div>
 <script src="./persistence.js"></script>
 <script src="./boot-recovery.js"></script>
@@ -100,5 +101,6 @@
 <script type="module" src="./summary-guard.js"></script>
 <script type="module" src="./professional-ui.js"></script>
 <script type="module" src="./install-app.js"></script>
+<script type="module" src="./planning-mode.js"></script>
 </body>
 </html>
