@@ -2,8 +2,10 @@
 
 ## Estado atual
 
-**Fase:** 3 — Pausas, implementação concluída; validação CI pendente  
-**Branch:** `phase/03-pausas`  
+**Fase:** 3 — Pausas concluída  
+**Próxima fase:** 4 — Atividades  
+**PR da Fase 3:** #8  
+**Validação CI:** GitHub Actions run `32412743237` — sucesso  
 **Fonte de verdade:** `project/PROJECT_SPEC.md`
 
 ## Fases concluídas
@@ -11,8 +13,9 @@
 - [x] Fase 0 — Especificação.
 - [x] Fase 1 — Fundação.
 - [x] Fase 2 — Jornada.
+- [x] Fase 3 — Pausas.
 
-## Implementado na Fase 3
+## Implementado e validado na Fase 3
 
 - [x] Entidade `BreakRecord` e regras puras de domínio.
 - [x] Pausa curta de 15 minutos.
@@ -36,24 +39,17 @@
 - [x] Testes do cálculo de tempo efetivo.
 - [x] Testes de persistência e concorrência IndexedDB.
 
-## Validação necessária antes de concluir a Fase 3
+## Resultado dos quality gates
 
-- [ ] GitHub Actions: typecheck verde.
-- [ ] GitHub Actions: lint verde.
-- [ ] GitHub Actions: testes verdes.
-- [ ] GitHub Actions: build verde.
-- [ ] Revisão técnica final da Fase 3.
+- Typecheck: **PASS**
+- Lint: **PASS**
+- Testes: **PASS**
+- Build: **PASS**
 
-## Fora desta fase
+## Próximo trabalho autorizado
 
-Continuam bloqueados:
+A Fase 4 — Atividades pode iniciar depois de a PR #8 ser integrada em `main`.
 
-- Atividades funcionais;
-- Foco/Pomodoro;
-- Café;
-- dashboard final integrado;
-- estatísticas completas.
+Escopo: criar, editar, iniciar, concluir e cancelar atividades; permitir apenas uma atividade ativa; persistir em IndexedDB; calcular duração por timestamps; integrar com a jornada sem colocar regras de negócio na UI.
 
-## Próximo gate
-
-A Fase 4 — Atividades só pode iniciar depois de todos os gates acima estarem verdes e a Fase 3 ser integrada em `main`.
+Foco/Pomodoro e Café continuam bloqueados.
