@@ -29,7 +29,7 @@ function ensureControl(){
   const label=input.closest('.fj-toggle');
   if(label){label.classList.add('notification-setting');label.setAttribute('role','group')}
   input.setAttribute('role','switch');
-  input.setAttribute('aria-label','Notificações quando foco ou pausa terminar');
+  input.setAttribute('aria-label','Notificações quando uma pausa terminar');
   if(!input.dataset.notificationController){
     input.dataset.notificationController='1';
     input.addEventListener('change',async()=>{
@@ -39,10 +39,10 @@ function ensureControl(){
       window.dispatchEvent(new CustomEvent('foco-notification-preference-change',{detail:{enabled}}));
       if(enabled){
         const permission=await requestSystemPermission();
-        if(permission==='granted')internalNotify('Notificações de foco e pausa ativadas.');
+        if(permission==='granted')internalNotify('Notificações de pausa ativadas.');
         else if(permission==='denied')internalNotify('Alertas internos ativados. As notificações do sistema estão bloqueadas no dispositivo.');
         else internalNotify('Alertas internos ativados. Este navegador não disponibiliza notificações do sistema.');
-      }else internalNotify('Notificações de foco e pausa desativadas.');
+      }else internalNotify('Notificações de pausa desativadas.');
       scheduleSync();
     });
   }
