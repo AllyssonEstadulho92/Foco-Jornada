@@ -65,7 +65,7 @@ test('arranque carrega persistência antes da aplicação e não usa shell bloqu
 });
 
 test('folhas principais são carregadas diretamente sem media print temporário',()=>{
-  for(const css of ['./styles.css','./ux.css','./features.css','./hub.css','./productivity.css','./stability-ui.css'])assert.ok(index.includes(`rel="stylesheet" href="${css}"`)||index.includes(`rel="stylesheet" href="${css}"`),css);
+  for(const css of ['./styles.css','./ux.css','./features.css','./hub.css','./productivity.css','./stability-ui.css'])assert.ok(index.includes(`rel="stylesheet" href="${css}"`),css);
   assert.equal(index.includes('media="print" onload='),false);
 });
 
@@ -86,7 +86,7 @@ test('runtime renderiza apenas a vista ativa e mantém temporizadores leves',()=
 });
 
 test('service worker usa rede primeiro e mantém aplicação completa offline',()=>{
-  assert.ok(sw.includes('direct-boot1'));
+  assert.ok(sw.includes('direct-boot2'));
   assert.ok(sw.includes('./features.js'));
   assert.ok(sw.includes('./shift-planner.js'));
   assert.ok(sw.includes('./runtime-fixes.js'));
