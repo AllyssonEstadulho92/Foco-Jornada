@@ -15,6 +15,7 @@ import './styles/breaks.css'
 import './styles/activities.css'
 import './styles/focus.css'
 import './styles/reports.css'
+import './styles/prototype.css'
 
 const root = document.getElementById('root')
 if (!root) throw new Error('Elemento #root não encontrado.')

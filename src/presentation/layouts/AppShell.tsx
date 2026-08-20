@@ -1,4 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom'
+import { BrandIcon, NavigationIcon } from '../navigation/NavigationIcon'
 import { primaryNavigation, secondaryNavigation, type NavigationItem } from '../navigation/navigationItems'
 import { useUiStore } from '../store/useUiStore'
 
@@ -11,7 +12,7 @@ function NavigationLink({ item, compact = false }: { item: NavigationItem; compa
       aria-label={compact ? item.label : undefined}
     >
       <span className="navMark" aria-hidden="true">
-        {item.mark}
+        <NavigationIcon name={item.icon} />
       </span>
       <span className="navLabel">{item.label}</span>
     </NavLink>
@@ -31,11 +32,11 @@ export function AppShell() {
       <aside className="sidebar" aria-label="Navegação principal">
         <div className="brandRow">
           <div className="brandMark" aria-hidden="true">
-            FJ
+            <BrandIcon />
           </div>
           <div className="brandCopy">
             <strong>Foco & Jornada</strong>
-            <span>Produtividade pessoal</span>
+            <span>Produtividade com propósito</span>
           </div>
         </div>
 
@@ -57,7 +58,7 @@ export function AppShell() {
           onClick={toggleSidebar}
           aria-label={sidebarCollapsed ? 'Expandir menu lateral' : 'Recolher menu lateral'}
         >
-          <span aria-hidden="true">{sidebarCollapsed ? '→' : '←'}</span>
+          <span className="sidebarToggleIcon" aria-hidden="true">{sidebarCollapsed ? '→' : '←'}</span>
           <span className="navLabel">Recolher</span>
         </button>
       </aside>
