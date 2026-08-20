@@ -10,15 +10,16 @@ let root=null,renderQueued=false,lastKey='';
 function readApp(){try{return C.migrateState(JSON.parse(localStorage.getItem(APP_KEY)||'null'))}catch{return C.createInitialState()}}
 function readFeatures(){try{return JSON.parse(localStorage.getItem(FEATURE_KEY)||'{}')||{}}catch{return{}}}
 function writeFeatures(features){localStorage.setItem(FEATURE_KEY,JSON.stringify(features||{}));window.FocoPersistence?.snapshot?.()}
-function prefs(){const f=readFeatures();return{activityId:f.focusMode?.activityId||null,dailyGoalMinutes:Math.max(15,Math.min(720,Number(f.focusMode?.dailyGoalMinutes)||120))}}
+function prefs(){const f=readFeatures();return{activityId:f.focusMode?.activityId||null,dailyGoalMinutes:Math.max(15,Math.min(720,Number(f.focusMode?.dailyGoalMinutes)||120)),lastStartedFocusId:f.focusMode?.lastStartedFocusId||null}}
 function savePrefs(patch){const f=readFeatures(),current=prefs();f.focusMode={...(f.focusMode||{}),...current,...patch};writeFeatures(f);return f.focusMode}
 function notify(text){window.FocoUI?.notify?.(text)}
-function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#39;'}[c]))}
 function fmtClock(ms){ms=Math.max(0,Number(ms)||0);const h=Math.floor(ms/C.MS.hour),m=Math.floor(ms%C.MS.hour/C.MS.minute),s=Math.floor(ms%C.MS.minute/1000);return h?`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`:`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`}
 function fmtTime(ts){return new Intl.DateTimeFormat('pt-PT',{hour:'2-digit',minute:'2-digit'}).format(new Date(ts))}
 function fmtDate(ts){return new Intl.DateTimeFormat('pt-PT',{day:'2-digit',month:'short'}).format(new Date(ts))}
 function navigate(view){const b=$(`.bottom-nav [data-nav="${view}"]`)||$(`.side-nav [data-nav="${view}"]`);b?.click()}
 function waitUntil(fn,timeout=2400){return new Promise(resolve=>{const start=Date.now();const check=()=>{let value=null;try{value=fn()}catch{}if(value)return resolve(value);if(Date.now()-start>=timeout)return resolve(null);setTimeout(check,35)};check()})}
+function summaryFor(app){const base=focusModeSummary(app,Date.now()),goal=prefs().dailyGoalMinutes;return{...base,goalMinutes:goal,goalReached:base.minutes>=goal,progress:Math.min(100,Math.round(base.minutes/goal*100))}}
 
 function ensureRoot(){
   const view=$('[data-view="focus"]');if(!view)return null;
@@ -64,6 +65,7 @@ async function startSession(){
   legacyStart.removeAttribute('disabled');legacyStart.disabled=false;legacyStart.click();
   const focus=await waitUntil(()=>C.activeFocus(readApp()));
   if(!focus){notify('Não foi possível iniciar a sessão.');return}
+  savePrefs({lastStartedFocusId:focus.id,activityId:activityId||null});
   notify('Modo Foco iniciado.');queueRender();
 }
 
@@ -82,7 +84,7 @@ function onClick(e){
 }
 function onChange(e){
   if(e.target.id==='focusModeActivity')savePrefs({activityId:e.target.value||null});
-  if(e.target.id==='focusModeGoal'){const value=Math.max(15,Math.min(720,Number(e.target.value)||120));savePrefs({dailyGoalMinutes:value});queueRender()}
+  if(e.target.id==='focusModeGoal'){const value=Math.max(15,Math.min(720,Number(e.target.value)||120));savePrefs({dailyGoalMinutes:value});lastKey='';queueRender()}
 }
 
 function activityName(app,id){return app.activities?.find(a=>a.id===id)?.title||''}
@@ -117,16 +119,17 @@ function historyHtml(app){
 }
 function renderMode(){
   const host=ensureRoot();if(!host)return;
-  const app=readApp(),focus=C.activeFocus(app),summary=focusModeSummary(app,Date.now());
-  const key=JSON.stringify([focus?.id,focus?.status,focus?.expectedEndAt,focus?.pausedAt,focus?.phase,app.updatedAt,prefs(),summary.minutes,summary.progress]);
+  const app=readApp(),focus=C.activeFocus(app),summary=summaryFor(app),p=prefs();
+  const key=JSON.stringify([focus?.id,focus?.status,focus?.expectedEndAt,focus?.pausedAt,focus?.phase,app.updatedAt,p,summary.minutes,summary.progress]);
   if(key===lastKey)return;lastKey=key;
   host.innerHTML=(focus?activeHtml(app,focus,summary):idleHtml(app,summary))+historyHtml(app);
 }
 function polishToday(){
-  const app=readApp(),focus=C.activeFocus(app),button=$('#quickActions [data-action="goFocus"]');
+  const app=readApp(),focus=C.activeFocus(app),p=prefs(),button=$('#quickActions [data-action="goFocus"]');
   if(button&&!C.activeBreak(app)){button.disabled=false;button.removeAttribute('disabled');const b=button.querySelector('b');if(b)b.textContent='Modo Foco'}
-  if(focus?.mode==='FOCUS_MODE'){
-    const hero=$('#todayHero .hero.focus');if(hero){const status=hero.querySelector('.status'),p=hero.querySelector('p'),end=hero.querySelector('[data-action="endFocus"]');if(status)status.textContent=focus.status==='PAUSED'?'MODO FOCO PAUSADO':'MODO FOCO';if(p)p.textContent=focus.activityId?`Atividade: ${activityName(app,focus.activityId)}`:(focus.workSessionId?'Sessão ligada à jornada':'Sessão independente');if(end)end.textContent='Concluir sessão'}
+  const belongs=focus?.phase==='FOCUS'&&(focus.mode==='FOCUS_MODE'||focus.id===p.lastStartedFocusId);
+  if(belongs){
+    const hero=$('#todayHero .hero.focus');if(hero){const status=hero.querySelector('.status'),copy=hero.querySelector('p'),end=hero.querySelector('[data-action="endFocus"]');if(status)status.textContent=focus.status==='PAUSED'?'MODO FOCO PAUSADO':'MODO FOCO';if(copy)copy.textContent=focus.activityId?`Atividade: ${activityName(app,focus.activityId)}`:(focus.workSessionId?'Sessão ligada à jornada':'Sessão independente');if(end)end.textContent='Concluir sessão'}
   }
 }
 function queueRender(){if(renderQueued)return;renderQueued=true;queueMicrotask(()=>{renderQueued=false;renderMode();polishToday()})}
@@ -140,4 +143,4 @@ window.addEventListener('storage',queueRender);
 window.addEventListener('pageshow',queueRender);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)queueRender()});
 queueRender();
-window.FocoMode=Object.freeze({version:'2.0.0',refresh:queueRender,start:startSession});
+window.FocoMode=Object.freeze({version:'2.0.1',refresh:queueRender,start:startSession});
