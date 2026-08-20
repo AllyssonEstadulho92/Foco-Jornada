@@ -14,18 +14,18 @@
 <link rel="apple-touch-icon" href="./icon.svg">
 <link rel="stylesheet" href="./styles.css">
 <link rel="stylesheet" href="./ux.css">
-<link id="featuresCss" rel="stylesheet" href="./features.css">
 <link rel="stylesheet" href="./hub.css">
-<link id="hubAboutCss" rel="stylesheet" href="./hub-about.css">
+<link rel="stylesheet" href="./hub-about.css">
 <link rel="stylesheet" href="./settings-controller.css">
 <link rel="stylesheet" href="./shift-planner.css">
 <link rel="stylesheet" href="./shift-mobile.css">
 <link rel="stylesheet" href="./shift-compact.css">
+<link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-regular-rounded/css/uicons-regular-rounded.css" data-flaticon-uicons>
+<link rel="stylesheet" href="./flaticon-motion.css">
 <link rel="stylesheet" href="./interaction-fixes.css">
 <link rel="stylesheet" href="./professional.css">
 <link rel="stylesheet" href="./productivity.css">
 <link rel="stylesheet" href="./install-app.css">
-<link rel="stylesheet" href="./stability-ui.css">
 </head>
 <body>
 <div class="layout">
@@ -60,7 +60,7 @@
 <section class="view" data-view="more">
   <section class="panel"><div class="section-head"><div><span class="kicker">PREFERÊNCIAS</span><h2>Definições</h2></div></div><form id="settingsForm" class="settings-grid"><label>Tema<select id="setTheme"><option value="system">Automático</option><option value="dark">Escuro</option><option value="light">Claro</option></select></label><label>Contexto<select id="setContext"><option value="work">Trabalho</option><option value="personal">Pessoal</option></select></label><label>Pausa de ecrã (min)<input id="setScreen" type="number" min="1" max="120"></label><label>Pausa principal (min)<input id="setRest" type="number" min="1" max="240"></label><label>Foco (min)<input id="setFocus" type="number" min="1" max="180"></label><label>Pausa curta Pomodoro<input id="setShort" type="number" min="1" max="60"></label><label>Pausa longa Pomodoro<input id="setLong" type="number" min="1" max="120"></label><label>Ciclos Pomodoro<input id="setCycles" type="number" min="1" max="12"></label><label>Preço café padrão (€)<input id="setCoffee" type="number" min="0" max="99" step="0.05"></label><label class="fj-toggle wide"><input id="setNotifications" type="checkbox"><span>Notificações quando foco/pausa terminar</span></label><div class="wide"><button class="btn primary" type="submit">Guardar definições</button></div></form></section>
   <section class="panel"><div class="section-head"><div><span class="kicker">DADOS</span><h2>Backup e diagnóstico</h2></div></div><p class="muted">Os dados são guardados localmente neste browser. Exporta um backup antes de trocar de dispositivo ou limpar dados.</p><div class="button-row"><button id="exportBtn" class="btn">Exportar backup</button><button id="importBtn" class="btn">Importar backup</button><input id="importInput" type="file" accept="application/json" hidden><button id="checkBtn" class="btn">Verificar dados</button><button id="resetBtn" class="btn danger">Apagar dados</button></div><div id="integrity" class="integrity"></div></section>
-  <section class="panel"><strong>Foco & Jornada</strong><p class="muted">Versão <span id="appVersion">4.2.0</span> · PWA · armazenamento local · offline após cache inicial.</p></section>
+  <section class="panel"><strong>Foco & Jornada</strong><p class="muted">Versão <span id="appVersion">4.2.0</span> · PWA · armazenamento local · offline após cache inicial.</p><small class="flaticon-attribution">UIcons by <a href="https://www.flaticon.com/uicons" target="_blank" rel="noopener">Flaticon</a></small></section>
 </section>
 </main>
 </div>
@@ -76,10 +76,12 @@
 <script type="module" src="./shift-reports.js"></script>
 <script type="module" src="./shift-mobile-interactions.js"></script>
 <script type="module" src="./app-links.js"></script>
+<script type="module" src="./flaticon-icons.js"></script>
 <script type="module" src="./interaction-fixes.js"></script>
 <script type="module" src="./runtime-fixes.js"></script>
 <script type="module" src="./summary-guard.js"></script>
 <script type="module" src="./professional-ui.js"></script>
+<script type="module" src="./focus-entry.js"></script>
 <script type="module" src="./install-app.js"></script>
 </body>
 </html>

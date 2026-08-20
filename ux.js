@@ -50,8 +50,6 @@ function scheduleEnhance(){if(iconRAF)return;iconRAF=requestAnimationFrame(()=>{
 function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function formatNotificationTime(ts){try{return new Intl.DateTimeFormat('pt-PT',{hour:'2-digit',minute:'2-digit'}).format(new Date(ts))}catch{return''}}
 
-setStaticViewport();ensureNotificationCenter();observeLegacyToast();scheduleEnhance();
-const uiObserver=new MutationObserver(mutations=>{for(const mutation of mutations){if([...mutation.addedNodes].some(node=>node.nodeType===1)){scheduleEnhance();break}}});
-uiObserver.observe(document.body,{childList:true,subtree:true});
+setStaticViewport();ensureNotificationCenter();observeLegacyToast();scheduleEnhance();new MutationObserver(scheduleEnhance).observe(document.body,{childList:true,subtree:true,characterData:true});
 window.FocoUI=Object.freeze({notify:pushNotification,icon,toggleNotifications,version:UI_VERSION});
 import('./features.js').catch(()=>pushNotification('O módulo de funcionalidades adicionais não foi carregado.'));
