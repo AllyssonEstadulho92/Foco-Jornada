@@ -1,9 +1,10 @@
-const BOOT_VERSION='1.1.0';
+const BOOT_VERSION='1.2.0';
 const APP_KEY='foco-jornada-v4';
 const root=document.documentElement;
 const shell=document.getElementById('startupShell');
 const status=document.getElementById('startupStatus');
 const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+const nextFrame=()=>new Promise(resolve=>requestAnimationFrame(()=>resolve()));
 let shiftPromise=null,extrasPromise=null;
 
 function setStatus(text){if(status)status.textContent=text}
@@ -12,7 +13,7 @@ async function waitStylesheet(id,timeout=3000){const link=document.getElementByI
 function revealApp(){root.dataset.fjCoreReady='1';if(shell)shell.hidden=true}
 function failBoot(error){console.error('[Foco & Jornada] Falha de arranque',error);root.dataset.fjBoot='error';setStatus('Não foi possível concluir o arranque. Toca em Recarregar para tentar novamente.');const retry=document.getElementById('startupRetry');if(retry){retry.hidden=false;retry.onclick=()=>location.reload()}}
 function onboardingPending(){try{return JSON.parse(localStorage.getItem(APP_KEY)||'null')?.settings?.onboardingDone===false}catch{return false}}
-async function loadExtras(){if(extrasPromise)return extrasPromise;extrasPromise=(async()=>{const modules=['./hub.js','./controls.js','./settings-controller.js','./app-links.js','./interaction-fixes.js','./runtime-fixes.js','./summary-guard.js','./professional-ui.js','./install-app.js'];for(const path of modules){try{await import(path)}catch(error){console.error(`[Foco & Jornada] Módulo opcional não carregado: ${path}`,error)}}})();return extrasPromise}
+async function loadExtras(){if(extrasPromise)return extrasPromise;extrasPromise=(async()=>{const modules=['./ux.js','./hub.js','./controls.js','./settings-controller.js','./app-links.js','./interaction-fixes.js','./runtime-fixes.js','./summary-guard.js','./professional-ui.js','./install-app.js'];for(const path of modules){try{await nextFrame();await import(path)}catch(error){console.error(`[Foco & Jornada] Módulo opcional não carregado: ${path}`,error)}}})();return extrasPromise}
 function scheduleExtras(){const start=()=>requestAnimationFrame(()=>setTimeout(()=>loadExtras(),0));if(!onboardingPending()){start();return}const complete=e=>{if(!e.target.closest?.('#finishOnboarding,#skipOnboarding'))return;setTimeout(()=>{if(onboardingPending())return;document.removeEventListener('click',complete);start()},0)};document.addEventListener('click',complete)}
 async function loadShift(){if(!shiftPromise)shiftPromise=(async()=>{const planner=await import('./shift-planner.js');await Promise.allSettled([import('./shift-advanced.js'),import('./shift-reports.js'),import('./shift-mobile-interactions.js')]);return planner})();return shiftPromise}
 
@@ -22,7 +23,7 @@ try{
   setStatus('A preparar os dados locais…');
   await loadClassic('./persistence.js');
   setStatus('A carregar a jornada…');
-  await import('./ux.js');
+  await import('./stability.js');
   await waitStylesheet('mainCss');
   revealApp();
   scheduleExtras();
