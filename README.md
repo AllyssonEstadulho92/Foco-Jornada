@@ -1,20 +1,44 @@
 # Foco & Jornada
 
-Reinício técnico do projeto a partir de uma árvore Git limpa.
+Aplicação local-first para controlo de jornada, pausas, atividades, foco/Pomodoro, café e produtividade pessoal.
 
 ## Estado atual
 
-**Fase 0 — Fundação.** Ainda não existem regras funcionais de Jornada, Pausas, Foco, Café ou Atividades.
+**Fase 1 — Fundação: em curso.**
 
-## Arquitetura
+O repositório já contém a base React + TypeScript + Vite, separação inicial por camadas e design tokens. A Fundação ainda precisa de Router, Zustand, Dexie, testes, lint/format, PWA e navegação responsiva antes de iniciar o módulo Jornada.
 
-- `src/domain`: regras de negócio puras.
-- `src/application`: casos de uso e coordenação.
-- `src/infrastructure`: persistência e integrações.
-- `src/presentation`: interface.
-- `src/shared`: abstrações realmente transversais.
+## Organização do repositório
 
-## Comandos
+```text
+Foco-Jornada/
+├── .github/              # CI e automações GitHub
+├── project/              # especificação, roadmap, decisões e prompts
+│   ├── docs/
+│   └── prompts/
+├── src/                  # código da aplicação
+│   ├── domain/
+│   ├── application/
+│   ├── infrastructure/
+│   ├── presentation/
+│   ├── shared/
+│   └── styles/
+├── index.html
+├── package.json
+└── tsconfig*.json
+```
+
+## Documentação principal
+
+- `project/PROJECT_SPEC.md` — fonte de verdade funcional e arquitetural.
+- `project/ROADMAP.md` — fases e gates de desenvolvimento.
+- `project/CHECKPOINT.md` — ponto exato de continuidade.
+- `project/docs/ARCHITECTURE.md` — regras de arquitetura.
+- `project/docs/QUALITY_GATES.md` — validações obrigatórias.
+- `project/docs/DECISIONS.md` — decisões técnicas.
+- `project/prompts/` — instruções de execução fase a fase para Codex.
+
+## Comandos atuais
 
 ```bash
 npm install
@@ -23,6 +47,8 @@ npm run build
 npm run dev
 ```
 
-## Próximo gate
+Os scripts de lint e testes serão adicionados durante a conclusão da Fase 1.
 
-Implementar exclusivamente o módulo Jornada. Pausas ficam bloqueadas até a Jornada ter testes e critérios de aceitação aprovados.
+## Regra de desenvolvimento
+
+Trabalhar uma fase de cada vez. Nenhuma fase seguinte deve começar antes de o `project/CHECKPOINT.md` e os quality gates confirmarem a fase anterior.
