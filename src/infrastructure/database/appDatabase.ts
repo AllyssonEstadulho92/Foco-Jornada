@@ -1,6 +1,7 @@
 import Dexie, { type Table } from 'dexie'
 import type { Activity } from '../../domain/activities/Activity'
 import type { BreakRecord } from '../../domain/breaks/BreakRecord'
+import type { FocusSession } from '../../domain/focus/FocusSession'
 import type { Journey } from '../../domain/journey/Journey'
 
 export interface AppMetadataRecord {
@@ -14,6 +15,7 @@ export class AppDatabase extends Dexie {
   journeys!: Table<Journey, string>
   breaks!: Table<BreakRecord, string>
   activities!: Table<Activity, string>
+  focusSessions!: Table<FocusSession, string>
 
   constructor(name = 'foco-jornada') {
     super(name)
@@ -38,6 +40,15 @@ export class AppDatabase extends Dexie {
       journeys: '&id,date,status,startedAt,endedAt,updatedAt',
       breaks: '&id,journeyId,status,startedAt,endedAt',
       activities: '&id,journeyId,status,createdAt,startedAt,endedAt,updatedAt',
+    })
+
+    this.version(5).stores({
+      metadata: '&key,updatedAt',
+      journeys: '&id,date,status,startedAt,endedAt,updatedAt',
+      breaks: '&id,journeyId,status,startedAt,endedAt',
+      activities: '&id,journeyId,status,createdAt,startedAt,endedAt,updatedAt',
+      focusSessions:
+        '&id,journeyId,activityId,mode,segmentType,status,cycle,createdAt,startedAt,endedAt,updatedAt',
     })
   }
 }

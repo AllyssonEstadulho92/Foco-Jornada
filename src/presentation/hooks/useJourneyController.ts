@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
-import { finishJourneyWithWorkState } from '../../application/journey/finishJourneyWithWorkState'
+import { finishJourneyWithProductivityState } from '../../application/journey/finishJourneyWithProductivityState'
 import { startJourney } from '../../application/journey/startJourney'
 import type { Journey } from '../../domain/journey/Journey'
 import { toLocalDateKey } from '../../shared/utils/dateTime'
 import { useAppServices } from '../providers/AppServicesProvider'
 
 export function useJourneyController() {
-  const { journeyRepository, breakRepository, activityRepository } = useAppServices()
+  const { journeyRepository, breakRepository, activityRepository, focusRepository } = useAppServices()
   const [activeJourney, setActiveJourney] = useState<Journey | undefined>()
   const [todayJourneys, setTodayJourneys] = useState<Journey[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -38,14 +38,11 @@ export function useJourneyController() {
           setError(loadError instanceof Error ? loadError.message : 'Erro ao carregar a jornada.')
         }
       } finally {
-        if (!cancelled) {
-          setIsLoading(false)
-        }
+        if (!cancelled) setIsLoading(false)
       }
     }
 
     void load()
-
     return () => {
       cancelled = true
     }
@@ -53,18 +50,13 @@ export function useJourneyController() {
 
   const start = useCallback(async () => {
     if (isBusy) return
-
     try {
       setIsBusy(true)
       setError(null)
       const result = await startJourney({ repository: journeyRepository })
       await refresh()
-
-      if (result.status === 'started') {
-        toast.success('Jornada iniciada.')
-      } else {
-        toast('Já existe uma jornada ativa.')
-      }
+      if (result.status === 'started') toast.success('Jornada iniciada.')
+      else toast('Já existe uma jornada ativa.')
     } catch (startError) {
       const message = startError instanceof Error ? startError.message : 'Erro ao iniciar a jornada.'
       setError(message)
@@ -76,24 +68,21 @@ export function useJourneyController() {
 
   const finish = useCallback(async () => {
     if (isBusy || !activeJourney) return
-
     try {
       setIsBusy(true)
       setError(null)
-      const result = await finishJourneyWithWorkState({
+      const result = await finishJourneyWithProductivityState({
         journeyRepository,
         breakRepository,
         activityRepository,
+        focusRepository,
         journeyId: activeJourney.id,
       })
-
       await refresh()
-
       if (result.status === 'finished') {
         toast.success('Jornada terminada.')
         return
       }
-
       toast.error('A jornada ativa mudou. Os dados foram atualizados.')
     } catch (finishError) {
       const message = finishError instanceof Error ? finishError.message : 'Erro ao terminar a jornada.'
@@ -102,7 +91,15 @@ export function useJourneyController() {
     } finally {
       setIsBusy(false)
     }
-  }, [activeJourney, activityRepository, breakRepository, isBusy, journeyRepository, refresh])
+  }, [
+    activeJourney,
+    activityRepository,
+    breakRepository,
+    focusRepository,
+    isBusy,
+    journeyRepository,
+    refresh,
+  ])
 
   return {
     activeJourney,

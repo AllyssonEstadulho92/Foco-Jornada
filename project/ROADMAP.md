@@ -8,103 +8,31 @@
 | 1 | Fundação | Concluída | Typecheck, lint, testes e build verdes |
 | 2 | Jornada | Concluída | Persistência, recuperação e concorrência validadas |
 | 3 | Pausas | Concluída | Tempo efetivo, persistência e CI verdes |
-| 4 | Atividades | Concluída | Apenas uma atividade ativa, persistência e CI verdes |
-| 5 | Foco/Pomodoro | Próxima | Timer persistente após refresh |
-| 6 | Café | Bloqueada | Registos e totais consistentes |
+| 4 | Atividades | Concluída | Exclusividade, persistência e CI verdes |
+| 5 | Foco/Pomodoro | Concluída | Timer persistente e CI verdes |
+| 6 | Café | Próxima | Registos e totais consistentes |
 | 7 | Dashboard | Bloqueada | Integração sem duplicação de lógica |
 | 8 | Histórico/Estatísticas/Definições | Bloqueada | Agregações corretas |
 | 9 | Qualidade final/PWA | Bloqueada | V1 cumpre critérios de aceitação |
 
-## Fase 1 — Fundação — CONCLUÍDA
+## Fases 1–5 — CONCLUÍDAS
 
-Implementado:
+A fundação, Jornada, Pausas, Atividades e Foco/Pomodoro estão implementados e passaram typecheck, lint, testes e build no GitHub Actions.
 
-- React + TypeScript + Vite;
-- TypeScript strict;
-- React Router;
-- Zustand;
-- Dexie/IndexedDB preparado;
-- Vitest + React Testing Library;
-- ESLint + Prettier;
-- configuração PWA;
-- separação `domain/application/infrastructure/presentation/shared`;
-- design tokens e CSS responsivo;
-- navegação mobile/desktop;
-- páginas Hoje, Atividades, Foco, Histórico, Mais e Definições;
-- CI com typecheck, lint, testes e build.
+### Fase 5 — Foco/Pomodoro
 
-Validação: **PASS** em typecheck, lint, testes e build.
-
----
-
-## Fase 2 — Jornada — CONCLUÍDA
-
-Implementado:
-
-- iniciar e terminar jornada;
-- impedir duas jornadas ativas;
-- operações concorrentes protegidas por transações;
-- persistência IndexedDB;
-- recuperação após refresh/reabertura;
-- duração calculada por timestamps;
-- histórico básico diário;
-- interface funcional no ecrã Hoje;
-- testes de domínio/aplicação e persistência.
-
-Validação: **PASS** em typecheck, lint, testes e build.
-
----
-
-## Fase 3 — Pausas — CONCLUÍDA
-
-Implementado:
-
-- 15 min, 60 min e personalizada;
-- apenas uma pausa ativa por jornada;
-- pausa apenas dentro de jornada ativa;
-- persistência IndexedDB no schema v3;
-- recuperação após refresh/reabertura;
-- duração real consolidada;
-- cálculo de tempo efetivo;
-- estado `Em pausa`;
-- histórico de pausas;
-- encerramento automático de pausa ativa ao terminar jornada;
-- testes de domínio, casos de uso, cálculo e persistência/concorrência.
-
-Validação GitHub Actions: **PASS** em typecheck, lint, testes e build.
-
----
-
-## Fase 4 — Atividades — CONCLUÍDA
-
-Implementado:
-
-- criar, editar, iniciar, concluir e cancelar atividades;
-- estados pendente, em curso, concluída e cancelada;
-- apenas uma atividade ativa por jornada;
-- proteção contra início concorrente;
-- persistência IndexedDB no schema v4;
-- recuperação após refresh/reabertura;
-- duração calculada por timestamps;
-- ecrã Atividades funcional e responsivo;
-- atividade atual apresentada no Hoje;
-- encerramento consistente da atividade ativa ao terminar a jornada;
-- testes de domínio, casos de uso, duração, persistência e concorrência.
-
-Validação GitHub Actions: **PASS** em typecheck, lint, testes e build.
-
----
-
-## Fase 5 — Foco/Pomodoro — PRÓXIMA
-
-- Pomodoro padrão e personalizado.
-- Pausar/retomar/ciclos.
-- Persistência por timestamps.
+- Pomodoro 25/5/15 com 4 ciclos.
+- Sessão personalizada.
+- Pausar/retomar/concluir/cancelar.
 - Associação opcional a atividade.
-- Recuperação consistente após refresh/reabertura.
-- Testes das transições e do cálculo temporal.
+- Persistência por timestamps e recuperação após refresh.
+- Apenas uma sessão aberta por jornada.
+- Encerramento consistente ao terminar jornada.
+- Testes de domínio, aplicação e IndexedDB.
 
-## Fase 6 — Café
+---
+
+## Fase 6 — Café — PRÓXIMA
 
 - Quantidade, preço e total diário.
 - Persistência e histórico.
@@ -119,6 +47,7 @@ Validação GitHub Actions: **PASS** em typecheck, lint, testes e build.
 - Timeline diária.
 - Agregações dia/semana/mês.
 - Definições persistentes.
+- Exportação básica de dados.
 
 ## Fase 9 — Qualidade final e PWA
 
