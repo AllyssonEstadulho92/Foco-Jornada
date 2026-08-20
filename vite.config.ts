@@ -2,7 +2,10 @@ import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
+const base = '/Foco-Jornada/'
+
 export default defineConfig({
+  base,
   plugins: [
     react(),
     VitePWA({
@@ -15,11 +18,11 @@ export default defineConfig({
         theme_color: '#0b1018',
         background_color: '#0b1018',
         display: 'standalone',
-        start_url: '/',
-        scope: '/',
+        start_url: base,
+        scope: base,
         icons: [
           {
-            src: '/icon.svg',
+            src: `${base}icon.svg`,
             sizes: 'any',
             type: 'image/svg+xml',
             purpose: 'any maskable',
@@ -27,7 +30,7 @@ export default defineConfig({
         ],
       },
       workbox: {
-        navigateFallback: '/index.html',
+        navigateFallback: `${base}index.html`,
         cleanupOutdatedCaches: true,
         globPatterns: ['**/*.{js,css,html,svg,woff2}'],
       },
