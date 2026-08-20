@@ -1,68 +1,36 @@
-/* Flaticon UIcons — animações de interação sem loops contínuos */
-.fi-motion{display:none;align-items:center;justify-content:center;line-height:1;font-size:1em;font-style:normal;transform-origin:50% 50%;will-change:transform;transition:transform .2s cubic-bezier(.2,.8,.2,1),color .2s ease,filter .2s ease}
+/* Flaticon UIcons — uma única linguagem de ícones, sem animações contínuas */
+.fi-motion{display:none;align-items:center;justify-content:center;line-height:1;font-size:1em;font-style:normal;transform-origin:50% 50%;will-change:transform;transition:transform .2s cubic-bezier(.2,.8,.2,1),color .2s ease}
 .fi-motion::before{display:block;line-height:1}
 .fi-motion.flaticon-live{display:inline-flex}
 .flaticon-source-hidden{display:none!important}
 
-/* Todos os ícones respondem ao toque/clique. */
 button:active .fi-motion.flaticon-live,
 a:active .fi-motion.flaticon-live,
-[role="button"]:active .fi-motion.flaticon-live{animation:fiTap .38s cubic-bezier(.2,.9,.25,1)}
+[role="button"]:active .fi-motion.flaticon-live{animation:fiTap .32s cubic-bezier(.2,.9,.25,1)}
+[data-nav].on .fi-motion.flaticon-live,.sp-bottom button.on .fi-motion.flaticon-live{animation:fiSelect .36s cubic-bezier(.18,.88,.3,1.2)}
+[data-action="coffee"]:active .fi-role-mug-hot{animation:fiCoffee .42s ease-out}
+[data-action="toggleTheme"]:active .fi-motion.flaticon-live{animation:fiSpin .38s ease-out}
+[data-action="screenBreak"]:active .fi-motion.flaticon-live,[data-action="restBreak"]:active .fi-motion.flaticon-live{animation:fiBreath .42s ease-out}
+.notification-bell.pulse .fi-motion.flaticon-live{animation:fiBell .56s cubic-bezier(.2,.8,.2,1)}
+.fj-history-delete:active .fi-motion.flaticon-live,.btn.danger:active .fi-role-trash{animation:fiTrash .36s ease-out}
+.sp-top-actions button:active .fi-motion.flaticon-live,.sp-fab:active .fi-motion.flaticon-live{animation:fiTap .32s cubic-bezier(.2,.9,.25,1)}
 
-/* Entradas ativas da navegação fazem um único pop quando passam a ativas. */
-[data-nav].on .fi-motion.flaticon-live,
-.sp-bottom button.on .fi-motion.flaticon-live,
-.hub-app:active .fi-motion.flaticon-live{animation:fiSelect .44s cubic-bezier(.18,.88,.3,1.25)}
+@media(hover:hover) and (pointer:fine){button:hover .fi-motion.flaticon-live,a:hover .fi-motion.flaticon-live{transform:translateY(-1px) scale(1.04)}}
 
-/* Ações com personalidade própria. */
-[data-action="coffee"]:active .fi-role-mug-hot,
-[data-action="coffee"]:active .fi-role-coffee{animation:fiCoffee .48s ease-out}
-[data-action="toggleTheme"]:active .fi-motion.flaticon-live{animation:fiSpin .42s ease-out}
-[data-action="screenBreak"]:active .fi-motion.flaticon-live,
-[data-action="restBreak"]:active .fi-motion.flaticon-live,
-[data-action="pauseFocus"]:active .fi-motion.flaticon-live{animation:fiBreath .48s ease-out}
-.notification-bell.pulse .fi-motion.flaticon-live{animation:fiBell .62s cubic-bezier(.2,.8,.2,1)}
-.fj-history-delete:active .fi-motion.flaticon-live,
-.btn.danger:active .fi-role-trash{animation:fiTrash .4s ease-out}
-.sp-top-actions button:active .fi-motion.flaticon-live,
-.sp-fab:active .fi-motion.flaticon-live{animation:fiTap .36s cubic-bezier(.2,.9,.25,1)}
-
-@media(hover:hover) and (pointer:fine){
-  button:hover .fi-motion.flaticon-live,
-  a:hover .fi-motion.flaticon-live{transform:translateY(-1px) scale(1.06)}
-  .hub-app:hover .fi-motion.flaticon-live{transform:translateY(-2px) scale(1.08)}
-}
-
-/* Tamanhos coerentes com cada superfície. */
-.bottom-nav .fi-motion,.side-nav .fi-motion{font-size:1.15em}
-.quick-grid .fi-motion{font-size:1.22em}
-.notification-bell .fi-motion{font-size:1.05em}
-.hub-app-icon .fi-motion{font-size:1.45em}
-.hub-row-icon .fi-motion{font-size:1.12em}
-.hub-row-arrow .fi-motion{font-size:.92em}
-.sp-bottom .fi-motion{font-size:1.02em}
-.sp-top-actions .fi-motion,.sp-fab .fi-motion{font-size:1.05em}
-.sp-add .fi-motion,.sp-checkbox .fi-motion{font-size:1em}
-.button-inline-icon .fi-motion{font-size:1em}
+.bottom-nav .fi-motion{font-size:1.15em}.side-nav .fi-motion{font-size:1.08em}.quick-grid .fi-motion{font-size:1.24em}.notification-bell .fi-motion{font-size:1.05em}
+.hub-item-icon .fi-motion{font-size:1.2em}.hub-item-arrow .fi-motion{font-size:.9em}.professional-shortcuts .fi-motion,.professional-result-icon .fi-motion{font-size:1.1em}
+.transport-launch-icon .fi-motion,.integration-app-card .fi-motion{font-size:1.3em}.sp-bottom .fi-motion{font-size:1.02em}.sp-top-actions .fi-motion,.sp-fab .fi-motion{font-size:1.05em}
+.sp-add .fi-motion,.sp-checkbox .fi-motion,.button-inline-icon .fi-motion{font-size:1em}
 
 .flaticon-attribution{display:block;margin-top:10px;font-size:11px;color:var(--muted)}
 .flaticon-attribution a{color:inherit;text-decoration:underline;text-underline-offset:2px}
 
-@keyframes fiTap{0%{transform:scale(1)}35%{transform:scale(.78) rotate(-5deg)}70%{transform:scale(1.14) rotate(3deg)}100%{transform:scale(1)}}
-@keyframes fiSelect{0%{transform:scale(.84)}55%{transform:scale(1.16)}100%{transform:scale(1)}}
-@keyframes fiCoffee{0%{transform:translateY(0) rotate(0)}35%{transform:translateY(-4px) rotate(-7deg)}70%{transform:translateY(1px) rotate(5deg)}100%{transform:translateY(0) rotate(0)}}
-@keyframes fiSpin{0%{transform:rotate(0) scale(.9)}65%{transform:rotate(210deg) scale(1.12)}100%{transform:rotate(360deg) scale(1)}}
-@keyframes fiBreath{0%{transform:scale(1)}45%{transform:scale(.82)}75%{transform:scale(1.1)}100%{transform:scale(1)}}
-@keyframes fiBell{0%,100%{transform:rotate(0)}20%{transform:rotate(-15deg)}40%{transform:rotate(13deg)}60%{transform:rotate(-8deg)}80%{transform:rotate(5deg)}}
-@keyframes fiTrash{0%{transform:translateX(0) rotate(0)}30%{transform:translateX(-2px) rotate(-8deg)}60%{transform:translateX(2px) rotate(7deg)}100%{transform:translateX(0) rotate(0)}}
+@keyframes fiTap{0%{transform:scale(1)}45%{transform:scale(.84)}75%{transform:scale(1.08)}100%{transform:scale(1)}}
+@keyframes fiSelect{0%{transform:scale(.9)}60%{transform:scale(1.1)}100%{transform:scale(1)}}
+@keyframes fiCoffee{0%{transform:translateY(0)}45%{transform:translateY(-3px) rotate(-4deg)}100%{transform:translateY(0)}}
+@keyframes fiSpin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
+@keyframes fiBreath{0%{transform:scale(1)}50%{transform:scale(.88)}100%{transform:scale(1)}}
+@keyframes fiBell{0%,100%{transform:rotate(0)}25%{transform:rotate(-12deg)}50%{transform:rotate(10deg)}75%{transform:rotate(-5deg)}}
+@keyframes fiTrash{0%,100%{transform:translateX(0)}35%{transform:translateX(-2px)}70%{transform:translateX(2px)}}
 
-@media(prefers-reduced-motion:reduce){
-  .fi-motion{transition:none!important}
-  .fi-motion.flaticon-live,
-  button:active .fi-motion.flaticon-live,
-  a:active .fi-motion.flaticon-live,
-  [role="button"]:active .fi-motion.flaticon-live,
-  [data-nav].on .fi-motion.flaticon-live,
-  .sp-bottom button.on .fi-motion.flaticon-live,
-  .notification-bell.pulse .fi-motion.flaticon-live{animation:none!important;transform:none!important}
-}
+@media(prefers-reduced-motion:reduce){.fi-motion{transition:none!important}.fi-motion.flaticon-live,button:active .fi-motion.flaticon-live,a:active .fi-motion.flaticon-live,[role="button"]:active .fi-motion.flaticon-live,[data-nav].on .fi-motion.flaticon-live,.sp-bottom button.on .fi-motion.flaticon-live,.notification-bell.pulse .fi-motion.flaticon-live{animation:none!important;transform:none!important}}
