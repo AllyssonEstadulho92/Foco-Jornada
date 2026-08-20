@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { InMemoryActivityRepository } from '../test/InMemoryActivityRepository'
 import { InMemoryBreakRepository } from '../test/InMemoryBreakRepository'
+import { InMemoryFocusRepository } from '../test/InMemoryFocusRepository'
 import { InMemoryJourneyRepository } from '../test/InMemoryJourneyRepository'
 import { App } from './App'
 
@@ -13,6 +14,7 @@ describe('App', () => {
           journeyRepository: new InMemoryJourneyRepository(),
           breakRepository: new InMemoryBreakRepository(),
           activityRepository: new InMemoryActivityRepository(),
+          focusRepository: new InMemoryFocusRepository(),
         }}
       />,
     )
