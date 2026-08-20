@@ -2,10 +2,8 @@
 
 ## Estado atual
 
-**Fase:** 2 — Jornada concluída  
-**Próxima fase:** 3 — Pausas  
-**PR da Fase 2:** #7  
-**Validação CI:** GitHub Actions run `32410930364` — sucesso  
+**Fase:** 3 — Pausas, implementação concluída; validação CI pendente  
+**Branch:** `phase/03-pausas`  
 **Fonte de verdade:** `project/PROJECT_SPEC.md`
 
 ## Fases concluídas
@@ -14,35 +12,48 @@
 - [x] Fase 1 — Fundação.
 - [x] Fase 2 — Jornada.
 
-## Implementado e validado na Fase 2
+## Implementado na Fase 3
 
-- [x] Entidade `Journey` e regras puras de domínio.
-- [x] Iniciar jornada.
-- [x] Impedir duas jornadas ativas.
-- [x] Proteção contra criação concorrente por transação IndexedDB.
-- [x] Terminar jornada.
+- [x] Entidade `BreakRecord` e regras puras de domínio.
+- [x] Pausa curta de 15 minutos.
+- [x] Pausa longa de 60 minutos.
+- [x] Pausa personalizada.
+- [x] Apenas uma pausa ativa por jornada.
+- [x] Pausas só podem ser iniciadas com jornada ativa.
+- [x] Proteção contra criação concorrente de pausas.
 - [x] Proteção contra dupla finalização.
-- [x] Duração calculada por timestamps persistidos.
-- [x] Dexie schema v2 com tabela `journeys`.
-- [x] Repositório Dexie para jornadas.
-- [x] Recuperação da jornada ativa ao abrir/recarregar a interface.
-- [x] Lista básica das jornadas do dia.
-- [x] Interface Hoje com entrada, duração, estado, iniciar e terminar.
-- [x] Confirmação antes de terminar jornada.
-- [x] Testes de casos de uso.
-- [x] Testes de persistência e concorrência com IndexedDB em memória.
+- [x] Duração real persistida em `actualDurationSeconds`.
+- [x] Dexie schema v3 com tabela `breaks`.
+- [x] Repositório Dexie para pausas.
+- [x] Recuperação de pausa ativa após refresh/reabertura.
+- [x] Tempo efetivo calculado por timestamps e pausas persistidas.
+- [x] Pausa ativa encerrada automaticamente ao terminar a jornada.
+- [x] Interface de pausas integrada no ecrã Hoje.
+- [x] Estado visual `Em pausa`.
+- [x] Histórico de pausas da jornada ativa.
+- [x] Testes de domínio.
+- [x] Testes dos casos de uso.
+- [x] Testes do cálculo de tempo efetivo.
+- [x] Testes de persistência e concorrência IndexedDB.
 
-## Resultado dos quality gates
+## Validação necessária antes de concluir a Fase 3
 
-- Typecheck: **PASS**
-- Lint: **PASS**
-- Testes: **PASS**
-- Build: **PASS**
+- [ ] GitHub Actions: typecheck verde.
+- [ ] GitHub Actions: lint verde.
+- [ ] GitHub Actions: testes verdes.
+- [ ] GitHub Actions: build verde.
+- [ ] Revisão técnica final da Fase 3.
 
-## Próximo trabalho autorizado
+## Fora desta fase
 
-A Fase 3 pode iniciar depois de a PR #7 ser integrada em `main`.
+Continuam bloqueados:
 
-Escopo: **Pausas apenas** — 15 min, 60 min e personalizada, uma pausa ativa por jornada, persistência/recuperação e cálculo do tempo efetivo.
+- Atividades funcionais;
+- Foco/Pomodoro;
+- Café;
+- dashboard final integrado;
+- estatísticas completas.
 
-Atividades, Foco e Café continuam bloqueados.
+## Próximo gate
+
+A Fase 4 — Atividades só pode iniciar depois de todos os gates acima estarem verdes e a Fase 3 ser integrada em `main`.
