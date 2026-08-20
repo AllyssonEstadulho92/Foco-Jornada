@@ -24,6 +24,10 @@ export function AppShell() {
 
   return (
     <div className={`appShell${sidebarCollapsed ? ' appShellCollapsed' : ''}`}>
+      <a className="skipLink" href="#main-content">
+        Saltar para o conteúdo
+      </a>
+
       <aside className="sidebar" aria-label="Navegação principal">
         <div className="brandRow">
           <div className="brandMark" aria-hidden="true">
@@ -58,7 +62,7 @@ export function AppShell() {
         </button>
       </aside>
 
-      <main className="appContent">
+      <main className="appContent" id="main-content" tabIndex={-1}>
         <Outlet />
       </main>
 
