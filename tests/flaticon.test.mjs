@@ -15,12 +15,14 @@ test('ícones públicos usam SVG local sem CDN bloqueante',()=>{
 
 test('camada de estabilidade aumenta ícones e alvos de toque',()=>{
   const css=read('stability-ui.css');
-  for(const value of ['.bottom-nav .ui-svg{width:36px;height:36px}', '.quick-grid>button>span .ui-svg{width:48px;height:48px}', '.icon-btn .ui-svg{width:28px;height:28px}', '.hub-item-icon .hub-svg{width:28px;height:28px}', '.shift-planner .sp-top-actions button,.shift-planner .sp-close{width:44px;height:44px'])assert.ok(css.includes(value),value);
+  for(const value of ['.bottom-nav .ui-svg{width:36px;height:36px}', '.quick-grid>button>span .ui-svg{width:48px;height:48px}', '.icon-btn .ui-svg{width:28px;height:28px}', '.hub-item-icon .hub-svg{width:28px;height:28px}', '.transport-launch-icon .feature-svg{width:34px;height:34px}', '.shift-planner .sp-top-actions button,.shift-planner .sp-close{width:44px;height:44px'])assert.ok(css.includes(value),value);
   assert.ok(css.includes('@media(prefers-reduced-motion:reduce)'));
 });
 
-test('Sobre reutiliza a folha CSS já presente no documento',()=>{
-  const html=read('index.html'),about=read('hub-about.js');
+test('folhas dinâmicas principais já chegam carregadas uma única vez',()=>{
+  const html=read('index.html'),features=read('features.js'),about=read('hub-about.js');
+  assert.ok(html.includes('id="featuresCss"'));
+  assert.ok(features.includes("if($('#featuresCss'))return"));
   assert.ok(html.includes('id="hubAboutCss"'));
   assert.ok(about.includes("document.querySelector('#hubAboutCss')"));
 });

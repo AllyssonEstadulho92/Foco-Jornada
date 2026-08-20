@@ -16,6 +16,8 @@ button,a,[role="button"]{touch-action:manipulation}
 .professional-search-trigger svg,.professional-top-search svg{width:25px;height:25px}
 .professional-shortcuts button{min-height:70px}
 .professional-shortcuts svg{width:28px;height:28px}
+.professional-result-icon{width:48px;height:48px}
+.professional-result-icon svg{width:25px;height:25px}
 .hub-close{width:48px;height:48px}
 .hub-close .hub-svg{width:24px;height:24px}
 .hub-item{min-height:60px;grid-template-columns:38px minmax(0,1fr) auto auto}
@@ -24,12 +26,29 @@ button,a,[role="button"]{touch-action:manipulation}
 .hub-item-arrow .hub-svg{width:18px;height:18px}
 .hub-search{height:52px;grid-template-columns:26px 1fr}
 .hub-search .hub-svg{width:23px;height:23px}
+.transport-launch-icon{width:60px;height:60px}
+.transport-launch-icon .feature-svg{width:34px;height:34px}
+.forecast-icon{width:48px;height:48px}
+.forecast-icon .feature-svg{width:28px;height:28px}
+.transport-close{width:48px;height:48px}
+.transport-close .feature-svg{width:26px;height:26px}
+.integration-app-card>span{width:54px;height:54px}
+.integration-app-card .feature-svg{width:30px;height:30px}
+.transport-quick .feature-svg{width:34px;height:34px}
+.transport-settings summary .feature-svg{width:24px;height:24px}
+.place-editor-title .feature-svg{width:24px;height:24px}
+.recent-trips>button>span{width:44px;height:44px}
+.recent-trips .feature-svg{width:24px;height:24px}
+.supershift-hero>span{width:52px;height:52px}
+.supershift-hero .feature-svg{width:30px;height:30px}
+.integration-actions .feature-svg{width:22px;height:22px}
 
 @media(max-width:760px){
   .bottom-nav .ui-svg{width:38px;height:38px}
   .quick-grid>button>span .ui-svg{width:50px;height:50px}
   .hub-item{min-height:58px;grid-template-columns:38px minmax(0,1fr) auto auto}
   .hub-item-icon .hub-svg{width:28px;height:28px}
+  .integration-app-card{min-height:100px}
 }
 
 @media(max-width:520px){
@@ -46,5 +65,5 @@ button,a,[role="button"]{touch-action:manipulation}
 }
 
 @media(prefers-reduced-motion:reduce){
-  .ui-svg{transition:none!important;animation:none!important}
+  .ui-svg,.feature-svg{transition:none!important;animation:none!important}
 }
