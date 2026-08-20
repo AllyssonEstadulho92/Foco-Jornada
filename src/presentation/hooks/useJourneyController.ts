@@ -48,19 +48,20 @@ export function useJourneyController() {
     }
   }, [refresh])
 
-  const start = useCallback(async () => {
-    if (isBusy) return
+  const start = useCallback(async (): Promise<Journey | undefined> => {
+    if (isBusy) return undefined
     try {
       setIsBusy(true)
       setError(null)
       const result = await startJourney({ repository: journeyRepository })
       await refresh()
       if (result.status === 'started') toast.success('Jornada iniciada.')
-      else toast('Já existe uma jornada ativa.')
+      return result.journey
     } catch (startError) {
       const message = startError instanceof Error ? startError.message : 'Erro ao iniciar a jornada.'
       setError(message)
       toast.error(message)
+      return undefined
     } finally {
       setIsBusy(false)
     }
