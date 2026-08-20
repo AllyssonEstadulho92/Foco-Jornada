@@ -2,10 +2,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {commandModel,buildSearchIndex,searchItems,diagnosticSnapshot,integrityIssues,todayShift} from '../professional-core.js';
 
-test('centro de comando prioriza pausa, sessão antiga e jornada com comando executável',()=>{
+test('centro de comando prioriza pausa e jornada e usa Planeamento como estado livre',()=>{
   assert.equal(commandModel({breakSessions:[{status:'ACTIVE'}]},{}).nextCommand,'endBreak');
-  assert.equal(commandModel({focusSessions:[{status:'PAUSED'}]},{}).nextCommand,'resumeFocus');
-  assert.equal(commandModel({focusSessions:[{status:'ACTIVE'}]},{}).nextTitle,'Abrir sessão ativa');
+  assert.equal(commandModel({},{}).nextCommand,'planning');
+  assert.equal(commandModel({},{}).nextTitle,'Abrir planeamento');
   assert.equal(commandModel({workSessions:[{status:'ACTIVE'}],activities:[{status:'ACTIVE',title:'Inventário'}]},{}).detail,'Inventário');
 });
 
@@ -25,13 +25,14 @@ test('pesquisa global inclui Planeamento, módulos, atividades e turnos',()=>{
   assert.ok(searchItems(index,'intermédio').some(x=>x.title==='Horário intermédio'));
   assert.ok(searchItems(index,'backup').some(x=>x.id==='backup'));
   assert.ok(searchItems(index,'planeamento').some(x=>x.title==='Planeamento'));
-  assert.equal(searchItems(index,'foco').some(x=>x.title==='Modo Foco'),false);
+  assert.equal(index.some(x=>/Pomodoro|Modo Foco|Foco e /i.test(`${x.title} ${x.subtitle}`)),false);
 });
 
-test('diagnóstico agrega contagens sem alterar dados',()=>{
+test('diagnóstico agrega contagens e isola dados antigos',()=>{
   const d=diagnosticSnapshot({workSessions:[{}],activities:[{},{}],focusSessions:[{}],coffeeEntries:[{}]},{shiftPlanner:{assignments:{a:{}},templates:[{},{}]}},{online:true,standalone:true,serviceWorker:'ativo',notifications:'granted',storageBytes:1234});
   assert.equal(d.counts.atividades,2);
   assert.equal(d.counts.turnos,1);
+  assert.equal(d.counts.legacySessions,1);
   assert.equal(d.storageBytes,1234);
   assert.equal(d.standalone,true);
 });
