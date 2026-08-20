@@ -4,8 +4,10 @@ import fs from 'node:fs';
 const read=p=>fs.readFileSync(new URL(`../${p}`,import.meta.url),'utf8');
 const help=read('hub-help.js'),summary=read('summary-guard.js'),css=read('interaction-fixes.css');
 
-test('Ajuda cobre os módulos principais da aplicação',()=>{
-  for(const text of ['Jornada de trabalho','Pausas e descanso','Atividades','Foco e Pomodoro','Café','Histórico','Estatísticas','Moovit e transportes','Supershift / Escala','Notificações','Backup e dados','Atualizações','Se algo não funcionar'])assert.ok(help.includes(text),text);
+test('Ajuda cobre os módulos atuais da aplicação',()=>{
+  for(const text of ['Jornada de trabalho','Pausas e descanso','Atividades','Modo Foco','Café','Histórico','Estatísticas','Moovit e transportes','Supershift / Escala','Notificações','Dados e persistência','Backup e diagnóstico','Instalar aplicação','Atualizações','Se algo não funcionar'])assert.ok(help.includes(text),text);
+  assert.ok(help.includes('Sem ciclos automáticos'));
+  assert.equal(help.includes('Foco e Pomodoro'),false);
 });
 
 test('Ajuda tem pesquisa e filtragem interna',()=>{
