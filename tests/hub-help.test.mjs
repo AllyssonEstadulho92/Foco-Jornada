@@ -14,8 +14,9 @@ test('Ajuda tem pesquisa e filtragem interna',()=>{
   assert.ok(help.includes('Pesquisar função ou problema'));
 });
 
-test('Ajuda, Sobre e deduplicação são carregados pelo runtime',()=>{
-  for(const file of ['./hub-help.js','./hub-about.js','./icon-dedupe.js'])assert.ok(summary.includes(`import '${file}'`),file);
+test('Ajuda e Sobre são carregados sem reintroduzir deduplicação legada',()=>{
+  for(const file of ['./hub-help.js','./hub-about.js'])assert.ok(summary.includes(`import '${file}'`),file);
+  assert.equal(summary.includes("import './icon-dedupe.js'"),false);
 });
 
 test('acesso superior duplicado ao Mais fica oculto',()=>{
