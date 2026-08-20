@@ -99,7 +99,7 @@ test('runtime renderiza apenas a vista ativa e mantém temporizadores leves',()=
 });
 
 test('service worker usa rede primeiro e inclui Modo Foco e recuperação offline',()=>{
-  assert.ok(sw.includes('focus-mode2'));
+  assert.ok(sw.includes('focus-mode3'));
   assert.ok(sw.includes('./focus-mode-core.js'));
   assert.ok(sw.includes('./focus-mode.js'));
   assert.ok(sw.includes('./focus-mode.css'));
