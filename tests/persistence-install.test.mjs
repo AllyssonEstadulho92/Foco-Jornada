@@ -85,6 +85,20 @@ test('primeiro paint entra direto na aplicação e adia módulos opcionais',()=>
   for(const heavy of ["import('./shift-planner.js')","import('./shift-advanced.js')","import('./shift-reports.js')","import('./shift-mobile-interactions.js')"])assert.ok(bootstrap.includes(heavy),heavy);
 });
 
+test('identidade visual usa animação leve e ícones próprios',()=>{
+  assert.ok(bootstrap.includes('installBrandVisual'));
+  assert.ok(bootstrap.includes('fjBrandOrbit'));
+  assert.ok(bootstrap.includes('fjBrandRoute'));
+  assert.ok(bootstrap.includes('prefers-reduced-motion'));
+  assert.ok(index.includes('./apple-touch-icon.png'));
+  const iconSources=manifest.icons.map(icon=>icon.src);
+  assert.ok(iconSources.includes('./icon-192.png'));
+  assert.ok(iconSources.includes('./icon-512.png'));
+  assert.ok(sw.includes('./icon-192.png'));
+  assert.ok(sw.includes('./icon-512.png'));
+  assert.ok(sw.includes('./apple-touch-icon.png'));
+});
+
 test('runtime não redesenha nem grava toda a aplicação a cada segundo',()=>{
   const renderBlock=app.slice(app.indexOf('function render(){'),app.indexOf('function renderToday('));
   assert.equal(renderBlock.includes('save();'),false);
@@ -98,7 +112,7 @@ test('runtime não redesenha nem grava toda a aplicação a cada segundo',()=>{
 });
 
 test('service worker abre pelo cache sem pré-carregar módulos pesados',()=>{
-  assert.ok(sw.includes('structural-clean1'));
+  assert.ok(sw.includes('brand-splash2'));
   assert.ok(sw.includes('./bootstrap.js'));
   assert.ok(sw.includes("cache:'no-cache'"));
   assert.ok(sw.includes('cache.match(key)'));
