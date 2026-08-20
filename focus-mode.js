@@ -5,7 +5,7 @@ const APP_KEY='foco-jornada-v4';
 const FEATURE_KEY='foco-jornada-features-v2';
 const RETURN_KEY='foco-jornada-focus-mode-return-v1';
 const $=s=>document.querySelector(s);
-let root=null,renderQueued=false,lastKey='';
+let root=null,renderQueued=false,lastKey='',liveTimer=0,lastHadActive=false;
 
 function readApp(){try{return C.migrateState(JSON.parse(localStorage.getItem(APP_KEY)||'null'))}catch{return C.createInitialState()}}
 function readFeatures(){try{return JSON.parse(localStorage.getItem(FEATURE_KEY)||'{}')||{}}catch{return{}}}
@@ -13,7 +13,7 @@ function writeFeatures(features){localStorage.setItem(FEATURE_KEY,JSON.stringify
 function prefs(){const f=readFeatures();return{activityId:f.focusMode?.activityId||null,dailyGoalMinutes:Math.max(15,Math.min(720,Number(f.focusMode?.dailyGoalMinutes)||120)),lastStartedFocusId:f.focusMode?.lastStartedFocusId||null}}
 function savePrefs(patch){const f=readFeatures(),current=prefs();f.focusMode={...(f.focusMode||{}),...current,...patch};writeFeatures(f);return f.focusMode}
 function notify(text){window.FocoUI?.notify?.(text)}
-function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#39;'}[c]))}
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function fmtClock(ms){ms=Math.max(0,Number(ms)||0);const h=Math.floor(ms/C.MS.hour),m=Math.floor(ms%C.MS.hour/C.MS.minute),s=Math.floor(ms%C.MS.minute/1000);return h?`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`:`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`}
 function fmtTime(ts){return new Intl.DateTimeFormat('pt-PT',{hour:'2-digit',minute:'2-digit'}).format(new Date(ts))}
 function fmtDate(ts){return new Intl.DateTimeFormat('pt-PT',{day:'2-digit',month:'short'}).format(new Date(ts))}
@@ -37,7 +37,7 @@ function finishActivityReturn(){
     if($('#dialogRoot .dialog'))return;
     const app=readApp(),latest=(app.activities||[]).filter(a=>!['COMPLETED','CANCELLED'].includes(a.status)).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0))[0];
     if(latest?.id)savePrefs({activityId:latest.id});
-    sessionStorage.removeItem(RETURN_KEY);navigate('focus');queueRender();
+    sessionStorage.removeItem(RETURN_KEY);navigate('focus');lastKey='';queueRender();
   },160);
 }
 
@@ -66,10 +66,10 @@ async function startSession(){
   const focus=await waitUntil(()=>C.activeFocus(readApp()));
   if(!focus){notify('Não foi possível iniciar a sessão.');return}
   savePrefs({lastStartedFocusId:focus.id,activityId:activityId||null});
-  notify('Modo Foco iniciado.');queueRender();
+  notify('Modo Foco iniciado.');lastKey='';queueRender();scheduleLive(20);
 }
 
-function runLegacyAction(action){const button=$(`#focusArea [data-action="${action}"]`);if(button){button.click();setTimeout(queueRender,30);return true}return false}
+function runLegacyAction(action){const button=$(`#focusArea [data-action="${action}"]`);if(button){button.click();lastKey='';setTimeout(queueRender,30);return true}notify('A ação de foco ainda está a preparar-se. Tenta novamente.');return false}
 function onClick(e){
   const button=e.target.closest('[data-focus-mode-action]');if(!button)return;
   e.preventDefault();e.stopPropagation();
@@ -123,6 +123,7 @@ function renderMode(){
   const key=JSON.stringify([focus?.id,focus?.status,focus?.expectedEndAt,focus?.pausedAt,focus?.phase,app.updatedAt,p,summary.minutes,summary.progress]);
   if(key===lastKey)return;lastKey=key;
   host.innerHTML=(focus?activeHtml(app,focus,summary):idleHtml(app,summary))+historyHtml(app);
+  lastHadActive=!!focus;scheduleLive(focus?1000:15000);
 }
 function polishToday(){
   const app=readApp(),focus=C.activeFocus(app),p=prefs(),button=$('#quickActions [data-action="goFocus"]');
@@ -132,6 +133,16 @@ function polishToday(){
     const hero=$('#todayHero .hero.focus');if(hero){const status=hero.querySelector('.status'),copy=hero.querySelector('p'),end=hero.querySelector('[data-action="endFocus"]');if(status)status.textContent=focus.status==='PAUSED'?'MODO FOCO PAUSADO':'MODO FOCO';if(copy)copy.textContent=focus.activityId?`Atividade: ${activityName(app,focus.activityId)}`:(focus.workSessionId?'Sessão ligada à jornada':'Sessão independente');if(end)end.textContent='Concluir sessão'}
   }
 }
+function updateLive(){
+  const app=readApp(),focus=C.activeFocus(app);
+  if(!focus){if(lastHadActive){lastHadActive=false;lastKey='';queueRender()}return scheduleLive(15000)}
+  lastHadActive=true;
+  const remaining=C.focusRemainingMs(focus,Date.now()),ring=root?.querySelector('.focus-mode-ring'),clock=root?.querySelector('.focus-mode-ring strong');
+  if(clock)clock.textContent=fmtClock(remaining);
+  if(ring){const pct=Math.min(100,Math.max(0,100-remaining/Math.max(1,focus.targetDurationMs)*100));ring.style.setProperty('--focus-progress',`${pct*3.6}deg`)}
+  scheduleLive(focus.status==='PAUSED'?5000:1000);
+}
+function scheduleLive(delay=1000){clearTimeout(liveTimer);liveTimer=setTimeout(updateLive,delay)}
 function queueRender(){if(renderQueued)return;renderQueued=true;queueMicrotask(()=>{renderQueued=false;renderMode();polishToday()})}
 
 document.addEventListener('click',e=>{
@@ -141,6 +152,6 @@ document.addEventListener('click',e=>{
 window.addEventListener('foco-render',queueRender);
 window.addEventListener('storage',queueRender);
 window.addEventListener('pageshow',queueRender);
-document.addEventListener('visibilitychange',()=>{if(!document.hidden)queueRender()});
-queueRender();
-window.FocoMode=Object.freeze({version:'2.0.1',refresh:queueRender,start:startSession});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){lastKey='';queueRender()}});
+queueRender();scheduleLive(1000);
+window.FocoMode=Object.freeze({version:'2.0.2',refresh:queueRender,start:startSession});
