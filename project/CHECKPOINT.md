@@ -2,10 +2,8 @@
 
 ## Estado atual
 
-**Fase:** 3 — Pausas concluída  
-**Próxima fase:** 4 — Atividades  
-**PR da Fase 3:** #8  
-**Validação CI:** GitHub Actions run `32412743237` — sucesso  
+**Fase:** 4 — Atividades, implementação concluída; validação CI pendente  
+**Branch:** `phase/04-atividades`  
 **Fonte de verdade:** `project/PROJECT_SPEC.md`
 
 ## Fases concluídas
@@ -15,41 +13,48 @@
 - [x] Fase 2 — Jornada.
 - [x] Fase 3 — Pausas.
 
-## Implementado e validado na Fase 3
+## Implementado na Fase 4
 
-- [x] Entidade `BreakRecord` e regras puras de domínio.
-- [x] Pausa curta de 15 minutos.
-- [x] Pausa longa de 60 minutos.
-- [x] Pausa personalizada.
-- [x] Apenas uma pausa ativa por jornada.
-- [x] Pausas só podem ser iniciadas com jornada ativa.
-- [x] Proteção contra criação concorrente de pausas.
-- [x] Proteção contra dupla finalização.
-- [x] Duração real persistida em `actualDurationSeconds`.
-- [x] Dexie schema v3 com tabela `breaks`.
-- [x] Repositório Dexie para pausas.
-- [x] Recuperação de pausa ativa após refresh/reabertura.
-- [x] Tempo efetivo calculado por timestamps e pausas persistidas.
-- [x] Pausa ativa encerrada automaticamente ao terminar a jornada.
-- [x] Interface de pausas integrada no ecrã Hoje.
-- [x] Estado visual `Em pausa`.
-- [x] Histórico de pausas da jornada ativa.
+- [x] Entidade `Activity` e regras puras de domínio.
+- [x] Criar atividade dentro da jornada ativa.
+- [x] Editar atividade pendente ou ativa.
+- [x] Iniciar atividade.
+- [x] Concluir atividade.
+- [x] Cancelar atividade.
+- [x] Estados `pending`, `active`, `completed` e `cancelled`.
+- [x] Apenas uma atividade ativa por jornada.
+- [x] Proteção contra início concorrente de duas atividades.
+- [x] Duração calculada por timestamps.
+- [x] Validação de nome, descrição e timestamps.
+- [x] Dexie schema v4 com tabela `activities`.
+- [x] Repositório Dexie para atividades.
+- [x] Recuperação de atividade ativa após refresh/reabertura.
+- [x] Ecrã Atividades funcional e responsivo.
+- [x] Atividade atual apresentada no ecrã Hoje.
+- [x] Atividade ativa concluída automaticamente ao terminar a jornada.
 - [x] Testes de domínio.
 - [x] Testes dos casos de uso.
-- [x] Testes do cálculo de tempo efetivo.
+- [x] Testes de exclusividade de atividade ativa.
 - [x] Testes de persistência e concorrência IndexedDB.
+- [x] Teste de encerramento consistente da jornada com atividade e pausa ativas.
 
-## Resultado dos quality gates
+## Validação necessária antes de concluir a Fase 4
 
-- Typecheck: **PASS**
-- Lint: **PASS**
-- Testes: **PASS**
-- Build: **PASS**
+- [ ] GitHub Actions: typecheck verde.
+- [ ] GitHub Actions: lint verde.
+- [ ] GitHub Actions: testes verdes.
+- [ ] GitHub Actions: build verde.
+- [ ] Revisão técnica final da Fase 4.
 
-## Próximo trabalho autorizado
+## Fora desta fase
 
-A Fase 4 — Atividades pode iniciar depois de a PR #8 ser integrada em `main`.
+Continuam bloqueados:
 
-Escopo: criar, editar, iniciar, concluir e cancelar atividades; permitir apenas uma atividade ativa; persistir em IndexedDB; calcular duração por timestamps; integrar com a jornada sem colocar regras de negócio na UI.
+- Foco/Pomodoro;
+- Café;
+- dashboard final integrado;
+- estatísticas completas.
 
-Foco/Pomodoro e Café continuam bloqueados.
+## Próximo gate
+
+A Fase 5 — Foco/Pomodoro só pode iniciar depois de todos os gates acima estarem verdes e a Fase 4 ser integrada em `main`.
