@@ -1,4 +1,4 @@
-const CACHE='foco-jornada-v4-2-0-fast-cache1-core-startup1';
+const CACHE='foco-jornada-v4-2-0-fast-cache1-core-startup1-no-first-use1';
 const CORE_ASSETS=['./','./index.html','./bootstrap.js','./styles.css','./ux.css','./features.css','./hub.css','./hub-about.css','./settings-controller.css','./runtime-fixes.css','./interaction-fixes.css','./professional.css','./productivity.css','./install-app.css','./stability-ui.css','./core.js','./productivity-core.js','./focus-entry.js','./persistence.js','./install-app.js','./app.js','./stability.js','./ux.js','./features-core.js','./features.js','./hub.js','./hub-help.js','./hub-about.js','./controls.js','./settings-controller.js','./app-links.js','./interaction-fixes.js','./runtime-fixes.js','./summary-guard.js','./professional-core.js','./professional-ui.js','./couple.js','./manifest.webmanifest','./icon.svg','./.nojekyll'];
 const INDEX_URL=new URL('./index.html',self.location.href).href;
 
