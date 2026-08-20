@@ -1,4 +1,4 @@
-const BOOT_VERSION='1.2.0';
+const BOOT_VERSION='1.3.0';
 const APP_KEY='foco-jornada-v4';
 const root=document.documentElement;
 const shell=document.getElementById('startupShell');
@@ -12,6 +12,7 @@ function loadClassic(src){return new Promise((resolve,reject)=>{const existing=d
 async function waitStylesheet(id,timeout=3000){const link=document.getElementById(id);if(!link||link.sheet)return;await Promise.race([new Promise(resolve=>{link.addEventListener('load',resolve,{once:true});link.addEventListener('error',resolve,{once:true})}),sleep(timeout)])}
 function revealApp(){root.dataset.fjCoreReady='1';if(shell)shell.hidden=true}
 function failBoot(error){console.error('[Foco & Jornada] Falha de arranque',error);root.dataset.fjBoot='error';setStatus('Não foi possível concluir o arranque. Toca em Recarregar para tentar novamente.');const retry=document.getElementById('startupRetry');if(retry){retry.hidden=false;retry.onclick=()=>location.reload()}}
+async function disableFirstUse(){const raw=localStorage.getItem(APP_KEY);try{const C=await import('./core.js');const state=raw?C.migrateState(JSON.parse(raw)):C.createInitialState();if(!state?.settings||state.settings.onboardingDone===true)return;state.settings.onboardingDone=true;state.updatedAt=Date.now();localStorage.setItem(APP_KEY,JSON.stringify(state))}catch(error){console.error('[Foco & Jornada] Não foi possível remover a primeira utilização',error)}}
 function onboardingPending(){try{return JSON.parse(localStorage.getItem(APP_KEY)||'null')?.settings?.onboardingDone===false}catch{return false}}
 async function loadExtras(){if(extrasPromise)return extrasPromise;extrasPromise=(async()=>{const modules=['./ux.js','./hub.js','./controls.js','./settings-controller.js','./app-links.js','./interaction-fixes.js','./runtime-fixes.js','./summary-guard.js','./professional-ui.js','./install-app.js'];for(const path of modules){try{await nextFrame();await import(path)}catch(error){console.error(`[Foco & Jornada] Módulo opcional não carregado: ${path}`,error)}}})();return extrasPromise}
 function scheduleExtras(){const start=()=>requestAnimationFrame(()=>setTimeout(()=>loadExtras(),0));if(!onboardingPending()){start();return}const complete=e=>{if(!e.target.closest?.('#finishOnboarding,#skipOnboarding'))return;setTimeout(()=>{if(onboardingPending())return;document.removeEventListener('click',complete);start()},0)};document.addEventListener('click',complete)}
@@ -22,6 +23,7 @@ window.FocoBootstrap=Object.freeze({version:BOOT_VERSION,loadShift,loadExtras});
 try{
   setStatus('A preparar os dados locais…');
   await loadClassic('./persistence.js');
+  await disableFirstUse();
   setStatus('A carregar a jornada…');
   await import('./stability.js');
   await waitStylesheet('mainCss');
