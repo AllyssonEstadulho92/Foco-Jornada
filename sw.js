@@ -1,9 +1,9 @@
-const CACHE='foco-jornada-v4-2-0-fast-cache1-safe-start2';
-const ASSETS=['./','./index.html','./styles.css','./ux.css','./features.css','./hub.css','./hub-about.css','./settings-controller.css','./shift-planner.css','./shift-mobile.css','./shift-compact.css','./runtime-fixes.css','./interaction-fixes.css','./professional.css','./productivity.css','./install-app.css','./stability-ui.css','./core.js','./productivity-core.js','./focus-entry.js','./persistence.js','./install-app.js','./app.js','./stability.js','./ux.js','./features-core.js','./features.js','./hub.js','./hub-help.js','./hub-about.js','./controls.js','./settings-controller.js','./shift-planner-core.js','./shift-planner.js','./shift-advanced-core.js','./shift-advanced.js','./shift-reports.js','./shift-mobile-interactions.js','./app-links.js','./interaction-fixes.js','./runtime-fixes.js','./summary-guard.js','./professional-core.js','./professional-ui.js','./couple.js','./manifest.webmanifest','./icon.svg','./.nojekyll'];
+const CACHE='foco-jornada-v4-2-0-fast-cache1-first-paint1';
+const CORE_ASSETS=['./','./index.html','./bootstrap.js','./styles.css','./ux.css','./features.css','./hub.css','./hub-about.css','./settings-controller.css','./runtime-fixes.css','./interaction-fixes.css','./professional.css','./productivity.css','./install-app.css','./stability-ui.css','./core.js','./productivity-core.js','./focus-entry.js','./persistence.js','./install-app.js','./app.js','./stability.js','./ux.js','./features-core.js','./features.js','./hub.js','./hub-help.js','./hub-about.js','./controls.js','./settings-controller.js','./app-links.js','./interaction-fixes.js','./runtime-fixes.js','./summary-guard.js','./professional-core.js','./professional-ui.js','./couple.js','./manifest.webmanifest','./icon.svg','./.nojekyll'];
 const INDEX_URL=new URL('./index.html',self.location.href).href;
 
 self.addEventListener('install',event=>event.waitUntil(
-  caches.open(CACHE).then(cache=>cache.addAll(ASSETS)).then(()=>self.skipWaiting())
+  caches.open(CACHE).then(cache=>cache.addAll(CORE_ASSETS)).then(()=>self.skipWaiting())
 ));
 self.addEventListener('activate',event=>event.waitUntil(
   caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())
