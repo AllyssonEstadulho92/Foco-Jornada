@@ -1,4 +1,4 @@
-const CACHE='foco-jornada-v4-2-0-planning-flaticon1';
+const CACHE='foco-jornada-v4-2-0-stability2';
 const ASSETS=[
   './','./index.html',
   './styles.css','./ux.css','./features.css','./hub.css','./hub-about.css','./settings-controller.css','./linear-ui.css','./flaticon-motion.css',
