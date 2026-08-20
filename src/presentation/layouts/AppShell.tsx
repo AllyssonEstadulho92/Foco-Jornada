@@ -1,4 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom'
+import { NavigationIcon } from '../components/NavigationIcon'
 import { primaryNavigation, secondaryNavigation, type NavigationItem } from '../navigation/navigationItems'
 import { useUiStore } from '../store/useUiStore'
 
@@ -11,7 +12,7 @@ function NavigationLink({ item, compact = false }: { item: NavigationItem; compa
       aria-label={compact ? item.label : undefined}
     >
       <span className="navMark" aria-hidden="true">
-        {item.mark}
+        <NavigationIcon name={item.icon} />
       </span>
       <span className="navLabel">{item.label}</span>
     </NavLink>
@@ -30,9 +31,7 @@ export function AppShell() {
 
       <aside className="sidebar" aria-label="Navegação principal">
         <div className="brandRow">
-          <div className="brandMark" aria-hidden="true">
-            FJ
-          </div>
+          <div className="brandMark" aria-hidden="true">FJ</div>
           <div className="brandCopy">
             <strong>Foco & Jornada</strong>
             <span>Produtividade pessoal</span>
