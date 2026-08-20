@@ -1,4 +1,12 @@
-export type NavigationIconName = 'home' | 'activities' | 'focus' | 'history' | 'more' | 'settings'
+export type NavigationIconName =
+  | 'home'
+  | 'activities'
+  | 'focus'
+  | 'history'
+  | 'more'
+  | 'settings'
+  | 'stats'
+  | 'export'
 
 export function NavigationIcon({ name }: { name: NavigationIconName }) {
   const commonProps = {
@@ -55,6 +63,24 @@ export function NavigationIcon({ name }: { name: NavigationIconName }) {
         <path d="M4 7h10M18 7h2M4 17h2M10 17h10M9 4v6M15 14v6" />
         <circle cx="9" cy="7" r="2" />
         <circle cx="15" cy="17" r="2" />
+      </svg>
+    )
+  }
+
+  if (name === 'stats') {
+    return (
+      <svg {...commonProps}>
+        <path d="M5 20V11M12 20V5M19 20v-7" />
+        <path d="M3 20h18" />
+      </svg>
+    )
+  }
+
+  if (name === 'export') {
+    return (
+      <svg {...commonProps}>
+        <path d="M12 3v12M8 7l4-4 4 4" />
+        <path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6" />
       </svg>
     )
   }
