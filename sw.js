@@ -1,4 +1,4 @@
-const CACHE='foco-jornada-v4-2-0-direct-boot1';
+const CACHE='foco-jornada-v4-2-0-direct-boot2';
 const ASSETS=[
   './','./index.html',
   './styles.css','./ux.css','./features.css','./hub.css','./hub-about.css','./settings-controller.css',
