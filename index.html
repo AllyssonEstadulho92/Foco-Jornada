@@ -5,15 +5,97 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#07111f">
 <meta name="description" content="Foco & Jornada — jornada, pausas, atividades, foco, café, transportes, escala, histórico e estatísticas.">
-<meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Foco & Jornada">
-<title>Foco & Jornada</title><link rel="manifest" href="./manifest.webmanifest"><link rel="icon" href="./icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="./icon.svg">
-<style>
-html,body{margin:0;min-height:100%;background:#07111f;color:#f5f8fa;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}*{box-sizing:border-box}#startupShell{position:fixed;inset:0;z-index:99999;background:radial-gradient(circle at 50% 42%,#102746 0,#07111f 42%,#050b14 100%);color:#f5f8fa;display:grid;place-items:center;padding:24px}#startupShell[hidden],html[data-fj-core-ready="1"] #startupShell{display:none!important}.startup-card{text-align:center;width:min(420px,100%)}.brand-mark{width:118px;height:118px;margin:0 auto 18px;filter:drop-shadow(0 8px 24px #328cff44)}.brand-mark .outer{transform-origin:50% 50%;animation:brandSpin 4.8s linear infinite}.brand-mark .route{stroke-dasharray:240;stroke-dashoffset:240;animation:brandRoute 1.45s ease-in-out infinite}.startup-card h1{margin:0;font-size:31px;letter-spacing:-.04em;font-weight:650}.startup-card h1 em{font-style:normal;color:#4b8dff}.startup-card p{margin:12px 0 0;color:#8fa2b5;line-height:1.5}.startup-dots::after{content:'…';display:inline-block;width:1.4em;text-align:left;animation:brandDots 1.2s steps(4,end) infinite}.startup-card button{margin-top:18px;min-height:44px;border:0;border-radius:13px;padding:10px 16px;background:#4b8dff;color:#fff;font:inherit;font-weight:800}@keyframes brandSpin{to{transform:rotate(360deg)}}@keyframes brandRoute{0%{stroke-dashoffset:240;opacity:.4}55%,100%{stroke-dashoffset:0;opacity:1}}@keyframes brandDots{0%{clip-path:inset(0 100% 0 0)}100%{clip-path:inset(0 0 0 0)}}.layout{min-height:100vh}.app{padding:20px 16px 112px}.sidebar{display:none}.topbar{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}.topbar h1{margin:3px 0;font-size:30px}.topbar p{margin:0;color:#91a2ae}.kicker{font-size:10px;letter-spacing:.16em;color:#4b8dff;font-weight:900}.top-right{display:flex;align-items:center;gap:8px}.view{display:none}.view.on{display:block}.bottom-nav{position:fixed;z-index:30;display:grid;grid-template-columns:repeat(5,1fr);left:50%;bottom:max(8px,env(safe-area-inset-bottom));transform:translateX(-50%);width:min(680px,calc(100% - 16px));padding:6px;background:#111b24;border:1px solid #273846;border-radius:21px}.bottom-nav button{border:0;background:transparent;color:#91a2ae;padding:9px 4px;border-radius:14px}.bottom-nav button.on{background:#172530;color:#4b8dff}.bottom-nav span,.bottom-nav small{display:block}@media(min-width:901px){.sidebar{display:block;position:fixed;left:0;top:0;bottom:0;width:242px;padding:22px 16px;background:#111b24;border-right:1px solid #273846}.app{max-width:1120px;margin:0 auto;padding:24px 24px 110px 266px}.bottom-nav{display:none}}@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
-</style>
-<link id="mainCss" rel="stylesheet" href="./styles.css" media="print" onload="this.media='all'"><link id="uxCss" rel="stylesheet" href="./ux.css" media="print" onload="this.media='all'"><link id="featuresCss" rel="stylesheet" href="./features.css" media="print" onload="this.media='all'"><link id="hubCss" rel="stylesheet" href="./hub.css" media="print" onload="this.media='all'"><link id="hubAboutCss" rel="stylesheet" href="./hub-about.css" media="print" onload="this.media='all'"><link id="settingsControllerCss" rel="stylesheet" href="./settings-controller.css" media="print" onload="this.media='all'"><link id="shiftPlannerCss" rel="stylesheet" href="./shift-planner.css" media="print" onload="this.media='all'"><link id="shiftPlannerMobileCss" rel="stylesheet" href="./shift-mobile.css" media="print" onload="this.media='all'"><link id="shiftCompactCss" rel="stylesheet" href="./shift-compact.css" media="print" onload="this.media='all'"><link id="interactionFixesCss" rel="stylesheet" href="./interaction-fixes.css" media="print" onload="this.media='all'"><link id="professionalCss" rel="stylesheet" href="./professional.css" media="print" onload="this.media='all'"><link id="productivityCss" rel="stylesheet" href="./productivity.css" media="print" onload="this.media='all'"><link id="installAppCss" rel="stylesheet" href="./install-app.css" media="print" onload="this.media='all'"><link id="stabilityUiCss" rel="stylesheet" href="./stability-ui.css" media="print" onload="this.media='all'">
-</head><body>
-<section id="startupShell" aria-live="polite" aria-label="A iniciar Foco & Jornada"><div class="startup-card"><svg class="brand-mark" viewBox="0 0 128 128" aria-hidden="true"><defs><linearGradient id="sg" x1="20" y1="16" x2="108" y2="112" gradientUnits="userSpaceOnUse"><stop stop-color="#35b9ff"/><stop offset="1" stop-color="#7668ff"/></linearGradient></defs><g class="outer"><path d="M91 29a45 45 0 1 0 11 52" fill="none" stroke="url(#sg)" stroke-width="7" stroke-linecap="round"/><circle cx="105" cy="24" r="4" fill="#35b9ff"/></g><path d="M84 41a30 30 0 1 0 6 45" fill="none" stroke="#edf5ff" stroke-width="6" stroke-linecap="round"/><path class="route" d="M31 98c16-25 34-25 50-48" fill="none" stroke="url(#sg)" stroke-width="7" stroke-linecap="round"/><path d="M71 52l12-4-1 13" fill="none" stroke="url(#sg)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg><h1>Foco <em>&amp;</em> Jornada</h1><p><span id="startupStatus">A iniciar</span><span class="startup-dots" aria-hidden="true"></span></p><button id="startupRetry" type="button" hidden>Recarregar</button></div></section>
-<div class="layout"><aside class="sidebar"><div class="logo"><span>✓</span><div><b>Foco & Jornada</b><small>Produtividade diária</small></div></div><nav class="side-nav" aria-label="Navegação principal"><button class="on" data-nav="today"><span>⌂</span>Hoje</button><button data-nav="activities"><span>☑</span>Atividades</button><button data-nav="focus"><span>◎</span>Foco</button><button data-nav="history"><span>≡</span>Histórico</button><button data-nav="stats"><span>▥</span>Estatísticas</button><button data-nav="more"><span>⋯</span>Mais</button></nav><div class="sidebar-foot"><small>Versão <span id="appVersionSide">4.2.0</span></small><span id="offlineSide" class="offline" hidden>Offline</span></div></aside><main class="app"><header class="topbar"><div><span class="kicker" id="contextName">Trabalho</span><h1 id="pageTitle">Hoje</h1><p id="dateText"></p></div><div class="top-right"><span id="offline" class="offline" hidden>Offline</span><time id="clock">--:--</time><button class="icon-btn" data-action="toggleTheme" aria-label="Alternar tema">◐</button></div></header>
-<section class="view on" data-view="today"><div id="todayHero"></div><section class="section"><div class="section-head"><div><span class="kicker">AGORA</span><h2>Ações rápidas</h2></div></div><div id="quickActions" class="quick-grid"></div></section><div id="resumeCard"></div><div id="todayMetrics" class="metric-grid"></div><section class="panel"><div class="section-head"><h2>Atividade atual</h2><button class="text-btn" data-nav="activities">Ver todas</button></div><div id="currentActivity"></div></section><section class="panel"><div class="section-head"><h2>Timeline de hoje</h2><button class="text-btn" data-nav="history">Histórico</button></div><div id="todayTimeline" class="timeline"></div></section></section>
-<section class="view" data-view="activities"><div class="page-tools"><div class="search-wrap"><input id="activitySearch" type="search" placeholder="Pesquisar atividades" aria-label="Pesquisar atividades"></div><button id="newActivityBtn" class="btn primary">+ Nova atividade</button></div><div class="filters"><button class="on" data-filter="open">Abertas</button><button data-filter="today">Hoje</button><button data-filter="overdue">Atrasadas</button><button data-filter="all">Todas</button><button data-filter="completed">Concluídas</button><button data-filter="cancelled">Canceladas</button><span id="activityCount"></span></div><section class="panel"><div id="activityList" class="task-list"></div></section></section><section class="view" data-view="focus"><div id="focusArea"></div><div id="focusMetrics" class="metric-grid"></div></section><section class="view" data-view="history"><div class="page-tools"><label class="date-picker">Data <input id="historyDate" type="date"></label></div><div id="historyMetrics" class="metric-grid"></div><section class="panel"><div class="section-head"><h2>Linha temporal</h2></div><div id="historyTimeline" class="timeline"></div></section><section class="panel"><div class="section-head"><h2>Jornadas</h2></div><div id="historyWorks"></div></section></section><section class="view" data-view="stats"><div class="segmented"><button class="on" data-period="week">7 dias</button><button data-period="month">30 dias</button><button data-period="year">Ano</button></div><div id="statsGrid" class="stats-grid"></div><section class="panel"><div class="section-head"><h2>Horas efetivas</h2></div><div id="statsChart" class="bars" role="img" aria-label="Gráfico de horas efetivas"></div></section><section class="panel"><div class="section-head"><h2>Resumo factual</h2></div><p id="statsSummary" class="summary"></p></section></section><section class="view" data-view="more"><section class="panel"><div class="section-head"><div><span class="kicker">PREFERÊNCIAS</span><h2>Definições</h2></div></div><form id="settingsForm" class="settings-grid"><label>Tema<select id="setTheme"><option value="system">Automático</option><option value="dark">Escuro</option><option value="light">Claro</option></select></label><label>Contexto<select id="setContext"><option value="work">Trabalho</option><option value="personal">Pessoal</option></select></label><label>Pausa de ecrã (min)<input id="setScreen" type="number" min="1" max="120"></label><label>Pausa principal (min)<input id="setRest" type="number" min="1" max="240"></label><label>Foco (min)<input id="setFocus" type="number" min="1" max="180"></label><label>Pausa curta Pomodoro<input id="setShort" type="number" min="1" max="60"></label><label>Pausa longa Pomodoro<input id="setLong" type="number" min="1" max="120"></label><label>Ciclos Pomodoro<input id="setCycles" type="number" min="1" max="12"></label><label>Preço café padrão (€)<input id="setCoffee" type="number" min="0" max="99" step="0.05"></label><label class="fj-toggle wide"><input id="setNotifications" type="checkbox"><span>Notificações quando foco/pausa terminar</span></label><div class="wide"><button class="btn primary" type="submit">Guardar definições</button></div></form></section><section class="panel"><div class="section-head"><div><span class="kicker">DADOS</span><h2>Backup e diagnóstico</h2></div></div><p class="muted">Os dados são guardados localmente neste browser. Exporta um backup antes de trocar de dispositivo ou limpar dados.</p><div class="button-row"><button id="exportBtn" class="btn">Exportar backup</button><button id="importBtn" class="btn">Importar backup</button><input id="importInput" type="file" accept="application/json" hidden><button id="checkBtn" class="btn">Verificar dados</button><button id="resetBtn" class="btn danger">Apagar dados</button></div><div id="integrity" class="integrity"></div></section><section class="panel"><strong>Foco & Jornada</strong><p class="muted">Versão <span id="appVersion">4.2.0</span> · PWA · armazenamento local · offline após cache inicial.</p></section></section></main></div>
-<nav class="bottom-nav" aria-label="Navegação móvel"><button class="on" data-nav="today"><span>⌂</span><small>Hoje</small></button><button data-nav="activities"><span>☑</span><small>Atividades</small></button><button data-nav="focus"><span>◎</span><small>Foco</small></button><button data-nav="history"><span>≡</span><small>Histórico</small></button><button data-nav="more"><span>⋯</span><small>Mais</small></button></nav><div id="toast" class="toast" role="status" aria-live="polite"></div><div id="dialogRoot"></div><script>requestAnimationFrame(function(){setTimeout(function(){import('./bootstrap.js').catch(function(error){console.error('[Foco & Jornada] Bootstrap indisponível',error);var status=document.getElementById('startupStatus'),retry=document.getElementById('startupRetry');if(status)status.textContent='Não foi possível carregar a aplicação.';if(retry){retry.hidden=false;retry.onclick=function(){location.reload()}}})},0)})</script></body></html>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Foco & Jornada">
+<title>Foco & Jornada</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<link rel="stylesheet" href="./styles.css">
+<link rel="stylesheet" href="./ux.css">
+<link rel="stylesheet" href="./features.css">
+<link rel="stylesheet" href="./hub.css">
+<link rel="stylesheet" href="./hub-about.css">
+<link rel="stylesheet" href="./settings-controller.css">
+<link rel="stylesheet" href="./shift-planner.css">
+<link rel="stylesheet" href="./shift-mobile.css">
+<link rel="stylesheet" href="./shift-compact.css">
+<link rel="stylesheet" href="./interaction-fixes.css">
+<link rel="stylesheet" href="./professional.css">
+<link rel="stylesheet" href="./productivity.css">
+<link rel="stylesheet" href="./install-app.css">
+<link rel="stylesheet" href="./stability-ui.css">
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar">
+  <div class="logo"><span>✓</span><div><b>Foco & Jornada</b><small>Produtividade diária</small></div></div>
+  <nav class="side-nav" aria-label="Navegação principal">
+    <button class="on" data-nav="today"><span>⌂</span>Hoje</button>
+    <button data-nav="activities"><span>☑</span>Atividades</button>
+    <button data-nav="focus"><span>◎</span>Foco</button>
+    <button data-nav="history"><span>≡</span>Histórico</button>
+    <button data-nav="stats"><span>▥</span>Estatísticas</button>
+    <button data-nav="more"><span>⋯</span>Mais</button>
+  </nav>
+  <div class="sidebar-foot"><small>Versão <span id="appVersionSide">4.2.0</span></small><span id="offlineSide" class="offline" hidden>Offline</span></div>
+</aside>
+<main class="app">
+<header class="topbar">
+  <div><span class="kicker" id="contextName">Trabalho</span><h1 id="pageTitle">Hoje</h1><p id="dateText"></p></div>
+  <div class="top-right"><span id="offline" class="offline" hidden>Offline</span><time id="clock">--:--</time><button class="icon-btn" data-action="toggleTheme" aria-label="Alternar tema">◐</button></div>
+</header>
+<section class="view on" data-view="today">
+  <div id="todayHero"></div>
+  <section class="section"><div class="section-head"><div><span class="kicker">AGORA</span><h2>Ações rápidas</h2></div></div><div id="quickActions" class="quick-grid"></div></section>
+  <div id="resumeCard"></div><div id="todayMetrics" class="metric-grid"></div>
+  <section class="panel"><div class="section-head"><h2>Atividade atual</h2><button class="text-btn" data-nav="activities">Ver todas</button></div><div id="currentActivity"></div></section>
+  <section class="panel"><div class="section-head"><h2>Timeline de hoje</h2><button class="text-btn" data-nav="history">Histórico</button></div><div id="todayTimeline" class="timeline"></div></section>
+</section>
+<section class="view" data-view="activities">
+  <div class="page-tools"><div class="search-wrap"><input id="activitySearch" type="search" placeholder="Pesquisar atividades" aria-label="Pesquisar atividades"></div><button id="newActivityBtn" class="btn primary">+ Nova atividade</button></div>
+  <div class="filters"><button class="on" data-filter="open">Abertas</button><button data-filter="today">Hoje</button><button data-filter="overdue">Atrasadas</button><button data-filter="all">Todas</button><button data-filter="completed">Concluídas</button><button data-filter="cancelled">Canceladas</button><span id="activityCount"></span></div>
+  <section class="panel"><div id="activityList" class="task-list"></div></section>
+</section>
+<section class="view" data-view="focus"><div id="focusArea"></div><div id="focusMetrics" class="metric-grid"></div></section>
+<section class="view" data-view="history">
+  <div class="page-tools"><label class="date-picker">Data <input id="historyDate" type="date"></label></div>
+  <div id="historyMetrics" class="metric-grid"></div>
+  <section class="panel"><div class="section-head"><h2>Linha temporal</h2></div><div id="historyTimeline" class="timeline"></div></section>
+  <section class="panel"><div class="section-head"><h2>Jornadas</h2></div><div id="historyWorks"></div></section>
+</section>
+<section class="view" data-view="stats">
+  <div class="segmented"><button class="on" data-period="week">7 dias</button><button data-period="month">30 dias</button><button data-period="year">Ano</button></div>
+  <div id="statsGrid" class="stats-grid"></div>
+  <section class="panel"><div class="section-head"><h2>Horas efetivas</h2></div><div id="statsChart" class="bars" role="img" aria-label="Gráfico de horas efetivas"></div></section>
+  <section class="panel"><div class="section-head"><h2>Resumo factual</h2></div><p id="statsSummary" class="summary"></p></section>
+</section>
+<section class="view" data-view="more">
+  <section class="panel"><div class="section-head"><div><span class="kicker">PREFERÊNCIAS</span><h2>Definições</h2></div></div><form id="settingsForm" class="settings-grid"><label>Tema<select id="setTheme"><option value="system">Automático</option><option value="dark">Escuro</option><option value="light">Claro</option></select></label><label>Contexto<select id="setContext"><option value="work">Trabalho</option><option value="personal">Pessoal</option></select></label><label>Pausa de ecrã (min)<input id="setScreen" type="number" min="1" max="120"></label><label>Pausa principal (min)<input id="setRest" type="number" min="1" max="240"></label><label>Foco (min)<input id="setFocus" type="number" min="1" max="180"></label><label>Pausa curta Pomodoro<input id="setShort" type="number" min="1" max="60"></label><label>Pausa longa Pomodoro<input id="setLong" type="number" min="1" max="120"></label><label>Ciclos Pomodoro<input id="setCycles" type="number" min="1" max="12"></label><label>Preço café padrão (€)<input id="setCoffee" type="number" min="0" max="99" step="0.05"></label><label class="fj-toggle wide"><input id="setNotifications" type="checkbox"><span>Notificações quando foco/pausa terminar</span></label><div class="wide"><button class="btn primary" type="submit">Guardar definições</button></div></form></section>
+  <section class="panel"><div class="section-head"><div><span class="kicker">DADOS</span><h2>Backup e diagnóstico</h2></div></div><p class="muted">Os dados são guardados localmente neste browser. Exporta um backup antes de trocar de dispositivo ou limpar dados.</p><div class="button-row"><button id="exportBtn" class="btn">Exportar backup</button><button id="importBtn" class="btn">Importar backup</button><input id="importInput" type="file" accept="application/json" hidden><button id="checkBtn" class="btn">Verificar dados</button><button id="resetBtn" class="btn danger">Apagar dados</button></div><div id="integrity" class="integrity"></div></section>
+  <section class="panel"><strong>Foco & Jornada</strong><p class="muted">Versão <span id="appVersion">4.2.0</span> · PWA · armazenamento local · offline após cache inicial.</p></section>
+</section>
+</main>
+</div>
+<nav class="bottom-nav" aria-label="Navegação móvel"><button class="on" data-nav="today"><span>⌂</span><small>Hoje</small></button><button data-nav="activities"><span>☑</span><small>Atividades</small></button><button data-nav="focus"><span>◎</span><small>Foco</small></button><button data-nav="history"><span>≡</span><small>Histórico</small></button><button data-nav="more"><span>⋯</span><small>Mais</small></button></nav>
+<div id="toast" class="toast" role="status" aria-live="polite"></div><div id="dialogRoot"></div>
+<script src="./persistence.js"></script>
+<script type="module" src="./ux.js"></script>
+<script type="module" src="./features.js"></script>
+<script type="module" src="./hub.js"></script>
+<script type="module" src="./controls.js"></script>
+<script type="module" src="./settings-controller.js"></script>
+<script type="module" src="./shift-planner.js"></script>
+<script type="module" src="./shift-advanced.js"></script>
+<script type="module" src="./shift-reports.js"></script>
+<script type="module" src="./shift-mobile-interactions.js"></script>
+<script type="module" src="./app-links.js"></script>
+<script type="module" src="./interaction-fixes.js"></script>
+<script type="module" src="./runtime-fixes.js"></script>
+<script type="module" src="./summary-guard.js"></script>
+<script type="module" src="./professional-ui.js"></script>
+<script type="module" src="./focus-entry.js"></script>
+<script type="module" src="./install-app.js"></script>
+</body>
+</html>
