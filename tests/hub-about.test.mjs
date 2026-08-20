@@ -31,9 +31,9 @@ test('Sobre mostra informação real da aplicação, Planeamento e diagnóstico'
 });
 
 test('publicação mantém Sobre e a camada Flaticon ativa',()=>{
-  const sw=read('sw.js'),pages=read('.github/workflows/pages.yml'),couple=read('couple.js');
+  const sw=read('sw.js'),pages=read('.github/workflows/pages.yml'),summary=read('summary-guard.js');
   for(const f of ['hub-about.js','hub-about.css','flaticon-icons.js','flaticon-motion.css']){assert.ok(sw.includes(f),`cache ${f}`);assert.ok(pages.includes(f),`pages ${f}`)}
   assert.equal(sw.includes('./icon-dedupe.js'),false);
   assert.equal(pages.includes('icon-dedupe.js'),false);
-  assert.ok(couple.includes("import './hub-about.js'"));
+  assert.ok(summary.includes("import './hub-about.js'"));
 });
