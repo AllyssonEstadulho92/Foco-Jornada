@@ -1,0 +1,156 @@
+.navMark svg {
+  display: block;
+}
+
+.bottomNav .navMark {
+  color: currentColor;
+}
+
+.bottomNav .navLinkActive .navMark {
+  color: var(--primary);
+}
+
+.journeyGateButton {
+  margin-top: 12px;
+}
+
+.journeyGateHint {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 14px 0 0;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.journeyGateHint strong {
+  color: var(--text);
+}
+
+.moreMenu {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.moreMenuItem {
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr) 26px;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  min-height: 92px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--text);
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.moreMenuItem:hover {
+  border-color: rgba(91, 156, 255, 0.38);
+  background: var(--surface-2);
+}
+
+.moreMenuIcon {
+  display: grid;
+  width: 46px;
+  height: 46px;
+  place-items: center;
+  border-radius: 14px;
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+.moreMenuCopy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.moreMenuCopy small {
+  color: var(--primary);
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: 0.12em;
+}
+
+.moreMenuCopy strong {
+  font-size: 17px;
+}
+
+.moreMenuCopy span {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.moreMenuArrow {
+  color: var(--muted);
+  font-size: 22px;
+  line-height: 1;
+}
+
+.moreSectionTitle {
+  margin: 0 0 12px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.moreSection + .moreSection {
+  margin-top: 26px;
+}
+
+@media (max-width: 899px) {
+  .bottomNav {
+    min-height: 70px;
+    padding: 6px 7px;
+  }
+
+  .bottomNav .navLink {
+    min-height: 56px;
+    gap: 3px;
+  }
+
+  .bottomNav .navMark {
+    width: 28px;
+    height: 28px;
+    flex-basis: 28px;
+  }
+
+  .bottomNav .navLabel {
+    font-size: 10px;
+    font-weight: 700;
+  }
+}
+
+@media (max-width: 480px) {
+  .reportHeader h1,
+  .activitiesHeader h1,
+  .focusHeader h1 {
+    font-size: 40px;
+  }
+
+  .moreMenuItem {
+    grid-template-columns: 42px minmax(0, 1fr) 20px;
+    min-height: 84px;
+    gap: 12px;
+    padding: 14px;
+  }
+
+  .moreMenuIcon {
+    width: 42px;
+    height: 42px;
+  }
+}
