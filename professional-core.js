@@ -1,4 +1,4 @@
-export const PROFESSIONAL_VERSION='1.2.0';
+export const PROFESSIONAL_VERSION='1.3.0';
 
 export function localDayKey(value=Date.now()){
   const d=value instanceof Date?value:new Date(value);
@@ -22,16 +22,14 @@ export function todayShift(features={},now=Date.now()){
 export function activeState(app={}){
   const work=(app.workSessions||[]).find(x=>x.status==='ACTIVE')||null;
   const pause=(app.breakSessions||[]).find(x=>x.status==='ACTIVE')||null;
-  const focus=(app.focusSessions||[]).find(x=>x.status==='ACTIVE'||x.status==='PAUSED')||null;
   const activity=(app.activities||[]).find(x=>x.status==='ACTIVE')||null;
-  return {work,pause,focus,activity};
+  return {work,pause,activity};
 }
 
 export function commandModel(app={},features={},now=Date.now()){
   const active=activeState(app),shift=todayShift(features,now);
-  let status='Livre',nextTitle='Organizar atividades',nextAction='activities',nextCommand='activities',tone='neutral',detail='Escolhe o que fazer a seguir.';
+  let status='Livre',nextTitle='Organizar atividades',nextAction='planning',nextCommand='planning',tone='neutral',detail='Revê prioridades e próximos passos.';
   if(active.pause){status='Em pausa';nextTitle='Regressar da pausa';nextAction='today';nextCommand='endBreak';tone='warning';detail='Existe uma pausa ativa.'}
-  else if(active.focus){status=active.focus.status==='PAUSED'?'Sessão pausada':'Sessão em curso';nextTitle=active.focus.status==='PAUSED'?'Retomar sessão':'Abrir sessão ativa';nextAction='today';nextCommand=active.focus.status==='PAUSED'?'resumeFocus':'today';tone='primary';detail='Existe uma sessão antiga ainda em curso.'}
   else if(active.work){status='Em jornada';nextTitle=active.activity?'Abrir atividade':'Escolher atividade';nextAction='activities';nextCommand='activities';tone='success';detail=active.activity?active.activity.title:'Jornada ativa sem atividade em curso.'}
   else if(shift&&['work','holiday'].includes(shift.kind)){status='Turno previsto';nextTitle='Iniciar jornada';nextAction='today';nextCommand='startWork';tone='primary';detail=shift.start&&shift.end?`${shift.start}–${shift.end}`:shift.label}
   return {status,nextTitle,nextAction,nextCommand,tone,detail,shift,active};
@@ -41,7 +39,7 @@ export function buildSearchIndex(app={},features={}){
   const staticItems=[
     ['today','Hoje','Jornada, ações rápidas e resumo','Principal','nav:today'],
     ['activities','Atividades','Subtarefas, prazos, recorrência e etiquetas','Produtividade','nav:activities'],
-    ['planning','Planeamento','Prioridades do dia, atividades e próximos passos','Produtividade','nav:focus'],
+    ['planning','Planeamento','Prioridades do dia, atividades e próximos passos','Produtividade','nav:planning'],
     ['history','Histórico','Jornadas e linha temporal','Principal','nav:history'],
     ['stats','Estatísticas','Semana, mês e ano','Relatórios','nav:stats'],
     ['shifts','Supershift / Escala','Calendário, turnos, férias e relatórios','Trabalho','shift'],
@@ -83,7 +81,6 @@ export function diagnosticSnapshot(app={},features={},env={}){
     counts:{
       jornadas:(app.workSessions||[]).length,
       atividades:(app.activities||[]).length,
-      foco:(app.focusSessions||[]).length,
       cafes:(app.coffeeEntries||[]).length,
       turnos:Object.keys(planner.assignments||{}).length,
       modelos:(planner.templates||[]).length
@@ -94,12 +91,12 @@ export function diagnosticSnapshot(app={},features={},env={}){
 export function integrityIssues(app={},features={}){
   const issues=[];
   const arrays=['workSessions','breakSessions','activities','activitySegments','focusSessions','coffeeEntries','events'];
-  for(const key of arrays)if(!Array.isArray(app?.[key]))issues.push({code:`APP_${key.toUpperCase()}_INVALID`,label:`Estrutura inválida: ${key}.`});
+  for(const key of arrays)if(!Array.isArray(app?.[key]))issues.push({code:`APP_${key.toUpperCase()}_INVALID`,label:key==='focusSessions'?'Estrutura de compatibilidade antiga inválida.':`Estrutura inválida: ${key}.`});
   if(!app?.settings||typeof app.settings!=='object')issues.push({code:'APP_SETTINGS_INVALID',label:'Definições principais inválidas.'});
   const count=(items,statuses)=>Array.isArray(items)?items.filter(x=>statuses.includes(x?.status)).length:0;
   if(count(app.workSessions,['ACTIVE'])>1)issues.push({code:'MULTIPLE_ACTIVE_WORK',label:'Existe mais de uma jornada ativa.'});
   if(count(app.breakSessions,['ACTIVE'])>1)issues.push({code:'MULTIPLE_ACTIVE_BREAK',label:'Existe mais de uma pausa ativa.'});
-  if(count(app.focusSessions,['ACTIVE','PAUSED'])>1)issues.push({code:'MULTIPLE_ACTIVE_FOCUS',label:'Existe mais de uma sessão de foco ativa/pausada.'});
+  if(count(app.focusSessions,['ACTIVE','PAUSED'])>1)issues.push({code:'MULTIPLE_ACTIVE_FOCUS',label:'Existe mais de um registo antigo ativo.'});
   if(count(app.activities,['ACTIVE'])>1)issues.push({code:'MULTIPLE_ACTIVE_ACTIVITY',label:'Existe mais de uma atividade ativa.'});
   const seen=new Set();
   for(const key of arrays){for(const item of Array.isArray(app?.[key])?app[key]:[]){if(!item?.id)continue;if(seen.has(item.id))issues.push({code:'DUPLICATE_ID',label:`ID duplicado detetado: ${item.id}.`});else seen.add(item.id)}}
