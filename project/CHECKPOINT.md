@@ -2,13 +2,12 @@
 
 ## Estado atual
 
-**Fase:** 5 — Foco/Pomodoro concluída  
-**Próxima fase:** 6 — Café  
-**PR da Fase 5:** #10  
-**Validação CI:** GitHub Actions run `32416877286` — sucesso  
+**Versão:** V1 implementada  
+**Branch de release:** `release/v1-finalizacao`  
+**PR de release:** #11  
 **Fonte de verdade:** `project/PROJECT_SPEC.md`
 
-## Fases concluídas
+## Fases
 
 - [x] Fase 0 — Especificação.
 - [x] Fase 1 — Fundação.
@@ -16,31 +15,32 @@
 - [x] Fase 3 — Pausas.
 - [x] Fase 4 — Atividades.
 - [x] Fase 5 — Foco/Pomodoro.
+- [x] Fase 6 — Café.
+- [x] Fase 7 — Dashboard.
+- [x] Fase 8 — Histórico, Estatísticas e Definições.
+- [x] Fase 9 — Qualidade/PWA implementada.
 
-## Implementado e validado na Fase 5
+## Funcionalidades da release
 
-- [x] Pomodoro padrão 25/5/15 com 4 ciclos.
-- [x] Sessão de foco personalizada.
-- [x] Iniciar, pausar, retomar, concluir e cancelar.
-- [x] Associação opcional à atividade ativa.
-- [x] Apenas uma sessão aberta por jornada.
-- [x] Bloqueio de foco durante pausa da jornada.
-- [x] Persistência IndexedDB/Dexie schema v5.
-- [x] Recuperação após refresh/reabertura.
-- [x] Timer derivado de timestamps persistidos.
-- [x] Sessão aberta cancelada de forma consistente ao terminar a jornada.
-- [x] Ecrã Foco funcional e responsivo.
-- [x] Testes de domínio, casos de uso e persistência/concorrência.
+- Jornada persistente e recuperável.
+- Pausas e cálculo de tempo efetivo.
+- Atividades com exclusividade de atividade ativa.
+- Pomodoro e foco personalizado persistentes.
+- Café com preço configurável e totais diários.
+- Dashboard integrado.
+- Timeline diária e resumo.
+- Estatísticas de 1, 7 e 30 dias.
+- Definições persistentes.
+- Exportação JSON do relatório diário.
+- PWA com manifest, ícone e cache offline.
 
-## Resultado dos quality gates
+## Gate de integração
+
+A PR #11 só pode ser integrada em `main` quando todos estes checks estiverem verdes:
 
 - Typecheck: **PASS**
 - Lint: **PASS**
 - Testes: **PASS**
 - Build: **PASS**
 
-## Próximo trabalho autorizado
-
-Fase 6 — Café: registo, quantidade, preço, custo diário e persistência.
-
-Dashboard completo, Histórico/Estatísticas/Definições e qualidade final permanecem nas fases seguintes.
+Depois da integração, `main` representa a V1 funcional. Evoluções como autenticação, sincronização cloud e publicação nativa ficam para V2.
