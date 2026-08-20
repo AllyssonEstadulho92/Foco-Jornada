@@ -44,16 +44,20 @@ test('Verificar dados executa análise estrutural real',()=>{
   assert.ok(professional.includes('Dados consistentes ✓'));
 });
 
-test('Moovit tem proprietário efetivo anterior ao runtime',()=>{
+test('Moovit tem um único proprietário efetivo anterior ao runtime',()=>{
   assert.ok(links.includes("document.addEventListener('click',handleMoovitClick,true)"));
   assert.ok(links.includes('stopImmediatePropagation'));
   assert.ok(index.indexOf('src="./app-links.js"')<index.indexOf('src="./runtime-fixes.js"'));
+  for(const fn of ['openMoovitPlanner','planMoovit','nearbyMoovit'])assert.equal(runtime.includes(`function ${fn}`),false,fn);
+  for(const token of ["t.matches('[data-hub-action=\"moovit\"]')","t.id==='planMoovit'","t.id==='nearbyTransit'"])assert.equal(runtime.includes(token),false,token);
 });
 
-test('teste de notificações tem proprietário efetivo anterior ao runtime',()=>{
+test('teste de notificações tem um único proprietário efetivo anterior ao runtime',()=>{
   assert.ok(interaction.includes("[data-runtime-test-notification]"));
   assert.ok(interaction.includes('stopImmediatePropagation'));
   assert.ok(index.indexOf('src="./interaction-fixes.js"')<index.indexOf('src="./runtime-fixes.js"'));
+  assert.equal(runtime.includes('function testNotification'),false);
+  assert.equal(runtime.includes("t.matches('[data-runtime-test-notification]')"),false);
 });
 
 test('compatibilidades restantes estão ligadas a ações reais',()=>{
