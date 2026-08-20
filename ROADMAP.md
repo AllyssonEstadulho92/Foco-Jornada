@@ -15,7 +15,7 @@ Estados:
 ### Experiência profissional
 - ✅ Centro de Comando no ecrã Hoje com próxima ação, turno e atalhos
 - ✅ Pesquisa global por módulos, atividades e modelos de turno
-- ✅ Atalhos contextuais para Atividades, Foco, Supershift e Moovit
+- ✅ Atalhos contextuais para Atividades, Modo Foco, Supershift e Moovit
 - ✅ Diagnóstico técnico com ligação, modo PWA, Service Worker, notificações, armazenamento e contagens
 - ✅ Atalho de teclado `Ctrl/Cmd + K` para pesquisa global em desktop
 - 🟡 Validação visual final em iPhone
@@ -41,19 +41,26 @@ Estados:
 - ✅ Mover para amanhã
 - ✅ Filtros Hoje e Atrasadas
 - ✅ Contagem de sessões de foco por atividade na lista
-- 🟡 Associação ao Pomodoro — funcional, ainda precisa smoke test físico no iPhone
+- ✅ Associação opcional ao Modo Foco
 - ⬜ Ordenação manual
 
-### Pomodoro
-- ✅ Foco por timestamp
+### Modo Foco
+- ✅ Nova interface `focus-mode.js` sem ciclo automático Pomodoro
+- ✅ Sessão única por timestamp
 - ✅ Pausar e retomar
-- ✅ Associação a atividade
-- ✅ Duração e número de ciclos configuráveis
-- ✅ Fluxo automático foco → pausa curta → foco → pausa longa
-- ✅ Ativar/desativar continuação automática
-- ✅ Objetivo diário configurável de sessões
-- ✅ Progresso diário de sessões e minutos
-- 🟡 Histórico por atividade — contagem/resumo implementados; falta vista histórica detalhada
+- ✅ Concluir manualmente ou ao terminar o temporizador
+- ✅ Associação opcional a atividade
+- ✅ Utilização sem atividade criada
+- ✅ Botão para criar atividade a partir do próprio ecrã Foco
+- ✅ Quando necessário, fluxo explícito “Iniciar jornada + sessão”
+- ✅ Duração principal configurável em Definições
+- ✅ Objetivo diário em minutos
+- ✅ Progresso diário em minutos
+- ✅ Lista de sessões recentes
+- ✅ Estados Pomodoro antigos continuam legíveis para permitir encerramento seguro
+- ✅ Ciclo automático foco → pausa → foco removido
+- ✅ `focus-entry.js` removido do runtime e do deploy
+- 🟡 Smoke test físico final no iPhone
 
 ### Café
 - ✅ Registo e desfazer
@@ -117,6 +124,7 @@ Estados:
 - ✅ Espelho de recuperação adicional em IndexedDB
 - ✅ Pedido de armazenamento persistente quando suportado pelo browser
 - ✅ Fluxo “Instalar aplicação” com prompt nativo e instruções específicas para iPhone
+- ✅ Preferências do Modo Foco preservadas no ramo de funcionalidades protegido
 - 🟡 Notificações de sistema no iPhone dependem das permissões e do modo PWA
 - ⬜ Histórico de backups manuais
 - ⬜ Backup parcial por módulo
@@ -130,10 +138,14 @@ Objetivo: reduzir remendos acumulados, tornar os fluxos críticos testáveis e e
 
 ### Arquitetura
 - 🟡 Incorporar progressivamente regras de `runtime-fixes.js`, `summary-guard.js`, `shift-reports.js` e `shift-mobile-interactions.js` nos módulos definitivos
-- ✅ Atividades e Pomodoro têm agora um único proprietário funcional em `app.js` + `productivity-core.js`; `runtime-fixes.js` deixou de interceptar esses fluxos
+- ✅ Atividades têm proprietário funcional em `app.js` + `productivity-core.js`; `runtime-fixes.js` não intercepta este fluxo
+- ✅ Interface Foco reconstruída em `focus-mode.js` + `focus-mode-core.js`
+- ✅ `focus-entry.js` eliminado
+- ✅ `productivity-core.js` já não importa camadas de UI e deixou de criar fases automáticas Pomodoro
+- 🟡 Operações base de pausar/retomar/concluir foco ainda reutilizam os handlers de estado do `app.js`; consolidar numa API pública única numa revisão futura
 - ✅ Núcleo puro `shift-advanced-core.js` para cópia, intervalos e resumos da escala
 - ✅ Núcleo puro `professional-core.js` para Centro de Comando, Pesquisa Global e Diagnóstico
-- ✅ Núcleo `productivity-core.js` para recorrência, subtarefas, duplicação e ciclo Pomodoro
+- ✅ Núcleo `productivity-core.js` para recorrência, subtarefas e duplicação
 - ✅ Camada `persistence.js` carregada antes do runtime para recuperação e proteção das gravações locais
 - ✅ Remover `enhancements.js` do runtime ativo
 - 🟡 Remover ficheiros legado restantes quando deixarem de ser necessários para caches antigos
@@ -148,14 +160,15 @@ Objetivo: reduzir remendos acumulados, tornar os fluxos críticos testáveis e e
 - ✅ Testes dos relatórios configuráveis
 - ✅ Testes puros para copiar dia/semana, intervalos e resumos da escala
 - ✅ Testes puros para Centro de Comando, Pesquisa Global e Diagnóstico
-- ✅ Testes de fluxo para recorrência, subtarefas, duplicação e transições Pomodoro
+- ✅ Testes de fluxo para recorrência, subtarefas e duplicação
+- ✅ Testes específicos do Modo Foco sem ciclo automático
 - ✅ Testes estáticos para recuperação de dados e instalação PWA
 - ⬜ Testes DOM de clique/toque
 - ⬜ Smoke test Safari/PWA documentado por release
 - ⬜ Teste de instalação/atualização offline em dispositivo físico
 
 ### Fluxos a fechar na 4.3.0
-- 🟡 Pomodoro e atividades: lógica e handlers principais consolidados; falta validação física no iPhone
+- 🟡 Modo Foco e atividades: fluxo reconstruído; falta validação física no iPhone
 - 🟡 Resumo diário consolidado
 - 🟡 Importação/backup com versão de schema explícita
 - 🟡 Atualização PWA com estado instalado/disponível/atualizado
@@ -169,7 +182,7 @@ A 4.3.0 só deve ser marcada como concluída quando:
 2. nenhum módulo ativo depender de ficheiros legado desnecessários;
 3. versão, cache, pacote e documentação estiverem coerentes;
 4. `npm run check` estiver verde;
-5. houver smoke test manual no iPhone para Foco, Atividades, Backup, Moovit, Supershift, Persistência, Instalação e Atualização.
+5. houver smoke test manual no iPhone para Modo Foco, Atividades, Backup, Moovit, Supershift, Persistência, Instalação e Atualização.
 
 ## 4.4.0 — Planeamento
 - ⬜ Calendário unificado da aplicação
