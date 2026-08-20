@@ -1,0 +1,330 @@
+.activitiesPage {
+  width: min(100%, 1040px);
+  margin: 0 auto;
+}
+
+.activitiesHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-5);
+  margin-bottom: var(--space-6);
+}
+
+.activitiesHeader h1 {
+  margin: 12px 0;
+  font-size: clamp(38px, 7vw, 64px);
+  line-height: 1;
+  letter-spacing: -0.055em;
+}
+
+.activitiesHeader p {
+  max-width: 680px;
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.activityJourneyState {
+  padding: 9px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.activityJourneyStateActive {
+  border-color: rgba(79, 212, 154, 0.24);
+  color: var(--success);
+}
+
+.activityCreatePanel,
+.activityListPanel,
+.currentActivityPanel {
+  padding: clamp(20px, 4vw, 30px);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+
+.activityListPanel,
+.currentActivityPanel {
+  margin-top: var(--space-5);
+}
+
+.activityForm {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  align-items: end;
+  gap: var(--space-3);
+}
+
+.activityForm label,
+.activityEditForm {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.activityForm label > span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.activityForm input,
+.activityForm textarea,
+.activityEditForm input,
+.activityEditForm textarea {
+  width: 100%;
+  padding: 11px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  outline: none;
+  background: var(--bg);
+  color: var(--text);
+  resize: vertical;
+}
+
+.activityForm input:focus,
+.activityForm textarea:focus,
+.activityEditForm input:focus,
+.activityEditForm textarea:focus {
+  border-color: var(--primary);
+}
+
+.activityHint {
+  margin: var(--space-4) 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.currentActivityPanel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: end;
+  gap: var(--space-5);
+  border-color: rgba(91, 156, 255, 0.24);
+  background: linear-gradient(145deg, rgba(91, 156, 255, 0.08), var(--surface));
+}
+
+.currentActivityPanel h2 {
+  margin: 6px 0 7px;
+  font-size: clamp(23px, 4vw, 32px);
+}
+
+.currentActivityPanel p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.currentActivityTime {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+}
+
+.currentActivityTime span {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.currentActivityTime strong {
+  font-size: 25px;
+  font-variant-numeric: tabular-nums;
+}
+
+.activityList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.activityCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+}
+
+.activityCard-active {
+  border-color: rgba(91, 156, 255, 0.28);
+}
+
+.activityCard-completed {
+  opacity: 0.82;
+}
+
+.activityCard-cancelled {
+  opacity: 0.62;
+}
+
+.activityCardMain {
+  min-width: 0;
+  flex: 1;
+}
+
+.activityCardTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.activityCardTitleRow > strong {
+  font-size: 16px;
+}
+
+.activityCardMain p {
+  margin: 7px 0 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.activityMeta {
+  display: flex;
+  gap: 14px;
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.activityStatus {
+  padding: 4px 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.activityStatus-active {
+  border-color: rgba(91, 156, 255, 0.3);
+  color: var(--primary);
+}
+
+.activityStatus-completed {
+  border-color: rgba(79, 212, 154, 0.25);
+  color: var(--success);
+}
+
+.activityStatus-cancelled {
+  border-color: rgba(239, 107, 115, 0.22);
+  color: #ffadb3;
+}
+
+.activityCardActions,
+.activityInlineActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.activityCardActions button,
+.activityInlineActions button {
+  min-height: 36px;
+  padding: 7px 10px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  cursor: pointer;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.activityCardActions button:hover:not(:disabled),
+.activityInlineActions button:hover:not(:disabled) {
+  border-color: var(--line-strong);
+}
+
+.activityCardActions button:disabled,
+.activityInlineActions button:disabled {
+  cursor: wait;
+  opacity: 0.5;
+}
+
+.activityCardActions .activityDangerAction {
+  border-color: rgba(239, 107, 115, 0.2);
+  color: #ffadb3;
+}
+
+.activityEditForm {
+  width: 100%;
+}
+
+.todayActivityPanel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-4);
+  margin-top: var(--space-5);
+  padding: var(--space-5);
+  border: 1px solid rgba(91, 156, 255, 0.22);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(145deg, rgba(91, 156, 255, 0.07), var(--surface));
+}
+
+.todayActivityPanel h2 {
+  margin: 5px 0 6px;
+  font-size: 22px;
+}
+
+.todayActivityPanel p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.todayActivityTimer {
+  font-size: clamp(25px, 4vw, 36px);
+  font-variant-numeric: tabular-nums;
+  font-weight: 850;
+}
+
+@media (max-width: 860px) {
+  .activityForm,
+  .currentActivityPanel {
+    grid-template-columns: 1fr;
+  }
+
+  .currentActivityTime {
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 680px) {
+  .activitiesHeader,
+  .activityCard,
+  .todayActivityPanel {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .activitiesHeader {
+    display: flex;
+  }
+
+  .activityCard {
+    display: flex;
+  }
+
+  .activityCardActions {
+    width: 100%;
+  }
+
+  .activityCardActions button {
+    flex: 1;
+  }
+
+  .todayActivityPanel {
+    display: flex;
+  }
+}

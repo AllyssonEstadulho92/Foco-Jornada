@@ -1,10 +1,12 @@
 import { createContext, type ReactNode, useContext } from 'react'
+import type { ActivityRepository } from '../../application/activities/ActivityRepository'
 import type { BreakRepository } from '../../application/breaks/BreakRepository'
 import type { JourneyRepository } from '../../application/journey/JourneyRepository'
 
 export interface AppServices {
   journeyRepository: JourneyRepository
   breakRepository: BreakRepository
+  activityRepository: ActivityRepository
 }
 
 const AppServicesContext = createContext<AppServices | null>(null)

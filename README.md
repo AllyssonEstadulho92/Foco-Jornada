@@ -8,9 +8,10 @@ Aplicação local-first para controlo de jornada, pausas, atividades, foco/Pomod
 - **Fase 1 — Fundação: concluída.**
 - **Fase 2 — Jornada: concluída.**
 - **Fase 3 — Pausas: concluída.**
-- **Próxima: Fase 4 — Atividades.**
+- **Fase 4 — Atividades: concluída.**
+- **Próxima: Fase 5 — Foco/Pomodoro.**
 
-A base técnica inclui React + TypeScript + Vite, Router, Zustand, Dexie/IndexedDB, testes, lint/format, PWA, navegação responsiva e CI. Jornada e Pausas já estão implementadas e validadas.
+A base técnica inclui React + TypeScript + Vite, Router, Zustand, Dexie/IndexedDB, testes, lint/format, PWA, navegação responsiva e CI. Jornada, Pausas e Atividades já estão implementadas e validadas.
 
 ## Organização do repositório
 
@@ -23,10 +24,12 @@ Foco-Jornada/
 ├── src/                  # código da aplicação
 │   ├── domain/           # entidades e regras puras
 │   │   ├── journey/
-│   │   └── breaks/
+│   │   ├── breaks/
+│   │   └── activities/
 │   ├── application/      # casos de uso
 │   │   ├── journey/
-│   │   └── breaks/
+│   │   ├── breaks/
+│   │   └── activities/
 │   ├── infrastructure/   # IndexedDB/Dexie e repositórios
 │   ├── presentation/     # páginas, hooks, componentes e providers
 │   ├── shared/
@@ -60,6 +63,16 @@ Foco-Jornada/
 - tempo efetivo = jornada - pausas;
 - encerramento automático da pausa ao terminar a jornada;
 - histórico da jornada atual.
+
+### Atividades
+
+- criar, editar, iniciar, concluir e cancelar;
+- apenas uma atividade ativa por jornada;
+- duração por timestamps;
+- persistência e recuperação via IndexedDB;
+- atividade atual no ecrã Hoje;
+- encerramento da atividade ativa ao terminar a jornada;
+- ecrã dedicado responsivo.
 
 ## Documentação principal
 

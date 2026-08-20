@@ -1,8 +1,10 @@
 import { useMemo, useState } from 'react'
 import { getEffectiveJourneyDurationMs } from '../../application/journey/getEffectiveJourneyDuration'
+import { getActivityDurationMs } from '../../domain/activities/Activity'
 import { getBreakDurationMs } from '../../domain/breaks/BreakRecord'
 import { getJourneyDurationMs } from '../../domain/journey/Journey'
 import { formatClockTime, formatDuration } from '../../shared/utils/dateTime'
+import { useActivityController } from '../hooks/useActivityController'
 import { useBreakController } from '../hooks/useBreakController'
 import { useJourneyController } from '../hooks/useJourneyController'
 import { useNow } from '../hooks/useNow'
@@ -19,6 +21,7 @@ export function TodayPage() {
     start: startBreak,
     finish: finishBreak,
   } = useBreakController(activeJourney?.id)
+  const { activeActivity, error: activityError } = useActivityController(activeJourney?.id)
   const [customMinutes, setCustomMinutes] = useState('30')
   const now = useNow()
   const nowIso = now.toISOString()
@@ -36,9 +39,15 @@ export function TodayPage() {
     : 0
 
   async function handleFinish() {
-    const message = activeBreak
-      ? 'Existe uma pausa ativa. Ao terminar a jornada, essa pausa será encerrada automaticamente. Continuar?'
-      : 'Terminar a jornada atual?'
+    const openItems: string[] = []
+    if (activeBreak) openItems.push('uma pausa ativa')
+    if (activeActivity) openItems.push(`a atividade "${activeActivity.name}"`)
+
+    const message =
+      openItems.length > 0
+        ? `Existe ${openItems.join(' e ')}. Ao terminar a jornada, estes registos serão encerrados automaticamente. Continuar?`
+        : 'Terminar a jornada atual?'
+
     const confirmed = window.confirm(message)
     if (confirmed) {
       await finish()
@@ -59,7 +68,7 @@ export function TodayPage() {
         <div>
           <span className="eyebrow">HOJE</span>
           <h1 id="page-title">Foco & Jornada</h1>
-          <p>Controlo da jornada, pausas e tempo efetivo do dia.</p>
+          <p>Controlo da jornada, pausas, atividades e tempo efetivo do dia.</p>
         </div>
         <span
           className={`journeyStatus ${activeJourney ? 'journeyStatusActive' : ''} ${activeBreak ? 'journeyStatusPaused' : ''}`}
@@ -69,9 +78,9 @@ export function TodayPage() {
         </span>
       </header>
 
-      {error || breakError ? (
+      {error || breakError || activityError ? (
         <div className="errorBanner" role="alert">
-          {error ?? breakError}
+          {error ?? breakError ?? activityError}
         </div>
       ) : null}
 
@@ -129,6 +138,22 @@ export function TodayPage() {
           )}
         </div>
       </section>
+
+      {activeActivity ? (
+        <section className="todayActivityPanel" aria-labelledby="today-activity-title">
+          <div>
+            <span className="sectionKicker">ATIVIDADE ATUAL</span>
+            <h2 id="today-activity-title">{activeActivity.name}</h2>
+            <p>
+              {activeActivity.description ??
+                `Em curso desde ${formatClockTime(activeActivity.startedAt)}`}
+            </p>
+          </div>
+          <strong className="todayActivityTimer">
+            {formatDuration(getActivityDurationMs(activeActivity, nowIso))}
+          </strong>
+        </section>
+      ) : null}
 
       <section className="breakPanel" aria-labelledby="break-title">
         <div className="sectionHeadingRow">
