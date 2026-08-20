@@ -1,59 +1,31 @@
-# Roadmap — Foco & Jornada V1
+# Roadmap — Foco & Jornada
 
-## Estado das fases
+## V1
 
-| Fase | Objetivo | Estado | Gate para avançar |
-|---|---|---|---|
-| 0 | Especificação | Concluída | `PROJECT_SPEC.md` aprovado |
-| 1 | Fundação | Concluída | Typecheck, lint, testes e build verdes |
-| 2 | Jornada | Concluída | Persistência, recuperação e concorrência validadas |
-| 3 | Pausas | Concluída | Tempo efetivo, persistência e CI verdes |
-| 4 | Atividades | Concluída | Exclusividade, persistência e CI verdes |
-| 5 | Foco/Pomodoro | Concluída | Timer persistente e CI verdes |
-| 6 | Café | Próxima | Registos e totais consistentes |
-| 7 | Dashboard | Bloqueada | Integração sem duplicação de lógica |
-| 8 | Histórico/Estatísticas/Definições | Bloqueada | Agregações corretas |
-| 9 | Qualidade final/PWA | Bloqueada | V1 cumpre critérios de aceitação |
+| Fase | Objetivo | Estado |
+|---|---|---|
+| 0 | Especificação | Concluída |
+| 1 | Fundação | Concluída |
+| 2 | Jornada | Concluída |
+| 3 | Pausas | Concluída |
+| 4 | Atividades | Concluída |
+| 5 | Foco/Pomodoro | Concluída |
+| 6 | Café | Concluída |
+| 7 | Dashboard | Concluída |
+| 8 | Histórico/Estatísticas/Definições | Concluída |
+| 9 | Qualidade final/PWA | Implementada — integração condicionada ao CI verde da PR #11 |
 
-## Fases 1–5 — CONCLUÍDAS
+## Entrega V1
 
-A fundação, Jornada, Pausas, Atividades e Foco/Pomodoro estão implementados e passaram typecheck, lint, testes e build no GitHub Actions.
+A release inclui persistência IndexedDB, recuperação por timestamps, interface responsiva, PWA, testes e CI. A branch de release é integrada em `main` apenas quando typecheck, lint, testes e build passam.
 
-### Fase 5 — Foco/Pomodoro
+## V2 — backlog
 
-- Pomodoro 25/5/15 com 4 ciclos.
-- Sessão personalizada.
-- Pausar/retomar/concluir/cancelar.
-- Associação opcional a atividade.
-- Persistência por timestamps e recuperação após refresh.
-- Apenas uma sessão aberta por jornada.
-- Encerramento consistente ao terminar jornada.
-- Testes de domínio, aplicação e IndexedDB.
-
----
-
-## Fase 6 — Café — PRÓXIMA
-
-- Quantidade, preço e total diário.
-- Persistência e histórico.
-
-## Fase 7 — Dashboard
-
-- Integrar Jornada, Pausas, Atividades, Foco e Café no Hoje.
-- Não duplicar regras de domínio.
-
-## Fase 8 — Histórico, Estatísticas e Definições
-
-- Timeline diária.
-- Agregações dia/semana/mês.
-- Definições persistentes.
-- Exportação básica de dados.
-
-## Fase 9 — Qualidade final e PWA
-
-- Acessibilidade.
-- Responsividade.
-- Offline/PWA.
-- Estados de erro.
-- Testes críticos.
-- Validação integral dos critérios de aceitação.
+- autenticação e contas;
+- sincronização entre dispositivos;
+- backend/cloud e backups;
+- notificações avançadas;
+- estatísticas de longo prazo;
+- exportação CSV/PDF;
+- publicação nativa Android/iOS;
+- funcionalidades colaborativas, se vierem a ser necessárias.
