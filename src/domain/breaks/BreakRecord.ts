@@ -8,6 +8,7 @@ export interface BreakRecord {
   plannedDurationMinutes?: number
   startedAt: string
   endedAt?: string
+  actualDurationSeconds?: number
   status: BreakStatus
 }
 
@@ -49,11 +50,16 @@ export function finishBreakRecord(record: BreakRecord, now: string): BreakRecord
   return {
     ...record,
     endedAt: now,
+    actualDurationSeconds: Math.floor((endedAt - startedAt) / 1000),
     status: 'finished',
   }
 }
 
 export function getBreakDurationMs(record: BreakRecord, now = new Date().toISOString()): number {
+  if (record.status === 'finished' && record.actualDurationSeconds !== undefined) {
+    return Math.max(0, record.actualDurationSeconds * 1000)
+  }
+
   const start = Date.parse(record.startedAt)
   const end = Date.parse(record.endedAt ?? now)
 
