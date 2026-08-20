@@ -22,7 +22,7 @@ function toast(text,actionLabel='',action=null){const el=$('#toast');if(!el)retu
 function setTheme(){const pref=state.settings.theme;const theme=pref==='system'?(matchMedia('(prefers-color-scheme:light)').matches?'light':'dark'):pref;document.documentElement.dataset.theme=theme;$('meta[name="theme-color"]').content=theme==='light'?'#f5f7f9':'#091017'}
 function reconcileTimers(now=Date.now(),announce=false){const r=P.reconcilePomodoro(state,now);if(r?.ok){save();if(announce){const next=r.next?P.pomodoroPhaseLabel(r.next.phase):null;toast(next?`${P.pomodoroPhaseLabel(r.completed.phase)} concluído. ${next} iniciado automaticamente.`:`${P.pomodoroPhaseLabel(r.completed.phase)} concluído.`)}}return r}
 
-function render(){reconcileTimers(Date.now());save();setTheme();const now=Date.now();$('#clock').textContent=fmtTime(now);$('#dateText').textContent=fmtDate(now);$('#offline').hidden=navigator.onLine;$('#contextName').textContent=state.contexts.find(c=>c.id===C.activeContextId(state))?.name||'Trabalho';$$('.view').forEach(el=>el.classList.toggle('on',el.dataset.view===view));$$('[data-nav]').forEach(el=>el.classList.toggle('on',el.dataset.nav===view));$('#pageTitle').textContent=({today:'Hoje',activities:'Atividades',focus:'Foco',history:'Histórico',stats:'Estatísticas',more:'Mais'})[view]||'Foco & Jornada';renderToday(now);renderActivities(now);renderFocus(now);renderHistory(now);renderStats(now);renderMore(now);bindDynamic();if(!state.settings.onboardingDone)openOnboarding();}
+function render(){const now=Date.now();reconcileTimers(now);setTheme();$('#clock').textContent=fmtTime(now);$('#dateText').textContent=fmtDate(now);$('#offline').hidden=navigator.onLine;$('#contextName').textContent=state.contexts.find(c=>c.id===C.activeContextId(state))?.name||'Trabalho';$$('.view').forEach(el=>el.classList.toggle('on',el.dataset.view===view));$$('[data-nav]').forEach(el=>el.classList.toggle('on',el.dataset.nav===view));$('#pageTitle').textContent=({today:'Hoje',activities:'Atividades',focus:'Foco',history:'Histórico',stats:'Estatísticas',more:'Mais'})[view]||'Foco & Jornada';renderToday(now);renderActivities(now);renderFocus(now);renderHistory(now);renderStats(now);renderMore(now);bindDynamic();window.dispatchEvent(new CustomEvent('foco-render',{detail:{view,at:now}}));}
 
 function renderToday(now){const w=C.activeWork(state),b=C.activeBreak(state),f=C.activeFocus(state),a=C.activeActivity(state);const stats=C.dayStats(state,C.localDayKey(now),now);let hero;if(b){const remain=C.breakRemainingMs(b,now),over=C.breakOvertimeMs(b,now);hero=`<article class="hero break"><div class="status warning">${b.type==='REST'?'PAUSA PRINCIPAL':'PAUSA DE ECRÃ'}</div><div class="timer">${remain?fmtDur(remain,true):'+'+fmtDur(over,true)}</div><p>${remain?`Regresso previsto às ${fmtTime(b.expectedEndAt)}`:'O tempo previsto terminou. Confirma quando regressares.'}</p><div class="hero-actions"><button class="btn primary" data-action="endBreak">Regressar</button><button class="btn" data-action="extendBreak">+5 min</button></div></article>`}else if(f){const phase=P.pomodoroPhaseLabel(f.phase).toUpperCase();hero=`<article class="hero focus"><div class="status primary">${f.status==='PAUSED'?`${phase} PAUSADO`:phase}</div><div class="timer">${fmtDur(C.focusRemainingMs(f,now),true)}</div><p>${f.phase==='FOCUS'&&f.activityId?`Atividade: ${esc(state.activities.find(a=>a.id===f.activityId)?.title||'')}`:`Ciclo ${f.cycleNumber}/${state.settings.focusCycles}`}</p><div class="hero-actions"><button class="btn primary" data-action="${f.status==='PAUSED'?'resumeFocus':'pauseFocus'}">${f.status==='PAUSED'?'Retomar':'Pausar'}</button><button class="btn danger" data-action="endFocus">Terminar fase</button></div></article>`}else if(w){hero=`<article class="hero work"><div class="status success">● EM TRABALHO</div><div class="timer">${fmtDur(C.grossWorkMs(w,now),true)}</div><div class="hero-grid"><div><small>Entrada</small><b>${fmtTime(w.startedAt)}</b></div><div><small>Efetivo</small><b>${fmtDur(C.effectiveWorkMs(state,w,now))}</b></div><div><small>Pausas</small><b>${fmtDur(C.breakMsForWork(state,w,now))}</b></div></div><button class="btn danger full" data-action="endWork">Terminar jornada</button></article>`}else{hero=`<article class="hero idle"><div class="status">PRONTO PARA COMEÇAR</div><h2>Organiza o dia sem perder o ritmo.</h2><p>Regista a entrada. O tempo é reconstruído por timestamps mesmo após fechar a aplicação.</p><button class="btn primary big" data-action="startWork">Entrar</button></article>`}
 $('#todayHero').innerHTML=hero;
@@ -63,6 +63,31 @@ function saveSettings(){state.settings.theme=$('#setTheme').value;state.settings
 function exportBackup(){const payload={product:'Foco & Jornada',appVersion:C.APP_VERSION,schemaVersion:C.SCHEMA_VERSION,exportedAt:new Date().toISOString(),state};const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`foco-jornada-${C.localDayKey(Date.now())}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);toast('Backup criado.')}
 async function importBackup(file){try{const obj=JSON.parse(await file.text());const incoming=C.migrateState(obj.state||obj);confirmDialog('Restaurar backup?',`Serão carregadas ${incoming.workSessions.length} jornadas, ${incoming.activities.length} atividades e ${incoming.coffeeEntries.length} entradas de café.`,'Restaurar',()=>{state=incoming;state.settings.onboardingDone=true;save();render();toast('Backup restaurado.')})}catch{toast('O ficheiro não é um backup válido.')}finally{$('#importInput').value=''}}
 
+function updateLiveUi(now=Date.now()){
+  const clock=$('#clock');if(clock)clock.textContent=fmtTime(now);
+  const date=$('#dateText');if(date)date.textContent=fmtDate(now);
+  const f=C.activeFocus(state),b=C.activeBreak(state),w=C.activeWork(state);
+  if(f?.status==='ACTIVE'&&Number.isFinite(f.expectedEndAt)&&now>=f.expectedEndAt){
+    if(reconcileTimers(now,true)){render();return true}
+  }
+  if(b){
+    const remain=C.breakRemainingMs(b,now),over=C.breakOvertimeMs(b,now),timer=$('.hero.break .timer');
+    if(timer)timer.textContent=remain?fmtDur(remain,true):'+'+fmtDur(over,true);
+  }else if(f){
+    const remain=C.focusRemainingMs(f,now),hero=$('.hero.focus .timer'),stage=$('.focus-ring strong');
+    if(hero)hero.textContent=fmtDur(remain,true);if(stage)stage.textContent=fmtDur(remain,true);
+    const ring=$('.focus-ring');if(ring){const pct=Math.min(100,Math.max(0,100-remain/(f.targetDurationMs||1)*100));ring.style.setProperty('--p',`${pct*3.6}deg`)}
+  }else if(w){
+    const timer=$('.hero.work .timer');if(timer)timer.textContent=fmtDur(C.grossWorkMs(w,now),true);
+    const effective=$('.hero.work .hero-grid div:nth-child(2) b'),pauses=$('.hero.work .hero-grid div:nth-child(3) b');
+    if(effective)effective.textContent=fmtDur(C.effectiveWorkMs(state,w,now));
+    if(pauses)pauses.textContent=fmtDur(C.breakMsForWork(state,w,now));
+  }
+  return !!(b||f||w);
+}
+let liveTimer=0;
+function scheduleLiveTick(delay=0){clearTimeout(liveTimer);liveTimer=setTimeout(()=>{const active=updateLiveUi(Date.now());scheduleLiveTick(active?1000:30000)},delay)}
+
 $('#newActivityBtn').onclick=()=>openActivityDialog();$('#exportBtn').onclick=exportBackup;$('#importInput').onchange=e=>importBackup(e.target.files?.[0]);$('#importBtn').onclick=()=>$('#importInput').click();$('#checkBtn').onclick=()=>{renderMore(Date.now());toast('Diagnóstico atualizado.')};$('#resetBtn').onclick=()=>guarded(()=>handleAction('reset'));$('#settingsForm').onsubmit=e=>{e.preventDefault();saveSettings()};addEventListener('online',render);addEventListener('offline',render);matchMedia('(prefers-color-scheme:light)').addEventListener?.('change',render);if('serviceWorker'in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
-setInterval(()=>{const r=reconcileTimers(Date.now(),true);if(!r)render();else render()},1000);
 render();
+scheduleLiveTick(1000);
