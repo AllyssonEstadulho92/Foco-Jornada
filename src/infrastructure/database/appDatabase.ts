@@ -1,4 +1,5 @@
 import Dexie, { type Table } from 'dexie'
+import type { Journey } from '../../domain/journey/Journey'
 
 export interface AppMetadataRecord {
   key: string
@@ -8,12 +9,18 @@ export interface AppMetadataRecord {
 
 export class AppDatabase extends Dexie {
   metadata!: Table<AppMetadataRecord, string>
+  journeys!: Table<Journey, string>
 
-  constructor() {
-    super('foco-jornada')
+  constructor(name = 'foco-jornada') {
+    super(name)
 
     this.version(1).stores({
       metadata: '&key,updatedAt',
+    })
+
+    this.version(2).stores({
+      metadata: '&key,updatedAt',
+      journeys: '&id,date,status,startedAt,endedAt,updatedAt',
     })
   }
 }
