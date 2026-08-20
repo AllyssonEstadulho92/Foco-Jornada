@@ -1,10 +1,8 @@
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 
-const base = '/Foco-Jornada/'
-
 export default defineConfig({
-  base,
+  base: './',
   build: {
     target: 'es2019',
   },
