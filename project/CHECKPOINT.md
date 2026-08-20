@@ -2,53 +2,50 @@
 
 ## Estado atual
 
-**Fase:** 1 — Fundação concluída  
-**Próxima fase:** 2 — Jornada  
-**PR da Fase 1:** #6  
-**Validação CI:** GitHub Actions run `32410154499` — sucesso  
+**Fase:** 2 — Jornada, implementação concluída; validação CI pendente  
+**Branch:** `phase/02-jornada`  
 **Fonte de verdade:** `project/PROJECT_SPEC.md`
 
-## Implementado e validado na Fase 1
+## Fundação
 
-- [x] React + TypeScript + Vite.
-- [x] TypeScript strict.
-- [x] Estrutura por camadas em `src/`.
-- [x] React Router.
-- [x] Zustand para estado de interface.
-- [x] Dexie/IndexedDB preparado.
-- [x] Vitest + Testing Library.
-- [x] ESLint + Prettier.
-- [x] PWA configurada.
-- [x] Navegação responsiva mobile/desktop.
-- [x] Páginas Hoje, Atividades, Foco, Histórico, Mais e Definições.
-- [x] Design tokens e layout escuro base.
-- [x] CI com typecheck + lint + testes + build.
-- [x] GitHub Actions: typecheck verde.
-- [x] GitHub Actions: lint verde.
-- [x] GitHub Actions: testes verdes.
-- [x] GitHub Actions: build verde.
+Fase 1 concluída e integrada em `main`. Quality gates verdes.
 
-## Resultado dos quality gates
+## Implementado na Fase 2
 
-- Typecheck: **PASS**
-- Lint: **PASS**
-- Testes: **PASS**
-- Build: **PASS**
+- [x] Entidade `Journey` e regras puras de domínio.
+- [x] Iniciar jornada.
+- [x] Impedir duas jornadas ativas.
+- [x] Proteção contra criação concorrente por transação IndexedDB.
+- [x] Terminar jornada.
+- [x] Proteção contra dupla finalização.
+- [x] Duração calculada por timestamps persistidos.
+- [x] Dexie schema v2 com tabela `journeys`.
+- [x] Repositório Dexie para jornadas.
+- [x] Recuperação da jornada ativa ao abrir/recarregar a interface.
+- [x] Lista básica das jornadas do dia.
+- [x] Interface Hoje com entrada, duração, estado, iniciar e terminar.
+- [x] Confirmação antes de terminar jornada.
+- [x] Testes de casos de uso.
+- [x] Testes de persistência e concorrência com IndexedDB em memória.
 
-## Próximo trabalho autorizado
+## Validação necessária antes de concluir a Fase 2
 
-A Fase 2 pode iniciar depois de a PR #6 ser integrada em `main`.
+- [ ] GitHub Actions: typecheck verde.
+- [ ] GitHub Actions: lint verde.
+- [ ] GitHub Actions: testes verdes.
+- [ ] GitHub Actions: build verde.
+- [ ] Revisão técnica final da Fase 2.
 
-Escopo da Fase 2: **Jornada apenas** — iniciar, impedir duplicados, persistir em IndexedDB, recuperar após refresh/reabertura, calcular duração por timestamps e terminar com consistência.
+## Fora desta fase
 
-Pausas, Atividades, Foco e Café continuam bloqueados.
+Continuam bloqueados:
 
-## Regra de continuidade
+- Pausas;
+- Atividades funcionais;
+- Foco/Pomodoro;
+- Café;
+- estatísticas completas.
 
-Antes de começar uma nova fase, atualizar este ficheiro com:
+## Próximo gate
 
-- fase concluída;
-- testes executados;
-- resultado do build;
-- decisões tomadas;
-- riscos e problemas pendentes.
+A Fase 3 — Pausas só pode iniciar depois de todos os gates acima estarem verdes e a Fase 2 ser integrada em `main`.
