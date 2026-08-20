@@ -1,1 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="118" fill="#091017"/><circle cx="256" cy="256" r="168" fill="none" stroke="#273846" stroke-width="34"/><path d="M256 88a168 168 0 0 1 153 99" fill="none" stroke="#4b8dff" stroke-width="34" stroke-linecap="round"/><path d="M256 170v96l66 42" fill="none" stroke="#f5f8fa" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/><circle cx="256" cy="256" r="24" fill="#4bd193"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Foco &amp; Jornada">
+  <defs>
+    <linearGradient id="fjBlue" x1="110" y1="390" x2="346" y2="142" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#34b7ff"/>
+      <stop offset="1" stop-color="#5c6cff"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="#07111f"/>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="256" cy="256" r="158" stroke="#eef4ff" stroke-width="25" stroke-dasharray="202 46" transform="rotate(-43 256 256)"/>
+    <path d="M256 72v38M256 402v38M72 256h38M402 256h38" stroke="#eef4ff" stroke-width="24"/>
+    <circle cx="256" cy="256" r="94" stroke="#9fb0c9" stroke-width="22" stroke-dasharray="150 47" transform="rotate(18 256 256)"/>
+    <path d="M124 384C154 317 199 319 239 289c39-29 64-66 85-112" stroke="url(#fjBlue)" stroke-width="28"/>
+    <path d="m286 184 45-12-7 46" stroke="url(#fjBlue)" stroke-width="28"/>
+    <path d="M160 378c6-28 19-50 38-67" stroke="#4b8dff" stroke-width="11" stroke-dasharray="16 22" opacity=".9"/>
+  </g>
+</svg>
