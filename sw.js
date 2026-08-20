@@ -1,4 +1,4 @@
-const CACHE='foco-jornada-v4-2-0-focus-mode2';
+const CACHE='foco-jornada-v4-2-0-focus-mode3';
 const ASSETS=[
   './','./index.html',
   './styles.css','./ux.css','./features.css','./hub.css','./hub-about.css','./settings-controller.css',
