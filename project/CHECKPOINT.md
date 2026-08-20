@@ -2,15 +2,19 @@
 
 ## Estado atual
 
-**Fase:** 2 — Jornada, implementação concluída; validação CI pendente  
-**Branch:** `phase/02-jornada`  
+**Fase:** 2 — Jornada concluída  
+**Próxima fase:** 3 — Pausas  
+**PR da Fase 2:** #7  
+**Validação CI:** GitHub Actions run `32410930364` — sucesso  
 **Fonte de verdade:** `project/PROJECT_SPEC.md`
 
-## Fundação
+## Fases concluídas
 
-Fase 1 concluída e integrada em `main`. Quality gates verdes.
+- [x] Fase 0 — Especificação.
+- [x] Fase 1 — Fundação.
+- [x] Fase 2 — Jornada.
 
-## Implementado na Fase 2
+## Implementado e validado na Fase 2
 
 - [x] Entidade `Journey` e regras puras de domínio.
 - [x] Iniciar jornada.
@@ -28,24 +32,17 @@ Fase 1 concluída e integrada em `main`. Quality gates verdes.
 - [x] Testes de casos de uso.
 - [x] Testes de persistência e concorrência com IndexedDB em memória.
 
-## Validação necessária antes de concluir a Fase 2
+## Resultado dos quality gates
 
-- [ ] GitHub Actions: typecheck verde.
-- [ ] GitHub Actions: lint verde.
-- [ ] GitHub Actions: testes verdes.
-- [ ] GitHub Actions: build verde.
-- [ ] Revisão técnica final da Fase 2.
+- Typecheck: **PASS**
+- Lint: **PASS**
+- Testes: **PASS**
+- Build: **PASS**
 
-## Fora desta fase
+## Próximo trabalho autorizado
 
-Continuam bloqueados:
+A Fase 3 pode iniciar depois de a PR #7 ser integrada em `main`.
 
-- Pausas;
-- Atividades funcionais;
-- Foco/Pomodoro;
-- Café;
-- estatísticas completas.
+Escopo: **Pausas apenas** — 15 min, 60 min e personalizada, uma pausa ativa por jornada, persistência/recuperação e cálculo do tempo efetivo.
 
-## Próximo gate
-
-A Fase 3 — Pausas só pode iniciar depois de todos os gates acima estarem verdes e a Fase 2 ser integrada em `main`.
+Atividades, Foco e Café continuam bloqueados.
