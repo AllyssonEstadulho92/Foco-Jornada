@@ -40,7 +40,15 @@ function normalizeDescription(description?: string): string | undefined {
   return normalized
 }
 
+function assertValidTimestamp(timestamp: string, message: string): number {
+  const value = Date.parse(timestamp)
+  if (!Number.isFinite(value)) throw new Error(message)
+  return value
+}
+
 export function createActivity(input: CreateActivityInput): Activity {
+  assertValidTimestamp(input.now, 'A data de criação da atividade é inválida.')
+
   return {
     id: input.id,
     journeyId: input.journeyId,
@@ -62,6 +70,8 @@ export function editActivity(
     throw new Error('Uma atividade concluída ou cancelada não pode ser editada.')
   }
 
+  assertValidTimestamp(now, 'A data de atualização da atividade é inválida.')
+
   return {
     ...activity,
     name: normalizeName(name),
@@ -74,6 +84,8 @@ export function startActivityRecord(activity: Activity, now: string): Activity {
   if (activity.status !== 'pending') {
     throw new Error('Apenas uma atividade pendente pode ser iniciada.')
   }
+
+  assertValidTimestamp(now, 'A hora de início da atividade é inválida.')
 
   return {
     ...activity,
@@ -88,7 +100,10 @@ export function completeActivityRecord(activity: Activity, now: string): Activit
     throw new Error('Apenas uma atividade ativa pode ser concluída.')
   }
 
-  if (Date.parse(now) < Date.parse(activity.startedAt)) {
+  const startedAt = assertValidTimestamp(activity.startedAt, 'A hora de início da atividade é inválida.')
+  const endedAt = assertValidTimestamp(now, 'A hora de fim da atividade é inválida.')
+
+  if (endedAt < startedAt) {
     throw new Error('O fim da atividade não pode ser anterior ao início.')
   }
 
@@ -105,8 +120,13 @@ export function cancelActivityRecord(activity: Activity, now: string): Activity 
     throw new Error('Esta atividade já está encerrada.')
   }
 
-  if (activity.startedAt && Date.parse(now) < Date.parse(activity.startedAt)) {
-    throw new Error('O cancelamento não pode ser anterior ao início.')
+  const endedAt = assertValidTimestamp(now, 'A hora de cancelamento da atividade é inválida.')
+
+  if (activity.startedAt) {
+    const startedAt = assertValidTimestamp(activity.startedAt, 'A hora de início da atividade é inválida.')
+    if (endedAt < startedAt) {
+      throw new Error('O cancelamento não pode ser anterior ao início.')
+    }
   }
 
   return {
