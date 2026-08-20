@@ -4,6 +4,7 @@ import fs from 'node:fs';
 const read=p=>fs.readFileSync(new URL(`../${p}`,import.meta.url),'utf8');
 const persistence=read('persistence.js');
 const install=read('install-app.js');
+const bootRecovery=read('boot-recovery.js');
 const index=read('index.html');
 const productivity=read('productivity-core.js');
 const app=read('app.js');
@@ -51,10 +52,12 @@ test('instalador não mantém observador global permanente',()=>{
   assert.ok(install.includes('setTimeout(schedule,100)'));
 });
 
-test('arranque carrega persistência antes da aplicação e não usa shell bloqueante',()=>{
+test('arranque carrega app diretamente depois da persistência',()=>{
   const persistencePos=index.indexOf('src="./persistence.js"');
+  const recoveryPos=index.indexOf('src="./boot-recovery.js"');
+  const appPos=index.indexOf('src="./app.js"');
   const uxPos=index.indexOf('src="./ux.js"');
-  assert.ok(persistencePos>=0&&uxPos>persistencePos);
+  assert.ok(persistencePos>=0&&recoveryPos>persistencePos&&appPos>recoveryPos&&uxPos>appPos);
   assert.ok(index.includes('src="./features.js"'));
   assert.equal(index.includes('src="./focus-entry.js"'),false);
   assert.ok(productivity.includes("import('./focus-entry.js')"));
@@ -62,6 +65,12 @@ test('arranque carrega persistência antes da aplicação e não usa shell bloqu
   assert.ok(index.includes('./install-app.css'));
   assert.equal(index.includes('id="startupShell"'),false);
   assert.equal(index.includes("import('./bootstrap.js')"),false);
+});
+
+test('recuperador remove bloqueios antigos e mantém fallback de navegação',()=>{
+  for(const token of ['startupShell','removeAttribute(\'inert\')','pointer-events','fallbackNavigate','appHasHandlers',"import('./app.js')"])assert.ok(bootRecovery.includes(token),token);
+  assert.ok(bootRecovery.includes('fjAppInteractive'));
+  assert.ok(bootRecovery.includes('Recarregar'));
 });
 
 test('folhas principais são carregadas diretamente sem media print temporário',()=>{
@@ -85,8 +94,9 @@ test('runtime renderiza apenas a vista ativa e mantém temporizadores leves',()=
   assert.ok(stability.includes("await import('./app.js')"));
 });
 
-test('service worker usa rede primeiro e mantém aplicação completa offline',()=>{
-  assert.ok(sw.includes('direct-boot2'));
+test('service worker usa rede primeiro e inclui recuperação offline',()=>{
+  assert.ok(sw.includes('interaction-recovery1'));
+  assert.ok(sw.includes('./boot-recovery.js'));
   assert.ok(sw.includes('./features.js'));
   assert.ok(sw.includes('./shift-planner.js'));
   assert.ok(sw.includes('./runtime-fixes.js'));
