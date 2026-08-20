@@ -9,9 +9,9 @@ interface PagePlaceholderProps {
 
 export function PagePlaceholder({ eyebrow, title, description, children }: PagePlaceholderProps) {
   return (
-    <section className="pagePlaceholder" aria-labelledby={`page-${title}`}>
+    <section className="pagePlaceholder" aria-labelledby="page-title">
       <span className="eyebrow">{eyebrow}</span>
-      <h1 id={`page-${title}`}>{title}</h1>
+      <h1 id="page-title">{title}</h1>
       <p>{description}</p>
       {children}
       <div className="emptyState">
