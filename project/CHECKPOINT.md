@@ -2,8 +2,10 @@
 
 ## Estado atual
 
-**Fase:** 4 — Atividades, implementação concluída; validação CI pendente  
-**Branch:** `phase/04-atividades`  
+**Fase:** 4 — Atividades concluída  
+**Próxima fase:** 5 — Foco/Pomodoro  
+**PR da Fase 4:** #9  
+**Validação CI:** GitHub Actions run `32413765506` — sucesso  
 **Fonte de verdade:** `project/PROJECT_SPEC.md`
 
 ## Fases concluídas
@@ -12,8 +14,9 @@
 - [x] Fase 1 — Fundação.
 - [x] Fase 2 — Jornada.
 - [x] Fase 3 — Pausas.
+- [x] Fase 4 — Atividades.
 
-## Implementado na Fase 4
+## Implementado e validado na Fase 4
 
 - [x] Entidade `Activity` e regras puras de domínio.
 - [x] Criar atividade dentro da jornada ativa.
@@ -38,23 +41,17 @@
 - [x] Testes de persistência e concorrência IndexedDB.
 - [x] Teste de encerramento consistente da jornada com atividade e pausa ativas.
 
-## Validação necessária antes de concluir a Fase 4
+## Resultado dos quality gates
 
-- [ ] GitHub Actions: typecheck verde.
-- [ ] GitHub Actions: lint verde.
-- [ ] GitHub Actions: testes verdes.
-- [ ] GitHub Actions: build verde.
-- [ ] Revisão técnica final da Fase 4.
+- Typecheck: **PASS**
+- Lint: **PASS**
+- Testes: **PASS**
+- Build: **PASS**
 
-## Fora desta fase
+## Próximo trabalho autorizado
 
-Continuam bloqueados:
+A Fase 5 — Foco/Pomodoro pode iniciar depois de a PR #9 ser integrada em `main`.
 
-- Foco/Pomodoro;
-- Café;
-- dashboard final integrado;
-- estatísticas completas.
+Escopo: Pomodoro padrão e personalizado, pausar/retomar, ciclos, associação opcional a atividade e persistência baseada em timestamps.
 
-## Próximo gate
-
-A Fase 5 — Foco/Pomodoro só pode iniciar depois de todos os gates acima estarem verdes e a Fase 4 ser integrada em `main`.
+Café continua bloqueado até a Fase 5 ser concluída e validada.
