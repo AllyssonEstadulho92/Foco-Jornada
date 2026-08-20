@@ -44,6 +44,8 @@ jobs:
 
       - name: Configurar Pages
         uses: actions/configure-pages@v5
+        with:
+          enablement: true
 
       - name: Carregar artefacto
         uses: actions/upload-pages-artifact@v3
