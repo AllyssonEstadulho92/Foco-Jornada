@@ -50,19 +50,20 @@ test('instalador não mantém observador global permanente',()=>{
   assert.ok(install.includes('setTimeout(schedule,100)'));
 });
 
-test('bootstrap carrega persistência antes do núcleo e mantém correção Pomodoro ativa sem duplicação',()=>{
+test('bootstrap carrega persistência antes do núcleo leve e mantém correção Pomodoro ativa sem duplicação',()=>{
   const persistencePos=bootstrap.indexOf("loadClassic('./persistence.js')");
-  const uxPos=bootstrap.indexOf("import('./ux.js')");
-  assert.ok(persistencePos>=0&&uxPos>persistencePos);
+  const stabilityPos=bootstrap.indexOf("import('./stability.js')");
+  assert.ok(persistencePos>=0&&stabilityPos>persistencePos);
   assert.ok(productivity.includes("import('./focus-entry.js')"));
   assert.equal(index.includes('src="./focus-entry.js"'),false);
   assert.equal(index.includes('src="./ux.js"'),false);
   assert.ok(index.includes("import('./bootstrap.js')"));
+  assert.ok(bootstrap.includes("'./ux.js'"));
   assert.ok(bootstrap.includes("'./install-app.js'"));
   assert.ok(index.includes('./install-app.css'));
 });
 
-test('primeiro paint mantém onboarding responsivo antes dos módulos opcionais',()=>{
+test('primeiro paint mantém onboarding isolado dos módulos visuais e integrações',()=>{
   assert.ok(index.includes('id="startupShell"'));
   assert.ok(index.includes('id="startupStatus"'));
   assert.ok(index.includes('requestAnimationFrame(function()'));
@@ -72,6 +73,9 @@ test('primeiro paint mantém onboarding responsivo antes dos módulos opcionais'
   assert.ok(bootstrap.includes('onboardingPending'));
   assert.ok(bootstrap.includes('#finishOnboarding,#skipOnboarding'));
   assert.ok(bootstrap.includes('scheduleExtras()'));
+  assert.ok(bootstrap.includes('const nextFrame='));
+  assert.ok(bootstrap.includes("const modules=['./ux.js'"));
+  assert.equal(bootstrap.includes("await import('./ux.js');"),false);
   assert.equal(bootstrap.includes('requestIdleCallback'),false);
   assert.equal(bootstrap.includes('setTimeout(()=>loadShift()'),false);
   for(const heavy of ['src="./shift-planner.js"','src="./shift-advanced.js"','src="./shift-reports.js"','src="./shift-mobile-interactions.js"'])assert.equal(index.includes(heavy),false,heavy);
@@ -79,7 +83,7 @@ test('primeiro paint mantém onboarding responsivo antes dos módulos opcionais'
 });
 
 test('service worker abre pelo cache e atualiza pela rede em segundo plano',()=>{
-  assert.ok(sw.includes('fast-cache1-onboarding-fix1'));
+  assert.ok(sw.includes('fast-cache1-core-startup1'));
   assert.ok(sw.includes('./bootstrap.js'));
   assert.ok(sw.includes("cache:'no-cache'"));
   assert.ok(sw.includes('cache.match(key)'));
