@@ -5,7 +5,8 @@ const FOCUS_SELECTION_KEY='foco-jornada-focus-activity-v1';
 const CREATE_RETURN_KEY='foco-jornada-focus-create-return-v1';
 const REOPEN_KEY='foco-jornada-focus-reopen-v1';
 const $=s=>document.querySelector(s);
-let raf=0;
+const enqueue=globalThis.queueMicrotask||((fn)=>Promise.resolve().then(fn));
+let scheduled=false;
 
 function readState(){
   try{return C.migrateState(JSON.parse(localStorage.getItem(APP_KEY)||'null'))}catch{return C.createInitialState()}
@@ -44,8 +45,18 @@ function ensureFocusUi(){
     select.addEventListener('change',()=>localStorage.setItem(FOCUS_SELECTION_KEY,select.value||''));
   }
   if(button){
-    if(pause){button.disabled=true;button.setAttribute('disabled','');button.textContent='Termina a pausa primeiro';button.title='Termina a pausa em curso antes de iniciar o Pomodoro.'}
-    else{button.disabled=false;button.removeAttribute('disabled');button.textContent=work?'Iniciar foco':'Iniciar jornada + foco';button.title=work?'Iniciar sessão de foco':'Iniciar a jornada e, após confirmação, iniciar o foco'}
+    if(pause){
+      if(!button.disabled)button.disabled=true;
+      if(!button.hasAttribute('disabled'))button.setAttribute('disabled','');
+      if(button.textContent!=='Termina a pausa primeiro')button.textContent='Termina a pausa primeiro';
+      button.title='Termina a pausa em curso antes de iniciar o Pomodoro.';
+    }else{
+      if(button.disabled)button.disabled=false;
+      if(button.hasAttribute('disabled'))button.removeAttribute('disabled');
+      const label=work?'Iniciar foco':'Iniciar jornada + foco';
+      if(button.textContent!==label)button.textContent=work?'Iniciar foco':'Iniciar jornada + foco';
+      button.title=work?'Iniciar sessão de foco':'Iniciar a jornada e, após confirmação, iniciar o foco';
+    }
   }
   let tools=panel.querySelector('.focus-entry-tools');
   if(!tools){
@@ -55,10 +66,16 @@ function ensureFocusUi(){
   }
   const available=[...select.options].filter(o=>o.value).length;
   const availableText=available===1?'1 atividade disponível para associar.':`${available} atividades disponíveis para associar.`;
-  tools.innerHTML=`<small>${available?availableText:'Nenhuma atividade aberta. Podes iniciar sem atividade ou criar uma agora.'}</small><button type="button" class="btn" data-focus-create-activity data-runtime-new-activity="1">+ Criar atividade</button>`;
+  const toolsHtml=`<small>${available?availableText:'Nenhuma atividade aberta. Podes iniciar sem atividade ou criar uma agora.'}</small><button type="button" class="btn" data-focus-create-activity data-runtime-new-activity="1">+ Criar atividade</button>`;
+  if(tools&&tools.innerHTML!==toolsHtml)tools.innerHTML=toolsHtml;
   let note=panel.querySelector('.focus-entry-start-note');
-  if(!note){note=document.createElement('small');note.className='focus-entry-start-note';button?.before(note)}
-  if(note)note.textContent=pause?'Existe uma pausa ativa. Termina-a primeiro.':work?'A sessão será registada dentro da jornada atual.':'Não existe jornada ativa. Ao iniciar, será pedida confirmação para registar Jornada + Foco.';
+  if(!note){
+    note=document.createElement('small');
+    note.className='focus-entry-start-note';
+    button?.before(note);
+  }
+  const noteText=pause?'Existe uma pausa ativa. Termina-a primeiro.':work?'A sessão será registada dentro da jornada atual.':'Não existe jornada ativa. Ao iniciar, será pedida confirmação para registar Jornada + Foco.';
+  if(note&&note.textContent!==noteText)note.textContent=noteText;
 }
 
 function confirmStartWithWork(){
@@ -102,7 +119,11 @@ function restoreFocus(){
   sessionStorage.removeItem(REOPEN_KEY);
   setTimeout(()=>{openFocus();notify('Jornada e sessão de foco iniciadas.')},140);
 }
-function schedule(){if(raf)return;raf=requestAnimationFrame(()=>{raf=0;ensureFocusUi()})}
+function schedule(){
+  if(scheduled)return;
+  scheduled=true;
+  enqueue(()=>{scheduled=false;ensureFocusUi()});
+}
 
 document.addEventListener('click',e=>{
   if(e.target.classList?.contains('backdrop')&&sessionStorage.getItem(CREATE_RETURN_KEY)==='1')sessionStorage.removeItem(CREATE_RETURN_KEY);
@@ -121,7 +142,10 @@ document.addEventListener('click',e=>{
 },true);
 
 document.addEventListener('change',e=>{if(e.target?.id==='focusActivity')localStorage.setItem(FOCUS_SELECTION_KEY,e.target.value||'')},true);
-new MutationObserver(schedule).observe(document.body,{childList:true,subtree:true});
+const focusRoot=$('#focusArea');
+if(focusRoot)new MutationObserver(schedule).observe(focusRoot,{childList:true,subtree:true});
+addEventListener('pageshow',schedule);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)schedule()});
 restoreFocus();
 schedule();
-window.FocoFocusEntry=Object.freeze({version:'1.0.1',refresh:schedule});
+window.FocoFocusEntry=Object.freeze({version:'1.1.0',refresh:schedule});
