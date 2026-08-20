@@ -12,11 +12,11 @@ A V1 está implementada no repositório. A branch de release só deve ser integr
 - Pausas: 15 min, 60 min e personalizada; tempo efetivo desconta pausas.
 - Atividades: criar, editar, iniciar, concluir e cancelar; apenas uma ativa.
 - Foco: Pomodoro 25/5/15, 4 ciclos e sessão personalizada, com pausa/retoma.
-- Café: quantidade, preço configurável, custo e histórico diário.
+- Café: quantidade, preço configurável em EUR, custo e histórico diário.
 - Dashboard Hoje: visão integrada dos módulos principais.
 - Histórico: seleção de dia, resumo e timeline persistida.
 - Estatísticas: hoje, últimos 7 dias e últimos 30 dias.
-- Definições: preço de café, moeda e intervalo sugerido para pausas.
+- Definições: preço de café e intervalo sugerido para pausas.
 - Exportação: relatório diário em JSON.
 - PWA: instalação e funcionamento offline dos assets da aplicação.
 
