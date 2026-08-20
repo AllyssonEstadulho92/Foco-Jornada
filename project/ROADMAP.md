@@ -8,8 +8,8 @@
 | 1 | Fundação | Concluída | Typecheck, lint, testes e build verdes |
 | 2 | Jornada | Concluída | Persistência, recuperação e concorrência validadas |
 | 3 | Pausas | Concluída | Tempo efetivo, persistência e CI verdes |
-| 4 | Atividades | Em validação | Apenas uma atividade ativa, persistência e CI verdes |
-| 5 | Foco/Pomodoro | Bloqueada | Timer persistente após refresh |
+| 4 | Atividades | Concluída | Apenas uma atividade ativa, persistência e CI verdes |
+| 5 | Foco/Pomodoro | Próxima | Timer persistente após refresh |
 | 6 | Café | Bloqueada | Registos e totais consistentes |
 | 7 | Dashboard | Bloqueada | Integração sem duplicação de lógica |
 | 8 | Histórico/Estatísticas/Definições | Bloqueada | Agregações corretas |
@@ -75,7 +75,7 @@ Validação GitHub Actions: **PASS** em typecheck, lint, testes e build.
 
 ---
 
-## Fase 4 — Atividades — EM VALIDAÇÃO
+## Fase 4 — Atividades — CONCLUÍDA
 
 Implementado:
 
@@ -91,16 +91,18 @@ Implementado:
 - encerramento consistente da atividade ativa ao terminar a jornada;
 - testes de domínio, casos de uso, duração, persistência e concorrência.
 
-Gate atual: GitHub Actions e revisão final.
+Validação GitHub Actions: **PASS** em typecheck, lint, testes e build.
 
 ---
 
-## Fase 5 — Foco/Pomodoro — BLOQUEADA
+## Fase 5 — Foco/Pomodoro — PRÓXIMA
 
 - Pomodoro padrão e personalizado.
 - Pausar/retomar/ciclos.
 - Persistência por timestamps.
 - Associação opcional a atividade.
+- Recuperação consistente após refresh/reabertura.
+- Testes das transições e do cálculo temporal.
 
 ## Fase 6 — Café
 
