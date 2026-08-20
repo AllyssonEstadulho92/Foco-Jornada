@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 const read=p=>fs.readFileSync(new URL(`../${p}`,import.meta.url),'utf8');
-const app=read('app.js'),runtime=read('runtime-fixes.js'),hub=read('hub.js'),shift=read('shift-planner.js'),touch=read('shift-mobile-interactions.js'),professional=read('professional-ui.js'),professionalCore=read('professional-core.js'),links=read('app-links.js'),interaction=read('interaction-fixes.js'),bootstrap=read('bootstrap.js');
+const app=read('app.js'),runtime=read('runtime-fixes.js'),hub=read('hub.js'),shift=read('shift-planner.js'),touch=read('shift-mobile-interactions.js'),professional=read('professional-ui.js'),professionalCore=read('professional-core.js'),links=read('app-links.js'),interaction=read('interaction-fixes.js'),index=read('index.html');
 
 test('ações centrais da aplicação têm handler',()=>{
   for(const action of ['startWork','endWork','screenBreak','restBreak','goFocus','coffee','startFocus','pauseFocus','resumeFocus','endFocus','newActivity','startActivity','pauseActivity','completeActivity','duplicateActivity','moveTomorrow','toggleSubtask','cancelActivity','editWork','reopenWork','cancelWork','export','import','check','reset','toggleTheme'])
@@ -31,13 +31,13 @@ test('Verificar dados executa análise estrutural real',()=>{
 test('Moovit tem proprietário efetivo anterior ao runtime',()=>{
   assert.ok(links.includes("document.addEventListener('click',handleMoovitClick,true)"));
   assert.ok(links.includes('stopImmediatePropagation'));
-  assert.ok(bootstrap.indexOf("'./app-links.js'")<bootstrap.indexOf("'./runtime-fixes.js'"));
+  assert.ok(index.indexOf('src="./app-links.js"')<index.indexOf('src="./runtime-fixes.js"'));
 });
 
 test('teste de notificações tem proprietário efetivo anterior ao runtime',()=>{
   assert.ok(interaction.includes("[data-runtime-test-notification]"));
   assert.ok(interaction.includes('stopImmediatePropagation'));
-  assert.ok(bootstrap.indexOf("'./interaction-fixes.js'")<bootstrap.indexOf("'./runtime-fixes.js'"));
+  assert.ok(index.indexOf('src="./interaction-fixes.js"')<index.indexOf('src="./runtime-fixes.js"'));
 });
 
 test('compatibilidades restantes estão ligadas a ações reais',()=>{
