@@ -1,0 +1,32 @@
+* { box-sizing: border-box; }
+html { min-width: 320px; background: var(--bg); }
+body { margin: 0; min-width: 320px; min-height: 100vh; background: var(--bg); color: var(--text); }
+button, input, textarea, select { font: inherit; }
+.shell { width: min(1080px, calc(100% - 32px)); margin: 0 auto; padding: 72px 0 40px; }
+.hero { max-width: 760px; padding-bottom: var(--space-7); }
+.eyebrow { display: inline-block; color: var(--primary); font-size: 12px; font-weight: 800; letter-spacing: .12em; }
+h1 { margin: 12px 0 16px; font-size: clamp(42px, 8vw, 78px); line-height: .96; letter-spacing: -.055em; }
+.hero p { max-width: 640px; margin: 0; color: var(--muted); font-size: clamp(17px, 2vw, 20px); line-height: 1.6; }
+.status { display: inline-flex; align-items: center; gap: 10px; margin-top: 24px; padding: 10px 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: #dce7f6; font-size: 14px; }
+.statusDot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); box-shadow: 0 0 0 5px rgba(79,212,154,.08); }
+.panel { padding: 28px; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface); }
+.sectionHeading { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; margin-bottom: 22px; }
+h2 { margin: 6px 0 0; font-size: 28px; letter-spacing: -.03em; }
+.badge { padding: 8px 11px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); font-size: 12px; white-space: nowrap; }
+.layerGrid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.layerCard { min-height: 180px; padding: 18px; border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface-2); }
+.layerNumber { color: var(--primary); font-variant-numeric: tabular-nums; font-size: 12px; font-weight: 800; }
+.layerCard h3 { margin: 40px 0 8px; font-size: 18px; }
+.layerCard p { margin: 0; color: var(--muted); line-height: 1.5; font-size: 14px; }
+.footer { padding: 28px 2px 0; color: var(--muted); font-size: 13px; line-height: 1.6; }
+@media (max-width: 760px) {
+  .shell { width: min(100% - 24px, 640px); padding-top: 40px; }
+  .sectionHeading { align-items: flex-start; flex-direction: column; }
+  .layerGrid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 460px) {
+  .panel { padding: 18px; border-radius: var(--radius-md); }
+  .layerGrid { grid-template-columns: 1fr; }
+  .layerCard { min-height: 140px; }
+  .layerCard h3 { margin-top: 24px; }
+}
