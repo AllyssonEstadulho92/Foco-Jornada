@@ -19,11 +19,11 @@ export function SettingsPage() {
         className="settingsPanel"
         onSubmit={(event) => {
           event.preventDefault()
-          void save(settings)
+          void save({ ...settings, currency: 'EUR' })
         }}
       >
         <label>
-          <span>Preço por café</span>
+          <span>Preço por café (€)</span>
           <input
             type="number"
             min="0"
@@ -32,27 +32,9 @@ export function SettingsPage() {
             value={settings.coffeeUnitPrice}
             disabled={isLoading || isBusy}
             onChange={(event) =>
-              setSettings({ ...settings, coffeeUnitPrice: Number(event.target.value) })
+              setSettings({ ...settings, coffeeUnitPrice: Number(event.target.value), currency: 'EUR' })
             }
           />
-        </label>
-
-        <label>
-          <span>Moeda</span>
-          <select
-            value={settings.currency}
-            disabled={isLoading || isBusy}
-            onChange={(event) =>
-              setSettings({
-                ...settings,
-                currency: event.target.value as 'EUR' | 'USD' | 'GBP',
-              })
-            }
-          >
-            <option value="EUR">EUR — Euro</option>
-            <option value="USD">USD — Dólar</option>
-            <option value="GBP">GBP — Libra</option>
-          </select>
         </label>
 
         <label>
@@ -69,6 +51,7 @@ export function SettingsPage() {
                 setSettings({
                   ...settings,
                   suggestedBreakIntervalMinutes: Number(event.target.value),
+                  currency: 'EUR',
                 })
               }
             />
@@ -79,6 +62,11 @@ export function SettingsPage() {
         <div className="settingsInfo">
           <strong>Foco/Pomodoro</strong>
           <p>Na V1 mantém o ciclo padrão de 25 min de foco, 5 min de pausa curta e 15 min de pausa longa.</p>
+        </div>
+
+        <div className="settingsInfo">
+          <strong>Moeda</strong>
+          <p>A V1 utiliza Euro (EUR) para manter os totais de café consistentes.</p>
         </div>
 
         <button className="actionButton actionButtonPrimary" type="submit" disabled={isLoading || isBusy}>
