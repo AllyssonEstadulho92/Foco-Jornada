@@ -1,6 +1,6 @@
 # Foco & Jornada
 
-PWA local-first para jornada de trabalho, pausas, atividades, Pomodoro, café, transportes, escala e relatórios.
+PWA local-first para jornada de trabalho, pausas, atividades, planeamento, café, transportes, escala e relatórios.
 
 **Versão estável pública:** 4.2.x  
 **Próxima fase:** 4.3.0 — consolidação e estabilidade.
@@ -10,18 +10,26 @@ PWA local-first para jornada de trabalho, pausas, atividades, Pomodoro, café, t
 - Horário semanal: segunda a sábado 08:00–17:00; domingo 09:00–18:00.
 - Pausa principal sugerida, com aviso automático e início manual.
 - Atividades: criar, editar, prioridade, categoria, estimativa, iniciar, pausar, concluir e cancelar.
-- Foco/Pomodoro: ciclos, pausa/retoma e associação a atividade.
+- Planeamento: estado da jornada, atividades abertas, tarefas para hoje, atrasadas, prioridades e atalhos operacionais.
 - Café: preço configurável, registo, gasto e desfazer.
 - Moovit: Casa/Trabalho, localização atual, planeamento de rota e transportes próximos através de deep links oficiais.
 - Escala interna: calendário, modelos de turnos, trabalhos, rotações, relatórios, horas/salário configuráveis, ICS e PDF A4.
 - Previsão de saída e resumo diário.
 - Histórico e estatísticas.
 - Backup/importação, diagnóstico e reset.
-- Centro de notificações e atualização PWA controlada.
+- Centro de notificações para pausas e atualização PWA controlada.
 - PWA/offline, tema claro/escuro e interface mobile/desktop.
 
+## Interface
+- Tipografia principal: **Manrope**, com fallbacks locais quando a fonte web não estiver disponível.
+- Ícones: **Flaticon UIcons Regular Rounded**, com SVG local como fallback técnico.
+- A interface privilegia superfícies lineares, pouca sombra, raios moderados e hierarquia tipográfica consistente.
+
 ## Hub “Mais”
-O botão **Mais** concentra Moovit, Supershift/Escala, horário, estatísticas, definições, backup/diagnóstico, notificações, atualizações e sobre sem aumentar a barra inferior.
+O botão **Mais** concentra Planeamento, Moovit, Supershift/Escala, horário, estatísticas, definições, backup/diagnóstico, notificações, atualizações e Sobre sem aumentar a barra inferior.
+
+## Compatibilidade de dados
+Estruturas de versões anteriores podem permanecer no esquema e nas rotinas de migração para que backups e estados antigos continuem recuperáveis. Essas estruturas não fazem parte da navegação ou da experiência pública atual.
 
 ## Vida pessoal
 O antigo módulo **Vida pessoal / Tempo a dois foi retirado do runtime**. Não deve regressar automaticamente em atualizações; qualquer funcionalidade pessoal adicional será implementada apenas quando pedida explicitamente.
