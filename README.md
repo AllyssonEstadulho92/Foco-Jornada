@@ -8,9 +8,10 @@ Aplicação local-first para controlo de jornada, pausas, atividades, foco/Pomod
 - **Fase 1 — Fundação: concluída.**
 - **Fase 2 — Jornada: concluída.**
 - **Fase 3 — Pausas: concluída.**
-- **Fase 4 — Atividades: em validação.**
+- **Fase 4 — Atividades: concluída.**
+- **Próxima: Fase 5 — Foco/Pomodoro.**
 
-A base técnica inclui React + TypeScript + Vite, Router, Zustand, Dexie/IndexedDB, testes, lint/format, PWA, navegação responsiva e CI. Jornada e Pausas estão integradas; Atividades já está implementada na branch da Fase 4 e aguarda os quality gates finais.
+A base técnica inclui React + TypeScript + Vite, Router, Zustand, Dexie/IndexedDB, testes, lint/format, PWA, navegação responsiva e CI. Jornada, Pausas e Atividades já estão implementadas e validadas.
 
 ## Organização do repositório
 
@@ -63,7 +64,7 @@ Foco-Jornada/
 - encerramento automático da pausa ao terminar a jornada;
 - histórico da jornada atual.
 
-### Atividades — Fase 4
+### Atividades
 
 - criar, editar, iniciar, concluir e cancelar;
 - apenas uma atividade ativa por jornada;
