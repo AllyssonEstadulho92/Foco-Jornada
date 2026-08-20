@@ -1,0 +1,9 @@
+import type { Journey } from '../../domain/journey/Journey'
+
+export interface JourneyRepository {
+  getActive(): Promise<Journey | undefined>
+  getById(id: string): Promise<Journey | undefined>
+  createIfNoActive(journey: Journey): Promise<boolean>
+  update(journey: Journey): Promise<void>
+  listByDate(date: string): Promise<Journey[]>
+}
