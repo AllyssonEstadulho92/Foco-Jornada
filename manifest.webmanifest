@@ -19,6 +19,6 @@
   ],
   "shortcuts":[
     {"name":"Transportes","short_name":"Transportes","url":"./?action=transport","icons":[{"src":"./icon-192.png","sizes":"192x192","type":"image/png"}]},
-    {"name":"Planeamento","short_name":"Planear","url":"./?action=focus","icons":[{"src":"./icon-192.png","sizes":"192x192","type":"image/png"}]}
+    {"name":"Planeamento","short_name":"Planear","url":"./?action=planning","icons":[{"src":"./icon-192.png","sizes":"192x192","type":"image/png"}]}
   ]
 }
