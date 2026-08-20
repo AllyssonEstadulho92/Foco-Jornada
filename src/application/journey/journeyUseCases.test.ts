@@ -26,7 +26,7 @@ describe('casos de uso de Jornada', () => {
     expect(repository.snapshot()[0]?.id).toBe('journey-1')
   })
 
-  it('termina a jornada ativa e permite iniciar outra depois', async () => {
+  it('termina a jornada ativa, ignora uma segunda finalização e permite outra jornada', async () => {
     const repository = new InMemoryJourneyRepository()
 
     await startJourney({
@@ -35,14 +35,21 @@ describe('casos de uso de Jornada', () => {
       createId: () => 'journey-1',
     })
 
-    const result = await finishJourney({
+    const firstFinish = await finishJourney({
       repository,
       journeyId: 'journey-1',
       now: () => new Date('2026-08-20T16:00:00.000Z'),
     })
+    const secondFinish = await finishJourney({
+      repository,
+      journeyId: 'journey-1',
+      now: () => new Date('2026-08-20T16:01:00.000Z'),
+    })
 
-    expect(result.status).toBe('finished')
+    expect(firstFinish.status).toBe('finished')
+    expect(secondFinish.status).toBe('not-active')
     expect(await repository.getActive()).toBeUndefined()
+    expect(repository.snapshot()[0]?.endedAt).toBe('2026-08-20T16:00:00.000Z')
 
     const next = await startJourney({
       repository,
