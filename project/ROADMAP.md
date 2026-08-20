@@ -7,8 +7,8 @@
 | 0 | Especificação | Concluída | `PROJECT_SPEC.md` aprovado |
 | 1 | Fundação | Concluída | Typecheck, lint, testes e build verdes |
 | 2 | Jornada | Concluída | Persistência, recuperação e concorrência validadas |
-| 3 | Pausas | Próxima | Cálculo de tempo efetivo validado |
-| 4 | Atividades | Bloqueada | Apenas uma atividade ativa |
+| 3 | Pausas | Concluída | Tempo efetivo, persistência e CI verdes |
+| 4 | Atividades | Próxima | Apenas uma atividade ativa e persistência validadas |
 | 5 | Foco/Pomodoro | Bloqueada | Timer persistente após refresh |
 | 6 | Café | Bloqueada | Registos e totais consistentes |
 | 7 | Dashboard | Bloqueada | Integração sem duplicação de lógica |
@@ -27,7 +27,7 @@ Implementado:
 - Vitest + React Testing Library;
 - ESLint + Prettier;
 - configuração PWA;
-- separação inicial `domain/application/infrastructure/presentation/shared`;
+- separação `domain/application/infrastructure/presentation/shared`;
 - design tokens e CSS responsivo;
 - navegação mobile/desktop;
 - páginas Hoje, Atividades, Foco, Histórico, Mais e Definições;
@@ -55,18 +55,33 @@ Validação: **PASS** em typecheck, lint, testes e build.
 
 ---
 
-## Fase 3 — Pausas — PRÓXIMA
+## Fase 3 — Pausas — CONCLUÍDA
 
-- 15 min, 60 min e personalizada.
-- Apenas uma pausa ativa por jornada.
-- Persistência e recuperação.
-- Cálculo de tempo efetivo.
+Implementado:
 
-## Fase 4 — Atividades
+- 15 min, 60 min e personalizada;
+- apenas uma pausa ativa por jornada;
+- pausa apenas dentro de jornada ativa;
+- persistência IndexedDB no schema v3;
+- recuperação após refresh/reabertura;
+- duração real consolidada;
+- cálculo de tempo efetivo;
+- estado `Em pausa`;
+- histórico de pausas;
+- encerramento automático de pausa ativa ao terminar jornada;
+- testes de domínio, casos de uso, cálculo e persistência/concorrência.
+
+Validação GitHub Actions: **PASS** em typecheck, lint, testes e build.
+
+---
+
+## Fase 4 — Atividades — PRÓXIMA
 
 - CRUD e estados.
 - Apenas uma atividade ativa.
 - Persistência e duração por timestamps.
+- Integração com jornada sem misturar regras na UI.
+- Testes de concorrência e regras críticas.
 
 ## Fase 5 — Foco/Pomodoro
 

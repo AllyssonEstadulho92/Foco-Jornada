@@ -56,6 +56,16 @@
   box-shadow: 0 0 0 5px rgba(79, 212, 154, 0.08);
 }
 
+.journeyStatusPaused {
+  border-color: rgba(245, 168, 77, 0.3);
+  color: #f5a84d;
+}
+
+.journeyStatusPaused .journeyStatusDot {
+  background: #f5a84d;
+  box-shadow: 0 0 0 5px rgba(245, 168, 77, 0.08);
+}
+
 .errorBanner {
   margin-bottom: var(--space-4);
   padding: 12px 14px;
@@ -124,6 +134,10 @@
   gap: var(--space-3);
 }
 
+.journeyMetricsFour {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
 .metricCard {
   display: flex;
   min-height: 132px;
@@ -133,6 +147,10 @@
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
   background: var(--surface-2);
+}
+
+.metricCardEffective {
+  border-color: rgba(79, 212, 154, 0.22);
 }
 
 .metricCard span {
@@ -240,13 +258,20 @@
   font-weight: 800;
 }
 
+@media (max-width: 900px) {
+  .journeyMetricsFour {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 720px) {
   .pageHeader {
     align-items: flex-start;
     flex-direction: column;
   }
 
-  .journeyMetrics {
+  .journeyMetrics,
+  .journeyMetricsFour {
     grid-template-columns: 1fr;
   }
 

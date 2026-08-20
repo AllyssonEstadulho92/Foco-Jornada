@@ -38,6 +38,18 @@ Utilizar este ficheiro para decisões que afetem arquitetura, dados ou comportam
 **Decisão:** a Fundação cria a infraestrutura Dexie e uma tabela neutra de metadados; as tabelas de Jornada, Pausas, Atividades, Foco e Café serão adicionadas na fase correspondente.  
 **Motivo:** evitar desenho prematuro do schema e manter migrações explicitamente ligadas aos módulos que as exigem.
 
+## ADR-007 — Pausas descontadas do tempo efetivo e encerradas com a jornada
+
+**Estado:** aceite  
+**Decisão:** o tempo efetivo é calculado como duração da jornada menos todas as pausas não canceladas. Se a jornada for terminada durante uma pausa ativa, a pausa é encerrada no mesmo instante antes do encerramento da jornada.  
+**Motivo:** impedir pausas órfãs, manter os totais consistentes e garantir recuperação determinística após reabertura.
+
+## ADR-008 — Duração real da pausa persistida no encerramento
+
+**Estado:** aceite  
+**Decisão:** pausas concluídas guardam `actualDurationSeconds`, mantendo os timestamps como referência primária e o valor persistido como resultado consolidado.  
+**Motivo:** simplificar agregações futuras e preservar o valor final mesmo depois de alterações de relógio da interface.
+
 ---
 
 ## Modelo para novas decisões

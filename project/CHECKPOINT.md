@@ -2,10 +2,10 @@
 
 ## Estado atual
 
-**Fase:** 2 — Jornada concluída  
-**Próxima fase:** 3 — Pausas  
-**PR da Fase 2:** #7  
-**Validação CI:** GitHub Actions run `32410930364` — sucesso  
+**Fase:** 3 — Pausas concluída  
+**Próxima fase:** 4 — Atividades  
+**PR da Fase 3:** #8  
+**Validação CI:** GitHub Actions run `32412743237` — sucesso  
 **Fonte de verdade:** `project/PROJECT_SPEC.md`
 
 ## Fases concluídas
@@ -13,24 +13,31 @@
 - [x] Fase 0 — Especificação.
 - [x] Fase 1 — Fundação.
 - [x] Fase 2 — Jornada.
+- [x] Fase 3 — Pausas.
 
-## Implementado e validado na Fase 2
+## Implementado e validado na Fase 3
 
-- [x] Entidade `Journey` e regras puras de domínio.
-- [x] Iniciar jornada.
-- [x] Impedir duas jornadas ativas.
-- [x] Proteção contra criação concorrente por transação IndexedDB.
-- [x] Terminar jornada.
+- [x] Entidade `BreakRecord` e regras puras de domínio.
+- [x] Pausa curta de 15 minutos.
+- [x] Pausa longa de 60 minutos.
+- [x] Pausa personalizada.
+- [x] Apenas uma pausa ativa por jornada.
+- [x] Pausas só podem ser iniciadas com jornada ativa.
+- [x] Proteção contra criação concorrente de pausas.
 - [x] Proteção contra dupla finalização.
-- [x] Duração calculada por timestamps persistidos.
-- [x] Dexie schema v2 com tabela `journeys`.
-- [x] Repositório Dexie para jornadas.
-- [x] Recuperação da jornada ativa ao abrir/recarregar a interface.
-- [x] Lista básica das jornadas do dia.
-- [x] Interface Hoje com entrada, duração, estado, iniciar e terminar.
-- [x] Confirmação antes de terminar jornada.
-- [x] Testes de casos de uso.
-- [x] Testes de persistência e concorrência com IndexedDB em memória.
+- [x] Duração real persistida em `actualDurationSeconds`.
+- [x] Dexie schema v3 com tabela `breaks`.
+- [x] Repositório Dexie para pausas.
+- [x] Recuperação de pausa ativa após refresh/reabertura.
+- [x] Tempo efetivo calculado por timestamps e pausas persistidas.
+- [x] Pausa ativa encerrada automaticamente ao terminar a jornada.
+- [x] Interface de pausas integrada no ecrã Hoje.
+- [x] Estado visual `Em pausa`.
+- [x] Histórico de pausas da jornada ativa.
+- [x] Testes de domínio.
+- [x] Testes dos casos de uso.
+- [x] Testes do cálculo de tempo efetivo.
+- [x] Testes de persistência e concorrência IndexedDB.
 
 ## Resultado dos quality gates
 
@@ -41,8 +48,8 @@
 
 ## Próximo trabalho autorizado
 
-A Fase 3 pode iniciar depois de a PR #7 ser integrada em `main`.
+A Fase 4 — Atividades pode iniciar depois de a PR #8 ser integrada em `main`.
 
-Escopo: **Pausas apenas** — 15 min, 60 min e personalizada, uma pausa ativa por jornada, persistência/recuperação e cálculo do tempo efetivo.
+Escopo: criar, editar, iniciar, concluir e cancelar atividades; permitir apenas uma atividade ativa; persistir em IndexedDB; calcular duração por timestamps; integrar com a jornada sem colocar regras de negócio na UI.
 
-Atividades, Foco e Café continuam bloqueados.
+Foco/Pomodoro e Café continuam bloqueados.

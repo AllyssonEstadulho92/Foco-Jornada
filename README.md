@@ -4,33 +4,62 @@ Aplicação local-first para controlo de jornada, pausas, atividades, foco/Pomod
 
 ## Estado atual
 
-**Fase 1 — Fundação: concluída.**  
-**Próxima fase: Fase 2 — Jornada.**
+- **Fase 0 — Especificação: concluída.**
+- **Fase 1 — Fundação: concluída.**
+- **Fase 2 — Jornada: concluída.**
+- **Fase 3 — Pausas: concluída.**
+- **Próxima: Fase 4 — Atividades.**
 
-A fundação técnica já inclui React + TypeScript + Vite, Router, Zustand, Dexie/IndexedDB preparado, testes, lint/format, PWA, navegação responsiva e as páginas-base da aplicação.
+A base técnica inclui React + TypeScript + Vite, Router, Zustand, Dexie/IndexedDB, testes, lint/format, PWA, navegação responsiva e CI. Jornada e Pausas já estão implementadas e validadas.
 
 ## Organização do repositório
 
 ```text
 Foco-Jornada/
 ├── .github/              # CI e automações GitHub
-├── project/              # especificação, roadmap, decisões e prompts
+├── project/              # especificação, roadmap, decisões, gates e prompts
 │   ├── docs/
 │   └── prompts/
 ├── src/                  # código da aplicação
-│   ├── domain/
-│   ├── application/
-│   ├── infrastructure/
-│   ├── presentation/
+│   ├── domain/           # entidades e regras puras
+│   │   ├── journey/
+│   │   └── breaks/
+│   ├── application/      # casos de uso
+│   │   ├── journey/
+│   │   └── breaks/
+│   ├── infrastructure/   # IndexedDB/Dexie e repositórios
+│   ├── presentation/     # páginas, hooks, componentes e providers
 │   ├── shared/
 │   ├── styles/
-│   └── test/
+│   └── test/             # doubles e setup de testes
 ├── index.html
 ├── package.json
 ├── vite.config.ts
 ├── vitest.config.ts
 └── tsconfig*.json
 ```
+
+## Funcionalidades disponíveis
+
+### Jornada
+
+- iniciar e terminar jornada;
+- impedir duas jornadas ativas;
+- recuperação após refresh/reabertura;
+- duração derivada de timestamps;
+- histórico básico diário.
+
+### Pausas
+
+- pausa curta de 15 min;
+- pausa longa de 60 min;
+- pausa personalizada;
+- apenas uma pausa ativa por jornada;
+- persistência e recuperação via IndexedDB;
+- duração real persistida;
+- tempo efetivo = jornada - pausas;
+- encerramento automático da pausa ao terminar a jornada;
+- histórico da jornada atual.
 
 ## Documentação principal
 
@@ -40,7 +69,7 @@ Foco-Jornada/
 - `project/docs/ARCHITECTURE.md` — regras de arquitetura.
 - `project/docs/QUALITY_GATES.md` — validações obrigatórias.
 - `project/docs/DECISIONS.md` — decisões técnicas.
-- `project/prompts/` — instruções de execução fase a fase para Codex.
+- `project/prompts/` — instruções fase a fase para Codex.
 
 ## Comandos
 
