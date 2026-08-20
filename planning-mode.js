@@ -42,6 +42,16 @@ function replaceStats(){
   cards[1].querySelector('small').textContent='Jornadas';cards[1].querySelector('strong').textContent=days.size;cards[1].querySelector('span').textContent='Dias registados';
   const summary=$('#statsSummary');if(summary)summary.innerHTML=`Foram registados <b>${days.size}</b> dias com jornada neste período. Consulta o gráfico para comparar as horas efetivas.`;
 }
+function cleanLegacyPresentation(){
+  $$('#dailySummaryCard .summary-grid>div').forEach(cell=>{if(/^foco$/i.test(cell.querySelector('small')?.textContent?.trim()||''))cell.remove()});
+  const closed=$('#dailySummaryCard .runtime-summary-closed small');if(closed)closed.textContent=closed.textContent.replace(/\s*·\s*[^·]*\bfoco\b/gi,'').replace(/\s{2,}/g,' ').trim();
+  const legacyHero=$('#todayHero .hero.focus');if(legacyHero){
+    const status=legacyHero.querySelector('.status');if(status)status.textContent='SESSÃO ANTIGA';
+    const copy=legacyHero.querySelector('p');if(copy)copy.textContent='Existe um registo antigo ainda ativo. Termina-o para continuar a jornada normalmente.';
+    legacyHero.querySelectorAll('[data-action="pauseFocus"],[data-action="resumeFocus"]').forEach(b=>b.hidden=true);
+    const end=legacyHero.querySelector('[data-action="endFocus"]');if(end)end.textContent='Encerrar registo antigo';
+  }
+}
 function syncToday(){
   const quick=$('#quickActions [data-action="goFocus"]');
   if(quick){quick.disabled=false;quick.removeAttribute('disabled');quick.innerHTML=`<span>${fi('calendar-lines')}</span><b>Planeamento</b><small>Organizar o dia</small>`;quick.onclick=e=>{e.preventDefault();e.stopImmediatePropagation();navigate('planning')}}
@@ -49,7 +59,7 @@ function syncToday(){
 }
 function render(){
   const planning=$('[data-view="planning"]');if(planning?.classList.contains('on')){const title=$('#pageTitle');if(title)title.textContent='Planeamento'}
-  syncToday();renderPlanning();replaceStats();window.FocoFlaticon?.refresh?.();
+  syncToday();renderPlanning();replaceStats();cleanLegacyPresentation();window.FocoFlaticon?.refresh?.();
 }
 
 document.addEventListener('foco-render',render);
@@ -57,4 +67,4 @@ window.addEventListener('pageshow',render);
 const observer=new MutationObserver(mutations=>{if(mutations.some(m=>[...m.addedNodes].some(n=>n.nodeType===1)))queueMicrotask(render)});
 observer.observe(document.body,{childList:true,subtree:true});
 queueMicrotask(render);
-window.FocoPlanningMode=Object.freeze({version:'2.0.0',render});
+window.FocoPlanningMode=Object.freeze({version:'2.1.0',render});
