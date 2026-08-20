@@ -1,6 +1,6 @@
 const APP_KEY='foco-jornada-v4';
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
-const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#39;'}[c]));
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const dayKey=t=>{const d=new Date(t),y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');return `${y}-${m}-${day}`};
 const readState=()=>{try{return JSON.parse(localStorage.getItem(APP_KEY)||'null')}catch{return null}};
 const isOpen=a=>a&&!['COMPLETED','CANCELLED'].includes(a.status);
@@ -55,4 +55,4 @@ function replaceVisibleFocus(){
 document.addEventListener('foco-render',replaceVisibleFocus);
 window.addEventListener('pageshow',replaceVisibleFocus);
 queueMicrotask(replaceVisibleFocus);
-window.FocoPlanningMode=Object.freeze({version:'1.0.0',render:replaceVisibleFocus});
+window.FocoPlanningMode=Object.freeze({version:'1.0.1',render:replaceVisibleFocus});
