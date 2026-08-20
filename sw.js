@@ -1,11 +1,11 @@
-const CACHE='foco-jornada-v4-2-0-brand-splash1';
+const CACHE='foco-jornada-v4-2-0-active-view-icons1';
 const CORE_ASSETS=[
   './','./index.html','./bootstrap.js',
   './styles.css','./ux.css','./features.css','./hub.css','./hub-about.css','./settings-controller.css',
   './shift-planner.css','./shift-mobile.css','./shift-compact.css','./runtime-fixes.css','./interaction-fixes.css',
   './professional.css','./productivity.css','./install-app.css','./stability-ui.css',
   './core.js','./productivity-core.js','./focus-entry.js','./persistence.js','./app.js','./stability.js',
-  './manifest.webmanifest','./icon.svg','./.nojekyll'
+  './manifest.webmanifest','./icon.svg','./apple-touch-icon.png','./icon-192.png','./icon-512.png','./.nojekyll'
 ];
 const INDEX_URL=new URL('./index.html',self.location.href).href;
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE_ASSETS)).then(()=>self.skipWaiting())));

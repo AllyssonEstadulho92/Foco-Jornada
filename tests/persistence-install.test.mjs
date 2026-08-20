@@ -65,7 +65,7 @@ test('bootstrap carrega persistência antes do núcleo leve e mantém correção
   assert.ok(index.includes('./install-app.css'));
 });
 
-test('primeiro paint entra direto na aplicação e adia módulos opcionais',()=>{
+test('primeiro paint entra direto na aplicação, tem watchdog e adia módulos opcionais',()=>{
   assert.ok(index.includes('id="startupShell"'));
   assert.ok(index.includes('id="startupStatus"'));
   assert.ok(index.includes('requestAnimationFrame(function()'));
@@ -73,6 +73,8 @@ test('primeiro paint entra direto na aplicação e adia módulos opcionais',()=>
   assert.ok(index.includes('id="mainCss"'));
   assert.ok(bootstrap.includes("waitStylesheet('mainCss')"));
   assert.ok(bootstrap.includes('disableFirstUse'));
+  assert.ok(bootstrap.includes('withTimeout(bootCore(),12000'));
+  assert.ok(bootstrap.includes('useInstallIcon'));
   assert.equal(bootstrap.includes('onboardingPending'),false);
   assert.equal(bootstrap.includes('#finishOnboarding,#skipOnboarding'),false);
   assert.ok(bootstrap.includes('scheduleExtras()'));
@@ -85,21 +87,29 @@ test('primeiro paint entra direto na aplicação e adia módulos opcionais',()=>
   for(const heavy of ["import('./shift-planner.js')","import('./shift-advanced.js')","import('./shift-reports.js')","import('./shift-mobile-interactions.js')"])assert.ok(bootstrap.includes(heavy),heavy);
 });
 
-test('runtime não redesenha nem grava toda a aplicação a cada segundo',()=>{
+test('runtime renderiza apenas a vista ativa e mantém temporizadores leves',()=>{
+  const activeBlock=app.slice(app.indexOf('function renderActiveView('),app.indexOf('function render(){'));
   const renderBlock=app.slice(app.indexOf('function render(){'),app.indexOf('function renderToday('));
+  for(const token of ["case'activities'","case'focus'","case'history'","case'stats'","case'more'","renderToday(now)"])assert.ok(activeBlock.includes(token),token);
+  assert.ok(renderBlock.includes('renderActiveView(now)'));
+  assert.equal(renderBlock.includes('renderActivities(now);renderFocus(now);renderHistory(now);renderStats(now);renderMore(now)'),false);
   assert.equal(renderBlock.includes('save();'),false);
   assert.equal(app.includes("setInterval(()=>{const r=reconcileTimers"),false);
   assert.ok(app.includes('function updateLiveUi('));
   assert.ok(app.includes('function scheduleLiveTick('));
   assert.ok(app.includes("window.dispatchEvent(new CustomEvent('foco-render'"));
+  assert.equal(app.includes('function openOnboarding()'),false);
   assert.equal(stability.includes('window.setInterval='),false);
   assert.equal(stability.includes('nativeSetInterval'),false);
   assert.ok(stability.includes("await import('./app.js')"));
 });
 
 test('service worker abre pelo cache sem pré-carregar módulos pesados',()=>{
-  assert.ok(sw.includes('structural-clean1'));
+  assert.ok(sw.includes('active-view-icons1'));
   assert.ok(sw.includes('./bootstrap.js'));
+  assert.ok(sw.includes('./apple-touch-icon.png'));
+  assert.ok(sw.includes('./icon-192.png'));
+  assert.ok(sw.includes('./icon-512.png'));
   assert.ok(sw.includes("cache:'no-cache'"));
   assert.ok(sw.includes('cache.match(key)'));
   assert.ok(sw.includes('event.waitUntil(update'));
@@ -114,9 +124,12 @@ test('interface ignora alterações apenas textuais dos temporizadores',()=>{
   assert.equal(ux.includes('characterData:true'),false);
 });
 
-test('manifest está configurado como aplicação standalone',()=>{
+test('manifest usa ícones PNG instaláveis e mantém SVG como fallback',()=>{
   assert.equal(manifest.display,'standalone');
   assert.equal(manifest.id,'./');
   assert.equal(manifest.start_url,'./');
-  assert.ok(Array.isArray(manifest.icons)&&manifest.icons.length>=1);
+  assert.ok(manifest.icons.some(icon=>icon.src==='./icon-192.png'&&icon.sizes==='192x192'));
+  assert.ok(manifest.icons.some(icon=>icon.src==='./icon-512.png'&&icon.sizes==='512x512'&&icon.purpose==='maskable'));
+  assert.ok(manifest.icons.some(icon=>icon.src==='./icon.svg'));
+  for(const file of ['apple-touch-icon.png','icon-192.png','icon-512.png'])assert.ok(fs.existsSync(new URL(`../${file}`,import.meta.url)),file);
 });
