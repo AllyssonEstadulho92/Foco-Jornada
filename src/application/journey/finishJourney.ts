@@ -28,7 +28,11 @@ export async function finishJourney({
   }
 
   const finished = finishJourneyEntity(activeJourney, now().toISOString())
-  await repository.update(finished)
+  const persisted = await repository.finishIfActive(finished)
+
+  if (!persisted) {
+    return { status: 'not-active' }
+  }
 
   return { status: 'finished', journey: finished }
 }
