@@ -1,7 +1,8 @@
 name: Publicar Foco & Jornada
 on:
-  push:
-    branches: [main]
+  workflow_run:
+    workflows: ["Qualidade"]
+    types: [completed]
   workflow_dispatch:
 permissions:
   contents: read
@@ -12,18 +13,21 @@ concurrency:
   cancel-in-progress: true
 jobs:
   deploy:
-    name: Publicar aplicação
+    name: Publicar aplicação validada
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' && github.event.workflow_run.head_branch == 'main') }}
     runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || 'main' }}
       - name: Preparar Node
         uses: actions/setup-node@v4
         with:
           node-version: '24'
-      - name: Executar testes
+      - name: Confirmar testes antes da publicação
         run: npm run check
       - name: Preparar site
         run: |
