@@ -4,6 +4,6 @@ export interface JourneyRepository {
   getActive(): Promise<Journey | undefined>
   getById(id: string): Promise<Journey | undefined>
   createIfNoActive(journey: Journey): Promise<boolean>
-  update(journey: Journey): Promise<void>
+  finishIfActive(journey: Journey): Promise<boolean>
   listByDate(date: string): Promise<Journey[]>
 }
