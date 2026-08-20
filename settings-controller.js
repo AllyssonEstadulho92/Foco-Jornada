@@ -48,16 +48,21 @@ function ensureControl(){
   }
   const enabled=readPreference();
   if(input.checked!==enabled)input.checked=enabled;
-  input.setAttribute('aria-checked',enabled?'true':'false');
+  const aria=enabled?'true':'false';
+  if(input.getAttribute('aria-checked')!==aria)input.setAttribute('aria-checked',aria);
 }
 
 function sync(){ensureControl()}
 function scheduleSync(){if(syncRAF)return;syncRAF=requestAnimationFrame(()=>{syncRAF=0;sync()})}
 
 scheduleSync();
-new MutationObserver(scheduleSync).observe(document.body,{childList:true,subtree:true,characterData:true});
+const settingsObserver=new MutationObserver(mutations=>{
+  for(const mutation of mutations){
+    if([...mutation.addedNodes].some(node=>node.nodeType===1)){scheduleSync();break}
+  }
+});
+settingsObserver.observe(document.body,{childList:true,subtree:true});
 document.addEventListener('change',()=>setTimeout(scheduleSync,0));
 document.addEventListener('submit',()=>setTimeout(scheduleSync,180));
-document.addEventListener('click',()=>setTimeout(scheduleSync,180));
 window.addEventListener('focus',scheduleSync);
 window.addEventListener('pageshow',scheduleSync);
