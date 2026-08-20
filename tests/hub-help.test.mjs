@@ -14,8 +14,8 @@ test('Ajuda tem pesquisa, filtragem e ícones Flaticon',()=>{
   assert.ok(help.includes('fjHelpSearch'));
   assert.ok(help.includes('function filter'));
   assert.ok(help.includes('Pesquisar função ou problema'));
-  assert.ok(help.includes('fi fi-rr-search'));
-  assert.ok(help.includes('fi fi-rr-angle-small-right'));
+  assert.ok(help.includes("fi('search')"));
+  assert.ok(help.includes("fi('angle-small-right')"));
 });
 
 test('Ajuda e Sobre são carregados sem reintroduzir deduplicação legada',()=>{
