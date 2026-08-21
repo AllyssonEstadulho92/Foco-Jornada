@@ -25,6 +25,7 @@ import './styles/topbar.css'
 import './styles/notifications.css'
 import './styles/payroll.css'
 import './styles/more-redesign.css'
+import './styles/today-modern.css'
 
 const root = document.getElementById('root')
 if (!root) throw new Error('Elemento #root não encontrado.')
