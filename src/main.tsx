@@ -47,21 +47,3 @@ createRoot(root).render(
     <App services={services} />
   </StrictMode>,
 )
-
-async function removeLegacyPwaRuntime() {
-  try {
-    if ('serviceWorker' in navigator) {
-      const registrations = await navigator.serviceWorker.getRegistrations()
-      await Promise.all(registrations.map((registration) => registration.unregister()))
-    }
-
-    if ('caches' in window) {
-      const keys = await window.caches.keys()
-      await Promise.all(keys.map((key) => window.caches.delete(key)))
-    }
-  } catch {
-    // A limpeza é auxiliar e nunca deve bloquear o arranque da aplicação.
-  }
-}
-
-void removeLegacyPwaRuntime()
