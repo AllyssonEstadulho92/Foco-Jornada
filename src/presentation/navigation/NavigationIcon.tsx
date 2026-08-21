@@ -60,6 +60,22 @@ export function NavigationIcon({ name }: { name: NavigationIconName }) {
     )
   }
 
+  if (name === 'more') {
+    return (
+      <svg {...commonProps} fill="currentColor" stroke="none">
+        <circle cx="6" cy="6" r="1.35" />
+        <circle cx="12" cy="6" r="1.35" />
+        <circle cx="18" cy="6" r="1.35" />
+        <circle cx="6" cy="12" r="1.35" />
+        <circle cx="12" cy="12" r="1.35" />
+        <circle cx="18" cy="12" r="1.35" />
+        <circle cx="6" cy="18" r="1.35" />
+        <circle cx="12" cy="18" r="1.35" />
+        <circle cx="18" cy="18" r="1.35" />
+      </svg>
+    )
+  }
+
   if (name === 'settings') {
     return (
       <svg {...commonProps}>
