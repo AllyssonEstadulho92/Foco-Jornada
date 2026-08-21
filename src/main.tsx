@@ -15,6 +15,7 @@ import './styles/breaks.css'
 import './styles/activities.css'
 import './styles/focus.css'
 import './styles/reports.css'
+import './styles/history.css'
 import './styles/prototype.css'
 import './styles/today-dashboard.css'
 
