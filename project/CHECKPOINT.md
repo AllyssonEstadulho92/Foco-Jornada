@@ -2,9 +2,8 @@
 
 ## Estado atual
 
-**Versão:** V1 — candidata final após auditoria  
-**Branch de auditoria:** `fix/v1-final-audit`  
-**PR de auditoria:** #39  
+**Versão:** V1 funcional auditada  
+**Integração final:** PR #39 integrada em `main`  
 **Fonte funcional principal:** `project/PROJECT_SPEC.md`  
 **Registo de fecho:** `project/docs/V1_FINAL_AUDIT.md`
 
@@ -53,6 +52,7 @@ Validação automática da PR #39:
 - Testes: **PASS — 54/54**
 - Build: **PASS**
 - Build PWA: **PASS** — gera `manifest.webmanifest`, `registerSW.js`, `sw.js` e Workbox.
+- Publicação: **atualizada** — a cópia compilada em `site/` contém manifest, registo de service worker, service worker e Workbox.
 
 ## Pontos não bloqueantes para evolução
 
@@ -61,4 +61,4 @@ Validação automática da PR #39:
 - considerar code splitting/lazy loading para reduzir o bundle principal, atualmente acima do aviso de 500 kB do Vite;
 - manter as limitações do simulador de vencimento claramente identificadas quando existam regimes fiscais, contributivos ou convencionais específicos.
 
-Depois da integração da PR #39, `main` representa a V1 funcional auditada. Autenticação, sincronização cloud, backups online, CSV/PDF e publicação nativa permanecem para V2.
+`main` representa agora a V1 funcional auditada. Autenticação, sincronização cloud, backups online, CSV/PDF e publicação nativa permanecem para V2.
