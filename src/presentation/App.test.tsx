@@ -23,10 +23,11 @@ describe('App', () => {
       />,
     )
 
-    expect(screen.getByRole('heading', { name: 'Foco & Jornada' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Hoje' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Jornada de trabalho' })).toBeInTheDocument()
     expect(await screen.findByRole('button', { name: 'Iniciar jornada' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Gestão de pausas' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: '+ Café' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Ações rápidas' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Café +1 registo' })).toBeInTheDocument()
     expect(screen.getAllByRole('link', { name: 'Atividades' }).length).toBeGreaterThan(0)
     expect(screen.getAllByRole('link', { name: 'Foco' }).length).toBeGreaterThan(0)
     expect(screen.getAllByRole('link', { name: 'Histórico' }).length).toBeGreaterThan(0)
