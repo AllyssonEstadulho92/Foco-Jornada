@@ -21,6 +21,28 @@ describe('calculatePayroll', () => {
     expect(result.netEstimate).toBe(956.8)
   })
 
+  it('permite reproduzir valores do recibo com ajustes manuais', () => {
+    const result = calculatePayroll(
+      {
+        ...defaultPayrollConfig,
+        mealDaysOverride: 23,
+        absenceDeductionOverride: 0,
+        overtimePayOverride: 0,
+        socialSecurityOverride: 101.2,
+        irsOverride: 0,
+      },
+      [{ date: '2026-08-03', kind: 'absence-unjustified', overtimeHours: 3 }],
+    )
+
+    expect(result.mealDays).toBe(23)
+    expect(result.mealAllowanceGross).toBe(138)
+    expect(result.absenceDeduction).toBe(0)
+    expect(result.overtimePay).toBe(0)
+    expect(result.socialSecurity).toBe(101.2)
+    expect(result.irsTotal).toBe(0)
+    expect(result.netEstimate).toBe(956.8)
+  })
+
   it('aplica retenção zero até 920 € na tabela I de 2026', () => {
     expect(calculateIrs2026(920, 'table-1', 0)).toBe(0)
   })
