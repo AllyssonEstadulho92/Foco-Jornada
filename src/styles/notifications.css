@@ -1,0 +1,65 @@
+.notificationHeaderActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.notificationHeaderActions button {
+  min-height: 30px;
+  padding: 5px 9px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.notificationHeaderActions button:hover {
+  border-color: rgba(91, 156, 255, 0.35);
+  color: var(--text);
+}
+
+.notificationStatusStrip {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 10px 10px 0;
+}
+
+.notificationStatusItem {
+  background: rgba(91, 156, 255, 0.06);
+}
+
+.notificationItemUnread {
+  border-color: rgba(91, 156, 255, 0.28);
+  background: rgba(91, 156, 255, 0.08);
+}
+
+.notificationDot-error {
+  background: #f87171;
+  box-shadow: 0 0 0 4px rgba(248, 113, 113, 0.09);
+}
+
+.notificationItem time {
+  margin-top: 2px;
+  color: color-mix(in srgb, var(--muted) 76%, transparent);
+  font-size: 9px;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 480px) {
+  .notificationPanel {
+    position: fixed;
+    top: 62px;
+    right: 10px;
+    left: 10px;
+    width: auto;
+    max-height: min(70dvh, 560px);
+  }
+
+  .notificationList {
+    max-height: min(48dvh, 360px);
+  }
+}
