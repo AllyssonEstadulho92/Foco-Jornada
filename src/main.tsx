@@ -19,6 +19,8 @@ import './styles/history.css'
 import './styles/prototype.css'
 import './styles/today-dashboard.css'
 import './styles/topbar.css'
+import './styles/notifications.css'
+import './styles/payroll.css'
 
 const root = document.getElementById('root')
 if (!root) throw new Error('Elemento #root não encontrado.')
