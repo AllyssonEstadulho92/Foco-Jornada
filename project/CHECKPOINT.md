@@ -28,7 +28,7 @@
 - Atividades com exclusividade de atividade ativa.
 - Pomodoro e foco personalizado persistentes.
 - Café com preço configurável e totais diários.
-- Dashboard/Hojе com jornada linear e próximo evento.
+- Dashboard/Hoje com jornada linear e próximo evento.
 - Timeline diária, resumo e eliminação controlada de registos.
 - Estatísticas de 1, 7 e 30 dias.
 - Definições persistentes.
