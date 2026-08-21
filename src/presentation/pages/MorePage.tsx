@@ -45,11 +45,20 @@ export function MorePage() {
         <div>
           <span className="eyebrow">MAIS</span>
           <h1 id="more-title">Mais</h1>
-          <p>Vencimento, estatísticas, definições e portabilidade dos teus dados.</p>
+          <p>Ferramentas profissionais para jornada, horas, vencimento, análise e organização.</p>
         </div>
       </header>
 
       <div className="moreList">
+        <Link to="/horas" className="moreRow">
+          <span className="moreRowIcon" aria-hidden="true"><NavigationIcon name="hours" /></span>
+          <span className="moreRowCopy">
+            <strong>Horas & ocorrências</strong>
+            <small>Horas previstas, trabalhadas, não trabalhadas, doença, saídas antecipadas e saldo mensal</small>
+          </span>
+          <RowArrow />
+        </Link>
+
         <Link to="/vencimento" className="moreRow">
           <span className="moreRowIcon" aria-hidden="true"><NavigationIcon name="payroll" /></span>
           <span className="moreRowCopy">
@@ -72,7 +81,7 @@ export function MorePage() {
           <span className="moreRowIcon" aria-hidden="true"><NavigationIcon name="settings" /></span>
           <span className="moreRowCopy">
             <strong>Definições</strong>
-            <small>Café, moeda, pausas e preferências</small>
+            <small>Horário fixo, pausas, café, moeda e preferências</small>
           </span>
           <RowArrow />
         </Link>
