@@ -1,0 +1,346 @@
+.scheduleBoard {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.scheduleNextEvent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 12px 14px;
+  border: 1px solid rgba(91, 156, 255, 0.22);
+  border-radius: 13px;
+  background: rgba(91, 156, 255, 0.055);
+}
+
+.scheduleNextEvent > span {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+}
+
+.scheduleNextEvent > strong {
+  color: var(--primary);
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+}
+
+.scheduleNextEventBreak {
+  border-color: rgba(245, 168, 77, 0.28);
+  background: rgba(245, 168, 77, 0.06);
+}
+
+.scheduleNextEventBreak > strong {
+  color: #f5a84d;
+}
+
+.scheduleNextEventDone {
+  border-color: rgba(79, 212, 154, 0.24);
+  background: rgba(79, 212, 154, 0.05);
+}
+
+.scheduleNextEventDone > strong {
+  color: var(--success);
+}
+
+.scheduleTimeline {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(var(--schedule-count, 4), minmax(0, 1fr));
+  gap: 0;
+  padding: 20px 8px 8px;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  background: var(--surface-2);
+}
+
+.scheduleTrack,
+.scheduleProgress {
+  position: absolute;
+  top: 32px;
+  right: 9%;
+  left: 9%;
+  height: 4px;
+  border-radius: 999px;
+}
+
+.scheduleTrack {
+  background: rgba(145, 164, 193, 0.14);
+}
+
+.scheduleProgress {
+  right: auto;
+  width: calc((82%) * var(--schedule-progress, 0));
+  background: linear-gradient(90deg, var(--primary), var(--success));
+  transition: width 500ms linear;
+}
+
+.scheduleMilestone {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 0 4px 7px;
+  text-align: center;
+}
+
+.scheduleMilestoneDot {
+  width: 12px;
+  height: 12px;
+  margin-bottom: 8px;
+  border: 3px solid var(--surface-2);
+  border-radius: 50%;
+  background: var(--muted);
+  box-shadow: 0 0 0 2px rgba(145, 164, 193, 0.25);
+}
+
+.scheduleMilestoneEntry .scheduleMilestoneDot,
+.scheduleMilestoneExit .scheduleMilestoneDot {
+  background: var(--primary);
+  box-shadow: 0 0 0 2px rgba(91, 156, 255, 0.28);
+}
+
+.scheduleMilestoneBreak-start .scheduleMilestoneDot {
+  background: #f5a84d;
+  box-shadow: 0 0 0 2px rgba(245, 168, 77, 0.28);
+}
+
+.scheduleMilestoneBreak-end .scheduleMilestoneDot {
+  background: var(--success);
+  box-shadow: 0 0 0 2px rgba(79, 212, 154, 0.24);
+}
+
+.scheduleMilestone span {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 750;
+}
+
+.scheduleMilestone strong {
+  font-size: clamp(15px, 2vw, 20px);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.scheduleLiveMetrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(8, 15, 24, 0.24);
+}
+
+.scheduleLiveMetrics article {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px;
+  border-right: 1px solid var(--line);
+}
+
+.scheduleLiveMetrics article:last-child {
+  border-right: 0;
+}
+
+.scheduleLiveMetrics span {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 750;
+}
+
+.scheduleLiveMetrics strong {
+  overflow: hidden;
+  font-size: 17px;
+  font-variant-numeric: tabular-nums;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.scheduleLiveMetrics article:nth-child(3) strong {
+  color: #7ce1b1;
+}
+
+.schedulePlanSummary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px 14px;
+  padding: 0 2px;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.schedulePlanSummary strong {
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.scheduleSettingsLink {
+  color: var(--primary);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.settingsGroup {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 18px;
+  border: 1px solid rgba(91, 156, 255, 0.18);
+  border-radius: var(--radius-md);
+  background: rgba(91, 156, 255, 0.035);
+}
+
+.settingsGroupHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.settingsGroupHeader > div:first-child > span {
+  color: var(--primary);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+}
+
+.settingsGroupHeader h2 {
+  margin: 5px 0 0;
+  font-size: 20px;
+}
+
+.settingsScheduleSummary {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px 10px;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.settingsScheduleSummary strong {
+  color: var(--success);
+}
+
+.settingsTimeGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.settingsBreakCard {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  background: var(--surface-2);
+}
+
+.settingsPanel .settingsToggleRow {
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+
+.settingsToggleRow input[type='checkbox'] {
+  width: 18px;
+  height: 18px;
+  min-height: 18px;
+  flex: 0 0 18px;
+  padding: 0;
+  accent-color: var(--primary);
+}
+
+.settingsToggleRow > span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.settingsToggleRow strong {
+  color: var(--text);
+  font-size: 12px;
+}
+
+.settingsToggleRow small {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.settingsScheduleNote {
+  margin: 0;
+  padding: 11px 12px;
+  border-left: 3px solid var(--primary);
+  border-radius: 8px;
+  background: rgba(8, 15, 24, 0.28);
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.55;
+}
+
+@media (max-width: 720px) {
+  .scheduleLiveMetrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .scheduleLiveMetrics article:nth-child(2) {
+    border-right: 0;
+  }
+
+  .scheduleLiveMetrics article:nth-child(-n + 2) {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .settingsGroupHeader {
+    flex-direction: column;
+  }
+
+  .settingsScheduleSummary {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 520px) {
+  .scheduleTimeline {
+    padding-inline: 2px;
+  }
+
+  .scheduleTrack,
+  .scheduleProgress {
+    right: 11%;
+    left: 11%;
+  }
+
+  .scheduleProgress {
+    right: auto;
+    width: calc((78%) * var(--schedule-progress, 0));
+  }
+
+  .scheduleMilestone {
+    padding-inline: 1px;
+  }
+
+  .scheduleMilestone span {
+    font-size: 8px;
+  }
+
+  .scheduleMilestone strong {
+    font-size: 13px;
+  }
+
+  .settingsTimeGrid {
+    grid-template-columns: 1fr;
+  }
+}
