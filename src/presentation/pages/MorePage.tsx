@@ -53,8 +53,8 @@ export function MorePage() {
         <Link to="/horas" className="moreRow">
           <span className="moreRowIcon" aria-hidden="true"><NavigationIcon name="hours" /></span>
           <span className="moreRowCopy">
-            <strong>Horas & ocorrências</strong>
-            <small>Horas previstas, trabalhadas, não trabalhadas, doença, saídas antecipadas e saldo mensal</small>
+            <strong>Calculadora de horas & ausências</strong>
+            <small>Verifica horas reais, doença, consultas, saídas antecipadas, horas não trabalhadas, extra e saldo mensal</small>
           </span>
           <RowArrow />
         </Link>

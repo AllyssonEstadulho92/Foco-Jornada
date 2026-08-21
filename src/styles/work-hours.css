@@ -4,9 +4,77 @@
   gap: 18px;
 }
 
+.workHoursVerifier {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(91, 156, 255, 0.08), rgba(79, 212, 154, 0.04));
+}
+
+.workHoursVerifier > div:first-child {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.workHoursVerifier strong {
+  font-size: 16px;
+}
+
+.workHoursVerifier p {
+  max-width: 720px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.workHoursVerifierActions {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 8px;
+}
+
+.workHoursVerifierActions button,
+.workHoursExampleButton,
+.workHoursMonthActions button {
+  min-height: 40px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-2);
+  color: var(--text);
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.workHoursVerifierActions button:first-child {
+  border-color: rgba(91, 156, 255, 0.35);
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+.workHoursVerifierActions button:last-child {
+  border-color: rgba(245, 177, 95, 0.3);
+  background: rgba(245, 177, 95, 0.08);
+  color: #f5b15f;
+}
+
+.workHoursVerifierActions button:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
 .workHoursSummary {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 10px;
 }
 
@@ -33,12 +101,56 @@
 
 .workHoursSummary strong,
 .workHoursMonthTotals strong {
-  font-size: clamp(18px, 2vw, 24px);
+  overflow: hidden;
+  font-size: clamp(17px, 1.8vw, 23px);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.025em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workHoursWorked strong { color: #7ce1b1; }
+.workHoursWarning strong { color: #f5b15f; }
+.workHoursPositive strong { color: var(--success); }
+
+.workHoursIllnessResult {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid rgba(245, 177, 95, 0.24);
+  border-radius: 16px;
+  background: rgba(245, 177, 95, 0.045);
+}
+
+.workHoursIllnessResult > div {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.workHoursIllnessResult span:not(.workHoursEquation) {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.workHoursIllnessResult strong {
+  font-size: clamp(20px, 3vw, 28px);
   font-variant-numeric: tabular-nums;
 }
 
-.workHoursWarning strong { color: #f5b15f; }
-.workHoursPositive strong { color: var(--success); }
+.workHoursIllnessResult > div:nth-child(3) strong {
+  color: #f5b15f;
+}
+
+.workHoursEquation {
+  color: var(--muted);
+  font-size: 20px;
+  font-weight: 800;
+}
 
 .workHoursForm,
 .workHoursMonth {
@@ -61,18 +173,35 @@
   font-size: 22px;
 }
 
-.workHoursExampleButton,
-.workHoursMonthActions button {
-  min-height: 38px;
-  padding: 8px 12px;
+.workHoursPlanNote {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr);
+  align-items: center;
+  gap: 10px 18px;
+  margin-bottom: 16px;
+  padding: 12px 14px;
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: 12px;
   background: var(--surface-2);
-  color: var(--text);
-  cursor: pointer;
-  font: inherit;
+}
+
+.workHoursPlanNote strong {
   font-size: 12px;
-  font-weight: 800;
+}
+
+.workHoursPlanNote > span {
+  color: var(--primary);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 850;
+}
+
+.workHoursPlanNote small {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .workHoursFieldGrid {
@@ -89,6 +218,13 @@
   color: var(--muted);
   font-size: 11px;
   font-weight: 750;
+}
+
+.workHoursFieldGrid label > small {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.4;
 }
 
 .workHoursFieldGrid input,
@@ -117,9 +253,9 @@
 
 .workHoursResultPanel {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 10px;
-  margin: 18px 0;
+  margin: 18px 0 12px;
   padding: 14px;
   border: 1px solid var(--line);
   border-radius: 14px;
@@ -144,7 +280,28 @@
 
 .workHoursResultPanel p {
   grid-column: 1 / -1;
-  margin: 2px 0 0;
+  margin: 4px 0 0;
+  padding-top: 10px;
+  border-top: 1px solid rgba(145, 164, 193, 0.08);
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.workHoursLegalNote {
+  margin-bottom: 16px;
+  padding: 14px 15px;
+  border: 1px solid rgba(91, 156, 255, 0.2);
+  border-radius: 13px;
+  background: rgba(91, 156, 255, 0.045);
+}
+
+.workHoursLegalNote strong {
+  font-size: 12px;
+}
+
+.workHoursLegalNote p {
+  margin: 6px 0 0;
   color: var(--muted);
   font-size: 11px;
   line-height: 1.55;
@@ -162,7 +319,7 @@
 
 .workHoursMonthTotals {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 10px;
   margin-bottom: 14px;
 }
@@ -175,7 +332,7 @@
 
 .workHoursEntries article {
   display: grid;
-  grid-template-columns: minmax(170px, 1.6fr) repeat(3, minmax(100px, 1fr)) auto;
+  grid-template-columns: minmax(170px, 1.6fr) repeat(4, minmax(90px, 1fr)) auto;
   align-items: center;
   gap: 12px;
   padding: 14px;
@@ -229,7 +386,7 @@
   text-align: center;
 }
 
-@media (max-width: 1050px) {
+@media (max-width: 1180px) {
   .workHoursSummary,
   .workHoursMonthTotals {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -239,12 +396,48 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .workHoursEntries article {
+  .workHoursResultPanel {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .workHoursEntries article {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .workHoursEntries article > button {
     justify-self: start;
+  }
+}
+
+@media (max-width: 760px) {
+  .workHoursVerifier {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .workHoursVerifierActions {
+    width: 100%;
+  }
+
+  .workHoursVerifierActions button {
+    flex: 1;
+  }
+
+  .workHoursIllnessResult {
+    grid-template-columns: 1fr;
+  }
+
+  .workHoursEquation {
+    display: none;
+  }
+
+  .workHoursPlanNote {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .workHoursPlanNote small {
+    grid-column: 1 / -1;
+    white-space: normal;
   }
 }
 
@@ -279,5 +472,17 @@
 
   .workHoursExampleButton {
     width: 100%;
+  }
+
+  .workHoursVerifierActions {
+    flex-direction: column;
+  }
+
+  .workHoursPlanNote {
+    grid-template-columns: 1fr;
+  }
+
+  .workHoursPlanNote small {
+    grid-column: 1;
   }
 }
