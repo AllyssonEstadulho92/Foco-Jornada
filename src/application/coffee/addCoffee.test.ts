@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { DEFAULT_APP_SETTINGS } from '../../domain/settings/AppSettings'
 import { InMemoryCoffeeRepository } from '../../test/InMemoryCoffeeRepository'
 import { InMemoryJourneyRepository } from '../../test/InMemoryJourneyRepository'
 import { InMemorySettingsRepository } from '../../test/InMemorySettingsRepository'
@@ -9,6 +10,7 @@ describe('addCoffee', () => {
     const coffeeRepository = new InMemoryCoffeeRepository()
     const journeyRepository = new InMemoryJourneyRepository()
     const settingsRepository = new InMemorySettingsRepository({
+      ...DEFAULT_APP_SETTINGS,
       coffeeUnitPrice: 0.7,
       currency: 'EUR',
       suggestedBreakIntervalMinutes: 90,
