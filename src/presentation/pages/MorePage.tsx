@@ -45,11 +45,20 @@ export function MorePage() {
         <div>
           <span className="eyebrow">MAIS</span>
           <h1 id="more-title">Mais</h1>
-          <p>Ferramentas profissionais para jornada, horas, vencimento, análise e organização.</p>
+          <p>Ajuda, jornada, horas, vencimento, análise e organização.</p>
         </div>
       </header>
 
       <div className="moreList">
+        <Link to="/guia" className="moreRow">
+          <span className="moreRowIcon" aria-hidden="true"><NavigationIcon name="guide" /></span>
+          <span className="moreRowCopy">
+            <strong>Guia de utilização</strong>
+            <small>Começa aqui: jornada, pausas, atividades, foco, histórico, horas e vencimento</small>
+          </span>
+          <RowArrow />
+        </Link>
+
         <Link to="/horas" className="moreRow">
           <span className="moreRowIcon" aria-hidden="true"><NavigationIcon name="hours" /></span>
           <span className="moreRowCopy">
