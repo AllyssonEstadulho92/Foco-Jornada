@@ -1,0 +1,741 @@
+/* Dashboard Hoje — composição compacta e hierarquia inspirada no protótipo. */
+
+.todayDashboard {
+  display: flex;
+  width: min(100%, 1120px);
+  flex-direction: column;
+  gap: 16px;
+}
+
+.todayHero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 2px 2px 4px;
+}
+
+.todayHero h1 {
+  margin: 0;
+  font-size: clamp(30px, 4vw, 42px);
+  line-height: 1;
+  letter-spacing: -0.045em;
+}
+
+.todayHero p {
+  margin: 7px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  text-transform: capitalize;
+}
+
+.todayJourneyCard,
+.todayQuickPanel,
+.todayTimelineCard,
+.todaySummaryCard {
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: var(--surface);
+}
+
+.todayJourneyCard {
+  padding: 20px;
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.13);
+}
+
+.todayCardHeader,
+.todaySectionTitle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.todayCardHeader {
+  margin-bottom: 18px;
+}
+
+.todayCardHeader h2,
+.todaySectionTitle h2 {
+  margin: 5px 0 0;
+  letter-spacing: -0.03em;
+}
+
+.todayCardHeader h2 {
+  font-size: clamp(20px, 3vw, 26px);
+}
+
+.todayHeaderAction {
+  min-height: 36px;
+  padding: 7px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-2);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.todayHeaderActionDanger {
+  border-color: rgba(239, 107, 115, 0.32);
+  background: rgba(239, 107, 115, 0.08);
+  color: #ffadb3;
+}
+
+.todayMainMetrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  background: var(--surface-2);
+}
+
+.todayMainMetrics article {
+  display: flex;
+  min-width: 0;
+  min-height: 88px;
+  flex-direction: column;
+  justify-content: center;
+  gap: 9px;
+  padding: 14px 18px;
+  border-right: 1px solid var(--line);
+}
+
+.todayMainMetrics article:last-child {
+  border-right: 0;
+}
+
+.todayMainMetrics span,
+.todayPauseStrip span,
+.todayProductivityCard > span {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.todayMainMetrics strong {
+  overflow: hidden;
+  font-size: clamp(20px, 3vw, 29px);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.035em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.todayMainMetrics article:nth-child(3) strong {
+  color: #7ce1b1;
+}
+
+.todayPauseStrip {
+  display: grid;
+  grid-template-columns: auto minmax(130px, 1fr);
+  align-items: center;
+  gap: 18px;
+  margin-top: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  background: rgba(91, 156, 255, 0.035);
+}
+
+.todayPauseStrip > div:first-child {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.todayPauseStrip strong {
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.todayPauseBar {
+  overflow: hidden;
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(145, 164, 193, 0.15);
+}
+
+.todayPauseBar span {
+  display: block;
+  width: 68%;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--success);
+}
+
+.todayJourneyEmpty {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  background: var(--surface-2);
+}
+
+.todayEmptyIcon,
+.todayActiveBreakIcon {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border-radius: 12px;
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+.todayJourneyEmpty > div:nth-child(2) {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.todayJourneyEmpty strong {
+  font-size: 14px;
+}
+
+.todayJourneyEmpty span {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.todayProductivityGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(150px, 1fr) minmax(150px, 1fr);
+  gap: 12px;
+}
+
+.todayProductivityCard {
+  display: flex;
+  min-width: 0;
+  min-height: 102px;
+  flex-direction: column;
+  justify-content: center;
+  gap: 7px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+}
+
+.todayProductivityCard:hover {
+  border-color: var(--line-strong);
+  background: var(--surface-2);
+}
+
+.todayProductivityCard strong {
+  overflow: hidden;
+  font-size: 18px;
+  letter-spacing: -0.02em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.todayProductivityCard small {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.todayCoffeeCard strong {
+  color: #7ce1b1;
+}
+
+.todayActiveBreak {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  padding: 13px 15px;
+  border: 1px solid rgba(245, 168, 77, 0.28);
+  border-radius: 16px;
+  background: rgba(245, 168, 77, 0.06);
+}
+
+.todayActiveBreakIcon {
+  background: rgba(245, 168, 77, 0.1);
+  color: #f5a84d;
+}
+
+.todayActiveBreak > div:nth-child(2) {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: baseline;
+  gap: 5px 12px;
+}
+
+.todayActiveBreak span {
+  color: #f5a84d;
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: 0.1em;
+}
+
+.todayActiveBreak strong {
+  font-size: 20px;
+  font-variant-numeric: tabular-nums;
+}
+
+.todayActiveBreak small {
+  grid-column: 1 / -1;
+  color: var(--muted);
+}
+
+.todayActiveBreak button {
+  min-height: 38px;
+  padding: 8px 13px;
+  border: 1px solid rgba(245, 168, 77, 0.3);
+  border-radius: 10px;
+  background: transparent;
+  color: #ffd19a;
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.todayQuickPanel,
+.todayTimelineCard,
+.todaySummaryCard {
+  padding: 18px;
+}
+
+.todaySectionTitle {
+  margin-bottom: 14px;
+}
+
+.todaySectionTitle h2 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.todaySectionTitle > span,
+.todaySectionTitle > a {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.todaySectionTitle > a {
+  color: var(--primary);
+}
+
+.todayQuickGrid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.todayQuickGrid > button,
+.todayQuickGrid > a {
+  display: flex;
+  min-width: 0;
+  min-height: 64px;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  background: var(--surface-2);
+  color: var(--text);
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+}
+
+.todayQuickGrid > button:hover:not(:disabled),
+.todayQuickGrid > a:hover {
+  border-color: var(--line-strong);
+  transform: translateY(-1px);
+}
+
+.todayQuickGrid > * > span {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.todayQuickGrid strong {
+  overflow: hidden;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.todayQuickGrid small {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.quickIcon {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  place-items: center;
+  border-radius: 10px;
+  background: rgba(145, 164, 193, 0.08);
+  color: var(--muted);
+  font-style: normal;
+}
+
+.quickIconAmber { background: rgba(245, 168, 77, 0.1); color: #f5a84d; }
+.quickIconRed { background: rgba(239, 107, 115, 0.1); color: #ef6b73; }
+.quickIconBlue { background: var(--primary-soft); color: var(--primary); }
+.quickIconGreen { background: rgba(79, 212, 154, 0.1); color: var(--success); }
+
+.todayCustomBreak {
+  margin-top: 10px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+}
+
+.todayCustomBreak summary {
+  padding-top: 12px;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.todayCustomBreak > div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.todayCustomBreak label {
+  font-size: 11px;
+}
+
+.todayCustomBreak input {
+  width: 72px;
+  min-height: 36px;
+  padding: 6px 8px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.todayCustomBreak button {
+  min-height: 36px;
+  margin-left: auto;
+  padding: 7px 12px;
+  border: 1px solid var(--primary);
+  border-radius: 9px;
+  background: var(--primary-soft);
+  color: var(--primary);
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.todayLowerGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(260px, 0.8fr);
+  gap: 12px;
+}
+
+.todayTimelineList {
+  display: flex;
+  flex-direction: column;
+}
+
+.todayTimelineRow {
+  display: grid;
+  grid-template-columns: 44px 12px minmax(0, 1fr);
+  align-items: start;
+  gap: 10px;
+  min-height: 42px;
+  padding: 7px 0;
+}
+
+.todayTimelineRow time {
+  color: var(--muted);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.todayTimelineDot {
+  width: 7px;
+  height: 7px;
+  margin-top: 4px;
+  border: 2px solid var(--primary);
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px rgba(91, 156, 255, 0.06);
+}
+
+.todayTimelineRow > div {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.todayTimelineRow strong {
+  font-size: 12px;
+}
+
+.todayTimelineRow small {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.todaySummaryCard dl {
+  display: flex;
+  margin: 0;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.todaySummaryCard dl > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(145, 164, 193, 0.08);
+}
+
+.todaySummaryCard dl > div:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.todaySummaryCard dt {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.todaySummaryCard dd {
+  margin: 0;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+}
+
+.todayEmptyText {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+@media (max-width: 900px) {
+  .todayQuickGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .todayQuickWide {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 899px) {
+  .appContent {
+    padding-bottom: calc(124px + env(safe-area-inset-bottom));
+  }
+
+  .todayDashboard {
+    gap: 12px;
+  }
+
+  .todayLowerGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .appContent {
+    padding-top: 18px;
+    padding-inline: 12px;
+  }
+
+  .todayHero {
+    align-items: flex-end;
+    padding: 2px 4px 5px;
+  }
+
+  .todayHero h1 {
+    font-size: 30px;
+  }
+
+  .todayHero p {
+    margin-top: 5px;
+    font-size: 11px;
+  }
+
+  .todayHero .journeyStatus {
+    max-width: 48%;
+    padding: 7px 9px;
+    gap: 7px;
+    font-size: 10px;
+  }
+
+  .todayJourneyCard,
+  .todayQuickPanel,
+  .todayTimelineCard,
+  .todaySummaryCard {
+    border-radius: 17px;
+  }
+
+  .todayJourneyCard {
+    padding: 15px;
+  }
+
+  .todayCardHeader {
+    margin-bottom: 13px;
+  }
+
+  .todayCardHeader h2 {
+    font-size: 18px;
+  }
+
+  .todayHeaderAction {
+    min-height: 32px;
+    padding: 6px 9px;
+    font-size: 10px;
+  }
+
+  .todayMainMetrics article {
+    min-height: 78px;
+    gap: 8px;
+    padding: 11px 9px;
+  }
+
+  .todayMainMetrics span {
+    font-size: 9px;
+  }
+
+  .todayMainMetrics strong {
+    font-size: clamp(15px, 5vw, 20px);
+  }
+
+  .todayPauseStrip {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding: 10px 11px;
+  }
+
+  .todayPauseStrip > div:first-child {
+    justify-content: space-between;
+  }
+
+  .todayJourneyEmpty {
+    grid-template-columns: 38px minmax(0, 1fr);
+    padding: 13px;
+  }
+
+  .todayJourneyEmpty .actionButton {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+
+  .todayProductivityGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+  }
+
+  .todayProductivityActivity {
+    grid-column: 1 / -1;
+  }
+
+  .todayProductivityCard {
+    min-height: 82px;
+    padding: 12px;
+    border-radius: 14px;
+  }
+
+  .todayProductivityCard strong {
+    font-size: 16px;
+  }
+
+  .todayActiveBreak {
+    grid-template-columns: 38px minmax(0, 1fr);
+    padding: 12px;
+  }
+
+  .todayActiveBreak button {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+
+  .todayQuickPanel,
+  .todayTimelineCard,
+  .todaySummaryCard {
+    padding: 14px;
+  }
+
+  .todayQuickGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .todayQuickWide {
+    grid-column: 1 / -1;
+  }
+
+  .todayQuickGrid > button,
+  .todayQuickGrid > a {
+    min-height: 58px;
+    gap: 8px;
+    padding: 8px 9px;
+    border-radius: 12px;
+  }
+
+  .quickIcon {
+    width: 31px;
+    height: 31px;
+    flex-basis: 31px;
+  }
+
+  .todayCustomBreak > div {
+    flex-wrap: wrap;
+  }
+
+  .todayCustomBreak button {
+    margin-left: 0;
+  }
+
+  .todayTimelineRow {
+    grid-template-columns: 40px 10px minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .bottomNav {
+    right: 8px;
+    bottom: max(8px, env(safe-area-inset-bottom));
+    left: 8px;
+    min-height: 66px;
+    border-radius: 19px;
+  }
+
+  .bottomNav .navLink {
+    min-height: 52px;
+    border-radius: 14px;
+  }
+
+  .bottomNav .navMark,
+  .bottomNav .navMark svg {
+    width: 19px;
+    height: 19px;
+  }
+
+  .bottomNav .navLabel {
+    font-size: 9px;
+  }
+}

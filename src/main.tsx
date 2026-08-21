@@ -16,6 +16,7 @@ import './styles/activities.css'
 import './styles/focus.css'
 import './styles/reports.css'
 import './styles/prototype.css'
+import './styles/today-dashboard.css'
 
 const root = document.getElementById('root')
 if (!root) throw new Error('Elemento #root não encontrado.')
