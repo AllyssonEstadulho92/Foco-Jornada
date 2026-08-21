@@ -18,6 +18,7 @@ import './styles/reports.css'
 import './styles/history.css'
 import './styles/prototype.css'
 import './styles/today-dashboard.css'
+import './styles/topbar.css'
 
 const root = document.getElementById('root')
 if (!root) throw new Error('Elemento #root não encontrado.')
