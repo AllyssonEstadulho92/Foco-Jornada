@@ -6,4 +6,5 @@ export interface JourneyRepository {
   createIfNoActive(journey: Journey): Promise<boolean>
   finishIfActive(journey: Journey): Promise<boolean>
   listByDate(date: string): Promise<Journey[]>
+  deleteById?(id: string): Promise<void>
 }

@@ -7,4 +7,5 @@ export interface ActivityRepository {
   listByJourney(journeyId: string): Promise<Activity[]>
   updateIfStatus(activity: Activity, allowedStatuses: ActivityStatus[]): Promise<boolean>
   startIfNoActive(activity: Activity): Promise<boolean>
+  deleteById?(id: string): Promise<void>
 }

@@ -43,4 +43,24 @@ export class DexieJourneyRepository implements JourneyRepository {
     const journeys = await this.database.journeys.where('date').equals(date).sortBy('startedAt')
     return journeys.reverse()
   }
+
+  async deleteById(id: string): Promise<void> {
+    await this.database.transaction(
+      'rw',
+      this.database.journeys,
+      this.database.breaks,
+      this.database.activities,
+      this.database.focusSessions,
+      this.database.coffeeRecords,
+      async () => {
+        await Promise.all([
+          this.database.breaks.where('journeyId').equals(id).delete(),
+          this.database.activities.where('journeyId').equals(id).delete(),
+          this.database.focusSessions.where('journeyId').equals(id).delete(),
+          this.database.coffeeRecords.where('journeyId').equals(id).delete(),
+        ])
+        await this.database.journeys.delete(id)
+      },
+    )
+  }
 }

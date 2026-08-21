@@ -43,4 +43,8 @@ export class DexieFocusRepository implements FocusRepository {
       return true
     })
   }
+
+  async deleteById(id: string): Promise<void> {
+    await this.database.focusSessions.delete(id)
+  }
 }
