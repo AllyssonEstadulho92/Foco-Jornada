@@ -21,9 +21,14 @@ export type DayEventType =
   | 'focus-end'
   | 'coffee'
 
+export type DayRecordType = 'journey' | 'break' | 'activity' | 'focus' | 'coffee'
+
 export interface DayEvent {
   id: string
   type: DayEventType
+  recordType: DayRecordType
+  recordId: string
+  deletable: boolean
   timestamp: string
   label: string
   detail?: string
@@ -107,23 +112,114 @@ export async function buildDayReport({
 
   const events: DayEvent[] = []
   for (const journey of journeys) {
-    events.push({ id: `${journey.id}-start`, type: 'journey-start', timestamp: journey.startedAt, label: 'Entrada na jornada' })
-    if (journey.endedAt) events.push({ id: `${journey.id}-end`, type: 'journey-end', timestamp: journey.endedAt, label: 'Saída da jornada' })
+    const deletable = journey.status !== 'active'
+    events.push({
+      id: `${journey.id}-start`,
+      type: 'journey-start',
+      recordType: 'journey',
+      recordId: journey.id,
+      deletable,
+      timestamp: journey.startedAt,
+      label: 'Entrada na jornada',
+    })
+    if (journey.endedAt) {
+      events.push({
+        id: `${journey.id}-end`,
+        type: 'journey-end',
+        recordType: 'journey',
+        recordId: journey.id,
+        deletable,
+        timestamp: journey.endedAt,
+        label: 'Saída da jornada',
+      })
+    }
   }
   for (const record of breaks) {
-    events.push({ id: `${record.id}-start`, type: 'break-start', timestamp: record.startedAt, label: 'Pausa iniciada', detail: record.plannedDurationMinutes ? `${record.plannedDurationMinutes} min previstos` : undefined })
-    if (record.endedAt) events.push({ id: `${record.id}-end`, type: 'break-end', timestamp: record.endedAt, label: 'Pausa terminada' })
+    const deletable = record.status !== 'active'
+    events.push({
+      id: `${record.id}-start`,
+      type: 'break-start',
+      recordType: 'break',
+      recordId: record.id,
+      deletable,
+      timestamp: record.startedAt,
+      label: 'Pausa iniciada',
+      detail: record.plannedDurationMinutes ? `${record.plannedDurationMinutes} min previstos` : undefined,
+    })
+    if (record.endedAt) {
+      events.push({
+        id: `${record.id}-end`,
+        type: 'break-end',
+        recordType: 'break',
+        recordId: record.id,
+        deletable,
+        timestamp: record.endedAt,
+        label: 'Pausa terminada',
+      })
+    }
   }
   for (const activity of activities) {
-    if (activity.startedAt) events.push({ id: `${activity.id}-start`, type: 'activity-start', timestamp: activity.startedAt, label: 'Atividade iniciada', detail: activity.name })
-    if (activity.endedAt) events.push({ id: `${activity.id}-end`, type: 'activity-end', timestamp: activity.endedAt, label: activity.status === 'cancelled' ? 'Atividade cancelada' : 'Atividade terminada', detail: `${activity.name} · ${Math.floor(getActivityDurationMs(activity, activity.endedAt) / 60000)} min` })
+    const deletable = activity.status !== 'active'
+    if (activity.startedAt) {
+      events.push({
+        id: `${activity.id}-start`,
+        type: 'activity-start',
+        recordType: 'activity',
+        recordId: activity.id,
+        deletable,
+        timestamp: activity.startedAt,
+        label: 'Atividade iniciada',
+        detail: activity.name,
+      })
+    }
+    if (activity.endedAt) {
+      events.push({
+        id: `${activity.id}-end`,
+        type: 'activity-end',
+        recordType: 'activity',
+        recordId: activity.id,
+        deletable,
+        timestamp: activity.endedAt,
+        label: activity.status === 'cancelled' ? 'Atividade cancelada' : 'Atividade terminada',
+        detail: `${activity.name} · ${Math.floor(getActivityDurationMs(activity, activity.endedAt) / 60000)} min`,
+      })
+    }
   }
   for (const session of focusSessions) {
-    events.push({ id: `${session.id}-start`, type: 'focus-start', timestamp: session.startedAt, label: session.segmentType === 'focus' ? 'Sessão de foco iniciada' : 'Pausa Pomodoro iniciada', detail: session.mode === 'pomodoro' ? `Ciclo ${session.cycle}/4` : 'Personalizada' })
-    if (session.endedAt) events.push({ id: `${session.id}-end`, type: 'focus-end', timestamp: session.endedAt, label: session.status === 'cancelled' ? 'Sessão de foco cancelada' : 'Sessão de foco terminada' })
+    const deletable = session.status !== 'running' && session.status !== 'paused'
+    events.push({
+      id: `${session.id}-start`,
+      type: 'focus-start',
+      recordType: 'focus',
+      recordId: session.id,
+      deletable,
+      timestamp: session.startedAt,
+      label: session.segmentType === 'focus' ? 'Sessão de foco iniciada' : 'Pausa Pomodoro iniciada',
+      detail: session.mode === 'pomodoro' ? `Ciclo ${session.cycle}/4` : 'Personalizada',
+    })
+    if (session.endedAt) {
+      events.push({
+        id: `${session.id}-end`,
+        type: 'focus-end',
+        recordType: 'focus',
+        recordId: session.id,
+        deletable,
+        timestamp: session.endedAt,
+        label: session.status === 'cancelled' ? 'Sessão de foco cancelada' : 'Sessão de foco terminada',
+      })
+    }
   }
   for (const coffee of coffees) {
-    events.push({ id: coffee.id, type: 'coffee', timestamp: coffee.createdAt, label: coffee.quantity === 1 ? 'Café adicionado' : `${coffee.quantity} cafés adicionados`, detail: `${coffee.totalPrice.toFixed(2)} €` })
+    events.push({
+      id: coffee.id,
+      type: 'coffee',
+      recordType: 'coffee',
+      recordId: coffee.id,
+      deletable: true,
+      timestamp: coffee.createdAt,
+      label: coffee.quantity === 1 ? 'Café adicionado' : `${coffee.quantity} cafés adicionados`,
+      detail: `${coffee.totalPrice.toFixed(2)} €`,
+    })
   }
 
   events.sort((a, b) => a.timestamp.localeCompare(b.timestamp))
