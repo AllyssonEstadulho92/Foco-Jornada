@@ -7,6 +7,7 @@ export type NavigationIconName =
   | 'settings'
   | 'stats'
   | 'payroll'
+  | 'hours'
   | 'export'
 
 export function NavigationIcon({ name }: { name: NavigationIconName }) {
@@ -83,6 +84,16 @@ export function NavigationIcon({ name }: { name: NavigationIconName }) {
         <rect x="4" y="3.5" width="16" height="17" rx="2.4" />
         <path d="M8 8h8M8 12h3M8 16h3M15 12v4" />
         <path d="M13.5 14h3" />
+      </svg>
+    )
+  }
+
+  if (name === 'hours') {
+    return (
+      <svg {...commonProps}>
+        <circle cx="12" cy="12" r="8.5" />
+        <path d="M12 7v5l3.5 2" />
+        <path d="M5 3.8 3.8 5M19 3.8 20.2 5" />
       </svg>
     )
   }
