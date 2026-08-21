@@ -8,6 +8,7 @@ import { DexieFocusRepository } from './infrastructure/repositories/DexieFocusRe
 import { DexieJourneyRepository } from './infrastructure/repositories/DexieJourneyRepository'
 import { DexieSettingsRepository } from './infrastructure/repositories/DexieSettingsRepository'
 import { App } from './presentation/App'
+import { installNumberInputNormalization } from './shared/utils/numberInput'
 import './styles/tokens.css'
 import './styles/global.css'
 import './styles/journey.css'
@@ -29,6 +30,8 @@ import './styles/today-modern.css'
 
 const root = document.getElementById('root')
 if (!root) throw new Error('Elemento #root não encontrado.')
+
+installNumberInputNormalization()
 
 const services = {
   journeyRepository: new DexieJourneyRepository(db),
