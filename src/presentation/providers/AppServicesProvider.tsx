@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components -- o provider e o hook pertencem ao mesmo contexto de serviços. */
 import { createContext, type ReactNode, useContext } from 'react'
 import type { ActivityRepository } from '../../application/activities/ActivityRepository'
 import type { BreakRepository } from '../../application/breaks/BreakRepository'

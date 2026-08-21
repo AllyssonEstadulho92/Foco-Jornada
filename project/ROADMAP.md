@@ -13,11 +13,13 @@
 | 6 | Café | Concluída |
 | 7 | Dashboard | Concluída |
 | 8 | Histórico/Estatísticas/Definições | Concluída |
-| 9 | Qualidade final/PWA | Implementada — integração condicionada ao CI verde da PR #11 |
+| 9 | Qualidade final/PWA | Concluída — auditoria final na PR #39 |
 
 ## Entrega V1
 
-A release inclui persistência IndexedDB, recuperação por timestamps, interface responsiva, PWA, testes e CI. A branch de release é integrada em `main` apenas quando typecheck, lint, testes e build passam.
+A V1 inclui persistência IndexedDB, recuperação por timestamps, jornada linear, pausas, atividades, foco/Pomodoro, café, histórico, estatísticas, definições, calculadora de horas e ausências, vencimento/planificação, guia de utilização, exportação JSON, interface responsiva e PWA com manifest, service worker e cache offline.
+
+A auditoria final é integrada em `main` apenas com typecheck, lint, testes e build concluídos com sucesso. A validação manual em browsers e dispositivos reais continua a fazer parte do fecho de qualidade visual, sem alterar o núcleo funcional da V1.
 
 ## V2 — backlog
 
