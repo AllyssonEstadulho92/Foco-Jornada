@@ -36,6 +36,7 @@ export interface PayrollConfig {
 
 export interface PayrollResult {
   workDays: number
+  mealDays: number
   restDays: number
   holidayDays: number
   vacationDays: number
