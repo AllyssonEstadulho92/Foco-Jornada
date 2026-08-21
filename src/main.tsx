@@ -24,6 +24,7 @@ import './styles/guide.css'
 import './styles/topbar.css'
 import './styles/notifications.css'
 import './styles/payroll.css'
+import './styles/more-redesign.css'
 
 const root = document.getElementById('root')
 if (!root) throw new Error('Elemento #root não encontrado.')
