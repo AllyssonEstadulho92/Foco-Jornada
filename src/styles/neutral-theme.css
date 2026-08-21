@@ -1,0 +1,419 @@
+/* Tema neutro e limpo — camada visual carregada por último.
+   Mantém a lógica funcional intacta e substitui apenas apresentação/cores. */
+
+:root {
+  color-scheme: light;
+  --bg: #f6f7f5;
+  --surface: #ffffff;
+  --surface-2: #f1f3f1;
+  --surface-3: #e9ece9;
+  --line: #e1e5e1;
+  --line-strong: #cfd5d0;
+  --text: #171a18;
+  --muted: #747c77;
+  --primary: #1eb56a;
+  --primary-soft: rgba(30, 181, 106, 0.1);
+  --success: #1fa568;
+  --warning: #c88435;
+  --danger: #d85f5f;
+  --shadow-lg: 0 16px 40px rgba(25, 34, 29, 0.08);
+}
+
+html,
+body {
+  background: var(--bg);
+  color: var(--text);
+}
+
+body {
+  background:
+    radial-gradient(circle at 50% -180px, rgba(30, 181, 106, 0.055), transparent 360px),
+    var(--bg);
+}
+
+/* Estrutura principal */
+.sidebar {
+  border-right-color: var(--line);
+  background: rgba(255, 255, 255, 0.93);
+  box-shadow: 8px 0 28px rgba(31, 42, 35, 0.025);
+}
+
+.appTopBar {
+  border-bottom-color: rgba(28, 39, 32, 0.07);
+  background: rgba(246, 247, 245, 0.9);
+  box-shadow: 0 8px 28px rgba(31, 42, 35, 0.025);
+}
+
+.appClock,
+.notificationButton {
+  border-color: var(--line);
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 4px 14px rgba(31, 42, 35, 0.035);
+}
+
+.notificationButton:hover,
+.notificationButtonActive {
+  border-color: rgba(30, 181, 106, 0.28);
+  background: var(--primary-soft);
+}
+
+.notificationPanel {
+  border-color: var(--line);
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 20px 50px rgba(31, 42, 35, 0.13);
+}
+
+.notificationItem {
+  border-color: var(--line);
+  background: var(--surface-2);
+}
+
+.notificationDot {
+  box-shadow: 0 0 0 4px rgba(30, 181, 106, 0.08);
+}
+
+.brandMark,
+.navLinkActive .navMark,
+.moreRowIcon,
+.historyTimelineIcon {
+  color: var(--primary);
+}
+
+.sidebar .navLinkActive,
+.bottomNav .navLinkActive {
+  border-color: rgba(30, 181, 106, 0.16);
+  background: var(--primary-soft);
+}
+
+.navLink:hover,
+.sidebarToggle:hover {
+  border-color: var(--line);
+  background: var(--surface-2);
+}
+
+.bottomNav {
+  border-color: rgba(25, 35, 29, 0.1);
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 12px 34px rgba(31, 42, 35, 0.12);
+}
+
+/* Campos e controlos */
+input,
+textarea,
+select {
+  color: var(--text);
+}
+
+input::placeholder,
+textarea::placeholder,
+.payrollFormGrid input::placeholder {
+  color: #9aa19d;
+}
+
+.payrollMonthPicker input,
+.payrollFormGrid input,
+.payrollFormGrid select,
+.activityForm input,
+.activityForm textarea,
+.customFocusInput input,
+.historyDateControl,
+.settingsForm input,
+.settingsForm select {
+  border-color: var(--line);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline-color: var(--primary);
+}
+
+.actionButtonPrimary,
+.payrollPrimaryButton {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: #ffffff;
+  box-shadow: 0 8px 20px rgba(30, 181, 106, 0.16);
+}
+
+.settingsLink,
+.payrollGhostButton {
+  border-color: var(--line);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.emptyState {
+  border-color: var(--line);
+  background: var(--surface);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Hoje — painel linear mais leve */
+.journeyStatus {
+  border-color: var(--line);
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: none;
+}
+
+.journeyStatusActive {
+  border-color: rgba(30, 181, 106, 0.2);
+  background: rgba(30, 181, 106, 0.08);
+}
+
+.todayJourneyCard {
+  border-color: var(--line);
+  background: var(--surface);
+  box-shadow: var(--shadow-lg);
+}
+
+.todayJourneyCard::before {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.scheduleSettingsLink {
+  border-color: rgba(30, 181, 106, 0.18);
+  background: rgba(30, 181, 106, 0.07);
+  color: var(--primary);
+}
+
+.scheduleSettingsLink:hover {
+  border-color: rgba(30, 181, 106, 0.3);
+  background: rgba(30, 181, 106, 0.11);
+}
+
+.scheduleNextEvent,
+.scheduleTimeline,
+.scheduleLiveMetrics article,
+.schedulePlanSummary,
+.todayJourneyEmpty,
+.todayProductivityCard,
+.todayActiveBreak,
+.todayQuickPanel,
+.todayTimelineCard,
+.todaySummaryCard,
+.todayQuickGrid > button,
+.todayQuickGrid > a {
+  border-color: var(--line);
+  background: var(--surface-2);
+  box-shadow: none;
+}
+
+.scheduleTimeline {
+  background: #f4f6f4;
+}
+
+.scheduleTrack {
+  background: #dfe4e0;
+}
+
+.scheduleProgress {
+  background: linear-gradient(90deg, #9ea7a1, var(--primary));
+  box-shadow: none;
+}
+
+.scheduleMilestoneDot {
+  border-color: var(--surface);
+  background: #9aa29d;
+  box-shadow: 0 0 0 3px #e9ece9;
+}
+
+.scheduleMilestoneEntry .scheduleMilestoneDot,
+.scheduleMilestoneExit .scheduleMilestoneDot,
+.scheduleMilestoneBreak-start .scheduleMilestoneDot,
+.scheduleMilestoneBreak-end .scheduleMilestoneDot {
+  background: var(--primary);
+  box-shadow: 0 0 0 3px rgba(30, 181, 106, 0.12);
+}
+
+.scheduleLiveMetrics article::before,
+.todayProductivityCard::before {
+  border-color: rgba(30, 181, 106, 0.16);
+  background: rgba(30, 181, 106, 0.075);
+  box-shadow: none;
+}
+
+.scheduleLiveMetrics article:nth-child(3)::before,
+.scheduleLiveMetrics article:nth-child(4)::before,
+.todayProductivityCard:nth-child(2)::before,
+.todayCoffeeCard::before {
+  border-color: var(--line);
+  background: #edf0ed;
+}
+
+.scheduleLiveMetrics article:nth-child(3) strong,
+.scheduleLiveMetrics article:nth-child(4) strong,
+.schedulePlanSummary > span:nth-child(2) strong,
+.schedulePlanSummary > span:nth-child(3) strong,
+.todayProductivityGrid .todayProductivityCard:nth-child(2) strong,
+.todayCoffeeCard strong {
+  color: var(--text);
+}
+
+.todayProductivityCard:hover {
+  border-color: #d4dad5;
+  background: #f7f8f7;
+  transform: translateY(-1px);
+}
+
+/* Atividades, foco, histórico e relatórios */
+.activityCreatePanel,
+.activityListPanel,
+.currentActivityPanel,
+.focusTimerPanel,
+.focusStartPanel,
+.focusHistoryPanel,
+.historySummaryCard,
+.historyTimelinePanel,
+.reportPanel,
+.reportCard,
+.guidePanel,
+.guideCard {
+  border-color: var(--line);
+  background: var(--surface);
+  box-shadow: var(--shadow-lg);
+}
+
+.historySummarySecondary,
+.historyEventCount {
+  background: var(--surface-2);
+}
+
+.historySummaryMetricEffective strong {
+  color: var(--primary);
+}
+
+.focusDial {
+  background: conic-gradient(var(--primary) var(--focus-progress), #e4e8e4 0);
+  box-shadow: 0 12px 34px rgba(31, 42, 35, 0.06);
+}
+
+.focusDial::before {
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.focusPrototypeActions .focusCancelAction {
+  border-color: rgba(216, 95, 95, 0.25);
+  background: rgba(216, 95, 95, 0.06);
+  color: var(--danger);
+}
+
+/* Mais — lista discreta como menu de ferramentas */
+.moreListGrouped {
+  border-color: var(--line);
+  background: var(--surface);
+  box-shadow: var(--shadow-lg);
+}
+
+.moreListGrouped .moreRow:hover {
+  background: var(--surface-2);
+}
+
+.moreListGrouped .moreRowIcon {
+  border-color: var(--line);
+  background: var(--surface-2);
+  box-shadow: none;
+}
+
+.moreListGrouped .moreRowCopy small,
+.moreListGrouped .moreRowArrow {
+  color: var(--muted);
+}
+
+.moreLocalCard {
+  border-color: var(--line);
+  background: var(--surface);
+}
+
+.moreLocalInfoIcon,
+.moreLocalShield {
+  border-color: rgba(30, 181, 106, 0.22);
+  background: var(--primary-soft);
+}
+
+/* Vencimento — mantém cálculos, simplifica apenas a leitura */
+.payrollManualIntro {
+  border-color: rgba(30, 181, 106, 0.16);
+  background: rgba(30, 181, 106, 0.055);
+}
+
+.payrollHero {
+  border-color: var(--line);
+  background: var(--surface);
+  box-shadow: var(--shadow-lg);
+}
+
+.payrollHeroStats > span,
+.payrollDayEditor,
+.payrollCalendarPanel {
+  border-color: var(--line);
+  background: var(--surface-2);
+}
+
+.payrollPanel {
+  border-color: var(--line);
+  background: var(--surface);
+  box-shadow: 0 10px 28px rgba(31, 42, 35, 0.045);
+}
+
+.payrollReceiptRow,
+.payrollReceiptHead,
+.payrollFacts article,
+.payrollLegalNote {
+  border-color: var(--line);
+}
+
+.payrollReceiptHead,
+.payrollFacts article {
+  background: var(--surface-2);
+}
+
+/* Desktop: conteúdo com leitura mais editorial e menos "dashboard pesado". */
+@media (min-width: 900px) {
+  .appContent {
+    padding-top: 34px;
+  }
+
+  .todayDashboard,
+  .historyPage,
+  .moreToolsPage,
+  .payrollPage {
+    margin-inline: auto;
+  }
+}
+
+/* Mobile: cartões mais leves e navegação semelhante à referência visual. */
+@media (max-width: 899px) {
+  .appTopBar {
+    background: rgba(246, 247, 245, 0.94);
+  }
+
+  .bottomNav {
+    right: max(8px, env(safe-area-inset-right));
+    bottom: max(8px, env(safe-area-inset-bottom));
+    left: max(8px, env(safe-area-inset-left));
+    min-height: 68px;
+    padding: 5px;
+    border-radius: 22px;
+  }
+
+  .bottomNav .navLink {
+    min-height: 54px;
+    border-radius: 17px;
+  }
+
+  .todayJourneyCard,
+  .historySummaryCard,
+  .historyTimelinePanel,
+  .moreListGrouped,
+  .payrollPanel,
+  .payrollHero {
+    border-radius: 20px;
+  }
+}
