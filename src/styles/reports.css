@@ -113,8 +113,10 @@
   font-variant-numeric: tabular-nums;
 }
 
-.timelineItem div {
+.timelineItemContent {
   display: flex;
+  min-width: 0;
+  flex: 1;
   flex-direction: column;
   gap: 4px;
 }
@@ -123,6 +125,59 @@
 .statsDailyList span {
   color: var(--muted);
   font-size: 12px;
+}
+
+.timelineDeleteButton {
+  display: inline-flex;
+  min-height: 38px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  margin-left: auto;
+  padding: 8px 11px;
+  border: 1px solid rgba(248, 113, 113, 0.34);
+  border-radius: 10px;
+  background: rgba(127, 29, 29, 0.15);
+  color: #fca5a5;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
+}
+
+.timelineDeleteButton:hover:not(:disabled) {
+  border-color: rgba(248, 113, 113, 0.62);
+  background: rgba(153, 27, 27, 0.25);
+  transform: translateY(-1px);
+}
+
+.timelineDeleteButton:disabled {
+  cursor: wait;
+  opacity: 0.58;
+}
+
+.timelineDeleteButton svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+
+.timelineDeleteButton span {
+  color: inherit;
+  font-size: inherit;
+}
+
+.timelineActiveBadge {
+  margin-left: auto;
+  padding: 6px 9px;
+  border: 1px solid rgba(74, 222, 128, 0.25);
+  border-radius: 999px;
+  background: rgba(22, 101, 52, 0.12);
+  color: #86efac !important;
+  font-size: 11px !important;
+  font-weight: 800;
 }
 
 .periodTabs {
@@ -292,5 +347,20 @@
 
   .timelineItem {
     align-items: flex-start;
+    gap: 10px;
+    padding: 13px;
+  }
+
+  .timelineItem time {
+    width: 48px;
+    flex-basis: 48px;
+  }
+
+  .timelineDeleteButton {
+    padding: 8px;
+  }
+
+  .timelineDeleteButton span {
+    display: none;
   }
 }
