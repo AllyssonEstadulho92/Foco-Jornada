@@ -65,7 +65,8 @@ export function calculateIrs2026(remuneration: number, profile: IrsProfile2026, 
   const r = nonNegative(remuneration)
   if (r === 0) return 0
 
-  const row = tableFor(profile).find((item) => r <= item.max) ?? tableFor(profile).at(-1)!
+  const table = tableFor(profile)
+  const row = table.find((item) => r <= item.max) ?? table.at(-1)!
   const allowance = typeof row.allowance === 'function' ? row.allowance(r) : row.allowance
   const adjustedRate = Math.max(0, row.rate - (dependents >= 3 ? 0.01 : 0))
   const result = r * adjustedRate - allowance - row.dependentAllowance * Math.max(0, dependents)
@@ -82,7 +83,7 @@ function calculateOvertimePay(
   let totalHours = 0
 
   function paySegment(hours: number, premiumUntil100: number, premiumAfter100: number) {
-    let remaining = nonNegative(hours)
+    const remaining = nonNegative(hours)
     if (remaining === 0) return
 
     const lowerRateCapacity = Math.max(0, 100 - annualHours)
@@ -123,6 +124,9 @@ export function calculatePayroll(config: PayrollConfig, plans: PayrollDayPlan[])
   const dailyHours = weeklyHours / 5
 
   const workDays = plans.filter((day) => day.kind === 'work').length
+  const mealDays = plans.filter(
+    (day) => day.kind === 'work' || ((day.kind === 'rest' || day.kind === 'holiday') && day.overtimeHours > 0),
+  ).length
   const restDays = plans.filter((day) => day.kind === 'rest').length
   const holidayDays = plans.filter((day) => day.kind === 'holiday').length
   const vacationDays = plans.filter((day) => day.kind === 'vacation').length
@@ -138,10 +142,10 @@ export function calculatePayroll(config: PayrollConfig, plans: PayrollDayPlan[])
     config.overtimeHoursBeforeMonth,
   )
 
-  const mealAllowanceGross = round2(workDays * nonNegative(config.mealAllowancePerDay))
+  const mealAllowanceGross = round2(mealDays * nonNegative(config.mealAllowancePerDay))
   const mealExemptDailyLimit = config.mealAllowanceMethod === 'card' ? 10.46 : 6.15
   const mealAllowanceTaxable = round2(
-    workDays * Math.max(0, nonNegative(config.mealAllowancePerDay) - mealExemptDailyLimit),
+    mealDays * Math.max(0, nonNegative(config.mealAllowancePerDay) - mealExemptDailyLimit),
   )
 
   const normalTaxableGross = round2(
@@ -180,6 +184,7 @@ export function calculatePayroll(config: PayrollConfig, plans: PayrollDayPlan[])
 
   return {
     workDays,
+    mealDays,
     restDays,
     holidayDays,
     vacationDays,
