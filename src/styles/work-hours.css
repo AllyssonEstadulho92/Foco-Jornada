@@ -1,0 +1,283 @@
+.workHoursPage {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.workHoursSummary {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.workHoursSummary article,
+.workHoursMonthTotals > div {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 7px;
+  padding: 15px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+}
+
+.workHoursSummary span,
+.workHoursMonthTotals span,
+.workHoursEntryDate span,
+.workHoursEntries article > div > span {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.workHoursSummary strong,
+.workHoursMonthTotals strong {
+  font-size: clamp(18px, 2vw, 24px);
+  font-variant-numeric: tabular-nums;
+}
+
+.workHoursWarning strong { color: #f5b15f; }
+.workHoursPositive strong { color: var(--success); }
+
+.workHoursForm,
+.workHoursMonth {
+  padding: clamp(18px, 3vw, 26px);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: var(--surface);
+}
+
+.workHoursSectionHeading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.workHoursSectionHeading h2 {
+  margin: 5px 0 0;
+  font-size: 22px;
+}
+
+.workHoursExampleButton,
+.workHoursMonthActions button {
+  min-height: 38px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-2);
+  color: var(--text);
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.workHoursFieldGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.workHoursFieldGrid label {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 7px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.workHoursFieldGrid input,
+.workHoursFieldGrid select,
+.workHoursFieldGrid textarea,
+.workHoursMonthActions input {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding: 9px 11px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-2);
+  color: var(--text);
+  font: inherit;
+}
+
+.workHoursFieldGrid textarea {
+  resize: vertical;
+  line-height: 1.45;
+}
+
+.workHoursWide {
+  grid-column: span 2;
+}
+
+.workHoursResultPanel {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 18px 0;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface-2);
+}
+
+.workHoursResultPanel > div {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.workHoursResultPanel span {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.workHoursResultPanel strong {
+  font-size: 20px;
+  font-variant-numeric: tabular-nums;
+}
+
+.workHoursResultPanel p {
+  grid-column: 1 / -1;
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.workHoursMonthActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.workHoursMonthActions input {
+  width: auto;
+}
+
+.workHoursMonthTotals {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.workHoursEntries {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.workHoursEntries article {
+  display: grid;
+  grid-template-columns: minmax(170px, 1.6fr) repeat(3, minmax(100px, 1fr)) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  background: var(--surface-2);
+}
+
+.workHoursEntryDate,
+.workHoursEntries article > div {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.workHoursEntries article > div > strong {
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.workHoursEntries article > button {
+  min-height: 36px;
+  padding: 7px 10px;
+  border: 1px solid rgba(248, 113, 113, 0.3);
+  border-radius: 9px;
+  background: rgba(127, 29, 29, 0.12);
+  color: #fca5a5;
+  cursor: pointer;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.workHoursEntries article > p {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding-top: 8px;
+  border-top: 1px solid rgba(145, 164, 193, 0.08);
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.workHoursEmpty {
+  margin: 0;
+  padding: 20px;
+  border: 1px dashed var(--line);
+  border-radius: 12px;
+  color: var(--muted);
+  text-align: center;
+}
+
+@media (max-width: 1050px) {
+  .workHoursSummary,
+  .workHoursMonthTotals {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .workHoursFieldGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .workHoursEntries article {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .workHoursEntries article > button {
+    justify-self: start;
+  }
+}
+
+@media (max-width: 640px) {
+  .workHoursSummary,
+  .workHoursMonthTotals,
+  .workHoursFieldGrid,
+  .workHoursResultPanel,
+  .workHoursEntries article {
+    grid-template-columns: 1fr;
+  }
+
+  .workHoursWide,
+  .workHoursResultPanel p,
+  .workHoursEntries article > p {
+    grid-column: 1;
+  }
+
+  .workHoursSectionHeading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .workHoursMonthActions {
+    width: 100%;
+  }
+
+  .workHoursMonthActions input {
+    flex: 1;
+    width: 100%;
+  }
+
+  .workHoursExampleButton {
+    width: 100%;
+  }
+}
