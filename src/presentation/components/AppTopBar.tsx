@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNow } from '../hooks/useNow'
 import { useAppServices } from '../providers/AppServicesProvider'
+import { useNotificationStore } from '../store/useNotificationStore'
 
-type NotificationItem = {
+type StatusNotification = {
   id: string
   title: string
   detail: string
@@ -27,14 +28,25 @@ function BellIcon() {
   )
 }
 
+function formatNotificationTime(value: string) {
+  return new Intl.DateTimeFormat('pt-PT', {
+    day: '2-digit',
+    month: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(new Date(value))
+}
+
 export function AppTopBar() {
   const { journeyRepository, focusRepository } = useAppServices()
   const now = useNow(1000)
   const [isOpen, setIsOpen] = useState(false)
-  const [hasSeen, setHasSeen] = useState(false)
   const [activeJourneyStartedAt, setActiveJourneyStartedAt] = useState<string | null>(null)
   const [hasActiveFocus, setHasActiveFocus] = useState(false)
   const panelRef = useRef<HTMLDivElement>(null)
+  const notifications = useNotificationStore((state) => state.notifications)
+  const markAllRead = useNotificationStore((state) => state.markAllRead)
+  const clearNotifications = useNotificationStore((state) => state.clear)
 
   const refreshStatus = useCallback(async () => {
     try {
@@ -78,8 +90,8 @@ export function AppTopBar() {
     }
   }, [isOpen])
 
-  const notifications = useMemo<NotificationItem[]>(() => {
-    const items: NotificationItem[] = []
+  const statusNotifications = useMemo<StatusNotification[]>(() => {
+    const items: StatusNotification[] = []
 
     if (hasActiveFocus) {
       items.push({
@@ -91,11 +103,10 @@ export function AppTopBar() {
     }
 
     if (activeJourneyStartedAt) {
-      const startedAt = new Date(activeJourneyStartedAt)
       const entryTime = new Intl.DateTimeFormat('pt-PT', {
         hour: '2-digit',
         minute: '2-digit',
-      }).format(startedAt)
+      }).format(new Date(activeJourneyStartedAt))
       items.push({
         id: 'journey-active',
         title: 'Jornada em curso',
@@ -112,13 +123,13 @@ export function AppTopBar() {
     minute: '2-digit',
   }).format(now)
 
-  const unreadCount = hasSeen ? 0 : notifications.length
+  const unreadCount = notifications.filter((item) => !item.read).length
 
   function toggleNotifications() {
     setIsOpen((current) => {
       const next = !current
       if (next) {
-        setHasSeen(true)
+        markAllRead()
         void refreshStatus()
       }
       return next
@@ -142,7 +153,9 @@ export function AppTopBar() {
           aria-haspopup="dialog"
         >
           <BellIcon />
-          {unreadCount > 0 ? <span className="notificationBadge">{unreadCount}</span> : null}
+          {unreadCount > 0 ? (
+            <span className="notificationBadge">{unreadCount > 9 ? '9+' : unreadCount}</span>
+          ) : null}
         </button>
 
         {isOpen ? (
@@ -152,29 +165,49 @@ export function AppTopBar() {
                 <span>NOTIFICAÇÕES</span>
                 <strong>Centro de notificações</strong>
               </div>
-              <span className="notificationCount">{notifications.length}</span>
+              <div className="notificationHeaderActions">
+                <span className="notificationCount">{notifications.length}</span>
+                {notifications.length > 0 ? (
+                  <button type="button" onClick={clearNotifications}>Limpar</button>
+                ) : null}
+              </div>
             </header>
 
-            <div className="notificationList">
-              {notifications.length === 0 ? (
-                <div className="notificationEmpty">
-                  <strong>Sem novas notificações</strong>
-                  <span>Jornada, pausas e foco aparecerão aqui quando estiverem ativos.</span>
-                </div>
-              ) : (
-                notifications.map((item) => (
-                  <article className="notificationItem" key={item.id}>
+            {statusNotifications.length > 0 ? (
+              <div className="notificationStatusStrip">
+                {statusNotifications.map((item) => (
+                  <article className="notificationItem notificationStatusItem" key={item.id}>
                     <span className={`notificationDot notificationDot-${item.tone}`} aria-hidden="true" />
                     <div>
                       <strong>{item.title}</strong>
                       <span>{item.detail}</span>
                     </div>
                   </article>
+                ))}
+              </div>
+            ) : null}
+
+            <div className="notificationList">
+              {notifications.length === 0 ? (
+                <div className="notificationEmpty">
+                  <strong>Sem notificações por ler</strong>
+                  <span>As ações da aplicação passam a ficar guardadas aqui, sem popups no ecrã.</span>
+                </div>
+              ) : (
+                notifications.map((item) => (
+                  <article className={`notificationItem${item.read ? '' : ' notificationItemUnread'}`} key={item.id}>
+                    <span className={`notificationDot notificationDot-${item.tone}`} aria-hidden="true" />
+                    <div>
+                      <strong>{item.title}</strong>
+                      {item.detail ? <span>{item.detail}</span> : null}
+                      <time dateTime={item.createdAt}>{formatNotificationTime(item.createdAt)}</time>
+                    </div>
+                  </article>
                 ))
               )}
             </div>
 
-            <footer className="notificationPanelFooter">Atualização automática</footer>
+            <footer className="notificationPanelFooter">As notificações ficam guardadas neste dispositivo.</footer>
           </section>
         ) : null}
       </div>
