@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
 import { DEFAULT_APP_SETTINGS, normalizeSettings, type AppSettings } from '../../domain/settings/AppSettings'
 import { useAppServices } from '../providers/AppServicesProvider'
+import { pushAppNotification } from '../store/useNotificationStore'
 
 export function useSettingsController() {
   const { settingsRepository } = useAppServices()
@@ -35,11 +35,11 @@ export function useSettingsController() {
         const normalized = normalizeSettings(next)
         await settingsRepository.save(normalized)
         setSettings(normalized)
-        toast.success('Definições guardadas.')
+        pushAppNotification('success', 'Definições guardadas', 'As preferências foram atualizadas neste dispositivo.')
       } catch (saveError) {
         const message = saveError instanceof Error ? saveError.message : 'Erro ao guardar definições.'
         setError(message)
-        toast.error(message)
+        pushAppNotification('error', 'Erro nas definições', message)
       } finally {
         setIsBusy(false)
       }
