@@ -22,7 +22,7 @@ function intervalMinutes(start: string, end: string) {
   if (!start || !end) return 0
   const [sh, sm] = start.split(':').map(Number)
   const [eh, em] = end.split(':').map(Number)
-  let startMinutes = sh * 60 + sm
+  const startMinutes = sh * 60 + sm
   let endMinutes = eh * 60 + em
   if (endMinutes < startMinutes) endMinutes += 24 * 60
   return Math.max(0, endMinutes - startMinutes)
