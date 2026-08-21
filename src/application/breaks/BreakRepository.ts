@@ -5,4 +5,5 @@ export interface BreakRepository {
   createIfNoActive(record: BreakRecord): Promise<boolean>
   finishIfActive(record: BreakRecord): Promise<boolean>
   listByJourney(journeyId: string): Promise<BreakRecord[]>
+  deleteById?(id: string): Promise<void>
 }
