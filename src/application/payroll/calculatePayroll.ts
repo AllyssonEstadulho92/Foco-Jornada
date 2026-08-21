@@ -55,6 +55,10 @@ function nonNegative(value: number) {
   return Number.isFinite(value) ? Math.max(0, value) : 0
 }
 
+function manualValue(value: number | null, automaticValue: number) {
+  return value === null ? automaticValue : round2(nonNegative(value))
+}
+
 function tableFor(profile: IrsProfile2026) {
   if (profile === 'table-2') return TABLE_2
   if (profile === 'table-3') return TABLE_3
@@ -120,27 +124,44 @@ function calculateOvertimePay(
 export function calculatePayroll(config: PayrollConfig, plans: PayrollDayPlan[]): PayrollResult {
   const baseSalary = nonNegative(config.baseSalary)
   const weeklyHours = Math.max(1, nonNegative(config.weeklyHours))
-  const hourlyRate = round2((baseSalary * 12) / (52 * weeklyHours))
+  const automaticHourlyRate = round2((baseSalary * 12) / (52 * weeklyHours))
+  const hourlyRate = manualValue(config.hourlyRateOverride, automaticHourlyRate)
   const dailyHours = weeklyHours / 5
 
   const workDays = plans.filter((day) => day.kind === 'work').length
-  const mealDays = plans.filter(
-    (day) => day.kind === 'work' || ((day.kind === 'rest' || day.kind === 'holiday') && day.overtimeHours > 0),
+  const automaticMealDays = plans.filter(
+    (day) =>
+      day.kind === 'work' ||
+      ((day.kind === 'rest' || day.kind === 'holiday') && day.overtimeHours > 0),
   ).length
+  const mealDays =
+    config.mealDaysOverride === null
+      ? automaticMealDays
+      : Math.round(nonNegative(config.mealDaysOverride))
   const restDays = plans.filter((day) => day.kind === 'rest').length
   const holidayDays = plans.filter((day) => day.kind === 'holiday').length
   const vacationDays = plans.filter((day) => day.kind === 'vacation').length
-  const justifiedPaidAbsenceDays = plans.filter((day) => day.kind === 'absence-justified-paid').length
-  const justifiedUnpaidAbsenceDays = plans.filter((day) => day.kind === 'absence-justified-unpaid').length
+  const justifiedPaidAbsenceDays = plans.filter(
+    (day) => day.kind === 'absence-justified-paid',
+  ).length
+  const justifiedUnpaidAbsenceDays = plans.filter(
+    (day) => day.kind === 'absence-justified-unpaid',
+  ).length
   const unjustifiedAbsenceDays = plans.filter((day) => day.kind === 'absence-unjustified').length
 
   const unpaidAbsenceDays = justifiedUnpaidAbsenceDays + unjustifiedAbsenceDays
-  const absenceDeduction = round2(unpaidAbsenceDays * dailyHours * hourlyRate)
-  const { overtimePay, overtimeHours } = calculateOvertimePay(
+  const automaticAbsenceDeduction = round2(unpaidAbsenceDays * dailyHours * hourlyRate)
+  const absenceDeduction = manualValue(
+    config.absenceDeductionOverride,
+    automaticAbsenceDeduction,
+  )
+  const automaticOvertime = calculateOvertimePay(
     plans,
     hourlyRate,
     config.overtimeHoursBeforeMonth,
   )
+  const overtimeHours = automaticOvertime.overtimeHours
+  const overtimePay = manualValue(config.overtimePayOverride, automaticOvertime.overtimePay)
 
   const mealAllowanceGross = round2(mealDays * nonNegative(config.mealAllowancePerDay))
   const mealExemptDailyLimit = config.mealAllowanceMethod === 'card' ? 10.46 : 6.15
@@ -159,13 +180,35 @@ export function calculatePayroll(config: PayrollConfig, plans: PayrollDayPlan[])
   const contributoryGross = round2(
     normalTaxableGross + overtimePay + vacationSubsidy + christmasSubsidy,
   )
-  const socialSecurity = round2(contributoryGross * (nonNegative(config.socialSecurityRate) / 100))
+  const automaticSocialSecurity = round2(
+    contributoryGross * (nonNegative(config.socialSecurityRate) / 100),
+  )
+  const socialSecurity = manualValue(config.socialSecurityOverride, automaticSocialSecurity)
 
-  const irsNormal = calculateIrs2026(normalTaxableGross, config.irsProfile, config.dependents)
-  const normalEffectiveRate = normalTaxableGross > 0 ? irsNormal / normalTaxableGross : 0
-  const irsOvertime = round2(overtimePay * normalEffectiveRate * 0.5)
-  const irsVacation = calculateIrs2026(vacationSubsidy, config.irsProfile, config.dependents)
-  const irsChristmas = calculateIrs2026(christmasSubsidy, config.irsProfile, config.dependents)
+  const automaticIrsNormal = calculateIrs2026(
+    normalTaxableGross,
+    config.irsProfile,
+    config.dependents,
+  )
+  const normalEffectiveRate =
+    normalTaxableGross > 0 ? automaticIrsNormal / normalTaxableGross : 0
+  const automaticIrsOvertime = round2(overtimePay * normalEffectiveRate * 0.5)
+  const automaticIrsVacation = calculateIrs2026(
+    vacationSubsidy,
+    config.irsProfile,
+    config.dependents,
+  )
+  const automaticIrsChristmas = calculateIrs2026(
+    christmasSubsidy,
+    config.irsProfile,
+    config.dependents,
+  )
+
+  const hasManualIrs = config.irsOverride !== null
+  const irsNormal = hasManualIrs ? manualValue(config.irsOverride, 0) : automaticIrsNormal
+  const irsOvertime = hasManualIrs ? 0 : automaticIrsOvertime
+  const irsVacation = hasManualIrs ? 0 : automaticIrsVacation
+  const irsChristmas = hasManualIrs ? 0 : automaticIrsChristmas
   const irsTotal = round2(irsNormal + irsOvertime + irsVacation + irsChristmas)
 
   const grossTotal = round2(
