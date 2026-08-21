@@ -46,4 +46,8 @@ export class DexieBreakRepository implements BreakRepository {
   async listByJourney(journeyId: string): Promise<BreakRecord[]> {
     return this.database.breaks.where('journeyId').equals(journeyId).sortBy('startedAt')
   }
+
+  async deleteById(id: string): Promise<void> {
+    await this.database.breaks.delete(id)
+  }
 }
