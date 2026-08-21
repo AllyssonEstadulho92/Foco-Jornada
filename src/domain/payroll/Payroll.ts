@@ -32,6 +32,12 @@ export interface PayrollConfig {
   otherExemptAllowances: number
   otherDeductions: number
   paymentDay: number
+  mealDaysOverride: number | null
+  hourlyRateOverride: number | null
+  absenceDeductionOverride: number | null
+  overtimePayOverride: number | null
+  socialSecurityOverride: number | null
+  irsOverride: number | null
 }
 
 export interface PayrollResult {
@@ -76,4 +82,10 @@ export const defaultPayrollConfig: PayrollConfig = {
   otherExemptAllowances: 0,
   otherDeductions: 0,
   paymentDay: 25,
+  mealDaysOverride: null,
+  hourlyRateOverride: null,
+  absenceDeductionOverride: null,
+  overtimePayOverride: null,
+  socialSecurityOverride: null,
+  irsOverride: null,
 }
