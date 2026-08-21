@@ -5,17 +5,47 @@ import { getActivityDurationMs } from '../../domain/activities/Activity'
 import { getBreakDurationMs } from '../../domain/breaks/BreakRecord'
 import { getFocusElapsedMs } from '../../domain/focus/FocusSession'
 import { getJourneyDurationMs } from '../../domain/journey/Journey'
-import { formatClockTime, formatDuration } from '../../shared/utils/dateTime'
+import { formatClockTime, formatDuration, toLocalDateKey } from '../../shared/utils/dateTime'
 import { useActivityController } from '../hooks/useActivityController'
 import { useBreakController } from '../hooks/useBreakController'
 import { useCoffeeController } from '../hooks/useCoffeeController'
+import { useDayReport } from '../hooks/useDayReport'
 import { useFocusController } from '../hooks/useFocusController'
 import { useJourneyController } from '../hooks/useJourneyController'
 import { useNow } from '../hooks/useNow'
 
+type DashboardIcon = 'pause' | 'focus' | 'coffee' | 'activity' | 'clock'
+
+function DashboardIcon({ type }: { type: DashboardIcon }) {
+  const common = {
+    width: 20,
+    height: 20,
+    viewBox: '0 0 24 24',
+    fill: 'none',
+    stroke: 'currentColor',
+    strokeWidth: 1.8,
+    strokeLinecap: 'round' as const,
+    strokeLinejoin: 'round' as const,
+    'aria-hidden': true,
+  }
+
+  if (type === 'pause') {
+    return <svg {...common}><circle cx="12" cy="12" r="9" /><path d="M9.5 8.5v7M14.5 8.5v7" /></svg>
+  }
+  if (type === 'focus') {
+    return <svg {...common}><circle cx="12" cy="12" r="7" /><circle cx="12" cy="12" r="2.5" /><path d="M12 2v3M12 19v3M2 12h3M19 12h3" /></svg>
+  }
+  if (type === 'coffee') {
+    return <svg {...common}><path d="M5 8h11v5a5 5 0 0 1-5 5H9a4 4 0 0 1-4-4V8Z" /><path d="M16 10h1.5a2.5 2.5 0 0 1 0 5H16M8 4v2M12 4v2" /></svg>
+  }
+  if (type === 'activity') {
+    return <svg {...common}><path d="M5 4h14v16H5z" /><path d="M8 8h8M8 12h8M8 16h5" /></svg>
+  }
+  return <svg {...common}><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></svg>
+}
+
 export function TodayPage() {
-  const { activeJourney, todayJourneys, isLoading, isBusy, error, start, finish } =
-    useJourneyController()
+  const { activeJourney, isLoading, isBusy, error, start, finish } = useJourneyController()
   const {
     activeBreak,
     breaks,
@@ -40,6 +70,13 @@ export function TodayPage() {
   const [customMinutes, setCustomMinutes] = useState('30')
   const now = useNow()
   const nowIso = now.toISOString()
+  const todayKey = toLocalDateKey(now)
+  const { report, refresh: refreshReport } = useDayReport(todayKey)
+
+  const dateLabel = useMemo(
+    () => new Intl.DateTimeFormat('pt-PT', { day: 'numeric', month: 'long', year: 'numeric' }).format(now),
+    [todayKey],
+  )
 
   const totalBreakDurationMs = useMemo(
     () =>
@@ -53,16 +90,17 @@ export function TodayPage() {
     () =>
       focusSessions
         .filter((session) => session.segmentType === 'focus' && session.status !== 'cancelled')
-        .reduce(
-          (total, session) => total + getFocusElapsedMs(session, session.endedAt ?? nowIso),
-          0,
-        ),
+        .reduce((total, session) => total + getFocusElapsedMs(session, session.endedAt ?? nowIso), 0),
     [focusSessions, nowIso],
   )
 
+  const completedFocusCount = focusSessions.filter(
+    (session) => session.segmentType === 'focus' && session.status === 'completed',
+  ).length
+
   const effectiveDurationMs = activeJourney
     ? getEffectiveJourneyDurationMs(activeJourney, breaks, nowIso)
-    : 0
+    : report?.summary.effectiveMs ?? 0
 
   async function handleFinish() {
     const openItems: string[] = []
@@ -75,13 +113,36 @@ export function TodayPage() {
         ? `Existem registos em curso (${openItems.join(', ')}). Ao terminar a jornada serão encerrados de forma consistente. Continuar?`
         : 'Terminar a jornada atual?'
 
-    if (window.confirm(message)) await finish()
+    if (!window.confirm(message)) return
+    await finish()
+    await refreshReport()
   }
 
-  function handleCustomBreak() {
+  async function handleStartJourney() {
+    await start()
+    await refreshReport()
+  }
+
+  async function handleStartBreak(type: 'short' | 'long', minutes: number) {
+    await startBreak(type, minutes)
+    await refreshReport()
+  }
+
+  async function handleFinishBreak() {
+    await finishBreak()
+    await refreshReport()
+  }
+
+  async function handleCustomBreak() {
     const minutes = Number(customMinutes)
     if (!Number.isFinite(minutes) || minutes <= 0) return
-    void startBreak('custom', Math.round(minutes))
+    await startBreak('custom', Math.round(minutes))
+    await refreshReport()
+  }
+
+  async function handleCoffee() {
+    await addCoffee(1)
+    await refreshReport()
   }
 
   const statusLabel = activeBreak
@@ -93,14 +154,14 @@ export function TodayPage() {
         : 'Sem jornada ativa'
 
   const pageError = error ?? breakError ?? activityError ?? focusError ?? coffeeError
+  const recentEvents = report?.events.slice(-5) ?? []
 
   return (
-    <section className="todayPage" aria-labelledby="page-title">
-      <header className="pageHeader">
+    <section className="todayPage todayDashboard" aria-labelledby="page-title">
+      <header className="todayHero">
         <div>
-          <span className="eyebrow">HOJE</span>
-          <h1 id="page-title">Foco & Jornada</h1>
-          <p>Jornada, pausas, atividade, foco e café num único painel.</p>
+          <h1 id="page-title">Hoje</h1>
+          <p>{dateLabel}</p>
         </div>
         <span
           className={`journeyStatus ${activeJourney ? 'journeyStatusActive' : ''} ${activeBreak ? 'journeyStatusPaused' : ''}`}
@@ -112,160 +173,172 @@ export function TodayPage() {
 
       {pageError ? <div className="errorBanner" role="alert">{pageError}</div> : null}
 
-      <section className="journeyPanel" aria-labelledby="journey-title">
-        <div className="sectionHeadingRow">
+      <section className="todayJourneyCard" aria-labelledby="journey-title">
+        <div className="todayCardHeader">
           <div>
             <span className="sectionKicker">JORNADA</span>
             <h2 id="journey-title">Jornada de trabalho</h2>
           </div>
-          {isLoading ? <span className="loadingLabel">A carregar…</span> : null}
-        </div>
-
-        <div className="journeyMetrics journeyMetricsFour">
-          <article className="metricCard">
-            <span>Entrada</span>
-            <strong>{activeJourney ? formatClockTime(activeJourney.startedAt) : '—'}</strong>
-          </article>
-          <article className="metricCard">
-            <span>Jornada</span>
-            <strong>{activeJourney ? formatDuration(getJourneyDurationMs(activeJourney, nowIso)) : '00:00:00'}</strong>
-          </article>
-          <article className="metricCard metricCardEffective">
-            <span>Tempo efetivo</span>
-            <strong>{formatDuration(effectiveDurationMs)}</strong>
-          </article>
-          <article className="metricCard">
-            <span>Pausas</span>
-            <strong>{formatDuration(totalBreakDurationMs)}</strong>
-          </article>
-        </div>
-
-        <div className="journeyActions">
           {activeJourney ? (
-            <button className="actionButton actionButtonDanger" type="button" disabled={isBusy || isLoading} onClick={() => void handleFinish()}>
-              {isBusy ? 'A terminar…' : 'Terminar jornada'}
+            <button
+              className="todayHeaderAction todayHeaderActionDanger"
+              type="button"
+              disabled={isBusy || isLoading}
+              onClick={() => void handleFinish()}
+            >
+              Terminar
             </button>
-          ) : (
-            <button className="actionButton actionButtonPrimary" type="button" disabled={isBusy || isLoading} onClick={() => void start()}>
+          ) : null}
+        </div>
+
+        {activeJourney ? (
+          <>
+            <div className="todayMainMetrics">
+              <article>
+                <span>Entrada</span>
+                <strong>{formatClockTime(activeJourney.startedAt)}</strong>
+              </article>
+              <article>
+                <span>Jornada</span>
+                <strong>{formatDuration(getJourneyDurationMs(activeJourney, nowIso))}</strong>
+              </article>
+              <article>
+                <span>Tempo efetivo</span>
+                <strong>{formatDuration(effectiveDurationMs)}</strong>
+              </article>
+            </div>
+            <div className="todayPauseStrip">
+              <div>
+                <span>Pausas</span>
+                <strong>{formatDuration(totalBreakDurationMs)}</strong>
+              </div>
+              <div className="todayPauseBar" aria-hidden="true"><span /></div>
+            </div>
+          </>
+        ) : (
+          <div className="todayJourneyEmpty">
+            <div className="todayEmptyIcon"><DashboardIcon type="clock" /></div>
+            <div>
+              <strong>Começa a jornada quando estiveres pronto.</strong>
+              <span>O tempo efetivo, as pausas e o foco serão registados automaticamente.</span>
+            </div>
+            <button className="actionButton actionButtonPrimary" type="button" disabled={isBusy || isLoading} onClick={() => void handleStartJourney()}>
               {isBusy ? 'A iniciar…' : 'Iniciar jornada'}
             </button>
-          )}
-        </div>
+          </div>
+        )}
       </section>
 
-      <section className="dashboardOverview" aria-label="Resumo de produtividade">
-        <article>
+      <section className="todayProductivityGrid" aria-label="Resumo de produtividade">
+        <Link className="todayProductivityCard todayProductivityActivity" to="/atividades">
           <span>Atividade atual</span>
-          <strong>{activeActivity?.name ?? 'Nenhuma'}</strong>
-          <small>{activeActivity ? formatDuration(getActivityDurationMs(activeActivity, nowIso)) : '—'}</small>
-          <Link to="/atividades">Gerir atividades</Link>
-        </article>
-        <article>
+          <strong>{activeActivity?.name ?? 'Nenhuma atividade'}</strong>
+          <small>
+            {activeActivity
+              ? `${formatDuration(getActivityDurationMs(activeActivity, nowIso))} em curso`
+              : 'Toca para criar ou iniciar uma atividade'}
+          </small>
+        </Link>
+        <Link className="todayProductivityCard" to="/foco">
           <span>Foco</span>
-          <strong>{formatDuration(focusDurationMs)}</strong>
-          <small>{activeFocus ? 'Sessão em curso' : `${focusSessions.filter((session) => session.segmentType === 'focus' && session.status === 'completed').length} concluídas`}</small>
-          <Link to="/foco">Abrir foco</Link>
-        </article>
-        <article>
+          <strong>{completedFocusCount}</strong>
+          <small>{activeFocus ? 'Sessão em curso' : `${formatDuration(focusDurationMs)} acumulado`}</small>
+        </Link>
+        <button className="todayProductivityCard todayCoffeeCard" type="button" disabled={isCoffeeBusy} onClick={() => void handleCoffee()}>
           <span>Café</span>
           <strong>{coffeeTotals.quantity}</strong>
           <small>{coffeeTotals.cost.toFixed(2)} €</small>
-          <button type="button" disabled={isCoffeeBusy} onClick={() => void addCoffee(1)}>+ Café</button>
-        </article>
+        </button>
       </section>
 
-      {activeActivity ? (
-        <section className="todayActivityPanel" aria-labelledby="today-activity-title">
+      {activeBreak ? (
+        <section className="todayActiveBreak" aria-label="Pausa ativa">
+          <div className="todayActiveBreakIcon"><DashboardIcon type="pause" /></div>
           <div>
-            <span className="sectionKicker">ATIVIDADE ATUAL</span>
-            <h2 id="today-activity-title">{activeActivity.name}</h2>
-            <p>{activeActivity.description ?? `Em curso desde ${formatClockTime(activeActivity.startedAt)}`}</p>
+            <span>PAUSA ATIVA</span>
+            <strong>{formatDuration(getBreakDurationMs(activeBreak, nowIso))}</strong>
+            <small>Iniciada às {formatClockTime(activeBreak.startedAt)}</small>
           </div>
-          <strong className="todayActivityTimer">{formatDuration(getActivityDurationMs(activeActivity, nowIso))}</strong>
+          <button type="button" disabled={isBreakBusy} onClick={() => void handleFinishBreak()}>
+            Terminar pausa
+          </button>
         </section>
       ) : null}
 
-      <section className="breakPanel" aria-labelledby="break-title">
-        <div className="sectionHeadingRow">
+      <section className="todayQuickPanel" aria-labelledby="quick-actions-title">
+        <div className="todaySectionTitle">
+          <h2 id="quick-actions-title">Ações rápidas</h2>
+          <span>Mais usadas</span>
+        </div>
+        <div className="todayQuickGrid">
+          <button type="button" disabled={!activeJourney || isBreakBusy || isLoadingBreaks || Boolean(activeBreak)} onClick={() => void handleStartBreak('short', 15)}>
+            <i className="quickIcon quickIconAmber"><DashboardIcon type="pause" /></i>
+            <span><strong>Pausa</strong><small>15 min</small></span>
+          </button>
+          <button type="button" disabled={!activeJourney || isBreakBusy || isLoadingBreaks || Boolean(activeBreak)} onClick={() => void handleStartBreak('long', 60)}>
+            <i className="quickIcon quickIconRed"><DashboardIcon type="pause" /></i>
+            <span><strong>Pausa</strong><small>60 min</small></span>
+          </button>
+          <Link to="/foco">
+            <i className="quickIcon quickIconBlue"><DashboardIcon type="focus" /></i>
+            <span><strong>Iniciar foco</strong><small>Pomodoro</small></span>
+          </Link>
+          <button type="button" disabled={isCoffeeBusy} onClick={() => void handleCoffee()}>
+            <i className="quickIcon quickIconGreen"><DashboardIcon type="coffee" /></i>
+            <span><strong>Café</strong><small>+1 registo</small></span>
+          </button>
+          <Link to="/atividades" className="todayQuickWide">
+            <i className="quickIcon"><DashboardIcon type="activity" /></i>
+            <span><strong>Nova atividade</strong><small>Criar e iniciar</small></span>
+          </Link>
+        </div>
+
+        <details className="todayCustomBreak">
+          <summary>Pausa personalizada</summary>
           <div>
-            <span className="sectionKicker">PAUSAS</span>
-            <h2 id="break-title">Gestão de pausas</h2>
-          </div>
-          <span className="historyCount">{breaks.length}</span>
-        </div>
-
-        {activeBreak ? (
-          <div className="activeBreakCard">
-            <div>
-              <span className="breakLiveLabel">PAUSA ATIVA</span>
-              <strong>{formatDuration(getBreakDurationMs(activeBreak, nowIso))}</strong>
-              <p>
-                Iniciada às {formatClockTime(activeBreak.startedAt)}
-                {activeBreak.plannedDurationMinutes ? ` · prevista: ${activeBreak.plannedDurationMinutes} min` : ''}
-              </p>
-            </div>
-            <button className="actionButton actionButtonPrimary" type="button" disabled={isBreakBusy} onClick={() => void finishBreak()}>
-              {isBreakBusy ? 'A terminar…' : 'Terminar pausa'}
+            <label htmlFor="custom-break-minutes">Duração</label>
+            <input id="custom-break-minutes" inputMode="numeric" min="1" type="number" value={customMinutes} onChange={(event) => setCustomMinutes(event.target.value)} />
+            <span>min</span>
+            <button type="button" disabled={!activeJourney || isBreakBusy || Boolean(activeBreak) || Number(customMinutes) <= 0} onClick={() => void handleCustomBreak()}>
+              Iniciar
             </button>
           </div>
-        ) : (
-          <div className="breakActions" aria-label="Iniciar pausa">
-            <button className="breakShortcut" type="button" disabled={!activeJourney || isBreakBusy || isLoadingBreaks} onClick={() => void startBreak('short', 15)}>
-              <strong>15 min</strong><span>Pausa curta</span>
-            </button>
-            <button className="breakShortcut" type="button" disabled={!activeJourney || isBreakBusy || isLoadingBreaks} onClick={() => void startBreak('long', 60)}>
-              <strong>60 min</strong><span>Pausa longa</span>
-            </button>
-            <div className="customBreak">
-              <label htmlFor="custom-break-minutes">Personalizada</label>
-              <div>
-                <input id="custom-break-minutes" inputMode="numeric" min="1" type="number" value={customMinutes} onChange={(event) => setCustomMinutes(event.target.value)} />
-                <button type="button" disabled={!activeJourney || isBreakBusy || Number(customMinutes) <= 0} onClick={handleCustomBreak}>Iniciar</button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {!activeJourney ? <p className="breakHint">Inicia uma jornada para poderes registar pausas.</p> : null}
-
-        {breaks.length > 0 ? (
-          <div className="breakHistory">
-            {breaks.slice().reverse().map((record) => (
-              <article className="breakHistoryItem" key={record.id}>
-                <div>
-                  <strong>{record.type === 'short' ? 'Pausa curta' : record.type === 'long' ? 'Pausa longa' : 'Pausa personalizada'}</strong>
-                  <span>{formatClockTime(record.startedAt)} → {formatClockTime(record.endedAt)}</span>
-                </div>
-                <time>{formatDuration(getBreakDurationMs(record, nowIso))}</time>
-              </article>
-            ))}
-          </div>
-        ) : null}
+        </details>
       </section>
 
-      <section className="journeyHistory" aria-labelledby="today-history-title">
-        <div className="sectionHeadingRow">
-          <div><span className="sectionKicker">REGISTOS</span><h2 id="today-history-title">Jornadas de hoje</h2></div>
-          <span className="historyCount">{todayJourneys.length}</span>
-        </div>
-        {isLoading ? (
-          <p className="mutedText">A recuperar os dados guardados no dispositivo…</p>
-        ) : todayJourneys.length === 0 ? (
-          <div className="historyEmpty">Ainda não existem jornadas registadas hoje.</div>
-        ) : (
-          <div className="historyList">
-            {todayJourneys.map((journey) => (
-              <article className="historyItem" key={journey.id}>
-                <div>
-                  <strong>{journey.status === 'active' ? 'Jornada em curso' : 'Jornada concluída'}</strong>
-                  <span>{formatClockTime(journey.startedAt)} → {formatClockTime(journey.endedAt)}</span>
-                </div>
-                <time>{formatDuration(getJourneyDurationMs(journey, journey.endedAt ?? nowIso))}</time>
-              </article>
-            ))}
+      <div className="todayLowerGrid">
+        <section className="todayTimelineCard" aria-labelledby="today-history-title">
+          <div className="todaySectionTitle">
+            <h2 id="today-history-title">Histórico de hoje</h2>
+            <Link to="/historico">Ver tudo</Link>
           </div>
-        )}
-      </section>
+          {recentEvents.length === 0 ? (
+            <p className="todayEmptyText">Ainda não existem registos hoje.</p>
+          ) : (
+            <div className="todayTimelineList">
+              {recentEvents.map((event) => (
+                <div key={event.id} className="todayTimelineRow">
+                  <time>{formatClockTime(event.timestamp)}</time>
+                  <span className="todayTimelineDot" aria-hidden="true" />
+                  <div><strong>{event.label}</strong>{event.detail ? <small>{event.detail}</small> : null}</div>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+
+        <section className="todaySummaryCard" aria-labelledby="today-summary-title">
+          <div className="todaySectionTitle"><h2 id="today-summary-title">Resumo do dia</h2></div>
+          <dl>
+            <div><dt>Tempo efetivo</dt><dd>{formatDuration(effectiveDurationMs)}</dd></div>
+            <div><dt>Pausas</dt><dd>{formatDuration(totalBreakDurationMs || report?.summary.breakMs || 0)}</dd></div>
+            <div><dt>Foco</dt><dd>{formatDuration(focusDurationMs || report?.summary.focusMs || 0)}</dd></div>
+            <div><dt>Atividades</dt><dd>{report?.summary.activityCount ?? 0}</dd></div>
+            <div><dt>Cafés</dt><dd>{coffeeTotals.quantity}</dd></div>
+            <div><dt>Gasto</dt><dd>{coffeeTotals.cost.toFixed(2)} €</dd></div>
+          </dl>
+        </section>
+      </div>
     </section>
   )
 }
