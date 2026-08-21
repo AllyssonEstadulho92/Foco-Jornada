@@ -6,5 +6,10 @@ export default defineConfig({
   build: {
     target: 'es2019',
   },
+  resolve: {
+    alias: {
+      'react-hot-toast': '/src/shared/notifications/hotToastBridge.tsx',
+    },
+  },
   plugins: [react()],
 })
