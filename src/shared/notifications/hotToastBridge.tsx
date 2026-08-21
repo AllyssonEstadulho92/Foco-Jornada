@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components -- este ficheiro adapta a API de react-hot-toast ao centro de notificações interno. */
 import { pushAppNotification } from '../../presentation/store/useNotificationStore'
 
 function textOf(message: unknown): string {
