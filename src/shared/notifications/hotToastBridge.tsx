@@ -1,4 +1,3 @@
-import type { ReactNode } from 'react'
 import { pushAppNotification } from '../../presentation/store/useNotificationStore'
 
 function textOf(message: unknown): string {
@@ -33,6 +32,6 @@ const toast = Object.assign(baseToast, {
 
 export default toast
 
-export function Toaster(_props: { position?: string; toastOptions?: unknown }): ReactNode {
+export function Toaster() {
   return null
 }
