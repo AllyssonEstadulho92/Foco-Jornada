@@ -412,7 +412,7 @@ select:disabled {
   .appContent {
     width: 100%;
     max-width: 100%;
-    padding: 36px max(18px, env(safe-area-inset-left)) calc(var(--bottom-nav-height) + 34px + env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-right));
+    padding: 36px max(18px, env(safe-area-inset-right)) calc(var(--bottom-nav-height) + 34px + env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
     overflow-x: clip;
   }
 
