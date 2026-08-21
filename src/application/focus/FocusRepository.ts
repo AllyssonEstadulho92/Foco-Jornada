@@ -6,4 +6,5 @@ export interface FocusRepository {
   getOpenForJourney(journeyId: string): Promise<FocusSession | undefined>
   listByJourney(journeyId: string): Promise<FocusSession[]>
   updateIfStatus(session: FocusSession, allowedStatuses: FocusStatus[]): Promise<boolean>
+  deleteById?(id: string): Promise<void>
 }
