@@ -1,10 +1,17 @@
-import { useMemo, useState } from 'react'
+import { type CSSProperties, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { getEffectiveJourneyDurationMs } from '../../application/journey/getEffectiveJourneyDuration'
 import { getActivityDurationMs } from '../../domain/activities/Activity'
 import { getBreakDurationMs } from '../../domain/breaks/BreakRecord'
 import { getFocusElapsedMs } from '../../domain/focus/FocusSession'
 import { getJourneyDurationMs } from '../../domain/journey/Journey'
+import {
+  formatPlannedMinutes,
+  getNextScheduleEvent,
+  getScheduleMilestones,
+  getScheduleProgress,
+  getScheduleSummary,
+} from '../../domain/journey/WorkSchedule'
 import { formatClockTime, formatDuration, toLocalDateKey } from '../../shared/utils/dateTime'
 import { useActivityController } from '../hooks/useActivityController'
 import { useBreakController } from '../hooks/useBreakController'
@@ -13,6 +20,7 @@ import { useDayReport } from '../hooks/useDayReport'
 import { useFocusController } from '../hooks/useFocusController'
 import { useJourneyController } from '../hooks/useJourneyController'
 import { useNow } from '../hooks/useNow'
+import { useSettingsController } from '../hooks/useSettingsController'
 
 type DashboardIcon = 'pause' | 'focus' | 'coffee' | 'activity' | 'clock'
 
@@ -67,6 +75,7 @@ export function TodayPage() {
     error: coffeeError,
     add: addCoffee,
   } = useCoffeeController()
+  const { settings, error: settingsError } = useSettingsController()
   const [customMinutes, setCustomMinutes] = useState('30')
   const now = useNow()
   const nowIso = now.toISOString()
@@ -101,6 +110,16 @@ export function TodayPage() {
   const effectiveDurationMs = activeJourney
     ? getEffectiveJourneyDurationMs(activeJourney, breaks, nowIso)
     : report?.summary.effectiveMs ?? 0
+
+  const schedule = settings.workSchedule
+  const scheduleMilestones = getScheduleMilestones(schedule)
+  const scheduleSummary = getScheduleSummary(schedule)
+  const nextScheduleEvent = getNextScheduleEvent(schedule, now)
+  const scheduleProgress = getScheduleProgress(schedule, now)
+  const scheduleStyle = {
+    '--schedule-count': Math.max(scheduleMilestones.length, 1),
+    '--schedule-progress': scheduleProgress,
+  } as CSSProperties
 
   async function handleFinish() {
     const openItems: string[] = []
@@ -153,8 +172,15 @@ export function TodayPage() {
         ? 'Em trabalho'
         : 'Sem jornada ativa'
 
-  const pageError = error ?? breakError ?? activityError ?? focusError ?? coffeeError
+  const pageError = error ?? breakError ?? activityError ?? focusError ?? coffeeError ?? settingsError
   const recentEvents = report?.events.slice(-5) ?? []
+
+  const nextEventClass =
+    nextScheduleEvent.state === 'break'
+      ? ' scheduleNextEventBreak'
+      : nextScheduleEvent.state === 'done'
+        ? ' scheduleNextEventDone'
+        : ''
 
   return (
     <section className="todayPage todayDashboard" aria-labelledby="page-title">
@@ -188,45 +214,71 @@ export function TodayPage() {
             >
               Terminar
             </button>
-          ) : null}
+          ) : (
+            <Link className="scheduleSettingsLink" to="/definicoes">Editar horário</Link>
+          )}
         </div>
 
-        {activeJourney ? (
-          <>
-            <div className="todayMainMetrics">
-              <article>
-                <span>Entrada</span>
-                <strong>{formatClockTime(activeJourney.startedAt)}</strong>
-              </article>
-              <article>
-                <span>Jornada</span>
-                <strong>{formatDuration(getJourneyDurationMs(activeJourney, nowIso))}</strong>
-              </article>
-              <article>
-                <span>Tempo efetivo</span>
-                <strong>{formatDuration(effectiveDurationMs)}</strong>
-              </article>
-            </div>
-            <div className="todayPauseStrip">
-              <div>
-                <span>Pausas</span>
-                <strong>{formatDuration(totalBreakDurationMs)}</strong>
-              </div>
-              <div className="todayPauseBar" aria-hidden="true"><span /></div>
-            </div>
-          </>
-        ) : (
-          <div className="todayJourneyEmpty">
-            <div className="todayEmptyIcon"><DashboardIcon type="clock" /></div>
-            <div>
-              <strong>Começa a jornada quando estiveres pronto.</strong>
-              <span>O tempo efetivo, as pausas e o foco serão registados automaticamente.</span>
-            </div>
-            <button className="actionButton actionButtonPrimary" type="button" disabled={isBusy || isLoading} onClick={() => void handleStartJourney()}>
-              {isBusy ? 'A iniciar…' : 'Iniciar jornada'}
-            </button>
+        <div className="scheduleBoard">
+          <div className={`scheduleNextEvent${nextEventClass}`}>
+            <span>{nextScheduleEvent.label}</span>
+            <strong>{nextScheduleEvent.time ?? 'Concluída'}</strong>
           </div>
-        )}
+
+          <div className="scheduleTimeline" style={scheduleStyle} aria-label="Linha do horário planeado">
+            <span className="scheduleTrack" aria-hidden="true" />
+            <span className="scheduleProgress" aria-hidden="true" />
+            {scheduleMilestones.map((milestone) => (
+              <div
+                key={milestone.id}
+                className={`scheduleMilestone scheduleMilestone${milestone.kind.charAt(0).toUpperCase()}${milestone.kind.slice(1)}`}
+              >
+                <i className="scheduleMilestoneDot" aria-hidden="true" />
+                <span>{milestone.label}</span>
+                <strong>{milestone.time}</strong>
+              </div>
+            ))}
+          </div>
+
+          <div className="scheduleLiveMetrics" aria-label="Registos reais da jornada">
+            <article>
+              <span>Entrada real</span>
+              <strong>{activeJourney ? formatClockTime(activeJourney.startedAt) : '—'}</strong>
+            </article>
+            <article>
+              <span>Jornada decorrida</span>
+              <strong>{activeJourney ? formatDuration(getJourneyDurationMs(activeJourney, nowIso)) : '00:00:00'}</strong>
+            </article>
+            <article>
+              <span>Tempo efetivo</span>
+              <strong>{formatDuration(effectiveDurationMs)}</strong>
+            </article>
+            <article>
+              <span>Pausas reais</span>
+              <strong>{formatDuration(totalBreakDurationMs)}</strong>
+            </article>
+          </div>
+
+          <div className="schedulePlanSummary">
+            <span>Planeado: <strong>{formatPlannedMinutes(scheduleSummary.totalMinutes)}</strong> jornada</span>
+            <span><strong>{formatPlannedMinutes(scheduleSummary.breakMinutes)}</strong> pausas</span>
+            <span><strong>{formatPlannedMinutes(scheduleSummary.effectiveMinutes)}</strong> efetivo</span>
+            <Link className="scheduleSettingsLink" to="/definicoes">Configurar</Link>
+          </div>
+
+          {!activeJourney ? (
+            <div className="todayJourneyEmpty">
+              <div className="todayEmptyIcon"><DashboardIcon type="clock" /></div>
+              <div>
+                <strong>Horário planeado pronto.</strong>
+                <span>Inicia a jornada; o plano permanece fixo e os tempos reais são registados separadamente.</span>
+              </div>
+              <button className="actionButton actionButtonPrimary" type="button" disabled={isBusy || isLoading} onClick={() => void handleStartJourney()}>
+                {isBusy ? 'A iniciar…' : 'Iniciar jornada'}
+              </button>
+            </div>
+          ) : null}
+        </div>
       </section>
 
       <section className="todayProductivityGrid" aria-label="Resumo de produtividade">
