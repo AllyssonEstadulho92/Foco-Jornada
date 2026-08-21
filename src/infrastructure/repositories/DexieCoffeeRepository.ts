@@ -16,4 +16,8 @@ export class DexieCoffeeRepository implements CoffeeRepository {
   async listByJourney(journeyId: string): Promise<CoffeeRecord[]> {
     return this.database.coffeeRecords.where('journeyId').equals(journeyId).sortBy('createdAt')
   }
+
+  async deleteById(id: string): Promise<void> {
+    await this.database.coffeeRecords.delete(id)
+  }
 }
