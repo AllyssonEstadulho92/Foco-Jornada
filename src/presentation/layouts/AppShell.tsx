@@ -1,4 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom'
+import { AppTopBar } from '../components/AppTopBar'
 import { BrandIcon, NavigationIcon } from '../navigation/NavigationIcon'
 import { primaryNavigation, secondaryNavigation, type NavigationItem } from '../navigation/navigationItems'
 import { useUiStore } from '../store/useUiStore'
@@ -63,9 +64,12 @@ export function AppShell() {
         </button>
       </aside>
 
-      <main className="appContent" id="main-content" tabIndex={-1}>
-        <Outlet />
-      </main>
+      <div className="appMainArea">
+        <AppTopBar />
+        <main className="appContent" id="main-content" tabIndex={-1}>
+          <Outlet />
+        </main>
+      </div>
 
       <nav className="bottomNav" aria-label="Navegação móvel">
         {primaryNavigation.map((item) => (
