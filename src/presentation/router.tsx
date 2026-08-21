@@ -4,6 +4,7 @@ import { ActivitiesPage } from './pages/ActivitiesPage'
 import { FocusPage } from './pages/FocusPage'
 import { HistoryPage } from './pages/HistoryPage'
 import { MorePage } from './pages/MorePage'
+import { PayrollPage } from './pages/PayrollPage'
 import { SettingsPage } from './pages/SettingsPage'
 import { StatisticsPage } from './pages/StatisticsPage'
 import { TodayPage } from './pages/TodayPage'
@@ -18,6 +19,7 @@ export const router = createHashRouter([
       { path: 'foco', element: <FocusPage /> },
       { path: 'historico', element: <HistoryPage /> },
       { path: 'mais', element: <MorePage /> },
+      { path: 'vencimento', element: <PayrollPage /> },
       { path: 'estatisticas', element: <StatisticsPage /> },
       { path: 'definicoes', element: <SettingsPage /> },
     ],
