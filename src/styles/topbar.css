@@ -1,5 +1,7 @@
 .appMainArea {
+  width: 100%;
   min-width: 0;
+  max-width: 100%;
 }
 
 .appTopBar {
@@ -7,11 +9,14 @@
   z-index: 18;
   top: 0;
   display: flex;
+  width: 100%;
+  max-width: 100%;
   min-height: 64px;
   align-items: center;
   justify-content: flex-end;
   gap: 10px;
   padding: 10px clamp(24px, 5vw, 72px);
+  overflow: visible;
   border-bottom: 1px solid rgba(148, 163, 184, 0.08);
   background: linear-gradient(180deg, rgba(8, 15, 24, 0.96), rgba(8, 15, 24, 0.82));
   backdrop-filter: blur(18px);
@@ -49,6 +54,7 @@
 
 .notificationCenter {
   position: relative;
+  min-width: 0;
 }
 
 .notificationButton {
@@ -224,10 +230,26 @@
   }
 }
 
+@media (min-width: 1600px) {
+  .appTopBar {
+    padding-inline: clamp(48px, 5vw, 110px);
+  }
+}
+
+@media (min-width: 2200px) {
+  .appTopBar {
+    padding-right: max(72px, calc((100vw - var(--sidebar-width) - 1760px) / 2));
+    padding-left: max(72px, calc((100vw - var(--sidebar-width) - 1760px) / 2));
+  }
+}
+
 @media (max-width: 899px) {
   .appTopBar {
     min-height: 58px;
-    padding: 8px 14px;
+    padding-top: 8px;
+    padding-right: max(14px, env(safe-area-inset-right));
+    padding-bottom: 8px;
+    padding-left: max(14px, env(safe-area-inset-left));
   }
 
   .appClock,
@@ -247,7 +269,8 @@
 
 @media (max-width: 380px) {
   .appTopBar {
-    padding-inline: 10px;
+    padding-right: max(10px, env(safe-area-inset-right));
+    padding-left: max(10px, env(safe-area-inset-left));
   }
 
   .appClock {
@@ -255,6 +278,7 @@
   }
 
   .notificationPanel {
-    width: calc(100vw - 20px);
+    right: calc(-1 * max(0px, env(safe-area-inset-right)));
+    width: min(360px, calc(100vw - 20px));
   }
 }
