@@ -130,7 +130,8 @@ select:disabled {
   height: 100dvh;
   padding: var(--space-5) var(--space-4);
   border-right: 1px solid var(--line);
-  background: rgba(17, 25, 38, 0.94);
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 8px 0 28px rgba(28, 38, 32, 0.025);
   backdrop-filter: blur(18px);
 }
 
@@ -148,7 +149,7 @@ select:disabled {
   width: 38px;
   height: 38px;
   place-items: center;
-  border: 1px solid rgba(91, 156, 255, 0.28);
+  border: 1px solid rgba(31, 157, 99, 0.20);
   border-radius: 12px;
   background: var(--primary-soft);
   color: var(--primary);
@@ -211,7 +212,7 @@ select:disabled {
 }
 
 .navLinkActive {
-  border-color: rgba(91, 156, 255, 0.24);
+  border-color: rgba(31, 157, 99, 0.18);
   background: var(--primary-soft);
   color: var(--text);
 }
@@ -231,8 +232,8 @@ select:disabled {
 }
 
 .navLinkActive .navMark {
-  border-color: rgba(91, 156, 255, 0.3);
-  background: rgba(91, 156, 255, 0.15);
+  border-color: rgba(31, 157, 99, 0.22);
+  background: var(--primary-soft);
   color: var(--primary);
 }
 
@@ -270,7 +271,7 @@ select:disabled {
   width: 100%;
   min-width: 0;
   max-width: 100%;
-  padding: 56px clamp(24px, 5vw, 72px);
+  padding: 48px clamp(24px, 5vw, 72px);
   outline: none;
 }
 
@@ -287,7 +288,7 @@ select:disabled {
 .eyebrow {
   display: inline-block;
   color: var(--primary);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.12em;
 }
@@ -318,8 +319,7 @@ select:disabled {
   padding: var(--space-6);
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
-  background:
-    linear-gradient(145deg, rgba(91, 156, 255, 0.06), transparent 45%), var(--surface);
+  background: var(--surface);
   box-shadow: var(--shadow-lg);
 }
 
@@ -412,7 +412,7 @@ select:disabled {
   .appContent {
     width: 100%;
     max-width: 100%;
-    padding: 36px max(18px, env(safe-area-inset-right)) calc(var(--bottom-nav-height) + 34px + env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
+    padding: 28px max(16px, env(safe-area-inset-right)) calc(var(--bottom-nav-height) + 32px + env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
     overflow-x: clip;
   }
 
@@ -425,17 +425,17 @@ select:disabled {
   .bottomNav {
     position: fixed;
     z-index: 20;
-    right: max(10px, env(safe-area-inset-right));
-    bottom: max(10px, env(safe-area-inset-bottom));
-    left: max(10px, env(safe-area-inset-left));
+    right: max(8px, env(safe-area-inset-right));
+    bottom: max(8px, env(safe-area-inset-bottom));
+    left: max(8px, env(safe-area-inset-left));
     display: grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
     min-height: var(--bottom-nav-height);
-    padding: 7px;
-    border: 1px solid var(--line);
-    border-radius: 20px;
-    background: rgba(17, 25, 38, 0.94);
-    box-shadow: var(--shadow-lg);
+    padding: 6px;
+    border: 1px solid rgba(25, 35, 29, 0.10);
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.96);
+    box-shadow: 0 12px 34px rgba(28, 38, 32, 0.12);
     backdrop-filter: blur(18px);
   }
 
@@ -446,7 +446,7 @@ select:disabled {
     justify-content: center;
     gap: 4px;
     padding: 5px 2px;
-    border-radius: 14px;
+    border-radius: 16px;
   }
 
   .bottomNav .navMark {
