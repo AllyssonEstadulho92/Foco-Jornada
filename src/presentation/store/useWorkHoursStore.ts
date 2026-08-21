@@ -1,0 +1,41 @@
+import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
+import type { WorkHoursEntry, WorkHoursEntryInput } from '../../domain/work-hours/WorkHours'
+
+interface WorkHoursState {
+  entries: WorkHoursEntry[]
+  add: (input: WorkHoursEntryInput) => WorkHoursEntry
+  remove: (id: string) => void
+  clearMonth: (monthKey: string) => void
+}
+
+function createId() {
+  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) return crypto.randomUUID()
+  return `work-hours-${Date.now()}-${Math.random().toString(36).slice(2)}`
+}
+
+export const useWorkHoursStore = create<WorkHoursState>()(
+  persist(
+    (set) => ({
+      entries: [],
+      add: (input) => {
+        const entry: WorkHoursEntry = {
+          ...input,
+          id: createId(),
+          createdAt: new Date().toISOString(),
+        }
+        set((state) => ({
+          entries: [entry, ...state.entries].slice(0, 500),
+        }))
+        return entry
+      },
+      remove: (id) => set((state) => ({ entries: state.entries.filter((item) => item.id !== id) })),
+      clearMonth: (monthKey) =>
+        set((state) => ({ entries: state.entries.filter((item) => !item.date.startsWith(monthKey)) })),
+    }),
+    {
+      name: 'foco-jornada-work-hours-v1',
+      partialize: (state) => ({ entries: state.entries }),
+    },
+  ),
+)

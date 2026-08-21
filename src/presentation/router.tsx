@@ -8,6 +8,7 @@ import { PayrollPage } from './pages/PayrollPage'
 import { SettingsPage } from './pages/SettingsPage'
 import { StatisticsPage } from './pages/StatisticsPage'
 import { TodayPage } from './pages/TodayPage'
+import { WorkHoursCalculatorPage } from './pages/WorkHoursCalculatorPage'
 
 export const router = createHashRouter([
   {
@@ -20,6 +21,7 @@ export const router = createHashRouter([
       { path: 'historico', element: <HistoryPage /> },
       { path: 'mais', element: <MorePage /> },
       { path: 'vencimento', element: <PayrollPage /> },
+      { path: 'horas', element: <WorkHoursCalculatorPage /> },
       { path: 'estatisticas', element: <StatisticsPage /> },
       { path: 'definicoes', element: <SettingsPage /> },
     ],
