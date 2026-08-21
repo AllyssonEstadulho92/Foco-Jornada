@@ -52,4 +52,8 @@ export class DexieActivityRepository implements ActivityRepository {
       return true
     })
   }
+
+  async deleteById(id: string): Promise<void> {
+    await this.database.activities.delete(id)
+  }
 }
