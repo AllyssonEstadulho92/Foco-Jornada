@@ -11,27 +11,28 @@
   display: flex;
   width: 100%;
   max-width: 100%;
-  min-height: 64px;
+  min-height: 62px;
   align-items: center;
   justify-content: flex-end;
   gap: 10px;
   padding: 10px clamp(24px, 5vw, 72px);
   overflow: visible;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.08);
-  background: linear-gradient(180deg, rgba(8, 15, 24, 0.96), rgba(8, 15, 24, 0.82));
+  border-bottom: 1px solid rgba(28, 38, 32, 0.07);
+  background: rgba(246, 247, 245, 0.92);
   backdrop-filter: blur(18px);
 }
 
 .appClock {
   display: inline-flex;
-  min-height: 42px;
+  min-height: 40px;
   align-items: center;
   gap: 8px;
-  padding: 8px 12px;
+  padding: 7px 11px;
   border: 1px solid var(--line);
-  border-radius: 13px;
-  background: rgba(17, 25, 38, 0.76);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.94);
   color: var(--text);
+  box-shadow: 0 4px 14px rgba(28, 38, 32, 0.035);
   font-variant-numeric: tabular-nums;
   font-weight: 800;
   letter-spacing: 0.01em;
@@ -39,8 +40,8 @@
 
 .appClock svg,
 .notificationButton svg {
-  width: 19px;
-  height: 19px;
+  width: 18px;
+  height: 18px;
   fill: none;
   stroke: currentColor;
   stroke-linecap: round;
@@ -60,20 +61,21 @@
 .notificationButton {
   position: relative;
   display: grid;
-  width: 42px;
-  height: 42px;
+  width: 40px;
+  height: 40px;
   place-items: center;
   border: 1px solid var(--line);
-  border-radius: 13px;
-  background: rgba(17, 25, 38, 0.76);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.94);
   color: var(--muted);
+  box-shadow: 0 4px 14px rgba(28, 38, 32, 0.035);
   cursor: pointer;
   transition: border-color 150ms ease, background 150ms ease, color 150ms ease;
 }
 
 .notificationButton:hover,
 .notificationButtonActive {
-  border-color: rgba(91, 156, 255, 0.35);
+  border-color: rgba(31, 157, 99, 0.28);
   background: var(--primary-soft);
   color: var(--primary);
 }
@@ -89,7 +91,7 @@
   padding: 0 5px;
   border: 2px solid var(--bg);
   border-radius: 999px;
-  background: #ef4444;
+  background: #d84b4b;
   color: white;
   font-size: 10px;
   font-weight: 900;
@@ -104,8 +106,8 @@
   overflow: hidden;
   border: 1px solid var(--line);
   border-radius: 18px;
-  background: rgba(14, 23, 36, 0.98);
-  box-shadow: 0 22px 55px rgba(0, 0, 0, 0.38);
+  background: rgba(255, 255, 255, 0.99);
+  box-shadow: 0 20px 50px rgba(28, 38, 32, 0.14);
   backdrop-filter: blur(24px);
 }
 
@@ -162,7 +164,7 @@
   align-items: flex-start;
   gap: 11px;
   padding: 12px;
-  border: 1px solid rgba(148, 163, 184, 0.12);
+  border: 1px solid var(--line);
   border-radius: 13px;
   background: var(--surface-2);
 }
@@ -193,16 +195,12 @@
   flex: 0 0 8px;
   margin-top: 5px;
   border-radius: 999px;
-  box-shadow: 0 0 0 4px rgba(91, 156, 255, 0.08);
+  box-shadow: 0 0 0 4px rgba(31, 157, 99, 0.08);
 }
 
-.notificationDot-info {
-  background: var(--primary);
-}
-
+.notificationDot-info,
 .notificationDot-success {
-  background: #4ade80;
-  box-shadow: 0 0 0 4px rgba(74, 222, 128, 0.08);
+  background: var(--primary);
 }
 
 .notificationEmpty {
@@ -245,7 +243,7 @@
 
 @media (max-width: 899px) {
   .appTopBar {
-    min-height: 58px;
+    min-height: 56px;
     padding-top: 8px;
     padding-right: max(14px, env(safe-area-inset-right));
     padding-bottom: 8px;
@@ -254,16 +252,16 @@
 
   .appClock,
   .notificationButton {
-    min-height: 40px;
-    height: 40px;
+    min-height: 38px;
+    height: 38px;
   }
 
   .appClock {
-    padding-inline: 11px;
+    padding-inline: 10px;
   }
 
   .appContent {
-    padding-top: 18px;
+    padding-top: 16px;
   }
 }
 

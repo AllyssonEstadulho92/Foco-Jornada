@@ -1,191 +1,183 @@
-/* Redesign moderno do ecrã Hoje — camada de override carregada por último. */
+/* Ecrã Hoje — acabamento final neutro, compacto e linear. */
 
 .todayDashboard {
-  width: min(100%, 1160px);
-  gap: 18px;
+  width: min(100%, 1120px);
+  gap: 14px;
 }
 
 .todayHero {
-  align-items: flex-end;
-  padding: 6px 4px 8px;
+  align-items: center;
+  padding: 4px 2px 8px;
 }
 
 .todayHero h1 {
-  font-size: clamp(38px, 4.6vw, 58px);
-  font-weight: 850;
-  letter-spacing: -0.055em;
+  font-size: clamp(34px, 4.2vw, 50px);
+  font-weight: 820;
+  letter-spacing: -0.05em;
 }
 
 .todayHero p {
-  margin-top: 9px;
-  font-size: 14px;
+  margin-top: 7px;
+  font-size: 13px;
   font-weight: 600;
-  letter-spacing: 0.01em;
 }
 
 .journeyStatus {
-  min-height: 42px;
-  padding: 9px 15px;
-  border: 1px solid rgba(145, 164, 193, 0.2);
+  min-height: 38px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
   border-radius: 999px;
-  background: rgba(145, 164, 193, 0.06);
-  backdrop-filter: blur(14px);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.025);
+  background: var(--surface);
+  color: var(--muted);
+  box-shadow: 0 4px 14px rgba(28, 38, 32, 0.04);
 }
 
 .journeyStatusActive {
-  border-color: rgba(79, 212, 154, 0.25);
-  background: rgba(79, 212, 154, 0.075);
+  border-color: rgba(31, 157, 99, 0.20);
+  background: var(--primary-soft);
+  color: var(--primary);
 }
 
 .todayJourneyCard {
   position: relative;
   overflow: hidden;
-  padding: clamp(20px, 2.6vw, 30px);
-  border-color: rgba(91, 156, 255, 0.2);
-  border-radius: 24px;
-  background:
-    radial-gradient(circle at 8% 0%, rgba(68, 126, 255, 0.1), transparent 30%),
-    linear-gradient(145deg, rgba(17, 29, 45, 0.98), rgba(10, 18, 29, 0.98));
-  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.2);
+  padding: clamp(18px, 2.4vw, 26px);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: var(--surface);
+  box-shadow: var(--shadow-lg);
 }
 
 .todayJourneyCard::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  border-radius: inherit;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.025);
+  content: none;
 }
 
 .todayCardHeader {
   position: relative;
   z-index: 1;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
 
 .todayCardHeader .sectionKicker {
   color: var(--primary);
   font-size: 10px;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.14em;
 }
 
 .todayCardHeader h2 {
-  margin-top: 7px;
-  font-size: clamp(23px, 3vw, 32px);
-  font-weight: 820;
-}
-
-.todayHeaderAction,
-.scheduleSettingsLink {
-  transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
+  margin-top: 6px;
+  font-size: clamp(21px, 2.8vw, 28px);
+  font-weight: 800;
 }
 
 .scheduleSettingsLink {
   display: inline-flex;
-  min-height: 36px;
+  min-height: 34px;
   align-items: center;
-  padding: 7px 11px;
-  border: 1px solid rgba(91, 156, 255, 0.18);
+  padding: 6px 10px;
+  border: 1px solid var(--line);
   border-radius: 10px;
-  background: rgba(91, 156, 255, 0.06);
-  font-size: 12px;
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 750;
+  text-decoration: none;
 }
 
 .scheduleSettingsLink:hover {
-  border-color: rgba(91, 156, 255, 0.34);
-  background: rgba(91, 156, 255, 0.1);
+  border-color: rgba(31, 157, 99, 0.24);
+  background: var(--primary-soft);
+  color: var(--primary);
 }
 
 .scheduleBoard {
-  gap: 16px;
+  gap: 14px;
 }
 
 .scheduleNextEvent {
-  width: min(100%, 290px);
+  width: min(100%, 280px);
   align-self: flex-end;
-  min-height: 62px;
-  padding: 12px 16px;
-  border-radius: 15px;
-  backdrop-filter: blur(14px);
+  min-height: 58px;
+  padding: 11px 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface-2);
+  color: var(--text);
 }
 
 .scheduleNextEvent > span {
-  font-size: 10px;
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
 .scheduleNextEvent > strong {
-  font-size: clamp(20px, 2.5vw, 27px);
-  letter-spacing: -0.035em;
+  font-size: clamp(18px, 2.2vw, 24px);
+  letter-spacing: -0.03em;
 }
 
 .scheduleTimeline {
-  min-height: 132px;
-  padding: 30px 12px 14px;
-  border-color: rgba(91, 156, 255, 0.16);
-  border-radius: 18px;
-  background:
-    linear-gradient(180deg, rgba(91, 156, 255, 0.05), rgba(91, 156, 255, 0.015)),
-    rgba(9, 17, 28, 0.72);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.018);
+  min-height: 124px;
+  padding: 28px 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 17px;
+  background: #f7f8f7;
+  box-shadow: none;
 }
 
 .scheduleTrack,
 .scheduleProgress {
-  top: 42px;
-  height: 4px;
+  top: 40px;
+  height: 3px;
 }
 
 .scheduleTrack {
-  background: rgba(145, 164, 193, 0.16);
+  background: #dfe4e0;
 }
 
 .scheduleProgress {
-  box-shadow: 0 0 18px rgba(91, 156, 255, 0.22);
+  background: var(--primary);
+  box-shadow: none;
 }
 
 .scheduleMilestone {
-  gap: 7px;
+  gap: 6px;
 }
 
 .scheduleMilestoneDot {
-  width: 14px;
-  height: 14px;
-  margin-bottom: 11px;
-  border-width: 3px;
-  box-shadow: 0 0 0 4px rgba(145, 164, 193, 0.08);
+  width: 13px;
+  height: 13px;
+  margin-bottom: 10px;
+  border: 3px solid var(--surface);
+  background: #a3aaa5;
+  box-shadow: 0 0 0 3px #e7ebe8;
 }
 
 .scheduleMilestoneEntry .scheduleMilestoneDot,
-.scheduleMilestoneExit .scheduleMilestoneDot {
-  box-shadow: 0 0 0 4px rgba(91, 156, 255, 0.1), 0 0 18px rgba(91, 156, 255, 0.28);
-}
-
-.scheduleMilestoneBreak-start .scheduleMilestoneDot {
-  box-shadow: 0 0 0 4px rgba(245, 168, 77, 0.09), 0 0 16px rgba(245, 168, 77, 0.22);
-}
-
+.scheduleMilestoneExit .scheduleMilestoneDot,
+.scheduleMilestoneBreak-start .scheduleMilestoneDot,
 .scheduleMilestoneBreak-end .scheduleMilestoneDot {
-  box-shadow: 0 0 0 4px rgba(79, 212, 154, 0.09), 0 0 16px rgba(79, 212, 154, 0.2);
+  background: var(--primary);
+  box-shadow: 0 0 0 3px rgba(31, 157, 99, 0.10);
 }
 
 .scheduleMilestone span {
-  font-size: 10px;
+  color: var(--muted);
+  font-size: 9px;
   font-weight: 700;
-  letter-spacing: 0.015em;
 }
 
 .scheduleMilestone strong {
-  font-size: clamp(17px, 2.1vw, 23px);
+  color: var(--text);
+  font-size: clamp(16px, 2vw, 21px);
 }
 
 .scheduleLiveMetrics {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
+  gap: 9px;
   overflow: visible;
   border: 0;
   background: transparent;
@@ -193,60 +185,39 @@
 
 .scheduleLiveMetrics article {
   position: relative;
-  min-height: 112px;
+  min-height: 92px;
   justify-content: flex-end;
-  gap: 8px;
-  padding: 16px;
-  border: 1px solid rgba(145, 164, 193, 0.14);
-  border-radius: 17px;
-  background:
-    linear-gradient(145deg, rgba(24, 39, 58, 0.72), rgba(12, 21, 33, 0.8));
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.018);
+  gap: 6px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  background: var(--surface-2);
+  box-shadow: none;
 }
 
 .scheduleLiveMetrics article::before {
-  content: '';
-  position: absolute;
-  top: 15px;
-  left: 16px;
-  width: 34px;
-  height: 34px;
-  border: 1px solid rgba(91, 156, 255, 0.2);
-  border-radius: 11px;
-  background: rgba(91, 156, 255, 0.09);
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.12);
-}
-
-.scheduleLiveMetrics article:nth-child(3)::before {
-  border-color: rgba(79, 212, 154, 0.2);
-  background: rgba(79, 212, 154, 0.08);
-}
-
-.scheduleLiveMetrics article:nth-child(4)::before {
-  border-color: rgba(245, 168, 77, 0.2);
-  background: rgba(245, 168, 77, 0.08);
+  content: none;
 }
 
 .scheduleLiveMetrics article:not(:last-child) {
-  border-right: 1px solid rgba(145, 164, 193, 0.14);
+  border-right: 1px solid var(--line);
 }
 
 .scheduleLiveMetrics span {
-  font-size: 10px;
-  letter-spacing: 0.025em;
+  color: var(--muted);
+  font-size: 9px;
+  letter-spacing: 0.02em;
 }
 
 .scheduleLiveMetrics strong {
-  font-size: clamp(19px, 2.4vw, 26px);
-  letter-spacing: -0.035em;
+  color: var(--text);
+  font-size: clamp(18px, 2.2vw, 24px);
+  letter-spacing: -0.03em;
 }
 
-.scheduleLiveMetrics article:nth-child(3) strong {
-  color: #67ddb0;
-}
-
+.scheduleLiveMetrics article:nth-child(3) strong,
 .scheduleLiveMetrics article:nth-child(4) strong {
-  color: #f2ad5f;
+  color: var(--text);
 }
 
 .schedulePlanSummary {
@@ -254,16 +225,17 @@
   grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
   align-items: center;
   gap: 0;
-  padding: 13px 14px;
-  border: 1px solid rgba(145, 164, 193, 0.12);
-  border-radius: 14px;
-  background: rgba(8, 15, 24, 0.34);
+  padding: 12px 13px;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  background: var(--surface);
+  color: var(--muted);
   font-size: 10px;
 }
 
 .schedulePlanSummary > span {
-  padding: 0 14px;
-  border-right: 1px solid rgba(145, 164, 193, 0.09);
+  padding: 0 12px;
+  border-right: 1px solid var(--line);
   text-align: center;
 }
 
@@ -271,172 +243,141 @@
   padding-left: 0;
 }
 
-.schedulePlanSummary strong {
+.schedulePlanSummary strong,
+.schedulePlanSummary > span:nth-child(2) strong,
+.schedulePlanSummary > span:nth-child(3) strong {
   display: inline-block;
   margin-left: 4px;
   color: var(--text);
 }
 
-.schedulePlanSummary > span:nth-child(2) strong {
-  color: #f2ad5f;
-}
-
-.schedulePlanSummary > span:nth-child(3) strong {
-  color: #67ddb0;
-}
-
 .todayJourneyEmpty {
-  min-height: 96px;
-  padding: 15px 16px;
-  border-color: rgba(91, 156, 255, 0.14);
-  border-radius: 17px;
-  background: rgba(91, 156, 255, 0.04);
+  min-height: 90px;
+  padding: 14px 15px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface-2);
 }
 
 .todayJourneyEmpty .actionButtonPrimary {
-  min-width: 150px;
-  min-height: 44px;
-  border-radius: 12px;
-  box-shadow: 0 10px 26px rgba(49, 116, 255, 0.16);
+  min-width: 146px;
+  min-height: 42px;
+  border-radius: 11px;
+  box-shadow: none;
 }
 
 .todayProductivityGrid {
-  grid-template-columns: 1.5fr 1fr 1fr;
-  gap: 12px;
+  grid-template-columns: 1.45fr 1fr 1fr;
+  gap: 9px;
 }
 
 .todayProductivityCard {
   position: relative;
-  min-height: 130px;
-  justify-content: flex-end;
-  gap: 7px;
-  padding: 18px;
-  border-color: rgba(145, 164, 193, 0.14);
-  border-radius: 18px;
-  background:
-    radial-gradient(circle at 16% 16%, rgba(91, 156, 255, 0.08), transparent 34%),
-    linear-gradient(145deg, rgba(20, 33, 50, 0.78), rgba(10, 18, 29, 0.9));
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.018);
-  transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+  min-height: 106px;
+  justify-content: center;
+  gap: 6px;
+  padding: 15px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: none;
+  transition: transform 150ms ease, border-color 150ms ease, background 150ms ease;
 }
 
 .todayProductivityCard::before {
-  content: '';
-  position: absolute;
-  top: 18px;
-  left: 18px;
-  width: 38px;
-  height: 38px;
-  border: 1px solid rgba(91, 156, 255, 0.22);
-  border-radius: 12px;
-  background: rgba(91, 156, 255, 0.1);
-}
-
-.todayProductivityCard:nth-child(2)::before {
-  border-color: rgba(79, 212, 154, 0.2);
-  background: rgba(79, 212, 154, 0.08);
-}
-
-.todayCoffeeCard::before {
-  border-color: rgba(245, 168, 77, 0.22);
-  background: rgba(245, 168, 77, 0.09);
+  content: none;
 }
 
 .todayProductivityCard:hover {
-  transform: translateY(-2px);
-  border-color: rgba(91, 156, 255, 0.25);
-  background: linear-gradient(145deg, rgba(24, 39, 58, 0.86), rgba(11, 20, 32, 0.94));
+  transform: translateY(-1px);
+  border-color: var(--line-strong);
+  background: var(--surface-2);
 }
 
 .todayProductivityCard > span {
-  font-size: 10px;
-  font-weight: 850;
-  letter-spacing: 0.09em;
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
 .todayProductivityCard strong {
-  font-size: clamp(18px, 2.3vw, 24px);
+  color: var(--text);
+  font-size: clamp(17px, 2.1vw, 22px);
   white-space: normal;
 }
 
 .todayProductivityCard small {
-  font-size: 11px;
+  color: var(--muted);
+  font-size: 10px;
   white-space: normal;
 }
 
-.todayProductivityGrid .todayProductivityCard:nth-child(2) strong {
-  color: #67ddb0;
-}
-
+.todayProductivityGrid .todayProductivityCard:nth-child(2) strong,
 .todayCoffeeCard strong {
-  color: #f2ad5f;
+  color: var(--text);
 }
 
 .todayActiveBreak,
 .todayQuickPanel,
 .todayTimelineCard,
 .todaySummaryCard {
-  border-color: rgba(145, 164, 193, 0.13);
-  border-radius: 19px;
-  background: linear-gradient(145deg, rgba(18, 30, 46, 0.78), rgba(10, 18, 29, 0.88));
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.016);
+  border: 1px solid var(--line);
+  border-radius: 17px;
+  background: var(--surface);
+  box-shadow: none;
 }
 
 .todayQuickPanel {
-  padding: 20px;
+  padding: 17px;
 }
 
 .todayQuickGrid {
-  gap: 10px;
+  gap: 8px;
 }
 
 .todayQuickGrid > button,
 .todayQuickGrid > a {
-  min-height: 70px;
-  border-color: rgba(145, 164, 193, 0.12);
-  border-radius: 14px;
-  background: rgba(9, 17, 28, 0.5);
+  min-height: 62px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-2);
+}
+
+.todayQuickGrid > button:hover:not(:disabled),
+.todayQuickGrid > a:hover {
+  border-color: var(--line-strong);
+  background: #f7f8f7;
+}
+
+.quickIcon,
+.quickIconAmber,
+.quickIconRed,
+.quickIconBlue,
+.quickIconGreen {
+  background: #e9ece9;
+  color: #66706a;
 }
 
 .todayLowerGrid {
-  gap: 12px;
+  gap: 10px;
 }
 
 @media (min-width: 1280px) {
   .todayDashboard {
-    width: min(100%, 1240px);
-  }
-
-  .todayJourneyCard {
-    padding: 30px;
-  }
-
-  .scheduleLiveMetrics article {
-    min-height: 124px;
+    width: min(100%, 1180px);
   }
 }
 
 @media (max-width: 899px) {
   .todayDashboard {
-    gap: 14px;
-  }
-
-  .todayJourneyCard {
-    border-radius: 22px;
+    gap: 12px;
   }
 
   .scheduleLiveMetrics {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px;
-  }
-
-  .scheduleLiveMetrics article:nth-child(2) {
-    border-right: 1px solid rgba(145, 164, 193, 0.14);
-  }
-
-  .scheduleLiveMetrics article:nth-child(-n + 2) {
-    border-bottom: 1px solid rgba(145, 164, 193, 0.14);
+    gap: 8px;
   }
 
   .todayProductivityGrid {
@@ -445,32 +386,28 @@
 }
 
 @media (max-width: 640px) {
-  .todayDashboard {
-    gap: 12px;
-  }
-
   .todayHero {
     align-items: center;
-    padding-inline: 4px;
+    padding-inline: 2px;
   }
 
   .todayHero h1 {
-    font-size: 36px;
+    font-size: 32px;
   }
 
   .todayHero p {
-    font-size: 12px;
-  }
-
-  .journeyStatus {
-    min-height: 38px;
-    padding: 8px 12px;
     font-size: 11px;
   }
 
+  .journeyStatus {
+    min-height: 34px;
+    padding: 7px 10px;
+    font-size: 10px;
+  }
+
   .todayJourneyCard {
-    padding: 17px;
-    border-radius: 20px;
+    padding: 14px;
+    border-radius: 18px;
   }
 
   .todayCardHeader {
@@ -478,35 +415,17 @@
   }
 
   .todayCardHeader h2 {
-    font-size: 24px;
-  }
-
-  .scheduleSettingsLink {
-    min-height: 34px;
-    padding: 6px 9px;
-    font-size: 11px;
+    font-size: 19px;
   }
 
   .scheduleNextEvent {
     width: 100%;
-    min-height: 56px;
+    align-self: stretch;
   }
 
   .scheduleTimeline {
-    min-height: 118px;
-    padding: 27px 2px 12px;
-    border-radius: 16px;
-  }
-
-  .scheduleTrack,
-  .scheduleProgress {
-    top: 39px;
-  }
-
-  .scheduleMilestoneDot {
-    width: 13px;
-    height: 13px;
-    margin-bottom: 9px;
+    min-height: 116px;
+    padding-inline: 5px;
   }
 
   .scheduleMilestone span {
@@ -514,154 +433,48 @@
   }
 
   .scheduleMilestone strong {
-    font-size: 14px;
-  }
-
-  .scheduleLiveMetrics {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 9px;
+    font-size: 15px;
   }
 
   .scheduleLiveMetrics article {
-    min-height: 104px;
-    padding: 14px;
-    border-radius: 15px;
-  }
-
-  .scheduleLiveMetrics article::before {
-    top: 13px;
-    left: 14px;
-    width: 30px;
-    height: 30px;
-    border-radius: 10px;
+    min-height: 78px;
+    padding: 11px;
   }
 
   .scheduleLiveMetrics strong {
-    font-size: 19px;
+    font-size: 18px;
   }
 
   .schedulePlanSummary {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0;
-    padding: 12px 8px;
+    gap: 8px 0;
+    padding: 10px;
   }
 
   .schedulePlanSummary > span {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    padding-inline: 8px;
+    padding: 0 8px;
   }
 
-  .schedulePlanSummary > span:first-child {
-    padding-left: 4px;
-  }
-
-  .schedulePlanSummary strong {
-    margin-left: 0;
-    font-size: 13px;
-  }
-
-  .schedulePlanSummary .scheduleSettingsLink {
+  .schedulePlanSummary > :last-child {
     grid-column: 1 / -1;
-    justify-content: center;
-    margin-top: 10px;
-  }
-
-  .todayJourneyEmpty {
-    grid-template-columns: 38px minmax(0, 1fr);
-    gap: 12px;
-    padding: 14px;
-  }
-
-  .todayJourneyEmpty .actionButtonPrimary {
-    grid-column: 1 / -1;
-    width: 100%;
   }
 
   .todayProductivityGrid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 8px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .todayProductivityActivity {
+    grid-column: 1 / -1;
   }
 
   .todayProductivityCard {
-    min-height: 124px;
-    padding: 13px;
-    border-radius: 16px;
-  }
-
-  .todayProductivityCard::before {
-    top: 13px;
-    left: 13px;
-    width: 30px;
-    height: 30px;
-    border-radius: 10px;
-  }
-
-  .todayProductivityCard > span {
-    font-size: 8px;
-  }
-
-  .todayProductivityCard strong {
-    font-size: 14px;
-    line-height: 1.2;
-  }
-
-  .todayProductivityCard small {
-    font-size: 9px;
+    min-height: 82px;
+    padding: 12px;
   }
 
   .todayQuickPanel,
   .todayTimelineCard,
   .todaySummaryCard {
-    border-radius: 17px;
-  }
-}
-
-@media (max-width: 430px) {
-  .todayHero h1 {
-    font-size: 34px;
-  }
-
-  .todayJourneyCard {
-    padding: 15px;
-  }
-
-  .todayCardHeader {
-    gap: 8px;
-  }
-
-  .todayCardHeader h2 {
-    font-size: 22px;
-  }
-
-  .scheduleMilestone strong {
-    font-size: 13px;
-  }
-
-  .scheduleLiveMetrics article {
-    min-height: 98px;
-    padding: 12px;
-  }
-
-  .scheduleLiveMetrics span {
-    font-size: 9px;
-  }
-
-  .scheduleLiveMetrics strong {
-    font-size: 17px;
-  }
-
-  .todayProductivityGrid {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .todayProductivityActivity {
-    grid-column: 1 / -1;
-    min-height: 112px;
-  }
-
-  .todayProductivityCard {
-    min-height: 110px;
+    padding: 14px;
   }
 }
