@@ -58,7 +58,7 @@ export function SettingsReferencePage() {
     <section className="referenceSettingsPage" aria-labelledby="settings-reference-title">
       <header className="referencePageTitle">
         <h1 id="settings-reference-title">Definições</h1>
-        <p>Personaliza a experiência e mantém tudo configurado para a tua jornada.</p>
+        <p>Ajusta o horário, as pausas, o tema e os dados da aplicação.</p>
       </header>
 
       {error ? <div className="errorBanner" role="alert">{error}</div> : null}
@@ -67,14 +67,14 @@ export function SettingsReferencePage() {
         <section className="referenceSettingsCard" aria-label="Preferências principais">
           <div className="referenceSettingsStaticRow">
             <SettingsIcon>○</SettingsIcon>
-            <span><strong>Perfil</strong><small>Preferências locais deste dispositivo</small></span>
+            <span><strong>Perfil</strong><small>Consulta os dados guardados neste dispositivo</small></span>
             <span className="referenceChevron">›</span>
           </div>
 
           <details className="referenceSettingsRow">
             <summary>
               <SettingsIcon>◷</SettingsIcon>
-              <span><strong>Horário base</strong><small>Seg–Sáb {settings.workSchedule.startTime}–{settings.workSchedule.endTime} · Dom {settings.workSchedule.sundayStartTime}–{settings.workSchedule.sundayEndTime}</small></span>
+              <span><strong>Horário base</strong><small>Define o teu horário habitual de trabalho</small></span>
               <span className="referenceChevron">›</span>
             </summary>
             <div className="referenceSettingsExpanded">
@@ -84,8 +84,8 @@ export function SettingsReferencePage() {
                 <label><span>Domingo entrada</span><input type="time" value={settings.workSchedule.sundayStartTime} disabled={isLoading || isBusy} onChange={(event) => setSettings({ ...settings, workSchedule: { ...settings.workSchedule, sundayStartTime: event.target.value } })} /></label>
                 <label><span>Domingo saída</span><input type="time" value={settings.workSchedule.sundayEndTime} disabled={isLoading || isBusy} onChange={(event) => setSettings({ ...settings, workSchedule: { ...settings.workSchedule, sundayEndTime: event.target.value } })} /></label>
               </div>
-              <p>{formatPlannedMinutes(weekdaySummary.effectiveMinutes)} de tempo efetivo previsto num dia normal.</p>
-              <label className="referenceMonthField"><span>Escala de fins de semana</span><input type="month" value={scheduleMonth} onChange={(event) => setScheduleMonth(event.target.value)} /></label>
+              <p>{formatPlannedMinutes(weekdaySummary.effectiveMinutes)} de trabalho efetivo previsto num dia normal.</p>
+              <label className="referenceMonthField"><span>Fins de semana</span><input type="month" value={scheduleMonth} onChange={(event) => setScheduleMonth(event.target.value)} /></label>
               <div className="referenceWeekendGrid">
                 {weekendDates.map((item) => {
                   const checked = settings.workSchedule.weekendWorkDates.includes(item.dateKey)
@@ -103,7 +103,7 @@ export function SettingsReferencePage() {
           <details className="referenceSettingsRow">
             <summary>
               <SettingsIcon>☕</SettingsIcon>
-              <span><strong>Pausas</strong><small>{settings.workSchedule.break1.enabled ? `${settings.workSchedule.break1.startTime}–${settings.workSchedule.break1.endTime}` : 'Sem pausa fixa'}</small></span>
+              <span><strong>Pausas</strong><small>Configura os teus intervalos de trabalho</small></span>
               <span className="referenceChevron">›</span>
             </summary>
             <div className="referenceSettingsExpanded">
@@ -114,19 +114,19 @@ export function SettingsReferencePage() {
                   <div className="referenceBreakEditor" key={key}>
                     <label className="referenceToggleLine"><input type="checkbox" checked={value.enabled} onChange={(event) => setSettings({ ...settings, workSchedule: { ...settings.workSchedule, [key]: { ...value, enabled: event.target.checked } } })} /><span>Pausa {number}</span></label>
                     <div className="referenceSettingsGrid">
-                      <label><span>Saída</span><input type="time" value={value.startTime} disabled={!value.enabled} onChange={(event) => setSettings({ ...settings, workSchedule: { ...settings.workSchedule, [key]: { ...value, startTime: event.target.value } } })} /></label>
-                      <label><span>Regresso</span><input type="time" value={value.endTime} disabled={!value.enabled} onChange={(event) => setSettings({ ...settings, workSchedule: { ...settings.workSchedule, [key]: { ...value, endTime: event.target.value } } })} /></label>
+                      <label><span>Início</span><input type="time" value={value.startTime} disabled={!value.enabled} onChange={(event) => setSettings({ ...settings, workSchedule: { ...settings.workSchedule, [key]: { ...value, startTime: event.target.value } } })} /></label>
+                      <label><span>Fim</span><input type="time" value={value.endTime} disabled={!value.enabled} onChange={(event) => setSettings({ ...settings, workSchedule: { ...settings.workSchedule, [key]: { ...value, endTime: event.target.value } } })} /></label>
                     </div>
                   </div>
                 )
               })}
-              <label><span>Intervalo sugerido entre pausas</span><div className="referenceInputSuffix"><input type="number" min="15" max="480" step="5" value={settings.suggestedBreakIntervalMinutes} onChange={(event) => setSettings({ ...settings, suggestedBreakIntervalMinutes: Number(event.target.value) })} /><span>min</span></div></label>
+              <label><span>Intervalo sugerido</span><div className="referenceInputSuffix"><input type="number" min="15" max="480" step="5" value={settings.suggestedBreakIntervalMinutes} onChange={(event) => setSettings({ ...settings, suggestedBreakIntervalMinutes: Number(event.target.value) })} /><span>min</span></div></label>
             </div>
           </details>
 
           <div className="referenceSettingsStaticRow referenceThemeRow">
             <SettingsIcon>◐</SettingsIcon>
-            <span><strong>Tema</strong><small>Escolher o tema da aplicação</small></span>
+            <span><strong>Tema</strong><small>Escolhe o aspeto da aplicação</small></span>
             <div className="referenceThemeSwitch" aria-label="Tema da aplicação">
               <button type="button" className={theme === 'light' ? 'active' : ''} onClick={() => setTheme('light')}>Claro</button>
               <button type="button" className={theme === 'dark' ? 'active' : ''} onClick={() => setTheme('dark')}>Escuro</button>
@@ -135,25 +135,25 @@ export function SettingsReferencePage() {
         </section>
 
         <section className="referenceSettingsCard">
-          <Link className="referenceSettingsLinkRow" to="/mais"><SettingsIcon>♢</SettingsIcon><span><strong>Notificações</strong><small>Gerir alertas e centro de notificações</small></span><span className="referenceChevron">›</span></Link>
+          <Link className="referenceSettingsLinkRow" to="/mais"><SettingsIcon>♢</SettingsIcon><span><strong>Notificações</strong><small>Gere os alertas que queres receber</small></span><span className="referenceChevron">›</span></Link>
         </section>
 
         <section className="referenceSettingsCard">
-          <Link className="referenceSettingsLinkRow" to="/mais"><SettingsIcon>⌁</SettingsIcon><span><strong>Diagnóstico do sistema</strong><small>Verificar o estado da aplicação</small></span><span className="referenceChevron">›</span></Link>
-          <Link className="referenceSettingsLinkRow" to="/mais"><SettingsIcon>⇧</SettingsIcon><span><strong>Exportar dados</strong><small>Exportar os dados deste dispositivo</small></span><span className="referenceChevron">›</span></Link>
-          <Link className="referenceSettingsLinkRow" to="/mais"><SettingsIcon>⇩</SettingsIcon><span><strong>Importar dados</strong><small>Importar dados de outro dispositivo</small></span><span className="referenceChevron">›</span></Link>
-          <Link className="referenceSettingsLinkRow" to="/mais"><SettingsIcon>☁</SettingsIcon><span><strong>Cópia de segurança</strong><small>Ferramentas de proteção e recuperação</small></span><span className="referenceChevron">›</span></Link>
+          <Link className="referenceSettingsLinkRow" to="/mais"><SettingsIcon>⌁</SettingsIcon><span><strong>Estado da aplicação</strong><small>Verifica se está tudo a funcionar</small></span><span className="referenceChevron">›</span></Link>
+          <Link className="referenceSettingsLinkRow" to="/mais"><SettingsIcon>⇧</SettingsIcon><span><strong>Exportar dados</strong><small>Guarda uma cópia dos teus dados</small></span><span className="referenceChevron">›</span></Link>
+          <Link className="referenceSettingsLinkRow" to="/mais"><SettingsIcon>⇩</SettingsIcon><span><strong>Importar dados</strong><small>Recupera dados de outro dispositivo</small></span><span className="referenceChevron">›</span></Link>
+          <Link className="referenceSettingsLinkRow" to="/mais"><SettingsIcon>☁</SettingsIcon><span><strong>Cópia de segurança</strong><small>Protege e recupera os teus dados</small></span><span className="referenceChevron">›</span></Link>
         </section>
 
         <section className="referenceSettingsCard">
-          <div className="referenceSettingsStaticRow"><SettingsIcon>ⓘ</SettingsIcon><span><strong>Versão</strong><small>Foco Jornada V1</small></span><span className="referenceChevron">›</span></div>
-          <div className="referenceSettingsStaticRow"><img className="referenceSettingsLogo" src="./logo-mark.svg" alt="" /><span><strong>Logo da aplicação</strong><small>Foco Jornada</small></span><span className="referenceChevron">›</span></div>
+          <div className="referenceSettingsStaticRow"><SettingsIcon>ⓘ</SettingsIcon><span><strong>Versão</strong><small>Consulta a versão instalada</small></span><span className="referenceChevron">›</span></div>
+          <div className="referenceSettingsStaticRow"><img className="referenceSettingsLogo" src="./logo-mark.svg" alt="" /><span><strong>Marca da aplicação</strong><small>Foco Jornada</small></span><span className="referenceChevron">›</span></div>
         </section>
       </div>
 
       <div className="referenceSettingsSave">
         <label><span>Preço por café (€)</span><input type="number" min="0" max="100" step="0.01" value={settings.coffeeUnitPrice} onChange={(event) => setSettings({ ...settings, coffeeUnitPrice: Number(event.target.value), currency: 'EUR' })} /></label>
-        <button type="button" onClick={() => void handleSave()} disabled={isLoading || isBusy}>{isBusy ? 'A guardar…' : 'Guardar definições'}</button>
+        <button type="button" onClick={() => void handleSave()} disabled={isLoading || isBusy}>{isBusy ? 'A guardar…' : 'Guardar alterações'}</button>
       </div>
     </section>
   )

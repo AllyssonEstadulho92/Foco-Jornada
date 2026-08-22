@@ -16,8 +16,8 @@ export function HistoryPage() {
   async function handleDelete(event: DayEvent) {
     const confirmed = window.confirm(
       event.recordType === 'journey'
-        ? 'Eliminar esta jornada? Também serão eliminadas as pausas, atividades, sessões de foco e cafés associados.'
-        : 'Eliminar este registo do histórico? Esta ação não pode ser anulada.',
+        ? 'Eliminar esta jornada? As pausas, atividades, sessões de foco e cafés associados também serão eliminados.'
+        : 'Eliminar este registo? Esta ação não pode ser anulada.',
     )
 
     if (!confirmed) return
@@ -28,7 +28,7 @@ export function HistoryPage() {
       await refresh()
       toast.success('Registo eliminado.')
     } catch (deleteError) {
-      toast.error(deleteError instanceof Error ? deleteError.message : 'Erro ao eliminar o registo.')
+      toast.error(deleteError instanceof Error ? deleteError.message : 'Não foi possível eliminar o registo.')
     } finally {
       setDeletingRecordId(null)
     }
@@ -41,7 +41,7 @@ export function HistoryPage() {
       <header className="historyHeader referenceHistoryHeader">
         <div className="historyHeaderCopy">
           <h1 id="history-title">Histórico</h1>
-          <p>Consulta o resumo e os registos reais do dia.</p>
+          <p>Vê o que aconteceu em cada dia.</p>
         </div>
 
         <label className="historyDateControl">
@@ -49,7 +49,7 @@ export function HistoryPage() {
             <rect x="4" y="5" width="16" height="15" rx="2.5" />
             <path d="M8 3v4M16 3v4M4 10h16" />
           </svg>
-          <input aria-label="Selecionar dia" type="date" value={date} onChange={(event) => setDate(event.target.value)} />
+          <input aria-label="Escolher dia" type="date" value={date} onChange={(event) => setDate(event.target.value)} />
         </label>
       </header>
 
@@ -101,17 +101,17 @@ export function HistoryPage() {
               </svg>
             </span>
             <div>
-              <h2 id="timeline-title">Eventos do dia</h2>
+              <h2 id="timeline-title">Registos do dia</h2>
               <span>{eventCount === 1 ? '1 registo' : `${eventCount} registos`}</span>
             </div>
           </div>
-          <span className="historyEventCount" aria-label={`${eventCount} eventos`}>{eventCount}</span>
+          <span className="historyEventCount" aria-label={`${eventCount} registos`}>{eventCount}</span>
         </div>
 
         {isLoading ? (
           <p className="mutedText">A carregar histórico…</p>
         ) : !report || report.events.length === 0 ? (
-          <div className="historyEmptyCompact">Não existem registos para este dia.</div>
+          <div className="historyEmptyCompact">Ainda não há registos neste dia.</div>
         ) : (
           <div className="historyTimelineList">
             {report.events.map((event) => (

@@ -200,7 +200,7 @@ export function WorkHoursCalculatorPage() {
       })
 
       if (!report.journeys.length) {
-        pushAppNotification('info', 'Sem jornada nesse dia', 'Não existem registos de entrada/saída para importar.')
+        pushAppNotification('info', 'Sem registos nesse dia', 'Não há uma jornada com entrada e saída para importar.')
         return
       }
 
@@ -250,7 +250,7 @@ export function WorkHoursCalculatorPage() {
     } catch (error) {
       pushAppNotification(
         'error',
-        'Não foi possível importar a jornada',
+        'Não foi possível importar',
         error instanceof Error ? error.message : 'Tenta novamente.',
       )
     } finally {
@@ -265,7 +265,7 @@ export function WorkHoursCalculatorPage() {
       updateEntry(editingEntryId, form)
       pushAppNotification(
         'success',
-        'Registo de horas atualizado',
+        'Registo atualizado',
         `${form.date} · ${OCCURRENCE_LABELS[form.reason]} · ${formatHoursMinutes(calculation.workedMinutes)} trabalhadas`,
       )
       setEditingEntryId(null)
@@ -273,7 +273,7 @@ export function WorkHoursCalculatorPage() {
       addEntry(form)
       pushAppNotification(
         'success',
-        'Registo de horas guardado',
+        'Registo guardado',
         `${form.date} · ${OCCURRENCE_LABELS[form.reason]} · ${formatHoursMinutes(calculation.workedMinutes)} trabalhadas`,
       )
     }
@@ -299,7 +299,7 @@ export function WorkHoursCalculatorPage() {
     if (!window.confirm('Eliminar este registo de horas?')) return
     removeEntry(id)
     if (editingEntryId === id) setEditingEntryId(null)
-    pushAppNotification('info', 'Registo eliminado', 'O registo foi removido da calculadora de horas.')
+    pushAppNotification('info', 'Registo eliminado', 'O registo foi removido de Horas.')
   }
 
   function handleClearMonth() {
@@ -310,59 +310,59 @@ export function WorkHoursCalculatorPage() {
     pushAppNotification('info', 'Mês limpo', `Foram removidos os registos de ${monthKey}.`)
   }
 
-  const sourceLabel = form.source === 'jornada' ? 'Importado da jornada' : 'Preenchimento manual'
+  const sourceLabel = form.source === 'jornada' ? 'Dados da jornada' : 'Preenchimento manual'
 
   return (
     <section className="reportPage workHoursPage" aria-labelledby="work-hours-title">
       <header className="reportHeader workHoursHeader">
         <div>
-          <span className="eyebrow">CONTROLO PROFISSIONAL DE TEMPO</span>
+          <span className="eyebrow">HORAS</span>
           <h1 id="work-hours-title">Horas & ausências</h1>
-          <p>Confere o horário planeado com o que realmente trabalhaste e separa, ao minuto, trabalho, ausência, doença, consulta e horas extra.</p>
+          <p>Compara o horário previsto com o que realmente trabalhaste e regista ausências ou horas extra.</p>
         </div>
       </header>
 
-      <section className="workHoursVerifier" aria-label="Verificador de horas">
+      <section className="workHoursVerifier" aria-label="Preenchimento das horas">
         <div>
-          <span className="sectionKicker">VERIFICAÇÃO</span>
-          <strong>{editingEntryId ? 'A editar um registo guardado' : sourceLabel}</strong>
-          <p>Podes preencher tudo manualmente ou importar os registos reais de jornada e pausas guardados na aplicação.</p>
+          <span className="sectionKicker">PREENCHIMENTO</span>
+          <strong>{editingEntryId ? 'A editar um registo' : sourceLabel}</strong>
+          <p>Preenche manualmente ou importa a jornada já guardada na aplicação.</p>
         </div>
         <div className="workHoursVerifierActions">
           <button type="button" onClick={() => void importDayRecord()} disabled={isImporting}>
-            {isImporting ? 'A importar…' : 'Importar jornada do dia'}
+            {isImporting ? 'A importar…' : 'Importar jornada'}
           </button>
-          <button type="button" onClick={markSicknessFromActual}>Marcar saída por doença</button>
+          <button type="button" onClick={markSicknessFromActual}>Registar saída por doença</button>
         </div>
       </section>
 
-      <div className="workHoursSummary" aria-label="Resumo do cálculo atual">
+      <div className="workHoursSummary" aria-label="Resumo das horas">
         <article><span>Previstas</span><strong>{formatHoursMinutes(calculation.plannedMinutes)}</strong></article>
         <article className="workHoursWorked"><span>Trabalhadas</span><strong>{formatHoursMinutes(calculation.workedMinutes)}</strong></article>
         <article className="workHoursWarning"><span>Não trabalhadas</span><strong>{formatHoursMinutes(calculation.nonWorkedMinutes)}</strong></article>
-        <article><span>Motivo / ausência</span><strong>{formatHoursMinutes(calculation.occurrenceMinutes)}</strong></article>
+        <article><span>Ausência</span><strong>{formatHoursMinutes(calculation.occurrenceMinutes)}</strong></article>
         <article className="workHoursPositive"><span>Horas extra</span><strong>{formatHoursMinutes(calculation.overtimeMinutes)}</strong></article>
         <article><span>Saldo</span><strong>{formatHoursMinutes(calculation.balanceMinutes)}</strong></article>
       </div>
 
       {form.reason === 'doenca' ? (
-        <section className="workHoursIllnessResult" aria-label="Resultado da ausência por doença">
+        <section className="workHoursIllnessResult" aria-label="Ausência por doença">
           <div><span>Trabalhaste</span><strong>{formatHoursMinutes(calculation.workedMinutes)}</strong></div>
           <span className="workHoursEquation">+</span>
-          <div><span>Não trabalhado por doença</span><strong>{formatHoursMinutes(calculation.nonWorkedMinutes)}</strong></div>
+          <div><span>Ausência por doença</span><strong>{formatHoursMinutes(calculation.nonWorkedMinutes)}</strong></div>
           <span className="workHoursEquation">=</span>
-          <div><span>Horário previsto</span><strong>{formatHoursMinutes(calculation.plannedMinutes)}</strong></div>
+          <div><span>Previsto</span><strong>{formatHoursMinutes(calculation.plannedMinutes)}</strong></div>
         </section>
       ) : null}
 
       <form className="workHoursForm" onSubmit={saveEntry}>
         <div className="workHoursSectionHeading">
-          <div><span className="sectionKicker">REGISTO PROFISSIONAL</span><h2>{editingEntryId ? 'Editar registo' : 'Dia, horário e ocorrência'}</h2></div>
-          <button type="button" className="workHoursExampleButton" onClick={loadSicknessExample}>Exemplo 08:00–14:00 por doença</button>
+          <div><span className="sectionKicker">DETALHES</span><h2>{editingEntryId ? 'Editar registo' : 'Registar horas'}</h2></div>
+          <button type="button" className="workHoursExampleButton" onClick={loadSicknessExample}>Usar exemplo de doença</button>
         </div>
 
         <div className="workHoursPlanNote">
-          <strong>Plano configurado</strong>
+          <strong>Horário previsto</strong>
           <span>{form.plannedStart} → {form.plannedEnd}</span>
           <small>
             {form.plannedBreaks?.length
@@ -379,41 +379,41 @@ export function WorkHoursCalculatorPage() {
 
           <label><span>Entrada real</span><input type="time" value={form.actualStart} onChange={(e) => updateActual('actualStart', e.target.value)} /></label>
           <label><span>Saída real</span><input type="time" value={form.actualEnd} onChange={(e) => updateActual('actualEnd', e.target.value)} /></label>
-          <label><span>Pausas realmente feitas</span><div className="inputWithSuffix"><input type="number" min="0" max="600" value={form.actualBreakMinutes} onChange={(e) => updateActual('actualBreakMinutes', Number(e.target.value))} /><span>min</span></div><small>Se saíste antes da pausa e não a fizeste, coloca 0.</small></label>
-          <label><span>Motivo / ocorrência</span><select value={form.reason} onChange={(e) => update('reason', e.target.value as WorkOccurrenceReason)}>{Object.entries(OCCURRENCE_LABELS).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
+          <label><span>Pausas feitas</span><div className="inputWithSuffix"><input type="number" min="0" max="600" value={form.actualBreakMinutes} onChange={(e) => updateActual('actualBreakMinutes', Number(e.target.value))} /><span>min</span></div><small>Se saíste antes da pausa e não a fizeste, coloca 0.</small></label>
+          <label><span>Motivo</span><select value={form.reason} onChange={(e) => update('reason', e.target.value as WorkOccurrenceReason)}>{Object.entries(OCCURRENCE_LABELS).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
 
           <label><span>Início da ausência</span><input type="time" value={form.occurrenceStart ?? ''} onChange={(e) => update('occurrenceStart', e.target.value)} /><small>Ex.: hora em que saíste por doença.</small></label>
           <label><span>Fim da ausência</span><input type="time" value={form.occurrenceEnd ?? ''} onChange={(e) => update('occurrenceEnd', e.target.value)} /><small>Se não regressaste, usa a saída prevista.</small></label>
           <label><span>Comprovativo</span><select value={form.proofType ?? 'nao_indicado'} onChange={(e) => update('proofType', e.target.value as WorkProofType)}>{Object.entries(WORK_PROOF_LABELS).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
-          <label><span>Tratamento remuneratório</span><select value={form.payTreatment} onChange={(e) => update('payTreatment', e.target.value as PayTreatment)}>{Object.entries(PAY_TREATMENT_LABELS).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
+          <label><span>Efeito no vencimento</span><select value={form.payTreatment} onChange={(e) => update('payTreatment', e.target.value as PayTreatment)}>{Object.entries(PAY_TREATMENT_LABELS).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
 
-          <label className="workHoursWide"><span>Observações / justificativo</span><textarea rows={3} value={form.notes ?? ''} placeholder="Ex.: indisposição às 14:00, saída autorizada, ADD/CIT entregue, regressou no dia seguinte..." onChange={(e) => update('notes', e.target.value)} /></label>
+          <label className="workHoursWide"><span>Notas</span><textarea rows={3} value={form.notes ?? ''} placeholder="Ex.: indisposição às 14:00, saída autorizada, comprovativo entregue..." onChange={(e) => update('notes', e.target.value)} /></label>
         </div>
 
         <div className="workHoursResultPanel">
-          <div><span>Horas dentro do horário</span><strong>{formatHoursMinutes(calculation.scheduledWorkedMinutes)}</strong></div>
-          <div><span>Ausência apurada</span><strong>{formatHoursMinutes(calculation.nonWorkedMinutes)}</strong></div>
-          <div><span>Ocorrência indicada</span><strong>{formatHoursMinutes(calculation.occurrenceMinutes)}</strong></div>
-          <div><span>Tempo considerado na estimativa</span><strong>{formatHoursMinutes(calculation.consideredMinutes)}</strong></div>
-          <p>O cálculo de tempo é feito ao minuto. Se existir ausência no meio do turno e depois houver regresso, esse intervalo é retirado das horas trabalhadas. Horas extra e ausência são contabilizadas separadamente, para uma não apagar a outra.</p>
+          <div><span>Horas no horário</span><strong>{formatHoursMinutes(calculation.scheduledWorkedMinutes)}</strong></div>
+          <div><span>Ausência</span><strong>{formatHoursMinutes(calculation.nonWorkedMinutes)}</strong></div>
+          <div><span>Motivo registado</span><strong>{formatHoursMinutes(calculation.occurrenceMinutes)}</strong></div>
+          <div><span>Tempo considerado</span><strong>{formatHoursMinutes(calculation.consideredMinutes)}</strong></div>
+          <p>O cálculo é feito ao minuto. Pausas, ausências e horas extra são apuradas separadamente para não duplicar nem retirar tempo indevidamente.</p>
         </div>
 
         <aside className="workHoursLegalNote">
-          <strong>Doença: tempo e remuneração são cálculos diferentes</strong>
-          <p>A aplicação calcula exatamente o tempo trabalhado e não trabalhado. O efeito no vencimento deve ficar separado, porque doença justificada, subsídio de doença, documentação e regras do contrato/CCT podem produzir tratamentos diferentes.</p>
+          <strong>Doença e vencimento</strong>
+          <p>A aplicação calcula o tempo trabalhado e a ausência. O valor pago pode depender do tipo de ausência, comprovativos e regras laborais aplicáveis.</p>
         </aside>
 
         <div className="workHoursFormActions">
-          {editingEntryId ? <button className="actionButton" type="button" onClick={cancelEdit}>Cancelar edição</button> : null}
+          {editingEntryId ? <button className="actionButton" type="button" onClick={cancelEdit}>Cancelar</button> : null}
           <button className="actionButton actionButtonPrimary" type="submit">
-            {editingEntryId ? 'Guardar alterações' : 'Guardar registo verificado'}
+            {editingEntryId ? 'Guardar alterações' : 'Guardar registo'}
           </button>
         </div>
       </form>
 
       <section className="workHoursMonth" aria-labelledby="work-hours-month-title">
         <div className="workHoursSectionHeading">
-          <div><span className="sectionKicker">ACUMULADO</span><h2 id="work-hours-month-title">Resumo mensal</h2></div>
+          <div><span className="sectionKicker">MÊS</span><h2 id="work-hours-month-title">Resumo do mês</h2></div>
           <div className="workHoursMonthActions"><input aria-label="Mês" type="month" value={monthKey} onChange={(e) => setMonthKey(e.target.value)} /><button type="button" onClick={handleClearMonth} disabled={!monthEntries.length}>Limpar mês</button></div>
         </div>
 
@@ -426,7 +426,7 @@ export function WorkHoursCalculatorPage() {
           <div><span>Consideradas</span><strong>{formatHoursMinutes(totals.considered)}</strong></div>
         </div>
 
-        {monthEntries.length === 0 ? <p className="workHoursEmpty">Ainda não existem registos neste mês.</p> : (
+        {monthEntries.length === 0 ? <p className="workHoursEmpty">Ainda não há registos neste mês.</p> : (
           <div className="workHoursEntries">
             {monthEntries.map((entry) => {
               const item = calculateWorkHours(entry)

@@ -45,7 +45,7 @@ const mobileMainNavigation: NavigationItem[] = [
   { label: 'Atividades', path: '/atividades', icon: 'activities' },
   { label: 'Histórico', path: '/historico', icon: 'history' },
   { label: 'Estatísticas', path: '/estatisticas', icon: 'stats' },
-  { label: 'Calculadora de horas', path: '/horas', icon: 'hours' },
+  { label: 'Horas', path: '/horas', icon: 'hours' },
   { label: 'Vencimento', path: '/vencimento', icon: 'payroll' },
   { label: 'Foco', path: '/foco', icon: 'focus' },
   { label: 'Guia', path: '/guia', icon: 'guide' },
@@ -53,7 +53,7 @@ const mobileMainNavigation: NavigationItem[] = [
 ]
 
 const mobileDataNavigation: NavigationItem[] = [
-  { label: 'Diagnóstico do sistema', path: '/mais', icon: 'focus' },
+  { label: 'Estado da aplicação', path: '/mais', icon: 'focus' },
   { label: 'Exportar dados', path: '/mais', icon: 'export' },
   { label: 'Importar dados', path: '/mais', icon: 'export' },
   { label: 'Cópia de segurança', path: '/mais', icon: 'more' },
@@ -113,7 +113,7 @@ export function AppShell() {
       <aside className="sidebar" aria-label="Navegação principal">
         <div className="brandRow">
           <BrandLockup compact={sidebarCollapsed} />
-          {!sidebarCollapsed ? <span className="brandTagline">Produtividade com propósito</span> : null}
+          {!sidebarCollapsed ? <span className="brandTagline">Tempo, foco e jornada</span> : null}
         </div>
 
         <nav className="sidebarNav">
@@ -146,8 +146,8 @@ export function AppShell() {
             <section className="prototypeThemeCard" aria-label="Tema da aplicação">
               <div>
                 <span>TEMA</span>
-                <strong>Claro ou escuro</strong>
-                <small>A escolha fica guardada neste dispositivo.</small>
+                <strong>Escolhe o tema</strong>
+                <small>Claro ou escuro. A escolha fica guardada.</small>
               </div>
               <div className="prototypeThemeSegment" role="group" aria-label="Escolher tema">
                 <button
@@ -186,7 +186,7 @@ export function AppShell() {
           <BrandLockup />
           <button type="button" onClick={() => setMobileMenuOpen(false)} aria-label="Fechar menu">×</button>
         </header>
-        <p className="mobileDrawerTagline">Organiza o teu tempo, jornada e vencimento.</p>
+        <p className="mobileDrawerTagline">Organiza o teu tempo, os turnos e o vencimento.</p>
 
         <nav className="mobileDrawerNav" aria-label="Navegação da aplicação">
           {mobileMainNavigation.map((item) => (
@@ -196,7 +196,7 @@ export function AppShell() {
 
         <div className="mobileDrawerDivider" />
 
-        <nav className="mobileDrawerNav mobileDrawerTools" aria-label="Ferramentas e dados">
+        <nav className="mobileDrawerNav mobileDrawerTools" aria-label="Dados e ferramentas">
           {mobileDataNavigation.map((item) => (
             <StaticNavigationLink key={`${item.path}-${item.label}`} item={item} />
           ))}
@@ -204,10 +204,10 @@ export function AppShell() {
 
         <div className="mobileDrawerDivider" />
 
-        <nav className="mobileDrawerNav mobileDrawerSupport" aria-label="Informação e apoio">
+        <nav className="mobileDrawerNav mobileDrawerSupport" aria-label="Ajuda">
           <NavLink to="/guia" className="navLink">
             <span className="navMark" aria-hidden="true"><NavigationIcon name="guide" /></span>
-            <span className="navLabel">Ajuda e suporte</span>
+            <span className="navLabel">Ajuda</span>
           </NavLink>
         </nav>
 

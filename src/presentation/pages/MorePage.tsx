@@ -79,9 +79,9 @@ export function MorePage() {
       anchor.click()
       anchor.remove()
       URL.revokeObjectURL(url)
-      pushAppNotification('success', 'Relatório exportado', 'O relatório do dia foi guardado em JSON.')
+      pushAppNotification('success', 'Dados exportados', 'A cópia do dia foi guardada no dispositivo.')
     } catch {
-      pushAppNotification('error', 'Não foi possível exportar', 'Tenta novamente a partir do menu Mais.')
+      pushAppNotification('error', 'Não foi possível exportar', 'Tenta novamente em Ferramentas.')
     }
   }
 
@@ -95,11 +95,11 @@ export function MorePage() {
 
     checks.push({
       id: 'https',
-      label: 'Ligação segura HTTPS',
+      label: 'Ligação segura',
       status: secureContext ? 'ok' : 'error',
       detail: secureContext
-        ? 'A aplicação está num contexto seguro, necessário para a proteção do navegador e para a PWA.'
-        : 'A ligação não está num contexto seguro. Abre a aplicação através de HTTPS.',
+        ? 'A aplicação está a usar uma ligação segura HTTPS.'
+        : 'A ligação não é segura. Abre a aplicação através de HTTPS.',
     })
 
     try {
@@ -117,14 +117,14 @@ export function MorePage() {
       ])
       checks.push({
         id: 'database',
-        label: 'Base de dados local',
+        label: 'Dados locais',
         status: 'ok',
-        detail: 'IndexedDB respondeu corretamente para definições, jornada, pausas, atividades, foco e café.',
+        detail: 'Os dados guardados neste dispositivo estão acessíveis.',
       })
     } catch {
       checks.push({
         id: 'database',
-        label: 'Base de dados local',
+        label: 'Dados locais',
         status: 'error',
         detail: 'Não foi possível ler todos os dados locais. Evita limpar o navegador até voltares a verificar.',
       })
@@ -136,39 +136,39 @@ export function MorePage() {
         if (registration?.active) {
           checks.push({
             id: 'pwa',
-            label: 'PWA e funcionamento offline',
+            label: 'Uso sem Internet',
             status: 'ok',
-            detail: 'O service worker está ativo e pode disponibilizar os ficheiros essenciais sem ligação.',
+            detail: 'Os ficheiros essenciais estão preparados para funcionar sem ligação.',
           })
         } else if (registration?.installing || registration?.waiting) {
           checks.push({
             id: 'pwa',
-            label: 'PWA e funcionamento offline',
+            label: 'Uso sem Internet',
             status: 'warning',
-            detail: 'A PWA está a instalar ou a preparar uma atualização. Volta a verificar dentro de alguns segundos.',
+            detail: 'A aplicação está a preparar uma atualização. Volta a verificar dentro de alguns segundos.',
           })
         } else {
           checks.push({
             id: 'pwa',
-            label: 'PWA e funcionamento offline',
+            label: 'Uso sem Internet',
             status: 'warning',
-            detail: 'Não foi encontrado um service worker ativo nesta abertura. Recarrega a aplicação e verifica novamente.',
+            detail: 'O modo offline ainda não está ativo nesta abertura. Recarrega a aplicação e verifica novamente.',
           })
         }
       } catch {
         checks.push({
           id: 'pwa',
-          label: 'PWA e funcionamento offline',
+          label: 'Uso sem Internet',
           status: 'warning',
-          detail: 'O navegador suporta PWA, mas não foi possível consultar o estado do service worker.',
+          detail: 'O navegador suporta o modo offline, mas não foi possível verificar o estado.',
         })
       }
     } else {
       checks.push({
         id: 'pwa',
-        label: 'PWA e funcionamento offline',
+        label: 'Uso sem Internet',
         status: 'warning',
-        detail: 'Este navegador não disponibiliza service workers para esta aplicação.',
+        detail: 'Este navegador não suporta o modo offline da aplicação.',
       })
     }
 
@@ -177,18 +177,18 @@ export function MorePage() {
         const persisted = await navigator.storage.persisted()
         checks.push({
           id: 'persistence',
-          label: 'Proteção contra limpeza automática',
+          label: 'Proteção dos dados',
           status: persisted ? 'ok' : 'warning',
           detail: persisted
-            ? 'O navegador marcou o armazenamento da aplicação como persistente.'
-            : 'O armazenamento não está marcado como persistente. Em falta extrema de espaço, o navegador pode remover dados locais.',
+            ? 'O navegador marcou os dados da aplicação como persistentes.'
+            : 'Os dados não estão marcados como persistentes. Em falta extrema de espaço, o navegador pode removê-los.',
         })
       } catch {
         checks.push({
           id: 'persistence',
-          label: 'Proteção contra limpeza automática',
+          label: 'Proteção dos dados',
           status: 'info',
-          detail: 'O navegador não informou se o armazenamento está marcado como persistente.',
+          detail: 'O navegador não informou o estado de persistência dos dados.',
         })
       }
 
@@ -199,26 +199,26 @@ export function MorePage() {
         const percent = quota > 0 ? (usage / quota) * 100 : 0
         checks.push({
           id: 'capacity',
-          label: 'Espaço de armazenamento',
+          label: 'Espaço disponível',
           status: quota > 0 && percent >= 90 ? 'warning' : 'ok',
           detail: quota > 0
-            ? `${formatBytes(usage)} usados de ${formatBytes(quota)} disponíveis para este contexto (${percent.toFixed(1)}%).`
-            : 'O navegador não forneceu a quota disponível, mas o armazenamento local está acessível.',
+            ? `${formatBytes(usage)} usados de ${formatBytes(quota)} disponíveis (${percent.toFixed(1)}%).`
+            : 'O navegador não indicou o espaço disponível, mas os dados locais estão acessíveis.',
         })
       } catch {
         checks.push({
           id: 'capacity',
-          label: 'Espaço de armazenamento',
+          label: 'Espaço disponível',
           status: 'info',
-          detail: 'O navegador não disponibilizou uma estimativa de utilização e quota.',
+          detail: 'O navegador não disponibilizou uma estimativa de espaço.',
         })
       }
     } else {
       checks.push({
         id: 'persistence',
-        label: 'Proteção do armazenamento',
+        label: 'Proteção dos dados',
         status: 'info',
-        detail: 'Este navegador não expõe o estado de persistência ou a quota de armazenamento.',
+        detail: 'Este navegador não disponibiliza informação sobre persistência ou espaço de armazenamento.',
       })
     }
 
@@ -226,11 +226,11 @@ export function MorePage() {
       || Boolean((navigator as Navigator & { standalone?: boolean }).standalone)
     checks.push({
       id: 'installation',
-      label: 'Modo de instalação',
+      label: 'Aplicação instalada',
       status: standalone ? 'ok' : 'info',
       detail: standalone
-        ? 'A aplicação está aberta em modo instalado/standalone.'
-        : 'A aplicação está aberta no navegador. A instalação como PWA é opcional.',
+        ? 'A aplicação está aberta como app instalada.'
+        : 'A aplicação está aberta no navegador. A instalação no ecrã principal é opcional.',
     })
 
     checks.push({
@@ -238,22 +238,22 @@ export function MorePage() {
       label: 'Ligação à Internet',
       status: 'info',
       detail: navigator.onLine
-        ? 'O dispositivo está online. Os registos funcionais da V1 continuam guardados localmente.'
-        : 'O dispositivo está offline. O estado da base de dados local foi verificado neste dispositivo.',
+        ? 'O dispositivo está online. Os registos continuam guardados neste dispositivo.'
+        : 'O dispositivo está offline. Os dados locais continuam disponíveis.',
     })
 
     checks.push({
       id: 'data-location',
-      label: 'Destino dos dados',
+      label: 'Onde ficam os dados',
       status: 'info',
-      detail: 'A V1 guarda jornada, pausas, atividades, foco, café e definições neste dispositivo; não existe sincronização cloud automática.',
+      detail: 'A versão atual guarda jornada, pausas, atividades, foco, café e definições neste dispositivo. Ainda não existe sincronização automática na cloud.',
     })
 
     checks.push({
       id: 'backup',
-      label: 'Recuperação e cópia de segurança',
+      label: 'Cópia de segurança',
       status: 'info',
-      detail: 'Limpar os dados do navegador, remover o armazenamento do site ou perder o dispositivo pode eliminar os registos. A exportação JSON do dia continua disponível no menu Gestão.',
+      detail: 'Limpar os dados do navegador ou perder o dispositivo pode eliminar os registos. Exporta uma cópia quando precisares.',
     })
 
     setProtectionChecks(checks)
@@ -268,7 +268,7 @@ export function MorePage() {
     : protectionWarnings > 0
       ? `${protectionWarnings} aviso${protectionWarnings === 1 ? '' : 's'} para rever`
       : protectionChecks.length > 0
-        ? 'Tudo verificado sem bloqueios'
+        ? 'Tudo a funcionar sem bloqueios'
         : 'Ainda não verificado'
 
   return (
@@ -277,7 +277,7 @@ export function MorePage() {
         <div>
           <span className="eyebrow">MAIS</span>
           <h1 id="more-title">Ferramentas</h1>
-          <p>Organização, horas, vencimento e apoio.</p>
+          <p>Acede às funções complementares e aos dados da aplicação.</p>
         </div>
       </header>
 
@@ -291,8 +291,8 @@ export function MorePage() {
           <Link to="/guia" className="moreRow">
             <span className="moreRowIcon" aria-hidden="true"><NavigationIcon name="guide" /></span>
             <span className="moreRowCopy">
-              <strong>Guia de utilização</strong>
-              <small>Como usar a aplicação</small>
+              <strong>Guia</strong>
+              <small>Aprende a usar a aplicação</small>
             </span>
             <RowArrow />
           </Link>
@@ -300,8 +300,8 @@ export function MorePage() {
           <Link to="/horas" className="moreRow">
             <span className="moreRowIcon" aria-hidden="true"><NavigationIcon name="hours" /></span>
             <span className="moreRowCopy">
-              <strong>Calculadora de horas & ausências</strong>
-              <small>Horas trabalhadas, doença e saldo</small>
+              <strong>Horas & ausências</strong>
+              <small>Confere horas, faltas e saldo</small>
             </span>
             <RowArrow />
           </Link>
@@ -309,8 +309,8 @@ export function MorePage() {
           <Link to="/vencimento" className="moreRow">
             <span className="moreRowIcon" aria-hidden="true"><NavigationIcon name="payroll" /></span>
             <span className="moreRowCopy">
-              <strong>Vencimento & planificação</strong>
-              <small>Previsão salarial e calendário</small>
+              <strong>Vencimento</strong>
+              <small>Consulta a estimativa do que vais receber</small>
             </span>
             <RowArrow />
           </Link>
@@ -320,15 +320,15 @@ export function MorePage() {
       <section className="moreToolSection" aria-labelledby="more-management-title">
         <div className="moreSectionHeading">
           <span className="moreSectionHeadingIcon" aria-hidden="true"><SectionIcon type="management" /></span>
-          <h2 id="more-management-title">Gestão</h2>
+          <h2 id="more-management-title">Dados e aplicação</h2>
         </div>
 
         <div className="moreList moreListGrouped">
           <Link to="/estatisticas" className="moreRow">
             <span className="moreRowIcon" aria-hidden="true"><NavigationIcon name="stats" /></span>
             <span className="moreRowCopy">
-              <strong>Estatísticas</strong>
-              <small>Hoje, 7 dias e 30 dias</small>
+              <strong>Relatórios</strong>
+              <small>Hoje, semana e mês</small>
             </span>
             <RowArrow />
           </Link>
@@ -337,7 +337,7 @@ export function MorePage() {
             <span className="moreRowIcon" aria-hidden="true"><NavigationIcon name="settings" /></span>
             <span className="moreRowCopy">
               <strong>Definições</strong>
-              <small>Horário, pausas, café e preferências</small>
+              <small>Horário, pausas, tema e dados</small>
             </span>
             <RowArrow />
           </Link>
@@ -345,24 +345,24 @@ export function MorePage() {
           <button type="button" className="moreRow moreRowButton" onClick={() => void exportToday()}>
             <span className="moreRowIcon" aria-hidden="true"><NavigationIcon name="export" /></span>
             <span className="moreRowCopy">
-              <strong>Exportar o dia</strong>
-              <small>Guardar relatório em JSON</small>
+              <strong>Exportar dados</strong>
+              <small>Guarda uma cópia do dia</small>
             </span>
             <RowArrow />
           </button>
         </div>
       </section>
 
-      <aside className="moreLocalCard" aria-label="Armazenamento local">
+      <aside className="moreLocalCard" aria-label="Dados guardados no dispositivo">
         <span className="moreLocalInfoIcon" aria-hidden="true">i</span>
         <div>
-          <strong>Tudo fica guardado localmente</strong>
-          <p>Os seus dados permanecem neste dispositivo.</p>
+          <strong>Os teus dados ficam neste dispositivo</strong>
+          <p>A versão atual guarda os registos localmente.</p>
         </div>
         <button
           type="button"
           className="moreLocalShield"
-          aria-label="Verificar proteção e armazenamento local"
+          aria-label="Ver estado da aplicação e proteção dos dados"
           aria-expanded={protectionOpen}
           aria-controls="local-protection-panel"
           onClick={() => void runProtectionCheck()}
@@ -380,17 +380,17 @@ export function MorePage() {
         <section id="local-protection-panel" className="moreProtectionPanel" aria-labelledby="local-protection-title" aria-live="polite">
           <div className="moreProtectionHeader">
             <div>
-              <span className="eyebrow">DIAGNÓSTICO LOCAL</span>
-              <h2 id="local-protection-title">Proteção e armazenamento</h2>
-              <p>{protectionLoading ? 'A verificar o dispositivo…' : protectionSummary}</p>
+              <span className="eyebrow">ESTADO DA APLICAÇÃO</span>
+              <h2 id="local-protection-title">Proteção dos dados</h2>
+              <p>{protectionLoading ? 'A verificar…' : protectionSummary}</p>
             </div>
-            <button type="button" className="moreProtectionClose" onClick={() => setProtectionOpen(false)} aria-label="Fechar diagnóstico">×</button>
+            <button type="button" className="moreProtectionClose" onClick={() => setProtectionOpen(false)} aria-label="Fechar estado da aplicação">×</button>
           </div>
 
           {protectionLoading ? (
             <div className="moreProtectionLoading" role="status">
               <span className="moreProtectionSpinner" aria-hidden="true" />
-              <span>A verificar HTTPS, dados locais, PWA e armazenamento…</span>
+              <span>A verificar ligação, dados, modo offline e armazenamento…</span>
             </div>
           ) : (
             <>

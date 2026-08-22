@@ -11,7 +11,7 @@ import { AppServicesProvider } from '../providers/AppServicesProvider'
 import { ShiftMapPage } from './ShiftMapPage'
 
 describe('ShiftMapPage', () => {
-  it('abre o mapa de turnos e apresenta o planeamento salarial sem erro', async () => {
+  it('abre o mapa de turnos e apresenta a estimativa do vencimento sem erro', async () => {
     render(
       <AppServicesProvider
         services={{
@@ -30,12 +30,12 @@ describe('ShiftMapPage', () => {
     )
 
     expect(screen.getByRole('heading', { name: 'Mapa de turnos' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Calendário do mês' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Guardar mapa e cálculo' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Turnos do mês' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Guardar mapa' })).toBeInTheDocument()
 
     // Aguarda o efeito assíncrono que carrega as definições e seleciona o primeiro dia.
     // Assim o teste só termina depois de o estado inicial do mapa estar estabilizado.
     expect(await screen.findByText('Situação RH')).toBeInTheDocument()
-    expect(screen.getByText('VALOR DA PLANIFICAÇÃO')).toBeInTheDocument()
+    expect(screen.getByText('VENCIMENTO ESTIMADO')).toBeInTheDocument()
   })
 })

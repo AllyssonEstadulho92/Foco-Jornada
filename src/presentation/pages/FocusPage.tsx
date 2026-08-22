@@ -18,7 +18,7 @@ function segmentLabel(segmentType: FocusSegmentType): string {
 }
 
 function sessionStatusLabel(session: FocusSession): string {
-  if (session.status === 'running') return 'Em execução'
+  if (session.status === 'running') return 'Em curso'
   if (session.status === 'paused') return 'Pausada'
   if (session.status === 'completed') return 'Concluída'
   return 'Cancelada'
@@ -101,10 +101,10 @@ export function FocusPage() {
         <div>
           <span className="eyebrow">FOCO</span>
           <h1 id="focus-title">Foco</h1>
-          <p>Concentra-te numa tarefa de cada vez.</p>
+          <p>Escolhe uma tarefa e concentra-te no que importa agora.</p>
         </div>
         <span className={`focusJourneyState ${activeJourney ? 'focusJourneyStateActive' : ''}`}>
-          {activeJourney ? 'Jornada ativa' : 'Sem jornada ativa'}
+          {activeJourney ? 'Jornada ativa' : 'Jornada por iniciar'}
         </span>
       </header>
 
@@ -138,11 +138,11 @@ export function FocusPage() {
 
           {activeSession.activityId ? (
             <p className="focusAssociation focusAssociationCentered">
-              {activeActivity?.name ?? 'Atividade registada'}
+              {activeActivity?.name ?? 'Atividade associada'}
             </p>
           ) : (
             <p className="focusAssociation focusAssociationCentered">
-              Iniciada às {formatClockTime(activeSession.startedAt)}
+              Início às {formatClockTime(activeSession.startedAt)}
             </p>
           )}
 
@@ -162,12 +162,12 @@ export function FocusPage() {
               disabled={isBusy}
               onClick={() => void cancel()}
             >
-              Terminar sessão
+              Terminar
             </button>
           </div>
         </section>
       ) : (
-        <section className="focusStartPanel focusPrototypePanel" aria-label="Iniciar sessão de foco">
+        <section className="focusStartPanel focusPrototypePanel" aria-label="Iniciar foco">
           <div className="focusModeTabs" role="tablist" aria-label="Modo de foco">
             <button
               type="button"
@@ -211,7 +211,7 @@ export function FocusPage() {
               ) : null}
 
               <p className="focusPrototypeDescription">
-                25 min de foco · 5 min pausa curta · 15 min pausa longa após o 4.º ciclo.
+                25 min de foco · 5 min de pausa · 15 min de pausa longa após o 4.º ciclo.
               </p>
 
               <button
@@ -227,7 +227,7 @@ export function FocusPage() {
             <>
               <div className="customFocusCompact">
                 <label className="customFocusInput">
-                  <span>Duração em minutos</span>
+                  <span>Minutos de foco</span>
                   <input
                     type="number"
                     min="1"
@@ -264,13 +264,13 @@ export function FocusPage() {
                 }
                 onClick={() => void handleStartCustom()}
               >
-                Iniciar sessão personalizada
+                Iniciar foco
               </button>
             </>
           )}
 
           {!activeJourney && !journeyLoading ? (
-            <p className="focusHint focusHintCentered">Ao iniciar o foco, a jornada começa automaticamente.</p>
+            <p className="focusHint focusHintCentered">Ao iniciares o foco, a jornada começa automaticamente.</p>
           ) : null}
         </section>
       )}
@@ -278,8 +278,8 @@ export function FocusPage() {
       <section className="focusHistoryPanel" aria-labelledby="focus-history-title">
         <div className="sectionHeadingRow">
           <div>
-            <span className="sectionKicker">HISTÓRICO</span>
-            <h2 id="focus-history-title">Sessões desta jornada</h2>
+            <span className="sectionKicker">HOJE</span>
+            <h2 id="focus-history-title">Sessões de foco</h2>
           </div>
           <div className="focusCounters">
             <span>{completedFocusCount} focos</span>
@@ -288,9 +288,9 @@ export function FocusPage() {
         </div>
 
         {isLoading ? (
-          <p className="mutedText">A recuperar sessões…</p>
+          <p className="mutedText">A carregar sessões…</p>
         ) : sessions.length === 0 ? (
-          <div className="historyEmpty">Ainda não existem sessões de foco nesta jornada.</div>
+          <div className="historyEmpty">Ainda não há sessões de foco nesta jornada.</div>
         ) : (
           <div className="focusHistoryList">
             {sessions
