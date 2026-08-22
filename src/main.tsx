@@ -37,6 +37,7 @@ import './styles/mobile-fit.css'
 import './styles/prototype-v2.css'
 import './styles/prototype-v2-settings.css'
 import './styles/reference-home.css'
+import './styles/today-live-status.css'
 import './styles/reference-settings.css'
 import './styles/reference-finance.css'
 
