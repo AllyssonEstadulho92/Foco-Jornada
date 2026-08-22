@@ -39,6 +39,25 @@ if (!root) throw new Error('Elemento #root não encontrado.')
 
 installNumberInputNormalization()
 
+function keepInstalledPwaCurrent() {
+  if (!('serviceWorker' in navigator)) return
+
+  let reloadingForUpdate = false
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (reloadingForUpdate) return
+    reloadingForUpdate = true
+    window.location.reload()
+  })
+
+  void navigator.serviceWorker.ready
+    .then((registration) => registration.update())
+    .catch(() => {
+      // A aplicação continua utilizável mesmo que a verificação de atualização falhe.
+    })
+}
+
+keepInstalledPwaCurrent()
+
 const services = {
   journeyRepository: new DexieJourneyRepository(db),
   breakRepository: new DexieBreakRepository(db),
