@@ -40,6 +40,7 @@ import './styles/reference-home.css'
 import './styles/today-live-status.css'
 import './styles/reference-settings.css'
 import './styles/reference-finance.css'
+import './styles/settings-functional.css'
 import './styles/export-a4.css'
 
 const root = document.getElementById('root')
