@@ -43,8 +43,8 @@ export const DEFAULT_WORK_SCHEDULE: WorkScheduleSettings = {
   dayOverrides: [],
   break1: {
     enabled: true,
-    startTime: '11:00',
-    endTime: '11:15',
+    startTime: '12:00',
+    endTime: '12:15',
   },
   break2: {
     enabled: false,
