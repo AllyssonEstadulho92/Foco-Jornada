@@ -4,6 +4,12 @@ export interface ScheduledBreakSettings {
   endTime: string
 }
 
+export interface WorkScheduleDayOverride {
+  date: string
+  startTime: string
+  endTime: string
+}
+
 export interface WorkScheduleSettings {
   mode: 'fixed'
   /** Segunda a sábado, quando o sábado estiver marcado como trabalho. */
@@ -14,6 +20,8 @@ export interface WorkScheduleSettings {
   sundayEndTime: string
   /** Datas de sábado/domingo em que existe trabalho planeado (YYYY-MM-DD). */
   weekendWorkDates: string[]
+  /** Exceções manuais por data. Uma exceção implica trabalho nesse dia. */
+  dayOverrides: WorkScheduleDayOverride[]
   break1: ScheduledBreakSettings
   break2: ScheduledBreakSettings
 }
@@ -32,6 +40,7 @@ export const DEFAULT_WORK_SCHEDULE: WorkScheduleSettings = {
   sundayStartTime: '09:00',
   sundayEndTime: '18:00',
   weekendWorkDates: [],
+  dayOverrides: [],
   break1: {
     enabled: true,
     startTime: '11:00',
@@ -51,12 +60,14 @@ export const DEFAULT_APP_SETTINGS: AppSettings = {
   workSchedule: DEFAULT_WORK_SCHEDULE,
 }
 
-function validClock(value: unknown, fallback: string) {
-  if (typeof value !== 'string' || !/^\d{2}:\d{2}$/.test(value)) return fallback
+function isValidClock(value: unknown): value is string {
+  if (typeof value !== 'string' || !/^\d{2}:\d{2}$/.test(value)) return false
   const [hours, minutes] = value.split(':').map(Number)
-  if (!Number.isInteger(hours) || !Number.isInteger(minutes)) return fallback
-  if (hours < 0 || hours > 23 || minutes < 0 || minutes > 59) return fallback
-  return value
+  return Number.isInteger(hours) && Number.isInteger(minutes) && hours >= 0 && hours <= 23 && minutes >= 0 && minutes <= 59
+}
+
+function validClock(value: unknown, fallback: string) {
+  return isValidClock(value) ? value : fallback
 }
 
 function validDateKey(value: unknown): value is string {
@@ -69,6 +80,25 @@ function validDateKey(value: unknown): value is string {
 function normalizeWeekendWorkDates(value: unknown): string[] {
   if (!Array.isArray(value)) return []
   return [...new Set(value.filter(validDateKey))].sort()
+}
+
+function normalizeDayOverrides(value: unknown): WorkScheduleDayOverride[] {
+  if (!Array.isArray(value)) return []
+
+  const byDate = new Map<string, WorkScheduleDayOverride>()
+  for (const item of value) {
+    if (!item || typeof item !== 'object') continue
+    const candidate = item as Partial<WorkScheduleDayOverride>
+    if (!validDateKey(candidate.date) || !isValidClock(candidate.startTime) || !isValidClock(candidate.endTime)) continue
+    if (candidate.endTime <= candidate.startTime) continue
+    byDate.set(candidate.date, {
+      date: candidate.date,
+      startTime: candidate.startTime,
+      endTime: candidate.endTime,
+    })
+  }
+
+  return [...byDate.values()].sort((a, b) => a.date.localeCompare(b.date))
 }
 
 function normalizeBreak(
@@ -90,6 +120,7 @@ function normalizeWorkSchedule(value: Partial<WorkScheduleSettings> | undefined)
     sundayStartTime: validClock(value?.sundayStartTime, DEFAULT_WORK_SCHEDULE.sundayStartTime),
     sundayEndTime: validClock(value?.sundayEndTime, DEFAULT_WORK_SCHEDULE.sundayEndTime),
     weekendWorkDates: normalizeWeekendWorkDates(value?.weekendWorkDates),
+    dayOverrides: normalizeDayOverrides(value?.dayOverrides),
     break1: normalizeBreak(value?.break1, DEFAULT_WORK_SCHEDULE.break1),
     break2: normalizeBreak(value?.break2, DEFAULT_WORK_SCHEDULE.break2),
   }
