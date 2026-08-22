@@ -67,10 +67,10 @@ export function ActivitiesPage() {
         <div>
           <span className="eyebrow">ATIVIDADES</span>
           <h1 id="activities-title">Atividades</h1>
-          <p>Organiza o trabalho da jornada atual e acompanha o tempo de cada atividade.</p>
+          <p>Organiza as tarefas de hoje e acompanha o tempo de cada uma.</p>
         </div>
         <span className={`activityJourneyState ${activeJourney ? 'activityJourneyStateActive' : ''}`}>
-          {activeJourney ? 'Jornada ativa' : 'Sem jornada ativa'}
+          {activeJourney ? 'Jornada ativa' : 'Jornada por iniciar'}
         </span>
       </header>
 
@@ -84,7 +84,7 @@ export function ActivitiesPage() {
         <div className="sectionHeadingRow">
           <div>
             <span className="sectionKicker">NOVA</span>
-            <h2 id="new-activity-title">Criar atividade</h2>
+            <h2 id="new-activity-title">Nova atividade</h2>
           </div>
         </div>
 
@@ -114,24 +114,24 @@ export function ActivitiesPage() {
             type="submit"
             disabled={isBusy || isJourneyBusy || isJourneyLoading || !name.trim()}
           >
-            {isBusy || isJourneyBusy ? 'A guardar…' : 'Criar atividade'}
+            {isBusy || isJourneyBusy ? 'A guardar…' : 'Adicionar atividade'}
           </button>
         </form>
 
         {!activeJourney && !isJourneyLoading ? (
-          <p className="activityHint">Ao criar a primeira atividade, a jornada é iniciada automaticamente.</p>
+          <p className="activityHint">Ao adicionares a primeira atividade, a jornada começa automaticamente.</p>
         ) : null}
       </section>
 
       {activeActivity ? (
         <section className="currentActivityPanel" aria-labelledby="current-activity-title">
           <div>
-            <span className="sectionKicker">ATUAL</span>
+            <span className="sectionKicker">AGORA</span>
             <h2 id="current-activity-title">{activeActivity.name}</h2>
             {activeActivity.description ? <p>{activeActivity.description}</p> : null}
           </div>
           <div className="currentActivityTime">
-            <span>Em curso desde {formatClockTime(activeActivity.startedAt)}</span>
+            <span>Desde {formatClockTime(activeActivity.startedAt)}</span>
             <strong>{formatDuration(getActivityDurationMs(activeActivity, nowIso))}</strong>
           </div>
           <button
@@ -140,7 +140,7 @@ export function ActivitiesPage() {
             disabled={isBusy}
             onClick={() => void complete(activeActivity.id)}
           >
-            Concluir atividade
+            Concluir
           </button>
         </section>
       ) : null}
@@ -148,8 +148,8 @@ export function ActivitiesPage() {
       <section className="activityListPanel" aria-labelledby="activity-list-title">
         <div className="sectionHeadingRow">
           <div>
-            <span className="sectionKicker">JORNADA ATUAL</span>
-            <h2 id="activity-list-title">Lista de atividades</h2>
+            <span className="sectionKicker">HOJE</span>
+            <h2 id="activity-list-title">As tuas atividades</h2>
           </div>
           <span className="historyCount">{activities.length}</span>
         </div>
@@ -157,7 +157,7 @@ export function ActivitiesPage() {
         {isLoading || isJourneyLoading ? (
           <p className="mutedText">A carregar atividades…</p>
         ) : activities.length === 0 ? (
-          <div className="historyEmpty">Ainda não existem atividades nesta jornada.</div>
+          <div className="historyEmpty">Ainda não adicionaste atividades nesta jornada.</div>
         ) : (
           <div className="activityList">
             {activities
@@ -185,7 +185,7 @@ export function ActivitiesPage() {
                             Guardar
                           </button>
                           <button type="button" onClick={() => setEditingId(null)}>
-                            Cancelar edição
+                            Cancelar
                           </button>
                         </div>
                       </div>
@@ -201,7 +201,7 @@ export function ActivitiesPage() {
                           {activity.description ? <p>{activity.description}</p> : null}
                           <div className="activityMeta">
                             <span>
-                              {activity.startedAt ? `Início ${formatClockTime(activity.startedAt)}` : 'Ainda não iniciada'}
+                              {activity.startedAt ? `Início ${formatClockTime(activity.startedAt)}` : 'Por iniciar'}
                             </span>
                             <span>{formatDuration(getActivityDurationMs(activity, nowIso))}</span>
                           </div>
