@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNow } from '../hooks/useNow'
 import { useAppServices } from '../providers/AppServicesProvider'
-import { useNotificationStore } from '../store/useNotificationStore'
+import { useNotificationStore, type AppNotification } from '../store/useNotificationStore'
 
 type StatusNotification = {
   id: string
@@ -36,6 +36,23 @@ function MenuIcon() {
   )
 }
 
+function EditIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="m4 16-.5 4.5L8 20l10.2-10.2-4-4L4 16Z" />
+      <path d="m12.8 7.2 4 4" />
+    </svg>
+  )
+}
+
+function TrashIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M5 7h14M9 7V4h6v3M8 10v8M12 10v8M16 10v8M7 7l1 13h8l1-13" />
+    </svg>
+  )
+}
+
 function formatNotificationTime(value: string) {
   return new Intl.DateTimeFormat('pt-PT', {
     day: '2-digit',
@@ -51,8 +68,13 @@ export function AppTopBar({ onOpenMenu }: { onOpenMenu?: () => void }) {
   const [isOpen, setIsOpen] = useState(false)
   const [activeJourneyStartedAt, setActiveJourneyStartedAt] = useState<string | null>(null)
   const [hasActiveFocus, setHasActiveFocus] = useState(false)
+  const [editingNotificationId, setEditingNotificationId] = useState<string | null>(null)
+  const [editTitle, setEditTitle] = useState('')
+  const [editDetail, setEditDetail] = useState('')
   const panelRef = useRef<HTMLDivElement>(null)
   const notifications = useNotificationStore((state) => state.notifications)
+  const updateNotification = useNotificationStore((state) => state.update)
+  const removeNotification = useNotificationStore((state) => state.remove)
   const markAllRead = useNotificationStore((state) => state.markAllRead)
   const clearNotifications = useNotificationStore((state) => state.clear)
 
@@ -87,7 +109,13 @@ export function AppTopBar({ onOpenMenu }: { onOpenMenu?: () => void }) {
     }
 
     function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === 'Escape') setIsOpen(false)
+      if (event.key === 'Escape') {
+        if (editingNotificationId) {
+          setEditingNotificationId(null)
+        } else {
+          setIsOpen(false)
+        }
+      }
     }
 
     document.addEventListener('mousedown', handlePointerDown)
@@ -96,7 +124,7 @@ export function AppTopBar({ onOpenMenu }: { onOpenMenu?: () => void }) {
       document.removeEventListener('mousedown', handlePointerDown)
       document.removeEventListener('keydown', handleKeyDown)
     }
-  }, [isOpen])
+  }, [editingNotificationId, isOpen])
 
   const statusNotifications = useMemo<StatusNotification[]>(() => {
     const items: StatusNotification[] = []
@@ -139,9 +167,46 @@ export function AppTopBar({ onOpenMenu }: { onOpenMenu?: () => void }) {
       if (next) {
         markAllRead()
         void refreshStatus()
+      } else {
+        setEditingNotificationId(null)
       }
       return next
     })
+  }
+
+  function startEditingNotification(item: AppNotification) {
+    setEditingNotificationId(item.id)
+    setEditTitle(item.title)
+    setEditDetail(item.detail)
+  }
+
+  function cancelEditingNotification() {
+    setEditingNotificationId(null)
+    setEditTitle('')
+    setEditDetail('')
+  }
+
+  function saveEditingNotification(event: React.FormEvent) {
+    event.preventDefault()
+    if (!editingNotificationId) return
+    const title = editTitle.trim()
+    if (!title) return
+
+    updateNotification(editingNotificationId, {
+      title,
+      detail: editDetail.trim(),
+    })
+    cancelEditingNotification()
+  }
+
+  function handleRemoveNotification(id: string) {
+    removeNotification(id)
+    if (editingNotificationId === id) cancelEditingNotification()
+  }
+
+  function handleClearNotifications() {
+    clearNotifications()
+    cancelEditingNotification()
   }
 
   return (
@@ -184,7 +249,7 @@ export function AppTopBar({ onOpenMenu }: { onOpenMenu?: () => void }) {
                 <div className="notificationHeaderActions">
                   <span className="notificationCount">{notifications.length}</span>
                   {notifications.length > 0 ? (
-                    <button type="button" onClick={clearNotifications}>Limpar</button>
+                    <button type="button" onClick={handleClearNotifications}>Limpar</button>
                   ) : null}
                 </div>
               </header>
@@ -194,7 +259,7 @@ export function AppTopBar({ onOpenMenu }: { onOpenMenu?: () => void }) {
                   {statusNotifications.map((item) => (
                     <article className="notificationItem notificationStatusItem" key={item.id}>
                       <span className={`notificationDot notificationDot-${item.tone}`} aria-hidden="true" />
-                      <div>
+                      <div className="notificationItemContent">
                         <strong>{item.title}</strong>
                         <span>{item.detail}</span>
                       </div>
@@ -210,16 +275,68 @@ export function AppTopBar({ onOpenMenu }: { onOpenMenu?: () => void }) {
                     <span>As ações da aplicação passam a ficar guardadas aqui, sem popups no ecrã.</span>
                   </div>
                 ) : (
-                  notifications.map((item) => (
-                    <article className={`notificationItem${item.read ? '' : ' notificationItemUnread'}`} key={item.id}>
-                      <span className={`notificationDot notificationDot-${item.tone}`} aria-hidden="true" />
-                      <div>
-                        <strong>{item.title}</strong>
-                        {item.detail ? <span>{item.detail}</span> : null}
-                        <time dateTime={item.createdAt}>{formatNotificationTime(item.createdAt)}</time>
-                      </div>
-                    </article>
-                  ))
+                  notifications.map((item) => {
+                    const isEditing = editingNotificationId === item.id
+                    return (
+                      <article className={`notificationItem${item.read ? '' : ' notificationItemUnread'}`} key={item.id}>
+                        <span className={`notificationDot notificationDot-${item.tone}`} aria-hidden="true" />
+                        {isEditing ? (
+                          <form className="notificationEditForm" onSubmit={saveEditingNotification}>
+                            <label>
+                              <span>Título</span>
+                              <input
+                                autoFocus
+                                maxLength={80}
+                                value={editTitle}
+                                onChange={(event) => setEditTitle(event.target.value)}
+                                required
+                              />
+                            </label>
+                            <label>
+                              <span>Detalhe</span>
+                              <textarea
+                                rows={2}
+                                maxLength={220}
+                                value={editDetail}
+                                onChange={(event) => setEditDetail(event.target.value)}
+                              />
+                            </label>
+                            <div className="notificationEditActions">
+                              <button type="button" onClick={cancelEditingNotification}>Cancelar</button>
+                              <button type="submit">Guardar</button>
+                            </div>
+                          </form>
+                        ) : (
+                          <>
+                            <div className="notificationItemContent">
+                              <strong>{item.title}</strong>
+                              {item.detail ? <span>{item.detail}</span> : null}
+                              <time dateTime={item.createdAt}>{formatNotificationTime(item.createdAt)}</time>
+                            </div>
+                            <div className="notificationItemActions" aria-label={`Ações para ${item.title}`}>
+                              <button
+                                type="button"
+                                onClick={() => startEditingNotification(item)}
+                                aria-label={`Editar notificação: ${item.title}`}
+                                title="Editar"
+                              >
+                                <EditIcon />
+                              </button>
+                              <button
+                                type="button"
+                                className="notificationDeleteButton"
+                                onClick={() => handleRemoveNotification(item.id)}
+                                aria-label={`Eliminar notificação: ${item.title}`}
+                                title="Eliminar"
+                              >
+                                <TrashIcon />
+                              </button>
+                            </div>
+                          </>
+                        )}
+                      </article>
+                    )
+                  })
                 )}
               </div>
 
