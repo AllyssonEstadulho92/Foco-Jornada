@@ -6,17 +6,17 @@ const base: WorkHoursEntryInput = {
   plannedStart: '08:00',
   plannedEnd: '17:00',
   plannedBreakMinutes: 15,
-  plannedBreaks: [{ start: '11:00', end: '11:15' }],
+  plannedBreaks: [{ start: '12:00', end: '12:15' }],
   actualStart: '08:00',
   actualEnd: '17:00',
   actualBreakMinutes: 15,
-  actualBreaks: [{ start: '11:00', end: '11:15' }],
+  actualBreaks: [{ start: '12:00', end: '12:15' }],
   reason: 'normal',
   payTreatment: 'apenas_registo',
 }
 
 describe('calculateWorkHours', () => {
-  it('calcula o dia normal 08:00–17:00 com pausa 11:00–11:15', () => {
+  it('calcula o dia normal 08:00–17:00 com pausa 12:00–12:15', () => {
     const result = calculateWorkHours(base)
     expect(result.plannedMinutes).toBe(525)
     expect(result.workedMinutes).toBe(525)
