@@ -79,11 +79,11 @@ export function PayrollReferencePage() {
 
   function refreshCalculation() {
     forceRefresh((value) => value + 1)
-    pushAppNotification('success', 'Cálculo atualizado', `Vencimento de ${monthLabel(month)} recalculado com a planificação guardada.`)
+    pushAppNotification('success', 'Cálculo atualizado', `Estimativa de ${monthLabel(month)} atualizada com os dados guardados.`)
   }
 
   function saveCalculation() {
-    pushAppNotification('success', 'Planificação e cálculo guardados', `${monthLabel(month)} · líquido estimado ${money(result.netEstimate)}.`)
+    pushAppNotification('success', 'Cálculo guardado', `${monthLabel(month)} · estimativa líquida ${money(result.netEstimate)}.`)
   }
 
   return (
@@ -92,19 +92,19 @@ export function PayrollReferencePage() {
         <div className="referencePayrollTitleIcon" aria-hidden="true">▣</div>
         <div>
           <h1 id="reference-payroll-title">Vencimento</h1>
-          <p>Detalhe da planificação e cálculo do teu vencimento.</p>
+          <p>Consulta a estimativa do que vais receber.</p>
         </div>
         <label className="referencePayrollMonth"><span className="referenceVisuallyHidden">Mês</span><input type="month" value={month} onChange={(event) => setMonth(event.target.value)} /></label>
       </header>
 
       <div className="referencePayrollToolbar">
         <span>{monthLabel(month)}</span>
-        <button type="button" onClick={refreshCalculation}>Atualizar cálculo</button>
-        <Link to="/vencimento/configurar">Configurar</Link>
+        <button type="button" onClick={refreshCalculation}>Recalcular</button>
+        <Link to="/vencimento/configurar">Editar dados</Link>
       </div>
 
       <section className="referencePayrollDetails" aria-labelledby="reference-payroll-detail-title">
-        <h2 id="reference-payroll-detail-title">Detalhe do vencimento</h2>
+        <h2 id="reference-payroll-detail-title">Resumo do vencimento</h2>
         <div className="referencePayrollRows">
           <PayrollRow icon="○" label="Salário base" value={money(config.baseSalary)} positive />
           <PayrollRow icon="♨" label="Subsídio de alimentação" hint={`${result.mealDays} dias`} value={money(result.mealAllowanceGross)} positive />
@@ -125,12 +125,12 @@ export function PayrollReferencePage() {
 
       <div className="referencePayrollNotice">
         <span aria-hidden="true">ⓘ</span>
-        <p>O valor usa a planificação guardada e o perfil fiscal configurado. Confere sempre as rubricas do recibo real.</p>
+        <p>Estimativa baseada nos turnos e nos dados fiscais guardados. Compara com o recibo quando o receberes.</p>
       </div>
 
       <div className="referencePayrollActions">
-        <button type="button" onClick={saveCalculation}>Guardar planificação e cálculo</button>
-        <Link to="/vencimento/configurar">Conferir / configurar recibo</Link>
+        <button type="button" onClick={saveCalculation}>Guardar cálculo</button>
+        <Link to="/vencimento/configurar">Rever dados do vencimento</Link>
       </div>
     </section>
   )
