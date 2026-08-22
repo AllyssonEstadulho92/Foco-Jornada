@@ -30,6 +30,10 @@ function SettingsIcon({ children }: { children: string }) {
   return <span className="referenceSettingsIcon" aria-hidden="true">{children}</span>
 }
 
+function breakSummary(enabled: boolean, startTime: string, endTime: string) {
+  return enabled ? `${startTime}–${endTime}` : 'Desativada'
+}
+
 export function SettingsReferencePage() {
   const { settings, setSettings, save, isLoading, isBusy, error } = useSettingsController()
   const theme = useUiStore((state) => state.theme)
@@ -66,11 +70,33 @@ export function SettingsReferencePage() {
 
       <div className="referenceSettingsGroups">
         <section className="referenceSettingsCard" aria-label="Preferências principais">
-          <div className="referenceSettingsStaticRow">
-            <SettingsIcon>○</SettingsIcon>
-            <span><strong>Perfil</strong><small>Consulta os dados guardados neste dispositivo</small></span>
-            <span className="referenceChevron">›</span>
-          </div>
+          <details className="referenceSettingsRow referenceProfileRow">
+            <summary>
+              <SettingsIcon>○</SettingsIcon>
+              <span><strong>Perfil</strong><small>Consulta os dados guardados neste dispositivo</small></span>
+              <span className="referenceChevron">›</span>
+            </summary>
+            <div className="referenceSettingsExpanded referenceProfileExpanded">
+              <div className="referenceProfileIntro">
+                <strong>Perfil local</strong>
+                <p>Esta versão não exige nome, e-mail ou conta. O perfil reúne as preferências e os dados operacionais guardados apenas neste dispositivo.</p>
+              </div>
+              <div className="referenceProfileFacts" aria-label="Dados do perfil local">
+                <article><span>Armazenamento</span><strong>Neste dispositivo</strong></article>
+                <article><span>Horário Seg–Sáb</span><strong>{settings.workSchedule.startTime}–{settings.workSchedule.endTime}</strong></article>
+                <article><span>Horário domingo</span><strong>{settings.workSchedule.sundayStartTime}–{settings.workSchedule.sundayEndTime}</strong></article>
+                <article><span>Fins de semana marcados</span><strong>{settings.workSchedule.weekendWorkDates.length}</strong></article>
+                <article><span>Pausa 1</span><strong>{breakSummary(settings.workSchedule.break1.enabled, settings.workSchedule.break1.startTime, settings.workSchedule.break1.endTime)}</strong></article>
+                <article><span>Pausa 2</span><strong>{breakSummary(settings.workSchedule.break2.enabled, settings.workSchedule.break2.startTime, settings.workSchedule.break2.endTime)}</strong></article>
+                <article><span>Tema</span><strong>{theme === 'dark' ? 'Escuro' : 'Claro'}</strong></article>
+                <article><span>Moeda</span><strong>{settings.currency}</strong></article>
+              </div>
+              <div className="referenceProfileActions">
+                <Link to="/exportar">Exportar relatório A4</Link>
+                <Link to="/mais">Ver estado da aplicação</Link>
+              </div>
+            </div>
+          </details>
 
           <details className="referenceSettingsRow">
             <summary>
@@ -141,7 +167,7 @@ export function SettingsReferencePage() {
 
         <section className="referenceSettingsCard">
           <Link className="referenceSettingsLinkRow" to="/mais"><SettingsIcon>⌁</SettingsIcon><span><strong>Estado da aplicação</strong><small>Verifica se está tudo a funcionar</small></span><span className="referenceChevron">›</span></Link>
-          <Link className="referenceSettingsLinkRow" to="/mais"><SettingsIcon>⇧</SettingsIcon><span><strong>Exportar dados</strong><small>Guarda uma cópia dos teus dados</small></span><span className="referenceChevron">›</span></Link>
+          <Link className="referenceSettingsLinkRow" to="/exportar"><SettingsIcon>⇧</SettingsIcon><span><strong>Exportar dados</strong><small>Abre um relatório A4 para guardar em PDF</small></span><span className="referenceChevron">›</span></Link>
           <Link className="referenceSettingsLinkRow" to="/mais"><SettingsIcon>⇩</SettingsIcon><span><strong>Importar dados</strong><small>Recupera dados de outro dispositivo</small></span><span className="referenceChevron">›</span></Link>
           <Link className="referenceSettingsLinkRow" to="/mais"><SettingsIcon>☁</SettingsIcon><span><strong>Cópia de segurança</strong><small>Protege e recupera os teus dados</small></span><span className="referenceChevron">›</span></Link>
         </section>
