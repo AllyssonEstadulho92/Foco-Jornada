@@ -17,7 +17,7 @@ export function useSettingsController() {
         const value = await settingsRepository.get()
         if (!cancelled) setSettings(value)
       } catch (loadError) {
-        if (!cancelled) setError(loadError instanceof Error ? loadError.message : 'Erro ao carregar definições.')
+        if (!cancelled) setError(loadError instanceof Error ? loadError.message : 'Não foi possível carregar as definições.')
       } finally {
         if (!cancelled) setIsLoading(false)
       }
@@ -35,11 +35,11 @@ export function useSettingsController() {
         const normalized = normalizeSettings(next)
         await settingsRepository.save(normalized)
         setSettings(normalized)
-        pushAppNotification('success', 'Definições guardadas', 'As preferências foram atualizadas neste dispositivo.')
+        pushAppNotification('success', 'Alterações guardadas', 'As tuas definições foram atualizadas.')
       } catch (saveError) {
-        const message = saveError instanceof Error ? saveError.message : 'Erro ao guardar definições.'
+        const message = saveError instanceof Error ? saveError.message : 'Não foi possível guardar as alterações.'
         setError(message)
-        pushAppNotification('error', 'Erro nas definições', message)
+        pushAppNotification('error', 'Não foi possível guardar', message)
       } finally {
         setIsBusy(false)
       }
