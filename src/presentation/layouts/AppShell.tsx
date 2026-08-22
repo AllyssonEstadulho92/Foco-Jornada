@@ -32,6 +32,7 @@ function StaticNavigationLink({ item }: { item: NavigationItem }) {
 
 const mobileMainNavigation: NavigationItem[] = [
   { label: 'Hoje', path: '/', icon: 'home', end: true },
+  { label: 'Mapa de turnos', path: '/turnos', icon: 'activities' },
   { label: 'Atividades', path: '/atividades', icon: 'activities' },
   { label: 'Histórico', path: '/historico', icon: 'history' },
   { label: 'Estatísticas', path: '/estatisticas', icon: 'stats' },
@@ -190,6 +191,7 @@ export function AppShell() {
 
       {quickMenuOpen ? (
         <div className="mobileQuickPanel" role="dialog" aria-label="Ações rápidas">
+          <NavLink to="/turnos"><NavigationIcon name="activities" /><span>Turnos</span></NavLink>
           <NavLink to="/atividades"><NavigationIcon name="activities" /><span>Atividade</span></NavLink>
           <NavLink to="/foco"><NavigationIcon name="focus" /><span>Foco</span></NavLink>
           <NavLink to="/horas"><NavigationIcon name="hours" /><span>Horas</span></NavLink>
