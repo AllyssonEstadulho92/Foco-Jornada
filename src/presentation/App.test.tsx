@@ -24,7 +24,9 @@ describe('App', () => {
     )
 
     expect(screen.getByRole('heading', { name: 'Hoje' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Bom dia, foco!' })).toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', { name: /^(Bom dia|Boa tarde|Boa noite), foco!$/ }),
+    ).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Resumo do dia' })).toBeInTheDocument()
     expect(await screen.findAllByRole('button', { name: 'Iniciar jornada' })).not.toHaveLength(0)
     expect(screen.getByRole('heading', { name: 'Ações rápidas' })).toBeInTheDocument()
