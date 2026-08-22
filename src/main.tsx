@@ -29,6 +29,7 @@ import './styles/more-redesign.css'
 import './styles/today-modern.css'
 import './styles/mobile-shell.css'
 import './styles/today-reference.css'
+import './styles/icon-refinement.css'
 
 const root = document.getElementById('root')
 if (!root) throw new Error('Elemento #root não encontrado.')
