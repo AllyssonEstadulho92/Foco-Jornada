@@ -1,0 +1,148 @@
+/* Refinamento transversal de ícones: alinhamento óptico, sem caixas decorativas desnecessárias. */
+
+.brandMark,
+.navMark,
+.historyTimelineIcon,
+.moreSectionHeadingIcon,
+.moreListGrouped .moreRowIcon,
+.todayEmptyIcon,
+.todayActiveBreakIcon,
+.quickIcon,
+.quickIconAmber,
+.quickIconRed,
+.quickIconBlue,
+.quickIconGreen {
+  display: grid;
+  place-items: center;
+  line-height: 0;
+}
+
+/* Ícones de navegação e secção ficam soltos, como no shell móvel aprovado. */
+.brandMark,
+.navMark,
+.historyTimelineIcon,
+.moreListGrouped .moreRowIcon,
+.todayEmptyIcon,
+.todayActiveBreakIcon,
+.quickIcon,
+.quickIconAmber,
+.quickIconRed,
+.quickIconBlue,
+.quickIconGreen {
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+}
+
+.brandMark {
+  width: 42px;
+  height: 42px;
+  flex-basis: 42px;
+}
+
+.brandMark svg {
+  width: 27px;
+  height: 27px;
+}
+
+.navMark svg,
+.moreListGrouped .moreRowIcon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.historyTimelineIcon {
+  width: 38px;
+  height: 38px;
+  flex-basis: 38px;
+}
+
+.historyTimelineIcon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.moreSectionHeadingIcon {
+  width: 26px;
+  height: 26px;
+}
+
+.moreSectionHeadingIcon svg {
+  width: 21px;
+  height: 21px;
+}
+
+.moreListGrouped .moreRowIcon {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+}
+
+.todayEmptyIcon,
+.todayActiveBreakIcon {
+  width: 42px;
+  height: 42px;
+}
+
+.todayEmptyIcon svg,
+.todayActiveBreakIcon svg,
+.quickIcon svg,
+.quickIconAmber svg,
+.quickIconRed svg,
+.quickIconBlue svg,
+.quickIconGreen svg {
+  width: 23px;
+  height: 23px;
+}
+
+/* O diagnóstico continua a ser botão, mas sem moldura visual pesada. */
+.moreLocalShield {
+  width: 42px;
+  height: 42px;
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+}
+
+.moreLocalShield svg {
+  width: 24px;
+  height: 24px;
+}
+
+.moreLocalShield:hover,
+.moreLocalShield:focus-visible {
+  border-color: transparent;
+  background: var(--primary-soft);
+}
+
+@media (max-width: 899px) {
+  .mobileDrawerNav .navMark,
+  .mobileBottomBar .navMark,
+  .mobileBottomBar .navLinkActive .navMark {
+    display: grid;
+    place-items: center;
+  }
+
+  .mobileDrawerNav .navMark svg {
+    width: 25px;
+    height: 25px;
+  }
+
+  .mobileBottomBar .navMark svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .todayQuickGrid .quickIcon,
+  .todayQuickGrid .quickIconAmber,
+  .todayQuickGrid .quickIconRed,
+  .todayQuickGrid .quickIconBlue,
+  .todayQuickGrid .quickIconGreen {
+    display: grid;
+    width: 38px;
+    height: 38px;
+    flex: 0 0 38px;
+    place-items: center;
+    background: transparent;
+  }
+}
