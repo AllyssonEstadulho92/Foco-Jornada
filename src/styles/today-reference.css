@@ -1,0 +1,473 @@
+/* Ajuste móvel do ecrã Hoje segundo o protótipo aprovado, sem alterar a lógica da jornada. */
+@media (max-width: 899px) {
+  .todayDashboard {
+    width: min(100%, 560px);
+    gap: 18px;
+  }
+
+  .todayHero {
+    align-items: flex-start;
+    padding: 4px 2px 2px;
+  }
+
+  .todayHero > div::before {
+    content: 'Bom dia!';
+    display: block;
+    margin-bottom: 5px;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 650;
+  }
+
+  .todayHero h1 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 850;
+    letter-spacing: -0.045em;
+  }
+
+  .todayHero p {
+    margin-top: 6px;
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  .journeyStatus {
+    min-height: 32px;
+    padding: 6px 9px;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    font-size: 10px;
+  }
+
+  .todayJourneyCard,
+  .todayQuickPanel,
+  .todayTimelineCard,
+  .todaySummaryCard,
+  .todayActiveBreak {
+    border: 1px solid rgba(28, 38, 32, 0.075);
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.96);
+    box-shadow: 0 9px 28px rgba(28, 38, 32, 0.055);
+  }
+
+  .todayJourneyCard {
+    padding: 16px;
+  }
+
+  .todayCardHeader {
+    margin-bottom: 12px;
+    align-items: center;
+  }
+
+  .todayCardHeader .sectionKicker {
+    display: none;
+  }
+
+  .todayCardHeader h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 820;
+    letter-spacing: -0.025em;
+  }
+
+  .scheduleSettingsLink,
+  .todayHeaderAction {
+    min-height: 34px;
+    padding: 6px 10px;
+    border: 1px solid rgba(28, 38, 32, 0.07);
+    border-radius: 10px;
+    background: #f7f8f6;
+    color: var(--primary);
+    font-size: 10px;
+    box-shadow: none;
+  }
+
+  .scheduleBoard {
+    gap: 14px;
+  }
+
+  .schedulePlanSummary {
+    position: relative;
+    order: -5;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid rgba(28, 38, 32, 0.07);
+    border-radius: 15px;
+    background: #fbfcfa;
+    color: var(--muted);
+    font-size: 11px;
+  }
+
+  .schedulePlanSummary > span {
+    display: flex;
+    min-height: 50px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 15px;
+    border: 0;
+    border-top: 1px solid rgba(28, 38, 32, 0.06);
+    text-align: left;
+  }
+
+  .schedulePlanSummary > span:first-child {
+    min-height: 78px;
+    padding: 15px 112px 15px 15px;
+    border-top: 0;
+    background: linear-gradient(90deg, rgba(31, 157, 99, 0.10), rgba(31, 157, 99, 0.035));
+    font-size: 11px;
+  }
+
+  .schedulePlanSummary > span:first-child strong {
+    display: block;
+    margin: 4px 0 0;
+    color: var(--primary);
+    font-size: 23px;
+    font-weight: 850;
+    letter-spacing: -0.04em;
+  }
+
+  .schedulePlanSummary > span:not(:first-child) strong {
+    margin-left: auto;
+    color: var(--text);
+    font-size: 16px;
+  }
+
+  .schedulePlanSummary > span:nth-child(4) strong {
+    color: var(--primary);
+  }
+
+  .schedulePlanSummary > button {
+    position: absolute;
+    z-index: 1;
+    top: 18px;
+    right: 12px;
+    min-height: 36px;
+    padding: 7px 10px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.92);
+  }
+
+  .scheduleNextEvent {
+    order: -4;
+    width: 100%;
+    min-height: 46px;
+    align-self: stretch;
+    padding: 9px 12px;
+    border: 0;
+    border-radius: 12px;
+    background: #f5f7f4;
+    box-shadow: none;
+  }
+
+  .scheduleNextEvent > span {
+    font-size: 9px;
+  }
+
+  .scheduleNextEvent > strong {
+    font-size: 15px;
+  }
+
+  .scheduleTimeline {
+    order: -3;
+    display: flex;
+    min-height: 0;
+    flex-direction: column;
+    gap: 0;
+    padding: 12px 10px 12px 8px;
+    border: 1px solid rgba(28, 38, 32, 0.07);
+    border-radius: 16px;
+    background: #fbfcfa;
+  }
+
+  .scheduleTrack,
+  .scheduleProgress {
+    top: 28px;
+    right: auto;
+    bottom: 28px;
+    left: 26px;
+    width: 2px;
+    height: auto;
+  }
+
+  .scheduleTrack {
+    background: #e0e5e1;
+  }
+
+  .scheduleProgress {
+    width: 2px;
+    height: calc((100% - 56px) * var(--schedule-progress, 0));
+    background: var(--primary);
+  }
+
+  .scheduleMilestone {
+    display: grid;
+    min-height: 60px;
+    grid-template-columns: 38px minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    align-items: center;
+    gap: 1px 10px;
+    padding: 8px 5px;
+    text-align: left;
+  }
+
+  .scheduleMilestoneDot {
+    grid-row: 1 / 3;
+    width: 16px;
+    height: 16px;
+    place-self: center;
+    margin: 0;
+    border: 3px solid #fbfcfa;
+    background: #8e9690;
+    box-shadow: 0 0 0 2px #e1e6e2;
+  }
+
+  .scheduleMilestoneEntry .scheduleMilestoneDot {
+    background: var(--primary);
+    box-shadow: 0 0 0 2px rgba(31, 157, 99, 0.18);
+  }
+
+  .scheduleMilestoneBreak-start .scheduleMilestoneDot {
+    background: #e4a21d;
+    box-shadow: 0 0 0 2px rgba(228, 162, 29, 0.18);
+  }
+
+  .scheduleMilestoneBreak-end .scheduleMilestoneDot {
+    background: #2d91df;
+    box-shadow: 0 0 0 2px rgba(45, 145, 223, 0.16);
+  }
+
+  .scheduleMilestoneExit .scheduleMilestoneDot {
+    background: #db5a5a;
+    box-shadow: 0 0 0 2px rgba(219, 90, 90, 0.16);
+  }
+
+  .scheduleMilestone span {
+    align-self: end;
+    color: var(--muted);
+    font-size: 10px;
+  }
+
+  .scheduleMilestone strong {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: end;
+    color: var(--text);
+    font-size: 15px;
+  }
+
+  .scheduleLiveMetrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    overflow: visible;
+    border: 0;
+    background: transparent;
+  }
+
+  .scheduleLiveMetrics article,
+  .scheduleLiveMetrics article:not(:last-child) {
+    min-height: 72px;
+    padding: 11px 12px;
+    border: 1px solid rgba(28, 38, 32, 0.065);
+    border-radius: 13px;
+    background: #f7f8f6;
+  }
+
+  .scheduleLiveMetrics span {
+    font-size: 9px;
+  }
+
+  .scheduleLiveMetrics strong {
+    font-size: 16px;
+  }
+
+  .todayJourneyEmpty {
+    min-height: 76px;
+    padding: 12px;
+    border: 0;
+    border-radius: 14px;
+    background: #f7f8f6;
+  }
+
+  .todayJourneyEmpty .todayEmptyIcon {
+    display: none;
+  }
+
+  .todayJourneyEmpty > div:not(.todayEmptyIcon) {
+    gap: 2px;
+  }
+
+  .todayJourneyEmpty > div > strong {
+    font-size: 12px;
+  }
+
+  .todayJourneyEmpty > div > span {
+    font-size: 10px;
+  }
+
+  .todayJourneyEmpty .actionButtonPrimary {
+    min-width: 124px;
+    min-height: 38px;
+    padding: 8px 12px;
+  }
+
+  .todayProductivityGrid {
+    display: none;
+  }
+
+  .todayQuickPanel {
+    padding: 15px;
+  }
+
+  .todaySectionTitle {
+    align-items: center;
+  }
+
+  .todaySectionTitle h2 {
+    font-size: 16px;
+    letter-spacing: -0.02em;
+  }
+
+  .todaySectionTitle > span {
+    font-size: 9px;
+  }
+
+  .todayQuickGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+  }
+
+  .todayQuickGrid > button,
+  .todayQuickGrid > a,
+  .todayQuickWide {
+    min-height: 64px;
+    padding: 10px 11px;
+    border: 0;
+    border-radius: 13px;
+    box-shadow: none;
+  }
+
+  .todayQuickGrid > button:nth-child(1) {
+    background: rgba(31, 157, 99, 0.09);
+    color: #21885b;
+  }
+
+  .todayQuickGrid > button:nth-child(2) {
+    background: rgba(228, 162, 29, 0.10);
+    color: #be8110;
+  }
+
+  .todayQuickGrid > a:nth-child(3) {
+    background: rgba(45, 145, 223, 0.09);
+    color: #247cbf;
+  }
+
+  .todayQuickGrid > button:nth-child(4) {
+    background: rgba(219, 90, 90, 0.08);
+    color: #ba4b4b;
+  }
+
+  .todayQuickGrid > .todayQuickWide {
+    grid-column: 1 / -1;
+    background: #f4f6f3;
+    color: var(--text);
+  }
+
+  .todayQuickGrid .quickIcon,
+  .todayQuickGrid .quickIconAmber,
+  .todayQuickGrid .quickIconRed,
+  .todayQuickGrid .quickIconBlue,
+  .todayQuickGrid .quickIconGreen {
+    background: transparent;
+    color: currentColor;
+  }
+
+  .todayCustomBreak {
+    margin-top: 10px;
+    border-top: 1px solid rgba(28, 38, 32, 0.06);
+  }
+
+  .todayLowerGrid {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 12px;
+  }
+
+  .todaySummaryCard,
+  .todayTimelineCard {
+    padding: 15px;
+  }
+
+  .todaySummaryCard dl {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .todaySummaryCard dl > div {
+    min-width: 0;
+    padding: 11px 9px;
+    border: 0;
+    border-radius: 12px;
+    background: #f5f7f4;
+  }
+
+  .todaySummaryCard dl > div:nth-child(1) {
+    background: rgba(31, 157, 99, 0.08);
+  }
+
+  .todaySummaryCard dl > div:nth-child(2) {
+    background: rgba(228, 162, 29, 0.09);
+  }
+
+  .todaySummaryCard dl > div:nth-child(3) {
+    background: rgba(45, 145, 223, 0.08);
+  }
+
+  .todaySummaryCard dt {
+    font-size: 9px;
+  }
+
+  .todaySummaryCard dd {
+    margin-top: 5px;
+    font-size: 15px;
+  }
+
+  .settingsBreakCard {
+    border-color: rgba(28, 38, 32, 0.07);
+    background: #f8f9f7;
+  }
+
+  .settingsScheduleNote {
+    border-left-color: var(--primary);
+    background: rgba(31, 157, 99, 0.05);
+  }
+}
+
+@media (max-width: 420px) {
+  .todayHero h1 {
+    font-size: 25px;
+  }
+
+  .journeyStatus {
+    max-width: 104px;
+    text-align: right;
+  }
+
+  .schedulePlanSummary > span:first-child {
+    padding-right: 102px;
+  }
+
+  .schedulePlanSummary > span:first-child strong {
+    font-size: 21px;
+  }
+
+  .todaySummaryCard dl {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

@@ -1,0 +1,456 @@
+.mobileAppIdentity,
+.mobileDrawer,
+.mobileDrawerBackdrop,
+.mobileQuickPanel,
+.mobileQuickButton {
+  display: none;
+}
+
+.topBarStatusGroup {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* Relógio deliberadamente sem cápsula: apenas ícone + hora. */
+.appClock {
+  min-height: auto;
+  padding: 4px 2px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+@media (max-width: 899px) {
+  .appShell {
+    background: #f7f8f6;
+  }
+
+  .appMainArea {
+    position: relative;
+    min-height: 100dvh;
+    transform: translateX(0);
+    transition: transform 220ms ease, filter 220ms ease;
+  }
+
+  .appShellMobileMenuOpen .appMainArea {
+    transform: translateX(-52px);
+    filter: saturate(0.92);
+  }
+
+  .appTopBar {
+    z-index: 54;
+    min-height: 70px;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px max(16px, env(safe-area-inset-right)) 10px max(16px, env(safe-area-inset-left));
+    border-bottom: 0;
+    background: rgba(250, 251, 249, 0.92);
+    box-shadow: 0 1px 0 rgba(28, 38, 32, 0.045);
+    backdrop-filter: blur(24px);
+  }
+
+  .mobileAppIdentity {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .mobileAppIdentity > strong {
+    overflow: hidden;
+    color: var(--text);
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .mobileMenuButton {
+    display: grid;
+    width: 44px;
+    height: 44px;
+    flex: 0 0 44px;
+    place-items: center;
+    padding: 0;
+    border: 1px solid rgba(28, 38, 32, 0.07);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.96);
+    color: var(--text);
+    box-shadow: 0 7px 22px rgba(28, 38, 32, 0.07);
+    cursor: pointer;
+  }
+
+  .mobileMenuButton svg {
+    width: 21px;
+    height: 21px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.9;
+    stroke-linecap: round;
+  }
+
+  .topBarStatusGroup {
+    flex: 0 0 auto;
+    gap: 5px;
+  }
+
+  .appClock {
+    gap: 7px;
+    padding: 5px 3px;
+    background: transparent;
+    color: var(--text);
+    font-size: 17px;
+    font-weight: 800;
+    box-shadow: none;
+  }
+
+  .appClock svg {
+    width: 19px;
+    height: 19px;
+  }
+
+  .notificationButton {
+    width: 40px;
+    height: 40px;
+    border: 0;
+    border-radius: 13px;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .notificationButton:hover,
+  .notificationButtonActive {
+    border: 0;
+    background: var(--primary-soft);
+  }
+
+  .notificationBadge {
+    top: -2px;
+    right: -2px;
+  }
+
+  .appContent {
+    padding-top: 20px;
+  }
+
+  .mobileDrawerBackdrop {
+    position: fixed;
+    z-index: 70;
+    inset: 0;
+    display: block;
+    padding: 0;
+    border: 0;
+    background: rgba(20, 25, 22, 0.22);
+    opacity: 0;
+    pointer-events: none;
+    backdrop-filter: blur(2px);
+    transition: opacity 220ms ease;
+  }
+
+  .mobileDrawerBackdropVisible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .mobileDrawer {
+    position: fixed;
+    z-index: 80;
+    top: max(8px, env(safe-area-inset-top));
+    right: 0;
+    bottom: max(8px, env(safe-area-inset-bottom));
+    display: flex;
+    width: min(82vw, 372px);
+    flex-direction: column;
+    padding: 20px 16px 18px;
+    overflow-y: auto;
+    border: 1px solid rgba(28, 38, 32, 0.07);
+    border-right: 0;
+    border-radius: 30px 0 0 30px;
+    background: rgba(255, 255, 255, 0.985);
+    box-shadow: -24px 0 70px rgba(28, 38, 32, 0.16);
+    transform: translateX(102%);
+    transition: transform 240ms cubic-bezier(.2, .8, .2, 1);
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .mobileDrawerOpen {
+    transform: translateX(0);
+  }
+
+  .mobileDrawerHeader {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 8px 4px 22px;
+  }
+
+  .mobileDrawerHeader > div {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .mobileDrawerHeader strong {
+    color: var(--primary);
+    font-size: 22px;
+    font-weight: 850;
+    letter-spacing: -0.035em;
+  }
+
+  .mobileDrawerHeader span {
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  .mobileDrawerHeader > button {
+    display: grid;
+    width: 38px;
+    height: 38px;
+    flex: 0 0 38px;
+    place-items: center;
+    padding: 0;
+    border: 0;
+    border-radius: 12px;
+    background: transparent;
+    color: var(--text);
+    font-size: 28px;
+    font-weight: 300;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .mobileDrawerNav {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .mobileDrawerNav .navLink {
+    min-height: 50px;
+    gap: 14px;
+    padding: 9px 12px;
+    border: 0;
+    border-radius: 15px;
+    background: transparent;
+    color: #202521;
+  }
+
+  .mobileDrawerNav .navLink:hover {
+    border: 0;
+    background: #f5f6f4;
+  }
+
+  .mobileDrawerNav .navLinkActive {
+    border: 0;
+    background: linear-gradient(90deg, rgba(31, 157, 99, 0.11), rgba(31, 157, 99, 0.055));
+    color: var(--primary);
+  }
+
+  .mobileDrawerNav .navMark {
+    width: 28px;
+    height: 28px;
+    flex: 0 0 28px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: currentColor;
+  }
+
+  .mobileDrawerNav .navMark svg {
+    width: 23px;
+    height: 23px;
+  }
+
+  .mobileDrawerNav .navLabel {
+    font-size: 15px;
+    font-weight: 650;
+  }
+
+  .mobileDrawerTools .navLink:first-child {
+    color: var(--primary);
+  }
+
+  .mobileDrawerDivider {
+    flex: 0 0 1px;
+    height: 1px;
+    margin: 14px 6px;
+    background: rgba(28, 38, 32, 0.08);
+  }
+
+  .mobileDrawerFooter {
+    display: grid;
+    margin-top: auto;
+    gap: 10px;
+    padding: 22px 12px 4px;
+    border-top: 1px solid rgba(28, 38, 32, 0.08);
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  .mobileDrawerFooter span {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .mobileDrawerFooter strong {
+    padding: 5px 10px;
+    border-radius: 999px;
+    background: #f3f4f2;
+    color: #828883;
+    font-size: 12px;
+    font-weight: 650;
+  }
+
+  .bottomNav.mobileBottomBar {
+    z-index: 60;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    min-height: 70px;
+    padding: 7px 8px max(7px, env(safe-area-inset-bottom));
+    border: 1px solid rgba(28, 38, 32, 0.07);
+    border-radius: 26px;
+    background: rgba(255, 255, 255, 0.965);
+    box-shadow: 0 16px 44px rgba(28, 38, 32, 0.13);
+    backdrop-filter: blur(24px);
+  }
+
+  .mobileBottomBar .navLink {
+    min-height: 54px;
+    gap: 3px;
+    padding: 4px 2px;
+    border: 0;
+    background: transparent;
+    color: #777d78;
+  }
+
+  .mobileBottomBar .navLinkActive {
+    color: var(--primary);
+  }
+
+  .mobileBottomBar .navMark,
+  .mobileBottomBar .navLinkActive .navMark {
+    width: 26px;
+    height: 26px;
+    flex: 0 0 26px;
+    border: 0;
+    background: transparent;
+    color: currentColor;
+  }
+
+  .mobileBottomBar .navMark svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .mobileBottomBar .navLabel {
+    font-size: 10px;
+    font-weight: 650;
+  }
+
+  .mobileQuickButton {
+    position: relative;
+    top: -11px;
+    display: grid;
+    width: 58px;
+    height: 58px;
+    place-self: center;
+    place-items: center;
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    background: var(--primary);
+    color: white;
+    box-shadow: 0 12px 28px rgba(31, 157, 99, 0.28);
+    cursor: pointer;
+    transition: transform 160ms ease, box-shadow 160ms ease;
+  }
+
+  .mobileQuickButton > span {
+    margin-top: -3px;
+    font-size: 37px;
+    font-weight: 300;
+    line-height: 1;
+  }
+
+  .mobileQuickButtonActive {
+    transform: rotate(45deg);
+    box-shadow: 0 8px 20px rgba(31, 157, 99, 0.24);
+  }
+
+  .mobileQuickPanel {
+    position: fixed;
+    z-index: 59;
+    right: max(18px, env(safe-area-inset-right));
+    bottom: calc(var(--bottom-nav-height) + 28px + env(safe-area-inset-bottom));
+    left: max(18px, env(safe-area-inset-left));
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    padding: 12px;
+    border: 1px solid rgba(28, 38, 32, 0.08);
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.98);
+    box-shadow: 0 22px 52px rgba(28, 38, 32, 0.16);
+    backdrop-filter: blur(22px);
+  }
+
+  .mobileQuickPanel a {
+    display: flex;
+    min-width: 0;
+    min-height: 54px;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 15px;
+    background: #f7f8f6;
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .mobileQuickPanel svg {
+    width: 21px;
+    height: 21px;
+    flex: 0 0 21px;
+    color: var(--primary);
+  }
+
+  .mobileQuickPanel span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 420px) {
+  .mobileAppIdentity {
+    gap: 8px;
+  }
+
+  .mobileAppIdentity > strong {
+    max-width: 92px;
+    font-size: 14px;
+  }
+
+  .mobileMenuButton {
+    width: 41px;
+    height: 41px;
+    flex-basis: 41px;
+  }
+
+  .appClock {
+    font-size: 15px;
+  }
+
+  .mobileDrawer {
+    width: min(86vw, 360px);
+  }
+}
