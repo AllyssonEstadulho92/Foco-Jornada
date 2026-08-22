@@ -11,6 +11,8 @@ export interface PayrollDayPlan {
   date: string
   kind: PayrollDayKind
   overtimeHours: number
+  /** Horas de ausência não remunerada apuradas ao minuto. Quando omitido num dia de falta integral, usa a duração diária contratual. */
+  unpaidAbsenceHours?: number
   note?: string
 }
 
@@ -49,6 +51,7 @@ export interface PayrollResult {
   justifiedPaidAbsenceDays: number
   justifiedUnpaidAbsenceDays: number
   unjustifiedAbsenceDays: number
+  unpaidAbsenceHours: number
   overtimeHours: number
   hourlyRate: number
   absenceDeduction: number
