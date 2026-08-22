@@ -5,11 +5,14 @@ import {
   getNextScheduleEvent,
   getScheduleMilestones,
   getScheduleSummary,
+  resolveWorkScheduleForDate,
 } from './WorkSchedule'
 
 describe('WorkSchedule', () => {
-  it('calcula o exemplo 08:00-17:00 com pausa 11:00-11:15', () => {
-    const summary = getScheduleSummary(DEFAULT_WORK_SCHEDULE)
+  const weekday = '2026-08-21'
+
+  it('calcula 08:00-17:00 com pausa 11:00-11:15 num dia útil', () => {
+    const summary = getScheduleSummary(DEFAULT_WORK_SCHEDULE, weekday)
 
     expect(summary.totalMinutes).toBe(540)
     expect(summary.breakMinutes).toBe(15)
@@ -19,12 +22,55 @@ describe('WorkSchedule', () => {
     expect(formatPlannedMinutes(summary.effectiveMinutes)).toBe('08:45')
   })
 
-  it('cria linha Entrada -> Pausa -> Regresso -> Saída quando a segunda pausa está desligada', () => {
-    expect(getScheduleMilestones(DEFAULT_WORK_SCHEDULE).map((item) => [item.label, item.time])).toEqual([
+  it('cria Entrada -> Pausa -> Regresso -> Saída num dia útil', () => {
+    expect(getScheduleMilestones(DEFAULT_WORK_SCHEDULE, weekday).map((item) => [item.label, item.time])).toEqual([
       ['Entrada', '08:00'],
       ['Pausa', '11:00'],
       ['Regresso', '11:15'],
       ['Saída', '17:00'],
+    ])
+  })
+
+  it('mantém sábado como folga quando a data não está escalada', () => {
+    const saturday = '2026-08-22'
+
+    expect(resolveWorkScheduleForDate(DEFAULT_WORK_SCHEDULE, saturday)).toMatchObject({
+      dayKind: 'saturday',
+      isWorkingDay: false,
+      startTime: '08:00',
+      endTime: '17:00',
+    })
+    expect(getScheduleSummary(DEFAULT_WORK_SCHEDULE, saturday).totalMinutes).toBe(0)
+    expect(getScheduleMilestones(DEFAULT_WORK_SCHEDULE, saturday)).toEqual([])
+  })
+
+  it('usa 08:00-17:00 num sábado marcado como trabalho', () => {
+    const saturday = '2026-08-22'
+    const schedule = { ...DEFAULT_WORK_SCHEDULE, weekendWorkDates: [saturday] }
+
+    expect(resolveWorkScheduleForDate(schedule, saturday)).toMatchObject({
+      isWorkingDay: true,
+      startTime: '08:00',
+      endTime: '17:00',
+    })
+    expect(getScheduleSummary(schedule, saturday).totalMinutes).toBe(540)
+  })
+
+  it('usa 09:00-18:00 num domingo marcado como trabalho', () => {
+    const sunday = '2026-08-23'
+    const schedule = { ...DEFAULT_WORK_SCHEDULE, weekendWorkDates: [sunday] }
+
+    expect(resolveWorkScheduleForDate(schedule, sunday)).toMatchObject({
+      dayKind: 'sunday',
+      isWorkingDay: true,
+      startTime: '09:00',
+      endTime: '18:00',
+    })
+    expect(getScheduleMilestones(schedule, sunday).map((item) => [item.label, item.time])).toEqual([
+      ['Entrada', '09:00'],
+      ['Pausa', '11:00'],
+      ['Regresso', '11:15'],
+      ['Saída', '18:00'],
     ])
   })
 
@@ -46,12 +92,12 @@ describe('WorkSchedule', () => {
     })
   })
 
-  it('mostra a saída após o regresso da última pausa', () => {
-    const now = new Date(2026, 7, 21, 15, 30)
+  it('assinala uma folga de fim de semana no ecrã Hoje', () => {
+    const now = new Date(2026, 7, 22, 10, 0)
     expect(getNextScheduleEvent(DEFAULT_WORK_SCHEDULE, now)).toEqual({
-      label: 'Saída prevista',
-      time: '17:00',
-      state: 'work',
+      label: 'Folga planeada',
+      time: 'Hoje',
+      state: 'done',
     })
   })
 })
