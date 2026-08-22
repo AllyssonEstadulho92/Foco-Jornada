@@ -32,6 +32,10 @@ describe('ShiftMapPage', () => {
     expect(screen.getByRole('heading', { name: 'Mapa de turnos' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Calendário do mês' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Guardar mapa e cálculo' })).toBeInTheDocument()
-    expect(await screen.findByText('VALOR DA PLANIFICAÇÃO')).toBeInTheDocument()
+
+    // Aguarda o efeito assíncrono que carrega as definições e seleciona o primeiro dia.
+    // Assim o teste só termina depois de o estado inicial do mapa estar estabilizado.
+    expect(await screen.findByText('Situação RH')).toBeInTheDocument()
+    expect(screen.getByText('VALOR DA PLANIFICAÇÃO')).toBeInTheDocument()
   })
 })
