@@ -234,7 +234,7 @@ export function ShiftMapPage() {
 
   function copySelectedShiftToWorkDays() {
     if (!selectedDay?.startTime || !selectedDay.endTime) return
-    if (!window.confirm('Aplicar este horário e esta pausa a todos os dias marcados como Trabalho neste mês?')) return
+    if (!window.confirm('Aplicar este turno aos restantes dias marcados como Trabalho neste mês?')) return
     setDays((current) =>
       current.map((item) =>
         item.kind === 'work'
@@ -250,14 +250,14 @@ export function ShiftMapPage() {
   }
 
   function resetMonthToBase() {
-    if (!window.confirm('Repor o mês com o horário base e a escala de fins de semana das Definições?')) return
+    if (!window.confirm('Repor este mês com o horário base e os fins de semana definidos?')) return
     const next = baseDays(month, settings)
     setDays(next)
     setSelectedDate(next[0]?.date ?? '')
     pushAppNotification(
       'info',
-      'Mapa reposto',
-      'O mês voltou ao horário base. Carrega em Guardar para confirmar a alteração.',
+      'Horário reposto',
+      'O horário base foi aplicado ao mês. Carrega em Guardar mapa para confirmar.',
     )
   }
 
@@ -268,8 +268,8 @@ export function ShiftMapPage() {
     setLastSavedAt(now.toISOString())
     pushAppNotification(
       'success',
-      'Mapa de turnos guardado',
-      `${monthLabel(month)} · ${formatPlannedMinutes(summary.effectiveMinutes)} efetivas · valor líquido calculado ${money(payrollResult.netEstimate)}.`,
+      'Mapa guardado',
+      `${monthLabel(month)} · ${formatPlannedMinutes(summary.effectiveMinutes)} efetivas · líquido estimado ${money(payrollResult.netEstimate)}.`,
     )
   }
 
@@ -279,11 +279,9 @@ export function ShiftMapPage() {
     <section className="shiftMapPage" aria-labelledby="shift-map-title">
       <header className="shiftMapHeader">
         <div>
-          <span className="eyebrow">RH & CONTABILIDADE</span>
+          <span className="eyebrow">TURNOS & VENCIMENTO</span>
           <h1 id="shift-map-title">Mapa de turnos</h1>
-          <p>
-            Planeia cada dia do mês, mantém turnos, folgas, férias, feriados e faltas organizados e vê o efeito da planificação no vencimento.
-          </p>
+          <p>Organiza os teus turnos do mês e vê o impacto no vencimento.</p>
         </div>
         <label className="shiftMapMonthPicker">
           <span>Mês</span>
@@ -291,34 +289,34 @@ export function ShiftMapPage() {
         </label>
       </header>
 
-      <section className="shiftMapCommand" aria-label="Comandos do mapa">
+      <section className="shiftMapCommand" aria-label="Ações do mapa">
         <div>
-          <span>MAPA ATUAL</span>
+          <span>ESTE MÊS</span>
           <strong>{monthLabel(month)}</strong>
           <small>
             {lastSavedAt
               ? `Guardado às ${new Intl.DateTimeFormat('pt-PT', { hour: '2-digit', minute: '2-digit' }).format(new Date(lastSavedAt))}`
-              : 'Alterações locais até carregares em Guardar'}
+              : 'Alterações ainda não guardadas'}
           </small>
         </div>
         <div className="shiftMapCommandActions">
-          <button type="button" onClick={resetMonthToBase}>Repor horário base</button>
-          <button type="button" className="shiftMapSaveButton" onClick={saveMap}>Guardar mapa e cálculo</button>
+          <button type="button" onClick={resetMonthToBase}>Repor horário</button>
+          <button type="button" className="shiftMapSaveButton" onClick={saveMap}>Guardar mapa</button>
         </div>
       </section>
 
       <section className="shiftMapOverview" aria-label="Resumo do mês">
-        <article><span>Turnos de trabalho</span><strong>{summary.workDays}</strong></article>
-        <article><span>Horas planeadas</span><strong>{formatPlannedMinutes(summary.plannedMinutes)}</strong></article>
+        <article><span>Turnos</span><strong>{summary.workDays}</strong></article>
+        <article><span>Horas</span><strong>{formatPlannedMinutes(summary.plannedMinutes)}</strong></article>
         <article><span>Pausas</span><strong>{formatPlannedMinutes(summary.breakMinutes)}</strong></article>
-        <article className="shiftMapOverviewPrimary"><span>Tempo efetivo</span><strong>{formatPlannedMinutes(summary.effectiveMinutes)}</strong></article>
+        <article className="shiftMapOverviewPrimary"><span>Efetivo</span><strong>{formatPlannedMinutes(summary.effectiveMinutes)}</strong></article>
         <article><span>Horas extra</span><strong>{summary.overtimeHours.toFixed(2)} h</strong></article>
       </section>
 
       <section className="shiftMapPanel" aria-labelledby="monthly-map-title">
         <div className="shiftMapSectionHeader">
-          <div><span>PLANEAMENTO VISUAL</span><h2 id="monthly-map-title">Calendário do mês</h2></div>
-          <small>Seleciona um dia para editar. No telemóvel, a grelha mantém sete colunas e desloca horizontalmente.</small>
+          <div><span>CALENDÁRIO</span><h2 id="monthly-map-title">Turnos do mês</h2></div>
+          <small>Toca num dia para ver ou editar o turno.</small>
         </div>
 
         <div className="shiftMapCalendarScroll" tabIndex={0} aria-label="Mapa mensal de turnos com deslocação horizontal">
@@ -398,14 +396,14 @@ export function ShiftMapPage() {
               </div>
             </label>
             <label className="shiftMapEditorWide">
-              <span>Observação RH</span>
-              <input type="text" maxLength={180} value={selectedDay.note} placeholder="Ex.: troca de turno, campanha, consulta, autorização..." onChange={(event) => updateSelected({ note: event.target.value })} />
+              <span>Nota</span>
+              <input type="text" maxLength={180} value={selectedDay.note} placeholder="Ex.: troca de turno, consulta, autorização..." onChange={(event) => updateSelected({ note: event.target.value })} />
             </label>
           </div>
 
           <div className="shiftMapEditorActions">
-            <button type="button" onClick={applyBaseToSelected}>Usar horário base neste dia</button>
-            <button type="button" onClick={copySelectedShiftToWorkDays} disabled={!selectedDay.startTime || !selectedDay.endTime}>Aplicar este turno aos dias de trabalho</button>
+            <button type="button" onClick={applyBaseToSelected}>Usar horário base</button>
+            <button type="button" onClick={copySelectedShiftToWorkDays} disabled={!selectedDay.startTime || !selectedDay.endTime}>Aplicar a dias de trabalho</button>
           </div>
         </section>
       ) : null}
@@ -413,7 +411,7 @@ export function ShiftMapPage() {
       <div className="shiftMapLowerGrid">
         <section className="shiftMapPanel shiftMapRhPanel" aria-labelledby="rh-summary-title">
           <div className="shiftMapSectionHeader">
-            <div><span>CONTROLO RH</span><h2 id="rh-summary-title">Situações do mês</h2></div>
+            <div><span>RESUMO</span><h2 id="rh-summary-title">Situações do mês</h2></div>
           </div>
           <dl>
             <div><dt>Trabalho</dt><dd>{summary.workDays}</dd></div>
@@ -427,9 +425,9 @@ export function ShiftMapPage() {
 
         <section className="shiftMapSalaryPanel" aria-labelledby="salary-map-title">
           <div className="shiftMapSalaryHero">
-            <span>VALOR DA PLANIFICAÇÃO</span>
+            <span>VENCIMENTO ESTIMADO</span>
             <strong id="salary-map-title">{money(payrollResult.netEstimate)}</strong>
-            <small>Líquido calculado com os dados atuais de Vencimento</small>
+            <small>Estimativa líquida com os dados guardados</small>
           </div>
           <div className="shiftMapSalaryBreakdown">
             <div><span>Bruto</span><strong>{money(payrollResult.grossTotal)}</strong></div>
@@ -440,16 +438,16 @@ export function ShiftMapPage() {
             <div><span>IRS</span><strong>-{money(payrollResult.irsTotal)}</strong></div>
           </div>
           <p>
-            O valor é calculado ao cêntimo com a planificação e os parâmetros atualmente guardados em Vencimento. Para coincidir com o recibo real, todas as rubricas, faltas, subsídios, horas extra e retenções aplicáveis têm de estar registadas.
+            A estimativa usa os turnos, faltas, horas extra e dados fiscais guardados. Mantém estes dados atualizados para comparar com o recibo real.
           </p>
-          <NavLink className="shiftMapPayrollLink" to="/vencimento">Rever dados salariais em Vencimento</NavLink>
+          <NavLink className="shiftMapPayrollLink" to="/vencimento">Rever dados do vencimento</NavLink>
         </section>
       </div>
 
-      <section className="shiftMapAccountingNote" aria-label="Critérios de RH e contabilidade">
-        <strong>Como o mapa alimenta o cálculo</strong>
+      <section className="shiftMapAccountingNote" aria-label="Como é calculado o vencimento">
+        <strong>Como é calculado</strong>
         <p>
-          A situação de cada dia e as horas extra são sincronizadas com a planificação salarial. Entrada, saída e pausa servem para controlo operacional das horas do turno; o salário base mensal não é convertido automaticamente em horas extra apenas porque um turno é mais longo. Regista em “Horas extra remuneráveis” apenas o tempo suplementar que deva entrar no vencimento.
+          O mapa envia a situação de cada dia e as horas extra para o cálculo do vencimento. Entrada, saída e pausa servem para apurar o tempo do turno. Regista em “Horas extra remuneráveis” apenas o tempo suplementar que deve ser pago.
         </p>
       </section>
     </section>
