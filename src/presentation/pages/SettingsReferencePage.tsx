@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { formatPlannedMinutes, getScheduleSummary } from '../../domain/journey/WorkSchedule'
+import { AppAboutSettings } from '../components/AppAboutSettings'
 import { useSettingsController } from '../hooks/useSettingsController'
 import { useUiStore } from '../store/useUiStore'
 
@@ -145,10 +146,7 @@ export function SettingsReferencePage() {
           <Link className="referenceSettingsLinkRow" to="/mais"><SettingsIcon>☁</SettingsIcon><span><strong>Cópia de segurança</strong><small>Protege e recupera os teus dados</small></span><span className="referenceChevron">›</span></Link>
         </section>
 
-        <section className="referenceSettingsCard">
-          <div className="referenceSettingsStaticRow"><SettingsIcon>ⓘ</SettingsIcon><span><strong>Versão</strong><small>Consulta a versão instalada</small></span><span className="referenceChevron">›</span></div>
-          <div className="referenceSettingsStaticRow"><img className="referenceSettingsLogo" src="./logo-mark.svg" alt="" /><span><strong>Marca da aplicação</strong><small>Foco Jornada</small></span><span className="referenceChevron">›</span></div>
-        </section>
+        <AppAboutSettings />
       </div>
 
       <div className="referenceSettingsSave">
