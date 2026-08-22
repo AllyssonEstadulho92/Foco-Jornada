@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { calculatePayroll } from '../../application/payroll/calculatePayroll'
 import { defaultPayrollConfig, type PayrollConfig, type PayrollDayPlan } from '../../domain/payroll/Payroll'
@@ -69,16 +69,16 @@ function PayrollRow({ icon, label, hint, value, positive = false, negative = fal
 
 export function PayrollReferencePage() {
   const [month, setMonth] = useState(currentMonthKey)
-  const [revision, setRevision] = useState(0)
-  const config = useMemo(() => readConfig(), [revision])
-  const plan = useMemo(() => readPlan(month), [month, revision])
-  const result = useMemo(() => calculatePayroll(config, plan), [config, plan])
+  const [, forceRefresh] = useState(0)
+  const config = readConfig()
+  const plan = readPlan(month)
+  const result = calculatePayroll(config, plan)
 
   const otherAllowances = config.vacationSubsidy + config.christmasSubsidy + config.otherTaxableAllowances + config.otherExemptAllowances
   const totalDiscounts = result.socialSecurity + result.irsTotal + config.otherDeductions
 
   function refreshCalculation() {
-    setRevision((value) => value + 1)
+    forceRefresh((value) => value + 1)
     pushAppNotification('success', 'Cálculo atualizado', `Vencimento de ${monthLabel(month)} recalculado com a planificação guardada.`)
   }
 
