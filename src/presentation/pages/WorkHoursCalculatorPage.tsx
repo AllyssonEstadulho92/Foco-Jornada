@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { buildDayReport } from '../../application/reports/buildDayReport'
+import { resolveWorkScheduleForDate } from '../../domain/journey/WorkSchedule'
 import {
   calculateWorkHours,
   formatHoursMinutes,
@@ -8,6 +9,7 @@ import {
   WORK_PROOF_LABELS,
   type ClockInterval,
   type PayTreatment,
+  type WorkHoursEntry,
   type WorkHoursEntryInput,
   type WorkOccurrenceReason,
   type WorkProofType,
@@ -46,17 +48,19 @@ export function WorkHoursCalculatorPage() {
   const { settings } = useSettingsController()
   const entries = useWorkHoursStore((state) => state.entries)
   const addEntry = useWorkHoursStore((state) => state.add)
+  const updateEntry = useWorkHoursStore((state) => state.update)
   const removeEntry = useWorkHoursStore((state) => state.remove)
   const clearMonth = useWorkHoursStore((state) => state.clearMonth)
   const today = toLocalDateKey(new Date())
   const [monthKey, setMonthKey] = useState(today.slice(0, 7))
   const [isImporting, setIsImporting] = useState(false)
+  const [editingEntryId, setEditingEntryId] = useState<string | null>(null)
   const [form, setForm] = useState<WorkHoursEntryInput>({
     date: today,
     plannedStart: '08:00',
     plannedEnd: '17:00',
     plannedBreakMinutes: 15,
-    plannedBreaks: [{ start: '11:00', end: '11:15' }],
+    plannedBreaks: [{ start: '12:00', end: '12:15' }],
     actualStart: '08:00',
     actualEnd: '17:00',
     actualBreakMinutes: 15,
@@ -70,21 +74,31 @@ export function WorkHoursCalculatorPage() {
   })
 
   useEffect(() => {
+    if (editingEntryId) return
+
     const schedule = settings.workSchedule
+    const resolvedSchedule = resolveWorkScheduleForDate(schedule, form.date)
     const plannedBreaks: ClockInterval[] = [schedule.break1, schedule.break2]
-      .filter((item) => item.enabled)
+      .filter(
+        (item) =>
+          item.enabled &&
+          item.startTime >= resolvedSchedule.startTime &&
+          item.endTime <= resolvedSchedule.endTime,
+      )
       .map((item) => ({ start: item.startTime, end: item.endTime }))
     const breakMinutes = totalIntervalMinutes(plannedBreaks)
 
     setForm((current) => ({
       ...current,
-      plannedStart: schedule.startTime,
-      plannedEnd: schedule.endTime,
+      plannedStart: resolvedSchedule.startTime,
+      plannedEnd: resolvedSchedule.endTime,
       plannedBreakMinutes: breakMinutes,
       plannedBreaks,
+      actualStart: current.source === 'manual' ? resolvedSchedule.startTime : current.actualStart,
+      actualEnd: current.source === 'manual' ? resolvedSchedule.endTime : current.actualEnd,
       actualBreakMinutes: current.source === 'manual' ? breakMinutes : current.actualBreakMinutes,
     }))
-  }, [settings.workSchedule])
+  }, [editingEntryId, form.date, settings.workSchedule])
 
   const calculation = useMemo(() => calculateWorkHours(form), [form])
   const monthEntries = useMemo(
@@ -246,18 +260,45 @@ export function WorkHoursCalculatorPage() {
 
   function saveEntry(event: React.FormEvent) {
     event.preventDefault()
-    addEntry(form)
+
+    if (editingEntryId) {
+      updateEntry(editingEntryId, form)
+      pushAppNotification(
+        'success',
+        'Registo de horas atualizado',
+        `${form.date} · ${OCCURRENCE_LABELS[form.reason]} · ${formatHoursMinutes(calculation.workedMinutes)} trabalhadas`,
+      )
+      setEditingEntryId(null)
+    } else {
+      addEntry(form)
+      pushAppNotification(
+        'success',
+        'Registo de horas guardado',
+        `${form.date} · ${OCCURRENCE_LABELS[form.reason]} · ${formatHoursMinutes(calculation.workedMinutes)} trabalhadas`,
+      )
+    }
+
     setMonthKey(form.date.slice(0, 7))
-    pushAppNotification(
-      'success',
-      'Registo de horas guardado',
-      `${form.date} · ${OCCURRENCE_LABELS[form.reason]} · ${formatHoursMinutes(calculation.workedMinutes)} trabalhadas`,
-    )
+  }
+
+  function handleEdit(entry: WorkHoursEntry) {
+    const { id, createdAt, ...input } = entry
+    void id
+    void createdAt
+    setEditingEntryId(entry.id)
+    setForm(input)
+    setMonthKey(entry.date.slice(0, 7))
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  function cancelEdit() {
+    setEditingEntryId(null)
   }
 
   function handleDelete(id: string) {
     if (!window.confirm('Eliminar este registo de horas?')) return
     removeEntry(id)
+    if (editingEntryId === id) setEditingEntryId(null)
     pushAppNotification('info', 'Registo eliminado', 'O registo foi removido da calculadora de horas.')
   }
 
@@ -265,6 +306,7 @@ export function WorkHoursCalculatorPage() {
     if (!monthEntries.length) return
     if (!window.confirm(`Eliminar todos os registos de ${monthKey}?`)) return
     clearMonth(monthKey)
+    setEditingEntryId(null)
     pushAppNotification('info', 'Mês limpo', `Foram removidos os registos de ${monthKey}.`)
   }
 
@@ -283,7 +325,7 @@ export function WorkHoursCalculatorPage() {
       <section className="workHoursVerifier" aria-label="Verificador de horas">
         <div>
           <span className="sectionKicker">VERIFICAÇÃO</span>
-          <strong>{sourceLabel}</strong>
+          <strong>{editingEntryId ? 'A editar um registo guardado' : sourceLabel}</strong>
           <p>Podes preencher tudo manualmente ou importar os registos reais de jornada e pausas guardados na aplicação.</p>
         </div>
         <div className="workHoursVerifierActions">
@@ -315,7 +357,7 @@ export function WorkHoursCalculatorPage() {
 
       <form className="workHoursForm" onSubmit={saveEntry}>
         <div className="workHoursSectionHeading">
-          <div><span className="sectionKicker">REGISTO PROFISSIONAL</span><h2>Dia, horário e ocorrência</h2></div>
+          <div><span className="sectionKicker">REGISTO PROFISSIONAL</span><h2>{editingEntryId ? 'Editar registo' : 'Dia, horário e ocorrência'}</h2></div>
           <button type="button" className="workHoursExampleButton" onClick={loadSicknessExample}>Exemplo 08:00–14:00 por doença</button>
         </div>
 
@@ -361,7 +403,12 @@ export function WorkHoursCalculatorPage() {
           <p>A aplicação calcula exatamente o tempo trabalhado e não trabalhado. O efeito no vencimento deve ficar separado, porque doença justificada, subsídio de doença, documentação e regras do contrato/CCT podem produzir tratamentos diferentes.</p>
         </aside>
 
-        <button className="actionButton actionButtonPrimary" type="submit">Guardar registo verificado</button>
+        <div className="workHoursFormActions">
+          {editingEntryId ? <button className="actionButton" type="button" onClick={cancelEdit}>Cancelar edição</button> : null}
+          <button className="actionButton actionButtonPrimary" type="submit">
+            {editingEntryId ? 'Guardar alterações' : 'Guardar registo verificado'}
+          </button>
+        </div>
       </form>
 
       <section className="workHoursMonth" aria-labelledby="work-hours-month-title">
@@ -383,13 +430,16 @@ export function WorkHoursCalculatorPage() {
           <div className="workHoursEntries">
             {monthEntries.map((entry) => {
               const item = calculateWorkHours(entry)
-              return <article key={entry.id}>
+              return <article key={entry.id} className={editingEntryId === entry.id ? 'workHoursEntryEditing' : undefined}>
                 <div className="workHoursEntryDate"><strong>{entry.date}</strong><span>{OCCURRENCE_LABELS[entry.reason]} · {entry.source === 'jornada' ? 'importado' : 'manual'}</span></div>
                 <div><span>Trabalhadas</span><strong>{formatHoursMinutes(item.workedMinutes)}</strong></div>
                 <div><span>Não trabalhadas</span><strong>{formatHoursMinutes(item.nonWorkedMinutes)}</strong></div>
                 <div><span>Extra</span><strong>{formatHoursMinutes(item.overtimeMinutes)}</strong></div>
                 <div><span>Saldo</span><strong>{formatHoursMinutes(item.balanceMinutes)}</strong></div>
-                <button type="button" onClick={() => handleDelete(entry.id)} aria-label={`Eliminar registo de ${entry.date}`}>Eliminar</button>
+                <div className="workHoursEntryActions">
+                  <button type="button" onClick={() => handleEdit(entry)} aria-label={`Editar registo de ${entry.date}`}>Editar</button>
+                  <button type="button" className="workHoursDeleteButton" onClick={() => handleDelete(entry.id)} aria-label={`Eliminar registo de ${entry.date}`}>Eliminar</button>
+                </div>
                 {entry.notes ? <p>{entry.notes}</p> : null}
               </article>
             })}
