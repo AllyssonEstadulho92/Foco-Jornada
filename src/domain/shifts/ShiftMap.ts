@@ -32,6 +32,10 @@ function clockMinutes(value: string): number | null {
 }
 
 export function getShiftDurationMinutes(day: ShiftMapDay): number {
+  // Folga, feriado, férias e faltas não podem herdar horas antigas do editor.
+  // Trabalho nesses dias entra separadamente em overtimeHours quando for remunerável.
+  if (day.kind !== 'work') return 0
+
   const start = clockMinutes(day.startTime)
   const end = clockMinutes(day.endTime)
   if (start === null || end === null) return 0
