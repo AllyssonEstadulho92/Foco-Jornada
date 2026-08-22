@@ -21,6 +21,15 @@ function NavigationLink({ item, compact = false }: { item: NavigationItem; compa
   )
 }
 
+function StaticNavigationLink({ item }: { item: NavigationItem }) {
+  return (
+    <NavLink to={item.path} className="navLink">
+      <span className="navMark" aria-hidden="true"><NavigationIcon name={item.icon} /></span>
+      <span className="navLabel">{item.label}</span>
+    </NavLink>
+  )
+}
+
 const mobileMainNavigation: NavigationItem[] = [
   { label: 'Hoje', path: '/', icon: 'home', end: true },
   { label: 'Atividades', path: '/atividades', icon: 'activities' },
@@ -156,7 +165,7 @@ export function AppShell() {
 
         <nav className="mobileDrawerNav mobileDrawerTools" aria-label="Ferramentas e dados">
           {mobileDataNavigation.map((item) => (
-            <NavigationLink key={`${item.path}-${item.label}`} item={item} />
+            <StaticNavigationLink key={`${item.path}-${item.label}`} item={item} />
           ))}
         </nav>
 
