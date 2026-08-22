@@ -10,11 +10,11 @@ export function StatisticsPage() {
     <section className="reportPage" aria-labelledby="statistics-title">
       <header className="reportHeader">
         <div>
-          <span className="eyebrow">ESTATÍSTICAS</span>
+          <span className="eyebrow">RELATÓRIOS</span>
           <h1 id="statistics-title">Produtividade</h1>
-          <p>Agregação local dos registos de jornada e foco.</p>
+          <p>Acompanha o teu tempo, foco e ritmo de trabalho.</p>
         </div>
-        <div className="periodTabs" aria-label="Período das estatísticas">
+        <div className="periodTabs" aria-label="Período do relatório">
           {(['day', 'week', 'month'] as const).map((value) => (
             <button
               type="button"
@@ -22,7 +22,7 @@ export function StatisticsPage() {
               key={value}
               onClick={() => setPeriod(value)}
             >
-              {value === 'day' ? 'Hoje' : value === 'week' ? '7 dias' : '30 dias'}
+              {value === 'day' ? 'Hoje' : value === 'week' ? 'Semana' : 'Mês'}
             </button>
           ))}
         </div>
@@ -32,7 +32,7 @@ export function StatisticsPage() {
 
       <div className="summaryGrid">
         <article><span>Jornada</span><strong>{formatDuration(totals.journeyMs)}</strong></article>
-        <article><span>Tempo efetivo</span><strong>{formatDuration(totals.effectiveMs)}</strong></article>
+        <article><span>Efetivo</span><strong>{formatDuration(totals.effectiveMs)}</strong></article>
         <article><span>Pausas</span><strong>{formatDuration(totals.breakMs)}</strong></article>
         <article><span>Foco</span><strong>{formatDuration(totals.focusMs)}</strong></article>
         <article><span>Atividades</span><strong>{totals.activityCount}</strong></article>
@@ -43,12 +43,12 @@ export function StatisticsPage() {
       <section className="timelinePanel" aria-labelledby="daily-breakdown-title">
         <div className="sectionHeadingRow">
           <div>
-            <span className="sectionKicker">EVOLUÇÃO</span>
-            <h2 id="daily-breakdown-title">Resumo por dia</h2>
+            <span className="sectionKicker">POR DIA</span>
+            <h2 id="daily-breakdown-title">Resumo diário</h2>
           </div>
         </div>
         {isLoading ? (
-          <p className="mutedText">A calcular estatísticas…</p>
+          <p className="mutedText">A atualizar relatório…</p>
         ) : (
           <div className="statsDailyList">
             {reports
@@ -62,7 +62,7 @@ export function StatisticsPage() {
                 </article>
               ))}
             {reports.every((report) => report.summary.journeyMs === 0 && report.summary.coffeeCount === 0) ? (
-              <div className="historyEmpty">Ainda não existem dados neste período.</div>
+              <div className="historyEmpty">Ainda não há dados neste período.</div>
             ) : null}
           </div>
         )}
