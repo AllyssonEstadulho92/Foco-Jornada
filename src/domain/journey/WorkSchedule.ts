@@ -26,6 +26,7 @@ export interface ResolvedWorkSchedule {
   isWorkingDay: boolean
   startTime: string
   endTime: string
+  source: 'default' | 'weekend' | 'manual'
 }
 
 type ScheduleDate = Date | string
@@ -76,6 +77,19 @@ export function resolveWorkScheduleForDate(
   const isSunday = weekday === 0
   const isSaturday = weekday === 6
   const isWeekend = isSaturday || isSunday
+  const manualOverride = schedule.dayOverrides.find((item) => item.date === dateKey)
+
+  if (manualOverride) {
+    return {
+      dateKey,
+      dayKind: isSunday ? 'sunday' : isSaturday ? 'saturday' : 'weekday',
+      isWorkingDay: true,
+      startTime: manualOverride.startTime,
+      endTime: manualOverride.endTime,
+      source: 'manual',
+    }
+  }
+
   const isWorkingDay = !isWeekend || schedule.weekendWorkDates.includes(dateKey)
 
   return {
@@ -84,6 +98,7 @@ export function resolveWorkScheduleForDate(
     isWorkingDay,
     startTime: isSunday ? schedule.sundayStartTime : schedule.startTime,
     endTime: isSunday ? schedule.sundayEndTime : schedule.endTime,
+    source: isWeekend && isWorkingDay ? 'weekend' : 'default',
   }
 }
 

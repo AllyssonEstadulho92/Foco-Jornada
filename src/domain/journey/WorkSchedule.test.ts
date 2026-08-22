@@ -74,6 +74,22 @@ describe('WorkSchedule', () => {
     ])
   })
 
+  it('dá prioridade ao horário manual definido para a data', () => {
+    const saturday = '2026-08-22'
+    const schedule = {
+      ...DEFAULT_WORK_SCHEDULE,
+      dayOverrides: [{ date: saturday, startTime: '10:30', endTime: '19:00' }],
+    }
+
+    expect(resolveWorkScheduleForDate(schedule, saturday)).toMatchObject({
+      isWorkingDay: true,
+      startTime: '10:30',
+      endTime: '19:00',
+      source: 'manual',
+    })
+    expect(getScheduleSummary(schedule, saturday).totalMinutes).toBe(510)
+  })
+
   it('mostra a pausa como próximo evento antes das 11:00', () => {
     const now = new Date(2026, 7, 21, 10, 30)
     expect(getNextScheduleEvent(DEFAULT_WORK_SCHEDULE, now)).toEqual({
