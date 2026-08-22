@@ -1,7 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title desc">
   <title id="title">Foco Jornada</title>
-  <rect width="512" height="512" rx="116" fill="#f5f8f4"/>
-  <g transform="translate(64 62) scale(3)" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <desc id="desc">Relógio aberto com caminho verde, símbolo de foco e jornada.</desc>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
     <path d="M92 90a43 43 0 1 0-20 13" stroke="#34413f" stroke-width="9"/>
     <path d="M91 90a43 43 0 0 0 9-27" stroke="#56a96a" stroke-width="9"/>
     <path d="M64 37v28l18 11" stroke="#34413f" stroke-width="8"/>

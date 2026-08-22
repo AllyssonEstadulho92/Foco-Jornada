@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { AppTopBar } from '../components/AppTopBar'
-import { BrandIcon, NavigationIcon } from '../navigation/NavigationIcon'
+import { NavigationIcon } from '../navigation/NavigationIcon'
 import { primaryNavigation, secondaryNavigation, type NavigationItem } from '../navigation/navigationItems'
 import { useUiStore } from '../store/useUiStore'
 
@@ -30,6 +30,15 @@ function StaticNavigationLink({ item }: { item: NavigationItem }) {
   )
 }
 
+function BrandLockup({ compact = false }: { compact?: boolean }) {
+  return (
+    <div className={`brandLockup${compact ? ' brandLockupCompact' : ''}`}>
+      <img src="./logo-mark.svg" alt="" aria-hidden="true" />
+      <span className="brandLockupText"><strong>Foco</strong> <em>Jornada</em></span>
+    </div>
+  )
+}
+
 const mobileMainNavigation: NavigationItem[] = [
   { label: 'Hoje', path: '/', icon: 'home', end: true },
   { label: 'Mapa de turnos', path: '/turnos', icon: 'activities' },
@@ -48,40 +57,45 @@ const mobileDataNavigation: NavigationItem[] = [
   { label: 'Exportar dados', path: '/mais', icon: 'export' },
   { label: 'Importar dados', path: '/mais', icon: 'export' },
   { label: 'Cópia de segurança', path: '/mais', icon: 'more' },
-  { label: 'Mais', path: '/mais', icon: 'more' },
 ]
 
 const mobileBottomNavigation: NavigationItem[] = [
-  { label: 'Hoje', path: '/', icon: 'home', end: true },
-  { label: 'Histórico', path: '/historico', icon: 'history' },
-  { label: 'Estatísticas', path: '/estatisticas', icon: 'stats' },
-  { label: 'Definições', path: '/definicoes', icon: 'settings' },
+  { label: 'Início', path: '/', icon: 'home', end: true },
+  { label: 'Foco', path: '/foco', icon: 'focus' },
+  { label: 'Relatórios', path: '/estatisticas', icon: 'stats' },
+  { label: 'Perfil', path: '/definicoes', icon: 'settings' },
 ]
 
 export function AppShell() {
   const sidebarCollapsed = useUiStore((state) => state.sidebarCollapsed)
   const toggleSidebar = useUiStore((state) => state.toggleSidebar)
+  const theme = useUiStore((state) => state.theme)
+  const setTheme = useUiStore((state) => state.setTheme)
+  const toggleTheme = useUiStore((state) => state.toggleTheme)
   const location = useLocation()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [quickMenuOpen, setQuickMenuOpen] = useState(false)
 
   useEffect(() => {
     setMobileMenuOpen(false)
-    setQuickMenuOpen(false)
   }, [location.pathname, location.search])
 
   useEffect(() => {
-    if (!mobileMenuOpen && !quickMenuOpen) return
+    document.documentElement.dataset.theme = theme
+    document.documentElement.style.colorScheme = theme
+    const themeColor = theme === 'dark' ? '#090c0b' : '#f7f8f6'
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', themeColor)
+  }, [theme])
+
+  useEffect(() => {
+    if (!mobileMenuOpen) return
 
     function handleKeyDown(event: KeyboardEvent) {
-      if (event.key !== 'Escape') return
-      setMobileMenuOpen(false)
-      setQuickMenuOpen(false)
+      if (event.key === 'Escape') setMobileMenuOpen(false)
     }
 
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [mobileMenuOpen, quickMenuOpen])
+  }, [mobileMenuOpen])
 
   useEffect(() => {
     if (!mobileMenuOpen) return
@@ -94,19 +108,12 @@ export function AppShell() {
 
   return (
     <div className={`appShell${sidebarCollapsed ? ' appShellCollapsed' : ''}${mobileMenuOpen ? ' appShellMobileMenuOpen' : ''}`}>
-      <a className="skipLink" href="#main-content">
-        Saltar para o conteúdo
-      </a>
+      <a className="skipLink" href="#main-content">Saltar para o conteúdo</a>
 
       <aside className="sidebar" aria-label="Navegação principal">
         <div className="brandRow">
-          <div className="brandMark" aria-hidden="true">
-            <BrandIcon />
-          </div>
-          <div className="brandCopy">
-            <strong>Foco & Jornada</strong>
-            <span>Produtividade com propósito</span>
-          </div>
+          <BrandLockup compact={sidebarCollapsed} />
+          {!sidebarCollapsed ? <span className="brandTagline">Produtividade com propósito</span> : null}
         </div>
 
         <nav className="sidebarNav">
@@ -135,6 +142,33 @@ export function AppShell() {
       <div className="appMainArea">
         <AppTopBar onOpenMenu={() => setMobileMenuOpen(true)} />
         <main className="appContent" id="main-content" tabIndex={-1}>
+          {location.pathname === '/definicoes' ? (
+            <section className="prototypeThemeCard" aria-label="Tema da aplicação">
+              <div>
+                <span>TEMA</span>
+                <strong>Claro ou escuro</strong>
+                <small>A escolha fica guardada neste dispositivo.</small>
+              </div>
+              <div className="prototypeThemeSegment" role="group" aria-label="Escolher tema">
+                <button
+                  type="button"
+                  className={theme === 'light' ? 'prototypeThemeActive' : ''}
+                  onClick={() => setTheme('light')}
+                  aria-pressed={theme === 'light'}
+                >
+                  Claro
+                </button>
+                <button
+                  type="button"
+                  className={theme === 'dark' ? 'prototypeThemeActive' : ''}
+                  onClick={() => setTheme('dark')}
+                  aria-pressed={theme === 'dark'}
+                >
+                  Escuro
+                </button>
+              </div>
+            </section>
+          ) : null}
           <Outlet />
         </main>
       </div>
@@ -149,12 +183,10 @@ export function AppShell() {
 
       <aside className={`mobileDrawer${mobileMenuOpen ? ' mobileDrawerOpen' : ''}`} aria-label="Menu móvel" aria-hidden={!mobileMenuOpen}>
         <header className="mobileDrawerHeader">
-          <div>
-            <strong>Foco Jornada</strong>
-            <span>Organiza o teu tempo.</span>
-          </div>
+          <BrandLockup />
           <button type="button" onClick={() => setMobileMenuOpen(false)} aria-label="Fechar menu">×</button>
         </header>
+        <p className="mobileDrawerTagline">Organiza o teu tempo, jornada e vencimento.</p>
 
         <nav className="mobileDrawerNav" aria-label="Navegação da aplicação">
           {mobileMainNavigation.map((item) => (
@@ -175,44 +207,23 @@ export function AppShell() {
         <nav className="mobileDrawerNav mobileDrawerSupport" aria-label="Informação e apoio">
           <NavLink to="/guia" className="navLink">
             <span className="navMark" aria-hidden="true"><NavigationIcon name="guide" /></span>
-            <span className="navLabel">Sobre a aplicação</span>
-          </NavLink>
-          <NavLink to="/guia" className="navLink">
-            <span className="navMark" aria-hidden="true"><NavigationIcon name="guide" /></span>
             <span className="navLabel">Ajuda e suporte</span>
           </NavLink>
         </nav>
 
         <footer className="mobileDrawerFooter">
-          <span>Tema <strong>Claro</strong></span>
-          <span>Versão <strong>1.0.0</strong></span>
+          <button className="drawerThemeToggle" type="button" onClick={toggleTheme}>
+            <span>Tema</span>
+            <strong>{theme === 'light' ? 'Claro' : 'Escuro'}</strong>
+          </button>
+          <span>Versão <strong>V1</strong></span>
         </footer>
       </aside>
 
-      {quickMenuOpen ? (
-        <div className="mobileQuickPanel" role="dialog" aria-label="Ações rápidas">
-          <NavLink to="/turnos"><NavigationIcon name="activities" /><span>Turnos</span></NavLink>
-          <NavLink to="/atividades"><NavigationIcon name="activities" /><span>Atividade</span></NavLink>
-          <NavLink to="/foco"><NavigationIcon name="focus" /><span>Foco</span></NavLink>
-          <NavLink to="/horas"><NavigationIcon name="hours" /><span>Horas</span></NavLink>
-          <NavLink to="/vencimento"><NavigationIcon name="payroll" /><span>Vencimento</span></NavLink>
-        </div>
-      ) : null}
-
       <nav className="bottomNav mobileBottomBar" aria-label="Navegação móvel">
-        <NavigationLink item={mobileBottomNavigation[0]} />
-        <NavigationLink item={mobileBottomNavigation[1]} />
-        <button
-          className={`mobileQuickButton${quickMenuOpen ? ' mobileQuickButtonActive' : ''}`}
-          type="button"
-          onClick={() => setQuickMenuOpen((current) => !current)}
-          aria-label={quickMenuOpen ? 'Fechar ações rápidas' : 'Abrir ações rápidas'}
-          aria-expanded={quickMenuOpen}
-        >
-          <span aria-hidden="true">+</span>
-        </button>
-        <NavigationLink item={mobileBottomNavigation[2]} />
-        <NavigationLink item={mobileBottomNavigation[3]} />
+        {mobileBottomNavigation.map((item) => (
+          <NavigationLink key={`${item.path}-${item.label}`} item={item} />
+        ))}
       </nav>
     </div>
   )
