@@ -12,7 +12,6 @@ import {
   parseClockMinutes,
   resolveWorkScheduleForDate,
 } from '../../domain/journey/WorkSchedule'
-import { pushAppNotification } from '../store/useNotificationStore'
 import { formatClockTime, formatDuration, toLocalDateKey } from '../../shared/utils/dateTime'
 import { getTimeGreeting } from '../../shared/utils/timeGreeting'
 import { useActivityController } from '../hooks/useActivityController'
@@ -23,6 +22,7 @@ import { useFocusController } from '../hooks/useFocusController'
 import { useJourneyController } from '../hooks/useJourneyController'
 import { useNow } from '../hooks/useNow'
 import { useSettingsController } from '../hooks/useSettingsController'
+import { pushAppNotification } from '../store/useNotificationStore'
 
 const notifiedBreaks = new Set<string>()
 
@@ -290,7 +290,7 @@ export function TodayReferencePage() {
       return
     }
     if (activeJourney) {
-      await startPomodoro(undefined, activeActivity?.id)
+      await startPomodoro()
       await refreshReport()
       return
     }
