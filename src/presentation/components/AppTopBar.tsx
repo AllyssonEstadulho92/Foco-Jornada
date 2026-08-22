@@ -28,6 +28,14 @@ function BellIcon() {
   )
 }
 
+function MenuIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M5 7h14M5 12h14M5 17h14" />
+    </svg>
+  )
+}
+
 function formatNotificationTime(value: string) {
   return new Intl.DateTimeFormat('pt-PT', {
     day: '2-digit',
@@ -37,7 +45,7 @@ function formatNotificationTime(value: string) {
   }).format(new Date(value))
 }
 
-export function AppTopBar() {
+export function AppTopBar({ onOpenMenu }: { onOpenMenu?: () => void }) {
   const { journeyRepository, focusRepository } = useAppServices()
   const now = useNow(1000)
   const [isOpen, setIsOpen] = useState(false)
@@ -138,78 +146,87 @@ export function AppTopBar() {
 
   return (
     <div className="appTopBar" aria-label="Estado da aplicação">
-      <div className="appClock" aria-label={`Hora atual ${clock}`}>
-        <ClockIcon />
-        <time dateTime={now.toISOString()}>{clock}</time>
+      <div className="mobileAppIdentity">
+        <button className="mobileMenuButton" type="button" onClick={onOpenMenu} aria-label="Abrir menu principal">
+          <MenuIcon />
+        </button>
+        <strong>Foco Jornada</strong>
       </div>
 
-      <div className="notificationCenter" ref={panelRef}>
-        <button
-          type="button"
-          className={`notificationButton${isOpen ? ' notificationButtonActive' : ''}`}
-          onClick={toggleNotifications}
-          aria-label="Abrir centro de notificações"
-          aria-expanded={isOpen}
-          aria-haspopup="dialog"
-        >
-          <BellIcon />
-          {unreadCount > 0 ? (
-            <span className="notificationBadge">{unreadCount > 9 ? '9+' : unreadCount}</span>
-          ) : null}
-        </button>
+      <div className="topBarStatusGroup">
+        <div className="appClock" aria-label={`Hora atual ${clock}`}>
+          <ClockIcon />
+          <time dateTime={now.toISOString()}>{clock}</time>
+        </div>
 
-        {isOpen ? (
-          <section className="notificationPanel" role="dialog" aria-label="Centro de notificações">
-            <header className="notificationPanelHeader">
-              <div>
-                <span>NOTIFICAÇÕES</span>
-                <strong>Centro de notificações</strong>
-              </div>
-              <div className="notificationHeaderActions">
-                <span className="notificationCount">{notifications.length}</span>
-                {notifications.length > 0 ? (
-                  <button type="button" onClick={clearNotifications}>Limpar</button>
-                ) : null}
-              </div>
-            </header>
-
-            {statusNotifications.length > 0 ? (
-              <div className="notificationStatusStrip">
-                {statusNotifications.map((item) => (
-                  <article className="notificationItem notificationStatusItem" key={item.id}>
-                    <span className={`notificationDot notificationDot-${item.tone}`} aria-hidden="true" />
-                    <div>
-                      <strong>{item.title}</strong>
-                      <span>{item.detail}</span>
-                    </div>
-                  </article>
-                ))}
-              </div>
+        <div className="notificationCenter" ref={panelRef}>
+          <button
+            type="button"
+            className={`notificationButton${isOpen ? ' notificationButtonActive' : ''}`}
+            onClick={toggleNotifications}
+            aria-label="Abrir centro de notificações"
+            aria-expanded={isOpen}
+            aria-haspopup="dialog"
+          >
+            <BellIcon />
+            {unreadCount > 0 ? (
+              <span className="notificationBadge">{unreadCount > 9 ? '9+' : unreadCount}</span>
             ) : null}
+          </button>
 
-            <div className="notificationList">
-              {notifications.length === 0 ? (
-                <div className="notificationEmpty">
-                  <strong>Sem notificações por ler</strong>
-                  <span>As ações da aplicação passam a ficar guardadas aqui, sem popups no ecrã.</span>
+          {isOpen ? (
+            <section className="notificationPanel" role="dialog" aria-label="Centro de notificações">
+              <header className="notificationPanelHeader">
+                <div>
+                  <span>NOTIFICAÇÕES</span>
+                  <strong>Centro de notificações</strong>
                 </div>
-              ) : (
-                notifications.map((item) => (
-                  <article className={`notificationItem${item.read ? '' : ' notificationItemUnread'}`} key={item.id}>
-                    <span className={`notificationDot notificationDot-${item.tone}`} aria-hidden="true" />
-                    <div>
-                      <strong>{item.title}</strong>
-                      {item.detail ? <span>{item.detail}</span> : null}
-                      <time dateTime={item.createdAt}>{formatNotificationTime(item.createdAt)}</time>
-                    </div>
-                  </article>
-                ))
-              )}
-            </div>
+                <div className="notificationHeaderActions">
+                  <span className="notificationCount">{notifications.length}</span>
+                  {notifications.length > 0 ? (
+                    <button type="button" onClick={clearNotifications}>Limpar</button>
+                  ) : null}
+                </div>
+              </header>
 
-            <footer className="notificationPanelFooter">As notificações ficam guardadas neste dispositivo.</footer>
-          </section>
-        ) : null}
+              {statusNotifications.length > 0 ? (
+                <div className="notificationStatusStrip">
+                  {statusNotifications.map((item) => (
+                    <article className="notificationItem notificationStatusItem" key={item.id}>
+                      <span className={`notificationDot notificationDot-${item.tone}`} aria-hidden="true" />
+                      <div>
+                        <strong>{item.title}</strong>
+                        <span>{item.detail}</span>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              ) : null}
+
+              <div className="notificationList">
+                {notifications.length === 0 ? (
+                  <div className="notificationEmpty">
+                    <strong>Sem notificações por ler</strong>
+                    <span>As ações da aplicação passam a ficar guardadas aqui, sem popups no ecrã.</span>
+                  </div>
+                ) : (
+                  notifications.map((item) => (
+                    <article className={`notificationItem${item.read ? '' : ' notificationItemUnread'}`} key={item.id}>
+                      <span className={`notificationDot notificationDot-${item.tone}`} aria-hidden="true" />
+                      <div>
+                        <strong>{item.title}</strong>
+                        {item.detail ? <span>{item.detail}</span> : null}
+                        <time dateTime={item.createdAt}>{formatNotificationTime(item.createdAt)}</time>
+                      </div>
+                    </article>
+                  ))
+                )}
+              </div>
+
+              <footer className="notificationPanelFooter">As notificações ficam guardadas neste dispositivo.</footer>
+            </section>
+          ) : null}
+        </div>
       </div>
     </div>
   )
