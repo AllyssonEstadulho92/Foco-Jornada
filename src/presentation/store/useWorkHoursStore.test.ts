@@ -37,4 +37,19 @@ describe('useWorkHoursStore', () => {
     expect(updated.actualEnd).toBe('16:30')
     expect(updated.notes).toBe('Saída antecipada.')
   })
+
+  it('substitui o apuramento anterior quando a mesma data é guardada novamente', () => {
+    useWorkHoursStore.getState().add(input)
+    useWorkHoursStore.getState().add({
+      ...input,
+      actualEnd: '16:00',
+      notes: 'Apuramento corrigido.',
+    })
+
+    const entries = useWorkHoursStore.getState().entries
+    expect(entries).toHaveLength(1)
+    expect(entries[0].date).toBe(input.date)
+    expect(entries[0].actualEnd).toBe('16:00')
+    expect(entries[0].notes).toBe('Apuramento corrigido.')
+  })
 })
