@@ -27,11 +27,15 @@ export interface WorkScheduleSettings {
 }
 
 export interface AppSettings {
+  /** Revisão interna usada apenas para migrações de configurações locais. */
+  settingsRevision?: number
   coffeeUnitPrice: number
   currency: 'EUR' | 'USD' | 'GBP'
   suggestedBreakIntervalMinutes: number
   workSchedule: WorkScheduleSettings
 }
+
+const CURRENT_SETTINGS_REVISION = 2
 
 export const DEFAULT_WORK_SCHEDULE: WorkScheduleSettings = {
   mode: 'fixed',
@@ -54,6 +58,7 @@ export const DEFAULT_WORK_SCHEDULE: WorkScheduleSettings = {
 }
 
 export const DEFAULT_APP_SETTINGS: AppSettings = {
+  settingsRevision: CURRENT_SETTINGS_REVISION,
   coffeeUnitPrice: 0.7,
   currency: 'EUR',
   suggestedBreakIntervalMinutes: 90,
@@ -112,7 +117,16 @@ function normalizeBreak(
   }
 }
 
-function normalizeWorkSchedule(value: Partial<WorkScheduleSettings> | undefined): WorkScheduleSettings {
+function isLegacyDefaultBreak(value: Partial<ScheduledBreakSettings> | undefined) {
+  return value?.enabled === true && value.startTime === '11:00' && value.endTime === '11:15'
+}
+
+function normalizeWorkSchedule(
+  value: Partial<WorkScheduleSettings> | undefined,
+  settingsRevision: number,
+): WorkScheduleSettings {
+  const migrateLegacyBreak = settingsRevision < CURRENT_SETTINGS_REVISION && isLegacyDefaultBreak(value?.break1)
+
   return {
     mode: 'fixed',
     startTime: validClock(value?.startTime, DEFAULT_WORK_SCHEDULE.startTime),
@@ -121,7 +135,9 @@ function normalizeWorkSchedule(value: Partial<WorkScheduleSettings> | undefined)
     sundayEndTime: validClock(value?.sundayEndTime, DEFAULT_WORK_SCHEDULE.sundayEndTime),
     weekendWorkDates: normalizeWeekendWorkDates(value?.weekendWorkDates),
     dayOverrides: normalizeDayOverrides(value?.dayOverrides),
-    break1: normalizeBreak(value?.break1, DEFAULT_WORK_SCHEDULE.break1),
+    break1: migrateLegacyBreak
+      ? { ...DEFAULT_WORK_SCHEDULE.break1 }
+      : normalizeBreak(value?.break1, DEFAULT_WORK_SCHEDULE.break1),
     break2: normalizeBreak(value?.break2, DEFAULT_WORK_SCHEDULE.break2),
   }
 }
@@ -129,9 +145,12 @@ function normalizeWorkSchedule(value: Partial<WorkScheduleSettings> | undefined)
 export function normalizeSettings(value: Partial<AppSettings> | undefined): AppSettings {
   const coffeeUnitPrice = Number(value?.coffeeUnitPrice)
   const suggestedBreakIntervalMinutes = Number(value?.suggestedBreakIntervalMinutes)
+  const settingsRevision = Number(value?.settingsRevision)
+  const normalizedRevision = Number.isFinite(settingsRevision) ? settingsRevision : 1
   const currency = value?.currency
 
   return {
+    settingsRevision: CURRENT_SETTINGS_REVISION,
     coffeeUnitPrice:
       Number.isFinite(coffeeUnitPrice) && coffeeUnitPrice >= 0 && coffeeUnitPrice <= 100
         ? Math.round(coffeeUnitPrice * 100) / 100
@@ -143,6 +162,6 @@ export function normalizeSettings(value: Partial<AppSettings> | undefined): AppS
       suggestedBreakIntervalMinutes <= 480
         ? Math.round(suggestedBreakIntervalMinutes)
         : DEFAULT_APP_SETTINGS.suggestedBreakIntervalMinutes,
-    workSchedule: normalizeWorkSchedule(value?.workSchedule),
+    workSchedule: normalizeWorkSchedule(value?.workSchedule, normalizedRevision),
   }
 }
