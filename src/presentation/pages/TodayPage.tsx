@@ -11,6 +11,8 @@ import {
   getScheduleMilestones,
   getScheduleProgress,
   getScheduleSummary,
+  parseClockMinutes,
+  resolveWorkScheduleForDate,
 } from '../../domain/journey/WorkSchedule'
 import { formatClockTime, formatDuration, toLocalDateKey } from '../../shared/utils/dateTime'
 import { useActivityController } from '../hooks/useActivityController'
@@ -75,17 +77,27 @@ export function TodayPage() {
     error: coffeeError,
     add: addCoffee,
   } = useCoffeeController()
-  const { settings, error: settingsError } = useSettingsController()
+  const {
+    settings,
+    save: saveSettings,
+    isBusy: isSettingsBusy,
+    error: settingsError,
+  } = useSettingsController()
   const [customMinutes, setCustomMinutes] = useState('30')
+  const [manualScheduleOpen, setManualScheduleOpen] = useState(false)
+  const [manualStartTime, setManualStartTime] = useState('')
+  const [manualEndTime, setManualEndTime] = useState('')
+  const [manualScheduleError, setManualScheduleError] = useState<string | null>(null)
   const now = useNow()
   const nowIso = now.toISOString()
   const todayKey = toLocalDateKey(now)
   const { report, refresh: refreshReport } = useDayReport(todayKey)
 
-  const dateLabel = useMemo(
-    () => new Intl.DateTimeFormat('pt-PT', { day: 'numeric', month: 'long', year: 'numeric' }).format(now),
-    [todayKey],
-  )
+  const dateLabel = new Intl.DateTimeFormat('pt-PT', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  }).format(now)
 
   const totalBreakDurationMs = useMemo(
     () =>
@@ -112,8 +124,9 @@ export function TodayPage() {
     : report?.summary.effectiveMs ?? 0
 
   const schedule = settings.workSchedule
-  const scheduleMilestones = getScheduleMilestones(schedule)
-  const scheduleSummary = getScheduleSummary(schedule)
+  const resolvedSchedule = resolveWorkScheduleForDate(schedule, now)
+  const scheduleMilestones = getScheduleMilestones(schedule, now)
+  const scheduleSummary = getScheduleSummary(schedule, now)
   const nextScheduleEvent = getNextScheduleEvent(schedule, now)
   const scheduleProgress = getScheduleProgress(schedule, now)
   const scheduleStyle = {
@@ -162,6 +175,49 @@ export function TodayPage() {
   async function handleCoffee() {
     await addCoffee(1)
     await refreshReport()
+  }
+
+  function openManualSchedule() {
+    setManualStartTime(resolvedSchedule.startTime)
+    setManualEndTime(resolvedSchedule.endTime)
+    setManualScheduleError(null)
+    setManualScheduleOpen(true)
+  }
+
+  async function saveManualScheduleForToday() {
+    const start = parseClockMinutes(manualStartTime)
+    const end = parseClockMinutes(manualEndTime)
+    if (start === null || end === null || end <= start) {
+      setManualScheduleError('Indica uma entrada e uma saída válidas. A saída tem de ser posterior à entrada.')
+      return
+    }
+
+    const dayOverrides = [
+      ...schedule.dayOverrides.filter((item) => item.date !== todayKey),
+      { date: todayKey, startTime: manualStartTime, endTime: manualEndTime },
+    ]
+
+    await saveSettings({
+      ...settings,
+      workSchedule: {
+        ...schedule,
+        dayOverrides,
+      },
+    })
+    setManualScheduleError(null)
+    setManualScheduleOpen(false)
+  }
+
+  async function resetManualScheduleForToday() {
+    await saveSettings({
+      ...settings,
+      workSchedule: {
+        ...schedule,
+        dayOverrides: schedule.dayOverrides.filter((item) => item.date !== todayKey),
+      },
+    })
+    setManualScheduleError(null)
+    setManualScheduleOpen(false)
   }
 
   const statusLabel = activeBreak
@@ -215,7 +271,7 @@ export function TodayPage() {
               Terminar
             </button>
           ) : (
-            <Link className="scheduleSettingsLink" to="/definicoes">Editar horário</Link>
+            <Link className="scheduleSettingsLink" to="/definicoes">Editar horário base</Link>
           )}
         </div>
 
@@ -260,18 +316,87 @@ export function TodayPage() {
           </div>
 
           <div className="schedulePlanSummary">
-            <span>Planeado: <strong>{formatPlannedMinutes(scheduleSummary.totalMinutes)}</strong> jornada</span>
+            <span>
+              Horário hoje: <strong>{resolvedSchedule.isWorkingDay ? `${resolvedSchedule.startTime}–${resolvedSchedule.endTime}` : 'Folga'}</strong>
+            </span>
+            <span><strong>{formatPlannedMinutes(scheduleSummary.totalMinutes)}</strong> jornada</span>
             <span><strong>{formatPlannedMinutes(scheduleSummary.breakMinutes)}</strong> pausas</span>
             <span><strong>{formatPlannedMinutes(scheduleSummary.effectiveMinutes)}</strong> efetivo</span>
-            <Link className="scheduleSettingsLink" to="/definicoes">Configurar</Link>
+            {resolvedSchedule.source === 'manual' ? <span><strong>Manual</strong></span> : null}
+            <button className="todayHeaderAction" type="button" onClick={openManualSchedule} disabled={isSettingsBusy}>
+              {resolvedSchedule.source === 'manual' ? 'Alterar horário de hoje' : 'Definir horário de hoje'}
+            </button>
           </div>
+
+          {manualScheduleOpen ? (
+            <div className="settingsBreakCard" aria-label="Horário manual de hoje">
+              <div>
+                <strong>Horário manual de hoje</strong>
+                <p className="settingsScheduleNote">
+                  Esta alteração aplica-se apenas a {dateLabel}. Não muda o horário base dos outros dias.
+                </p>
+              </div>
+              <div className="settingsTimeGrid">
+                <label>
+                  <span>Entrada</span>
+                  <input
+                    type="time"
+                    value={manualStartTime}
+                    disabled={isSettingsBusy}
+                    onChange={(event) => setManualStartTime(event.target.value)}
+                  />
+                </label>
+                <label>
+                  <span>Saída</span>
+                  <input
+                    type="time"
+                    value={manualEndTime}
+                    disabled={isSettingsBusy}
+                    onChange={(event) => setManualEndTime(event.target.value)}
+                  />
+                </label>
+              </div>
+              {manualScheduleError ? <div className="errorBanner" role="alert">{manualScheduleError}</div> : null}
+              <div className="workHoursVerifierActions">
+                <button
+                  className="actionButton actionButtonPrimary"
+                  type="button"
+                  disabled={isSettingsBusy}
+                  onClick={() => void saveManualScheduleForToday()}
+                >
+                  {isSettingsBusy ? 'A guardar…' : 'Guardar horário de hoje'}
+                </button>
+                {resolvedSchedule.source === 'manual' ? (
+                  <button
+                    className="actionButton"
+                    type="button"
+                    disabled={isSettingsBusy}
+                    onClick={() => void resetManualScheduleForToday()}
+                  >
+                    Usar horário base
+                  </button>
+                ) : null}
+                <button
+                  className="actionButton"
+                  type="button"
+                  disabled={isSettingsBusy}
+                  onClick={() => {
+                    setManualScheduleOpen(false)
+                    setManualScheduleError(null)
+                  }}
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          ) : null}
 
           {!activeJourney ? (
             <div className="todayJourneyEmpty">
               <div className="todayEmptyIcon"><DashboardIcon type="clock" /></div>
               <div>
                 <strong>Horário planeado pronto.</strong>
-                <span>Inicia a jornada; o plano permanece fixo e os tempos reais são registados separadamente.</span>
+                <span>Inicia a jornada; o plano permanece separado dos tempos reais registados.</span>
               </div>
               <button className="actionButton actionButtonPrimary" type="button" disabled={isBusy || isLoading} onClick={() => void handleStartJourney()}>
                 {isBusy ? 'A iniciar…' : 'Iniciar jornada'}
