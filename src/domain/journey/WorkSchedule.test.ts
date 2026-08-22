@@ -11,7 +11,7 @@ import {
 describe('WorkSchedule', () => {
   const weekday = '2026-08-21'
 
-  it('calcula 08:00-17:00 com pausa 11:00-11:15 num dia útil', () => {
+  it('calcula 08:00-17:00 com pausa 12:00-12:15 num dia útil', () => {
     const summary = getScheduleSummary(DEFAULT_WORK_SCHEDULE, weekday)
 
     expect(summary.totalMinutes).toBe(540)
@@ -25,8 +25,8 @@ describe('WorkSchedule', () => {
   it('cria Entrada -> Pausa -> Regresso -> Saída num dia útil', () => {
     expect(getScheduleMilestones(DEFAULT_WORK_SCHEDULE, weekday).map((item) => [item.label, item.time])).toEqual([
       ['Entrada', '08:00'],
-      ['Pausa', '11:00'],
-      ['Regresso', '11:15'],
+      ['Pausa', '12:00'],
+      ['Regresso', '12:15'],
       ['Saída', '17:00'],
     ])
   })
@@ -68,8 +68,8 @@ describe('WorkSchedule', () => {
     })
     expect(getScheduleMilestones(schedule, sunday).map((item) => [item.label, item.time])).toEqual([
       ['Entrada', '09:00'],
-      ['Pausa', '11:00'],
-      ['Regresso', '11:15'],
+      ['Pausa', '12:00'],
+      ['Regresso', '12:15'],
       ['Saída', '18:00'],
     ])
   })
@@ -90,20 +90,20 @@ describe('WorkSchedule', () => {
     expect(getScheduleSummary(schedule, saturday).totalMinutes).toBe(510)
   })
 
-  it('mostra a pausa como próximo evento antes das 11:00', () => {
-    const now = new Date(2026, 7, 21, 10, 30)
+  it('mostra a pausa como próximo evento antes das 12:00', () => {
+    const now = new Date(2026, 7, 21, 11, 30)
     expect(getNextScheduleEvent(DEFAULT_WORK_SCHEDULE, now)).toEqual({
       label: 'Próxima pausa',
-      time: '11:00',
+      time: '12:00',
       state: 'work',
     })
   })
 
   it('mostra o regresso durante a pausa planeada', () => {
-    const now = new Date(2026, 7, 21, 11, 5)
+    const now = new Date(2026, 7, 21, 12, 5)
     expect(getNextScheduleEvent(DEFAULT_WORK_SCHEDULE, now)).toEqual({
       label: 'Regresso',
-      time: '11:15',
+      time: '12:15',
       state: 'break',
     })
   })
