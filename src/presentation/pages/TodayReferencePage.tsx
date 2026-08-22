@@ -1,6 +1,7 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { getEffectiveJourneyDurationMs } from '../../application/journey/getEffectiveJourneyDuration'
+import { getActivityDurationMs } from '../../domain/activities/Activity'
 import { getBreakDurationMs } from '../../domain/breaks/BreakRecord'
 import { getFocusElapsedMs, getFocusRemainingMs } from '../../domain/focus/FocusSession'
 import { getJourneyDurationMs } from '../../domain/journey/Journey'
@@ -11,7 +12,9 @@ import {
   parseClockMinutes,
   resolveWorkScheduleForDate,
 } from '../../domain/journey/WorkSchedule'
+import { pushAppNotification } from '../store/useNotificationStore'
 import { formatClockTime, formatDuration, toLocalDateKey } from '../../shared/utils/dateTime'
+import { getTimeGreeting } from '../../shared/utils/timeGreeting'
 import { useActivityController } from '../hooks/useActivityController'
 import { useBreakController } from '../hooks/useBreakController'
 import { useCoffeeController } from '../hooks/useCoffeeController'
@@ -20,6 +23,8 @@ import { useFocusController } from '../hooks/useFocusController'
 import { useJourneyController } from '../hooks/useJourneyController'
 import { useNow } from '../hooks/useNow'
 import { useSettingsController } from '../hooks/useSettingsController'
+
+const notifiedBreaks = new Set<string>()
 
 function FocusGlyph() {
   return (
@@ -57,7 +62,11 @@ export function TodayReferencePage() {
     start: startBreak,
     finish: finishBreak,
   } = useBreakController(activeJourney?.id)
-  const { activeActivity, error: activityError } = useActivityController(activeJourney?.id)
+  const {
+    activeActivity,
+    error: activityError,
+    complete: completeActivity,
+  } = useActivityController(activeJourney?.id)
   const {
     sessions: focusSessions,
     activeSession: activeFocus,
@@ -66,6 +75,7 @@ export function TodayReferencePage() {
     startPomodoro,
     pause: pauseFocus,
     resume: resumeFocus,
+    complete: completeFocus,
   } = useFocusController(activeJourney?.id)
   const { isBusy: isCoffeeBusy, error: coffeeError, add: addCoffee } = useCoffeeController()
   const { settings, save: saveSettings, isBusy: isSettingsBusy, error: settingsError } = useSettingsController()
@@ -83,53 +93,151 @@ export function TodayReferencePage() {
   const scheduleSummary = getScheduleSummary(schedule, now)
   const nextScheduleEvent = getNextScheduleEvent(schedule, now)
 
-  const journeyDurationMs = activeJourney
-    ? getJourneyDurationMs(activeJourney, nowIso)
-    : report?.summary.journeyMs ?? 0
-  const effectiveDurationMs = activeJourney
-    ? getEffectiveJourneyDurationMs(activeJourney, breaks, nowIso)
-    : report?.summary.effectiveMs ?? 0
+  const dayJourneys = report?.journeys ?? (activeJourney ? [activeJourney] : [])
+  const dayBreaks = report?.breaks ?? breaks
+  const dayFocusSessions = report?.focusSessions ?? focusSessions
+
+  const journeyDurationMs = useMemo(
+    () => dayJourneys.reduce((sum, journey) => sum + getJourneyDurationMs(journey, journey.endedAt ?? nowIso), 0),
+    [dayJourneys, nowIso],
+  )
   const breakDurationMs = useMemo(
-    () => breaks.filter((item) => item.status !== 'cancelled').reduce((sum, item) => sum + getBreakDurationMs(item, nowIso), 0),
-    [breaks, nowIso],
+    () => dayBreaks
+      .filter((item) => item.status !== 'cancelled')
+      .reduce((sum, item) => sum + getBreakDurationMs(item, item.endedAt ?? nowIso), 0),
+    [dayBreaks, nowIso],
   )
-  const focusDurationMs = useMemo(
-    () => focusSessions.filter((item) => item.segmentType === 'focus' && item.status !== 'cancelled').reduce((sum, item) => sum + getFocusElapsedMs(item, item.endedAt ?? nowIso), 0),
-    [focusSessions, nowIso],
+  const effectiveDurationMs = useMemo(
+    () => dayJourneys.reduce((sum, journey) => {
+      const journeyBreaks = dayBreaks.filter((item) => item.journeyId === journey.id)
+      return sum + getEffectiveJourneyDurationMs(journey, journeyBreaks, journey.endedAt ?? nowIso)
+    }, 0),
+    [dayBreaks, dayJourneys, nowIso],
   )
-  const completedFocusCount = focusSessions.filter((item) => item.segmentType === 'focus' && item.status === 'completed').length
-  const productivity = journeyDurationMs > 0 ? Math.min(100, Math.round((effectiveDurationMs / journeyDurationMs) * 100)) : 0
+
+  const activeBreakDurationMs = activeBreak ? getBreakDurationMs(activeBreak, nowIso) : 0
+  const activeBreakPlannedMs = activeBreak?.plannedDurationMinutes
+    ? activeBreak.plannedDurationMinutes * 60 * 1000
+    : 0
+  const breakReachedPlan = Boolean(
+    activeBreak && activeBreakPlannedMs > 0 && activeBreakDurationMs >= activeBreakPlannedMs,
+  )
+  const activeActivityDurationMs = activeActivity ? getActivityDurationMs(activeActivity, nowIso) : 0
+  const completedFocusCount = dayFocusSessions.filter(
+    (item) => item.segmentType === 'focus' && item.status === 'completed',
+  ).length
+  const completedActivityCount = report?.summary.activityCount ?? 0
 
   const focusRemainingMs = activeFocus ? getFocusRemainingMs(activeFocus, nowIso) : 0
   const focusProgress = activeFocus
-    ? Math.min(100, Math.max(0, Math.round((getFocusElapsedMs(activeFocus, nowIso) / (activeFocus.plannedDurationSeconds * 1000)) * 100)))
-    : activeJourney
-      ? Math.min(100, Math.max(5, productivity))
-      : 0
+    ? Math.min(
+        100,
+        Math.max(
+          0,
+          Math.round(
+            (getFocusElapsedMs(activeFocus, nowIso) / (activeFocus.plannedDurationSeconds * 1000)) * 100,
+          ),
+        ),
+      )
+    : 0
+  const breakProgress = activeBreak && activeBreakPlannedMs > 0
+    ? Math.min(100, Math.round((activeBreakDurationMs / activeBreakPlannedMs) * 100))
+    : 0
+  const mainProgress = activeBreak ? breakProgress : activeFocus ? focusProgress : 0
 
-  const mainTitle = activeFocus
-    ? 'Foco atual'
-    : activeBreak
-      ? 'Pausa em curso'
-      : activeJourney
-        ? 'Jornada ativa'
-        : 'Pronto para começar'
-  const mainSubtitle = activeActivity?.name
-    ?? (activeFocus ? 'Trabalho profundo' : resolvedSchedule.isWorkingDay ? `${resolvedSchedule.startTime}–${resolvedSchedule.endTime}` : 'Dia sem jornada planeada')
-  const mainTime = activeFocus
-    ? formatFocusTime(focusRemainingMs)
-    : activeJourney
-      ? formatDuration(effectiveDurationMs)
-      : nextScheduleEvent.time ?? '—'
-  const mainTimeLabel = activeFocus ? 'Tempo restante' : activeJourney ? 'Tempo efetivo' : nextScheduleEvent.label
+  const mainTitle = activeBreak
+    ? 'Pausa em curso'
+    : activeFocus
+      ? 'Foco atual'
+      : activeActivity
+        ? 'Atividade em curso'
+        : activeJourney
+          ? 'Jornada ativa'
+          : 'Pronto para começar'
+  const mainSubtitle = activeBreak
+    ? activeBreak.plannedDurationMinutes
+      ? `Pausa planeada · ${activeBreak.plannedDurationMinutes} min`
+      : 'Pausa sem duração definida'
+    : activeFocus
+      ? activeActivity?.name ?? 'Trabalho profundo'
+      : activeActivity
+        ? activeActivity.name
+        : activeJourney
+          ? resolvedSchedule.isWorkingDay
+            ? `${resolvedSchedule.startTime}–${resolvedSchedule.endTime}`
+            : 'Jornada sem horário planeado'
+          : resolvedSchedule.isWorkingDay
+            ? `${resolvedSchedule.startTime}–${resolvedSchedule.endTime}`
+            : 'Dia sem jornada planeada'
+  const mainTime = activeBreak
+    ? formatDuration(activeBreakDurationMs)
+    : activeFocus
+      ? formatFocusTime(focusRemainingMs)
+      : activeActivity
+        ? formatDuration(activeActivityDurationMs)
+        : activeJourney
+          ? formatDuration(effectiveDurationMs)
+          : nextScheduleEvent.time ?? '—'
+  const mainTimeLabel = activeBreak
+    ? 'Tempo da pausa'
+    : activeFocus
+      ? 'Tempo restante'
+      : activeActivity
+        ? 'Tempo da atividade'
+        : activeJourney
+          ? 'Tempo efetivo'
+          : nextScheduleEvent.label
+  const primaryActionLabel = activeBreak
+    ? 'Terminar pausa'
+    : activeFocus?.status === 'paused'
+      ? 'Retomar foco'
+      : activeFocus
+        ? 'Pausar foco'
+        : activeActivity
+          ? 'Concluir atividade'
+          : activeJourney
+            ? 'Iniciar foco'
+            : 'Iniciar jornada'
+  const primaryActionGlyph = activeBreak
+    ? '▶'
+    : activeFocus?.status === 'paused'
+      ? '▶'
+      : activeFocus
+        ? 'Ⅱ'
+        : activeActivity
+          ? '✓'
+          : '▶'
 
   const dateLabel = new Intl.DateTimeFormat('pt-PT', {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
   }).format(now)
+  const greeting = getTimeGreeting(now)
 
   const pageError = error ?? breakError ?? activityError ?? focusError ?? coffeeError ?? settingsError
+
+  useEffect(() => {
+    if (
+      activeFocus?.status === 'running' &&
+      focusRemainingMs === 0 &&
+      !activeBreak &&
+      !isFocusBusy
+    ) {
+      void completeFocus().then(() => refreshReport())
+    }
+  }, [activeBreak, activeFocus?.status, completeFocus, focusRemainingMs, isFocusBusy, refreshReport])
+
+  useEffect(() => {
+    if (!activeBreak || !breakReachedPlan || notifiedBreaks.has(activeBreak.id)) return
+
+    notifiedBreaks.add(activeBreak.id)
+    pushAppNotification(
+      'info',
+      'Tempo da pausa concluído.',
+      'A pausa continua a contar até tocares em “Terminar pausa”.',
+    )
+  }, [activeBreak, breakReachedPlan])
 
   async function handleStartJourney() {
     await start()
@@ -142,19 +250,47 @@ export function TodayReferencePage() {
     await refreshReport()
   }
 
+  async function handleStartBreak() {
+    if (activeFocus?.status === 'running') {
+      await pauseFocus()
+    }
+    await startBreak('short', 15)
+    await refreshReport()
+  }
+
+  async function handleFinishBreak() {
+    await finishBreak()
+    await refreshReport()
+  }
+
+  async function handleCompleteActivity() {
+    if (!activeActivity) return
+    await completeActivity(activeActivity.id)
+    await refreshReport()
+  }
+
+  async function handleAddCoffee() {
+    await addCoffee(1)
+    await refreshReport()
+  }
+
   async function handlePrimaryAction() {
+    if (activeBreak) {
+      await handleFinishBreak()
+      return
+    }
     if (activeFocus) {
       if (activeFocus.status === 'paused') await resumeFocus()
       else await pauseFocus()
-      return
-    }
-    if (activeBreak) {
-      await finishBreak()
       await refreshReport()
       return
     }
+    if (activeActivity) {
+      await handleCompleteActivity()
+      return
+    }
     if (activeJourney) {
-      await startPomodoro()
+      await startPomodoro(undefined, activeActivity?.id)
       await refreshReport()
       return
     }
@@ -211,7 +347,7 @@ export function TodayReferencePage() {
       <header className="referenceGreeting">
         <div>
           <span>{dateLabel}</span>
-          <h2>Bom dia, foco! <i aria-hidden="true">✦</i></h2>
+          <h2>{greeting}, foco! <i aria-hidden="true">✦</i></h2>
           <p>Que tal manter o ritmo e fazer mais acontecer hoje?</p>
         </div>
         <div className="referencePlant" aria-hidden="true">
@@ -247,21 +383,38 @@ export function TodayReferencePage() {
             <strong>{mainTime}</strong>
             <span>{mainTimeLabel}</span>
           </div>
-          <button
-            type="button"
-            className="referenceProgressAction"
-            style={{ '--focus-progress': `${focusProgress * 3.6}deg` } as React.CSSProperties}
-            onClick={() => void handlePrimaryAction()}
-            disabled={busy}
-            aria-label={activeFocus?.status === 'paused' ? 'Retomar foco' : activeFocus ? 'Pausar foco' : activeBreak ? 'Terminar pausa' : activeJourney ? 'Iniciar foco' : 'Iniciar jornada'}
-          >
-            <span>{activeFocus?.status === 'paused' ? '▶' : activeFocus ? 'Ⅱ' : '▶'}</span>
-          </button>
+          <div className="referenceProgressControl">
+            <button
+              type="button"
+              className="referenceProgressAction"
+              style={{ '--focus-progress': `${mainProgress * 3.6}deg` } as React.CSSProperties}
+              onClick={() => void handlePrimaryAction()}
+              disabled={busy}
+              aria-label={primaryActionLabel}
+            >
+              <span>{primaryActionGlyph}</span>
+            </button>
+            <small>{primaryActionLabel}</small>
+          </div>
         </div>
 
         <div className="referenceEncouragement">
           <span aria-hidden="true">⌁</span>
-          <p>{activeBreak ? 'A pausa está registada. Retoma quando estiveres pronto.' : activeJourney ? 'Mantém o foco, estás a avançar bem.' : 'Começa a jornada quando estiveres pronto.'}</p>
+          <p>
+            {activeBreak
+              ? breakReachedPlan
+                ? 'O tempo planeado terminou. A pausa continua a ser contada até terminares o registo.'
+                : 'Pausa em curso. O tempo está a ser contado em tempo real.'
+              : activeFocus
+                ? activeFocus.status === 'paused'
+                  ? 'O foco está pausado. Retoma quando estiveres pronto.'
+                  : 'Mantém o foco, estás a avançar bem.'
+                : activeActivity
+                  ? 'Atividade em curso. Conclui-a quando terminares.'
+                  : activeJourney
+                    ? 'A jornada está a contar em tempo real.'
+                    : 'Começa a jornada quando estiveres pronto.'}
+          </p>
         </div>
       </section>
 
@@ -272,19 +425,23 @@ export function TodayReferencePage() {
         </header>
         <div className="referenceSummaryGrid">
           <article>
-            <strong>{completedFocusCount}</strong>
-            <span>Sessões</span>
-            <small>{completedFocusCount > 0 ? `+${completedFocusCount} hoje` : 'Sem sessões'}</small>
+            <strong>{formatDuration(journeyDurationMs)}</strong>
+            <span>Jornada</span>
+            <small>{activeJourney ? 'Em curso' : journeyDurationMs > 0 ? 'Acumulado hoje' : 'Sem registo'}</small>
           </article>
           <article>
-            <strong>{formatDuration(focusDurationMs)}</strong>
-            <span>Foco total</span>
-            <small>{activeFocus ? 'Em curso' : 'Acumulado'}</small>
+            <strong>{formatDuration(breakDurationMs)}</strong>
+            <span>Pausas</span>
+            <small>{activeBreak ? 'A contar agora' : breakDurationMs > 0 ? 'Acumulado hoje' : 'Sem pausas'}</small>
           </article>
           <article>
-            <strong>{productivity}%</strong>
-            <span>Produtividade</span>
-            <small>{formatDuration(effectiveDurationMs)} efetivo</small>
+            <strong>{formatDuration(effectiveDurationMs)}</strong>
+            <span>Efetivo</span>
+            <small>
+              {completedActivityCount > 0 || completedFocusCount > 0
+                ? `${completedActivityCount} ativ. · ${completedFocusCount} foco`
+                : 'Tempo trabalhado'}
+            </small>
           </article>
         </div>
       </section>
@@ -324,14 +481,17 @@ export function TodayReferencePage() {
               <button type="button" onClick={() => void handleFinishJourney()} disabled={busy}>Terminar jornada</button>
             )}
             {activeJourney && !activeBreak ? (
-              <button type="button" onClick={() => void startBreak('short', 15)} disabled={busy}>Pausa 15 min</button>
+              <button type="button" onClick={() => void handleStartBreak()} disabled={busy}>Pausa 15 min</button>
             ) : null}
             {activeBreak ? (
-              <button type="button" onClick={() => void finishBreak()} disabled={busy}>Terminar pausa</button>
+              <button type="button" onClick={() => void handleFinishBreak()} disabled={busy}>Terminar pausa</button>
+            ) : null}
+            {activeActivity && !activeBreak ? (
+              <button type="button" onClick={() => void handleCompleteActivity()} disabled={busy}>Concluir atividade</button>
             ) : null}
             <Link to="/atividades">Atividades</Link>
             <Link to="/foco">Foco</Link>
-            <button type="button" onClick={() => void addCoffee(1)} disabled={busy}>Café +1 registo</button>
+            <button type="button" onClick={() => void handleAddCoffee()} disabled={busy}>Café +1 registo</button>
           </div>
 
           <button className="referenceInlineLink" type="button" onClick={openManualSchedule} disabled={isSettingsBusy}>
