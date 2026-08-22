@@ -70,6 +70,7 @@ export function AppShell() {
   const sidebarCollapsed = useUiStore((state) => state.sidebarCollapsed)
   const toggleSidebar = useUiStore((state) => state.toggleSidebar)
   const theme = useUiStore((state) => state.theme)
+  const setTheme = useUiStore((state) => state.setTheme)
   const toggleTheme = useUiStore((state) => state.toggleTheme)
   const location = useLocation()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -141,6 +142,33 @@ export function AppShell() {
       <div className="appMainArea">
         <AppTopBar onOpenMenu={() => setMobileMenuOpen(true)} />
         <main className="appContent" id="main-content" tabIndex={-1}>
+          {location.pathname === '/definicoes' ? (
+            <section className="prototypeThemeCard" aria-label="Tema da aplicação">
+              <div>
+                <span>TEMA</span>
+                <strong>Claro ou escuro</strong>
+                <small>A escolha fica guardada neste dispositivo.</small>
+              </div>
+              <div className="prototypeThemeSegment" role="group" aria-label="Escolher tema">
+                <button
+                  type="button"
+                  className={theme === 'light' ? 'prototypeThemeActive' : ''}
+                  onClick={() => setTheme('light')}
+                  aria-pressed={theme === 'light'}
+                >
+                  Claro
+                </button>
+                <button
+                  type="button"
+                  className={theme === 'dark' ? 'prototypeThemeActive' : ''}
+                  onClick={() => setTheme('dark')}
+                  aria-pressed={theme === 'dark'}
+                >
+                  Escuro
+                </button>
+              </div>
+            </section>
+          ) : null}
           <Outlet />
         </main>
       </div>
