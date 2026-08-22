@@ -51,6 +51,10 @@ describe('calculatePayroll', () => {
     expect(calculateIrs2026(960, 'table-1', 0)).toBe(18)
   })
 
+  it('aplica a redução de um ponto percentual com três dependentes', () => {
+    expect(calculateIrs2026(1500, 'table-1', 3)).toBe(88.88)
+  })
+
   it('usa a fórmula legal completa do valor hora antes do arredondamento final', () => {
     const plans: PayrollDayPlan[] = [
       { date: '2026-08-03', kind: 'work', overtimeHours: 2 },
@@ -60,6 +64,30 @@ describe('calculatePayroll', () => {
     expect(result.hourlyRate).toBe(5.31)
     expect(result.overtimeHours).toBe(2)
     expect(result.overtimePay).toBe(13.93)
+  })
+
+  it('muda os acréscimos quando o acumulado anual ultrapassa 100 horas', () => {
+    const plans: PayrollDayPlan[] = [
+      { date: '2026-08-03', kind: 'work', overtimeHours: 2 },
+    ]
+    const result = calculatePayroll(
+      { ...defaultPayrollConfig, overtimeHoursBeforeMonth: 100 },
+      plans,
+    )
+
+    expect(result.overtimePay).toBe(17.25)
+  })
+
+  it('aplica 100% de acréscimo em descanso/feriado acima das 100 horas anuais', () => {
+    const plans: PayrollDayPlan[] = [
+      { date: '2026-08-09', kind: 'rest', overtimeHours: 2 },
+    ]
+    const result = calculatePayroll(
+      { ...defaultPayrollConfig, overtimeHoursBeforeMonth: 100 },
+      plans,
+    )
+
+    expect(result.overtimePay).toBe(21.23)
   })
 
   it('desconta uma falta integral pela duração diária contratual', () => {
