@@ -6,6 +6,7 @@ import { GuidePage } from './pages/GuidePage'
 import { HistoryPage } from './pages/HistoryPage'
 import { MorePage } from './pages/MorePage'
 import { PayrollPage } from './pages/PayrollPage'
+import { PayrollReferencePage } from './pages/PayrollReferencePage'
 import { SettingsReferencePage } from './pages/SettingsReferencePage'
 import { ShiftMapPage } from './pages/ShiftMapPage'
 import { StatisticsPage } from './pages/StatisticsPage'
@@ -24,7 +25,8 @@ export const router = createHashRouter([
       { path: 'historico', element: <HistoryPage /> },
       { path: 'mais', element: <MorePage /> },
       { path: 'guia', element: <GuidePage /> },
-      { path: 'vencimento', element: <PayrollPage /> },
+      { path: 'vencimento', element: <PayrollReferencePage /> },
+      { path: 'vencimento/configurar', element: <PayrollPage /> },
       { path: 'horas', element: <WorkHoursCalculatorPage /> },
       { path: 'estatisticas', element: <StatisticsPage /> },
       { path: 'definicoes', element: <SettingsReferencePage /> },
