@@ -7,6 +7,7 @@ import { HistoryPage } from './pages/HistoryPage'
 import { MorePage } from './pages/MorePage'
 import { PayrollPage } from './pages/PayrollPage'
 import { SettingsPage } from './pages/SettingsPage'
+import { ShiftMapPage } from './pages/ShiftMapPage'
 import { StatisticsPage } from './pages/StatisticsPage'
 import { TodayPage } from './pages/TodayPage'
 import { WorkHoursCalculatorPage } from './pages/WorkHoursCalculatorPage'
@@ -17,6 +18,7 @@ export const router = createHashRouter([
     element: <AppShell />,
     children: [
       { index: true, element: <TodayPage /> },
+      { path: 'turnos', element: <ShiftMapPage /> },
       { path: 'atividades', element: <ActivitiesPage /> },
       { path: 'foco', element: <FocusPage /> },
       { path: 'historico', element: <HistoryPage /> },
