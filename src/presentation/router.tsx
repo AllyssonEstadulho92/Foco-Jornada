@@ -1,6 +1,7 @@
 import { createHashRouter } from 'react-router-dom'
 import { AppShell } from './layouts/AppShell'
 import { ActivitiesPage } from './pages/ActivitiesPage'
+import { ExportDataPage } from './pages/ExportDataPage'
 import { FocusPage } from './pages/FocusPage'
 import { GuidePage } from './pages/GuidePage'
 import { HistoryPage } from './pages/HistoryPage'
@@ -29,6 +30,7 @@ export const router = createHashRouter([
       { path: 'vencimento/configurar', element: <PayrollPage /> },
       { path: 'horas', element: <WorkHoursCalculatorPage /> },
       { path: 'estatisticas', element: <StatisticsPage /> },
+      { path: 'exportar', element: <ExportDataPage /> },
       { path: 'definicoes', element: <SettingsReferencePage /> },
     ],
   },
