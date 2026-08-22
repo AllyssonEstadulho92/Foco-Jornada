@@ -9,7 +9,7 @@ import { InMemorySettingsRepository } from '../test/InMemorySettingsRepository'
 import { App } from './App'
 
 describe('App', () => {
-  it('renderiza o dashboard e a navegação principal', async () => {
+  it('renderiza o dashboard de referência e a navegação principal', async () => {
     render(
       <App
         services={{
@@ -24,8 +24,9 @@ describe('App', () => {
     )
 
     expect(screen.getByRole('heading', { name: 'Hoje' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Jornada de trabalho' })).toBeInTheDocument()
-    expect(await screen.findByRole('button', { name: 'Iniciar jornada' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Bom dia, foco!' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Resumo do dia' })).toBeInTheDocument()
+    expect(await screen.findAllByRole('button', { name: 'Iniciar jornada' })).not.toHaveLength(0)
     expect(screen.getByRole('heading', { name: 'Ações rápidas' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Café +1 registo' })).toBeInTheDocument()
     expect(screen.getAllByRole('link', { name: 'Atividades' }).length).toBeGreaterThan(0)

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import toast from 'react-hot-toast'
+import { Link } from 'react-router-dom'
 import type { DayEvent } from '../../application/reports/buildDayReport'
 import { deleteDayEventRecord } from '../../application/reports/deleteDayEventRecord'
 import { formatClockTime, formatDuration, toLocalDateKey } from '../../shared/utils/dateTime'
@@ -36,12 +37,11 @@ export function HistoryPage() {
   const eventCount = report?.events.length ?? 0
 
   return (
-    <section className="historyPage" aria-labelledby="history-title">
-      <header className="historyHeader">
+    <section className="historyPage referenceHistoryPage" aria-labelledby="history-title">
+      <header className="historyHeader referenceHistoryHeader">
         <div className="historyHeaderCopy">
-          <span className="eyebrow">HISTÓRICO</span>
-          <h1 id="history-title">Histórico diário</h1>
-          <p>Consulta o resumo e os registos do dia.</p>
+          <h1 id="history-title">Histórico</h1>
+          <p>Consulta o resumo e os registos reais do dia.</p>
         </div>
 
         <label className="historyDateControl">
@@ -53,10 +53,20 @@ export function HistoryPage() {
         </label>
       </header>
 
+      <nav className="referenceHistoryTabs" aria-label="Período do histórico">
+        <span aria-current="page">Hoje</span>
+        <Link to="/estatisticas">Semana</Link>
+        <Link to="/estatisticas">Mês</Link>
+      </nav>
+
       {error ? <div className="errorBanner" role="alert">{error}</div> : null}
 
       {report ? (
-        <section className="historySummaryCard" aria-label="Resumo do dia">
+        <section className="historySummaryCard referenceHistorySummary" aria-label="Resumo do dia">
+          <header className="referenceHistorySummaryHeader">
+            <div><strong>Resumo do dia</strong><small>{date}</small></div>
+            <Link to="/estatisticas">Ver relatório <span aria-hidden="true">›</span></Link>
+          </header>
           <div className="historySummaryPrimary">
             <article className="historySummaryMetric">
               <span>Jornada</span>
@@ -81,7 +91,7 @@ export function HistoryPage() {
         </section>
       ) : null}
 
-      <section className="historyTimelinePanel" aria-labelledby="timeline-title">
+      <section className="historyTimelinePanel referenceHistoryTimeline" aria-labelledby="timeline-title">
         <div className="historyTimelineHeader">
           <div className="historyTimelineTitle">
             <span className="historyTimelineIcon" aria-hidden="true">
