@@ -40,11 +40,21 @@ import './styles/reference-home.css'
 import './styles/today-live-status.css'
 import './styles/reference-settings.css'
 import './styles/reference-finance.css'
+import './styles/export-a4.css'
 
 const root = document.getElementById('root')
 if (!root) throw new Error('Elemento #root não encontrado.')
 
 installNumberInputNormalization()
+
+function requestPwaUpdate() {
+  if (!('serviceWorker' in navigator) || !navigator.onLine) return
+  void navigator.serviceWorker.ready
+    .then((registration) => registration.update())
+    .catch(() => {
+      // Uma falha de rede não impede o uso da versão já instalada.
+    })
+}
 
 function keepInstalledPwaCurrent() {
   if (!('serviceWorker' in navigator)) return
@@ -56,11 +66,13 @@ function keepInstalledPwaCurrent() {
     window.location.reload()
   })
 
-  void navigator.serviceWorker.ready
-    .then((registration) => registration.update())
-    .catch(() => {
-      // A aplicação continua utilizável mesmo que a verificação de atualização falhe.
-    })
+  requestPwaUpdate()
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') requestPwaUpdate()
+  })
+  window.addEventListener('online', requestPwaUpdate)
+  window.setInterval(requestPwaUpdate, 60 * 60 * 1000)
 }
 
 keepInstalledPwaCurrent()
