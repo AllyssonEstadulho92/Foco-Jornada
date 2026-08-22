@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { emitAppFeedback } from '../../shared/notifications/appFeedback'
 
 export type NotificationTone = 'success' | 'error' | 'info'
 
@@ -78,4 +79,5 @@ export function pushAppNotification(
   detail = '',
 ) {
   useNotificationStore.getState().add({ tone, title, detail })
+  emitAppFeedback(tone, title, detail)
 }

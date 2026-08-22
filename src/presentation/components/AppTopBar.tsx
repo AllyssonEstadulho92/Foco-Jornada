@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { emitAppFeedback } from '../../shared/notifications/appFeedback'
 import { useNow } from '../hooks/useNow'
 import { useAppServices } from '../providers/AppServicesProvider'
 import { useNotificationStore, type AppNotification } from '../store/useNotificationStore'
@@ -197,6 +198,7 @@ export function AppTopBar({ onOpenMenu }: { onOpenMenu?: () => void }) {
       detail: editDetail.trim(),
     })
     cancelEditingNotification()
+    emitAppFeedback('success', 'Alteração guardada', 'A notificação foi atualizada neste dispositivo.')
   }
 
   function handleRemoveNotification(id: string) {
