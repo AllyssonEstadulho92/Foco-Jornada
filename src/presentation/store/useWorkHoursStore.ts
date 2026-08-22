@@ -5,6 +5,7 @@ import type { WorkHoursEntry, WorkHoursEntryInput } from '../../domain/work-hour
 interface WorkHoursState {
   entries: WorkHoursEntry[]
   add: (input: WorkHoursEntryInput) => WorkHoursEntry
+  update: (id: string, input: WorkHoursEntryInput) => void
   remove: (id: string) => void
   clearMonth: (monthKey: string) => void
 }
@@ -29,6 +30,18 @@ export const useWorkHoursStore = create<WorkHoursState>()(
         }))
         return entry
       },
+      update: (id, input) =>
+        set((state) => ({
+          entries: state.entries.map((item) =>
+            item.id === id
+              ? {
+                  ...input,
+                  id: item.id,
+                  createdAt: item.createdAt,
+                }
+              : item,
+          ),
+        })),
       remove: (id) => set((state) => ({ entries: state.entries.filter((item) => item.id !== id) })),
       clearMonth: (monthKey) =>
         set((state) => ({ entries: state.entries.filter((item) => !item.date.startsWith(monthKey)) })),
