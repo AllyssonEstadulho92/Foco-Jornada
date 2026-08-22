@@ -21,43 +21,73 @@ function AboutChevron() {
   return <span className="referenceChevron" aria-hidden="true">›</span>
 }
 
+async function waitForWorkerState(worker: ServiceWorker | null, timeoutMs = 4000) {
+  if (!worker) return
+  if (worker.state === 'installed' || worker.state === 'activated' || worker.state === 'redundant') return
+
+  await new Promise<void>((resolve) => {
+    const timer = window.setTimeout(resolve, timeoutMs)
+    const onStateChange = () => {
+      if (worker.state !== 'installed' && worker.state !== 'activated' && worker.state !== 'redundant') return
+      window.clearTimeout(timer)
+      worker.removeEventListener('statechange', onStateChange)
+      resolve()
+    }
+    worker.addEventListener('statechange', onStateChange)
+  })
+}
+
 export function AppAboutSettings() {
   const [versionState, setVersionState] = useState<VersionCheckState>('idle')
-  const [versionMessage, setVersionMessage] = useState('Podes verificar agora se existe uma atualização da aplicação.')
+  const [versionMessage, setVersionMessage] = useState('As atualizações são verificadas automaticamente quando a aplicação está online.')
   const standalone = isStandaloneMode()
   const serviceWorkerActive = 'serviceWorker' in navigator && Boolean(navigator.serviceWorker.controller)
 
   async function checkForUpdate() {
     if (!('serviceWorker' in navigator)) {
       setVersionState('unavailable')
-      setVersionMessage('Este navegador não permite verificar atualizações PWA. A versão aberta continua indicada acima.')
+      setVersionMessage('Este navegador não suporta a atualização automática da aplicação.')
+      return
+    }
+
+    if (!navigator.onLine) {
+      setVersionState('unavailable')
+      setVersionMessage('Sem ligação à Internet. A versão atual continua disponível e a verificação será repetida quando voltares a ficar online.')
       return
     }
 
     try {
       setVersionState('checking')
-      setVersionMessage('A verificar a versão disponível…')
+      setVersionMessage('A comparar esta compilação com a versão publicada…')
 
-      const registration = await navigator.serviceWorker.getRegistration()
-      if (!registration) {
-        setVersionState('unavailable')
-        setVersionMessage('A aplicação está aberta no navegador e não tem um Service Worker ativo para verificar atualizações.')
-        return
+      const registration = await navigator.serviceWorker.ready
+      let updateFound = false
+      const onUpdateFound = () => {
+        updateFound = true
       }
+      registration.addEventListener('updatefound', onUpdateFound, { once: true })
 
       await registration.update()
+      await waitForWorkerState(registration.installing)
 
       if (registration.waiting) {
         setVersionState('update')
-        setVersionMessage('Foi encontrada uma atualização. Será aplicada automaticamente quando a nova versão ficar ativa.')
+        setVersionMessage('Nova compilação encontrada. A atualização está a ser aplicada automaticamente…')
+        registration.waiting.postMessage({ type: 'SKIP_WAITING' })
+        return
+      }
+
+      if (updateFound || registration.installing) {
+        setVersionState('update')
+        setVersionMessage('Foi detetada uma nova compilação. A aplicação será atualizada assim que o novo Service Worker assumir o controlo.')
         return
       }
 
       setVersionState('current')
-      setVersionMessage(`Versão ${__APP_VERSION__} verificada. Não foi encontrada uma atualização pendente.`)
+      setVersionMessage(`Compilação ${__APP_BUILD_ID__} verificada. Não existe uma atualização pendente.`)
     } catch {
       setVersionState('error')
-      setVersionMessage('Não foi possível verificar a atualização agora. Tenta novamente quando tiveres ligação à Internet.')
+      setVersionMessage('Não foi possível verificar a atualização agora. A aplicação volta a tentar automaticamente quando estiver online.')
     }
   }
 
@@ -68,7 +98,7 @@ export function AppAboutSettings() {
           <span className="referenceAboutInfoIcon" aria-hidden="true">i</span>
           <span>
             <strong>Versão</strong>
-            <small>Consulta e verifica a versão instalada</small>
+            <small>Consulta a compilação e verifica atualizações</small>
           </span>
           <AboutChevron />
         </summary>
@@ -77,9 +107,17 @@ export function AppAboutSettings() {
             <div>
               <span>VERSÃO INSTALADA</span>
               <strong>Foco Jornada {__APP_VERSION__}</strong>
-              <small>Compilação de {formatBuildDate()}</small>
+              <small>Build <span className="referenceVersionBuildId">{__APP_BUILD_ID__}</span> · {formatBuildDate()}</small>
             </div>
-            <span className="referenceVersionBadge">{standalone ? 'Instalada' : 'Navegador'}</span>
+            <button
+              type="button"
+              className="referenceVersionBadgeButton"
+              disabled={versionState === 'checking'}
+              onClick={() => void checkForUpdate()}
+              aria-label="Verificar e aplicar atualização da aplicação"
+            >
+              {versionState === 'checking' ? 'A verificar…' : standalone ? 'Instalada · ↻' : 'Navegador · ↻'}
+            </button>
           </div>
 
           <div className="referenceVersionFacts" aria-label="Estado da versão">
@@ -97,13 +135,17 @@ export function AppAboutSettings() {
             </article>
           </div>
 
+          <p className="referenceVersionAutoNote">
+            <strong>Deteção automática.</strong> A aplicação compara a compilação publicada com a que está aberta. Não é necessário alterar manualmente o número da versão para receber uma atualização.
+          </p>
+
           <button
             type="button"
             className="referenceVersionCheckButton"
             disabled={versionState === 'checking'}
             onClick={() => void checkForUpdate()}
           >
-            {versionState === 'checking' ? 'A verificar…' : 'Verificar atualização'}
+            {versionState === 'checking' ? 'A verificar…' : 'Verificar e atualizar agora'}
           </button>
 
           <p className={`referenceVersionStatus is-${versionState}`} role="status" aria-live="polite">
