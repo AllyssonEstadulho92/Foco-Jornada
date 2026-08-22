@@ -107,7 +107,6 @@ function baseDays(month: string, settings: AppSettings): ShiftMapDay[] {
   return monthDates(month).map((date) => {
     const resolved = resolveWorkScheduleForDate(settings.workSchedule, date)
     const summary = getScheduleSummary(settings.workSchedule, date)
-
     return {
       date,
       kind: resolved.isWorkingDay ? 'work' : 'rest',
@@ -122,27 +121,32 @@ function baseDays(month: string, settings: AppSettings): ShiftMapDay[] {
 
 function loadMonth(month: string, settings: AppSettings): ShiftMapDay[] {
   const payrollByDate = new Map(readPayrollPlan(month).map((item) => [item.date, item]))
-  const shiftByDate = new Map(readShiftMap(month).filter((item) => item.date).map((item) => [item.date!, item]))
+  const shiftByDate = new Map(
+    readShiftMap(month)
+      .filter((item): item is Partial<ShiftMapDay> & { date: string } => Boolean(item.date))
+      .map((item) => [item.date, item]),
+  )
 
   return baseDays(month, settings).map((base) => {
     const payroll = payrollByDate.get(base.date)
-    const storedShift = shiftByDate.get(base.date)
     const payrollKind = payroll?.kind ?? base.kind
-    const shouldKeepBaseHours = payrollKind === 'work'
-
-    return {
+    const initial: ShiftMapDay = {
       ...base,
       kind: payrollKind,
-      startTime: shouldKeepBaseHours ? base.startTime : '',
-      endTime: shouldKeepBaseHours ? base.endTime : '',
-      breakMinutes: shouldKeepBaseHours ? base.breakMinutes : 0,
+      startTime: payrollKind === 'work' ? base.startTime : '',
+      endTime: payrollKind === 'work' ? base.endTime : '',
+      breakMinutes: payrollKind === 'work' ? base.breakMinutes : 0,
       overtimeHours: Math.max(0, payroll?.overtimeHours ?? 0),
       note: payroll?.note ?? '',
-      ...storedShift,
+    }
+    const merged = { ...initial, ...(shiftByDate.get(base.date) ?? {}), date: base.date }
+
+    return {
+      ...merged,
       date: base.date,
-      breakMinutes: Math.max(0, Number(storedShift?.breakMinutes ?? (shouldKeepBaseHours ? base.breakMinutes : 0)) || 0),
-      overtimeHours: Math.max(0, Number(storedShift?.overtimeHours ?? payroll?.overtimeHours ?? 0) || 0),
-      note: String(storedShift?.note ?? payroll?.note ?? ''),
+      breakMinutes: Math.max(0, Number(merged.breakMinutes) || 0),
+      overtimeHours: Math.max(0, Number(merged.overtimeHours) || 0),
+      note: String(merged.note ?? ''),
     }
   })
 }
@@ -168,8 +172,8 @@ export function ShiftMapPage() {
     if (settingsLoading) return
     const loaded = loadMonth(month, settings)
     setDays(loaded)
-    const today = new Date()
-    const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
+    const now = new Date()
+    const todayKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
     setSelectedDate(loaded.some((item) => item.date === todayKey) ? todayKey : loaded[0]?.date ?? '')
     setPayrollConfig(readPayrollConfig())
     setLastSavedAt(null)
@@ -179,15 +183,21 @@ export function ShiftMapPage() {
   const firstWeekday = useMemo(() => mondayFirstIndex(month), [month])
   const summary = useMemo(() => summarizeShiftMap(days), [days])
   const payrollPlan = useMemo(() => days.map(toPayrollDayPlan), [days])
-  const payrollResult = useMemo(() => calculatePayroll(payrollConfig, payrollPlan), [payrollConfig, payrollPlan])
+  const payrollResult = useMemo(
+    () => calculatePayroll(payrollConfig, payrollPlan),
+    [payrollConfig, payrollPlan],
+  )
 
   function updateSelected(patch: Partial<ShiftMapDay>) {
     if (!selectedDate) return
-    setDays((current) => current.map((item) => (item.date === selectedDate ? { ...item, ...patch } : item)))
+    setDays((current) =>
+      current.map((item) => (item.date === selectedDate ? { ...item, ...patch } : item)),
+    )
   }
 
   function updateSelectedKind(kind: PayrollDayKind) {
     if (!selectedDay) return
+
     if (kind === 'work') {
       const resolved = resolveWorkScheduleForDate(settings.workSchedule, selectedDay.date)
       const plan = getScheduleSummary(settings.workSchedule, selectedDay.date)
@@ -195,7 +205,8 @@ export function ShiftMapPage() {
         kind,
         startTime: selectedDay.startTime || resolved.startTime,
         endTime: selectedDay.endTime || resolved.endTime,
-        breakMinutes: selectedDay.startTime && selectedDay.endTime ? selectedDay.breakMinutes : plan.breakMinutes,
+        breakMinutes:
+          selectedDay.startTime && selectedDay.endTime ? selectedDay.breakMinutes : plan.breakMinutes,
       })
       return
     }
@@ -224,7 +235,6 @@ export function ShiftMapPage() {
   function copySelectedShiftToWorkDays() {
     if (!selectedDay?.startTime || !selectedDay.endTime) return
     if (!window.confirm('Aplicar este horário e esta pausa a todos os dias marcados como Trabalho neste mês?')) return
-
     setDays((current) =>
       current.map((item) =>
         item.kind === 'work'
@@ -244,7 +254,11 @@ export function ShiftMapPage() {
     const next = baseDays(month, settings)
     setDays(next)
     setSelectedDate(next[0]?.date ?? '')
-    pushAppNotification('info', 'Mapa reposto', 'O mês voltou ao horário base. Carrega em Guardar para confirmar a alteração.')
+    pushAppNotification(
+      'info',
+      'Mapa reposto',
+      'O mês voltou ao horário base. Carrega em Guardar para confirmar a alteração.',
+    )
   }
 
   function saveMap() {
@@ -267,7 +281,9 @@ export function ShiftMapPage() {
         <div>
           <span className="eyebrow">RH & CONTABILIDADE</span>
           <h1 id="shift-map-title">Mapa de turnos</h1>
-          <p>Planeia cada dia do mês, mantém turnos, folgas, férias, feriados e faltas organizados e vê o efeito da planificação no vencimento.</p>
+          <p>
+            Planeia cada dia do mês, mantém turnos, folgas, férias, feriados e faltas organizados e vê o efeito da planificação no vencimento.
+          </p>
         </div>
         <label className="shiftMapMonthPicker">
           <span>Mês</span>
@@ -279,7 +295,11 @@ export function ShiftMapPage() {
         <div>
           <span>MAPA ATUAL</span>
           <strong>{monthLabel(month)}</strong>
-          <small>{lastSavedAt ? `Guardado às ${new Intl.DateTimeFormat('pt-PT', { hour: '2-digit', minute: '2-digit' }).format(new Date(lastSavedAt))}` : 'Alterações locais até carregares em Guardar'}</small>
+          <small>
+            {lastSavedAt
+              ? `Guardado às ${new Intl.DateTimeFormat('pt-PT', { hour: '2-digit', minute: '2-digit' }).format(new Date(lastSavedAt))}`
+              : 'Alterações locais até carregares em Guardar'}
+          </small>
         </div>
         <div className="shiftMapCommandActions">
           <button type="button" onClick={resetMonthToBase}>Repor horário base</button>
@@ -297,11 +317,8 @@ export function ShiftMapPage() {
 
       <section className="shiftMapPanel" aria-labelledby="monthly-map-title">
         <div className="shiftMapSectionHeader">
-          <div>
-            <span>PLANEAMENTO VISUAL</span>
-            <h2 id="monthly-map-title">Calendário do mês</h2>
-          </div>
-          <small>Seleciona um dia para editar. No telemóvel, o mapa mantém a grelha e desloca horizontalmente.</small>
+          <div><span>PLANEAMENTO VISUAL</span><h2 id="monthly-map-title">Calendário do mês</h2></div>
+          <small>Seleciona um dia para editar. No telemóvel, a grelha mantém sete colunas e desloca horizontalmente.</small>
         </div>
 
         <div className="shiftMapCalendarScroll" tabIndex={0} aria-label="Mapa mensal de turnos com deslocação horizontal">
@@ -309,7 +326,9 @@ export function ShiftMapPage() {
             {['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'].map((weekday) => (
               <div className="shiftMapWeekday" key={weekday}>{weekday}</div>
             ))}
-            {Array.from({ length: firstWeekday }, (_, index) => <span className="shiftMapBlank" key={`blank-${index}`} />)}
+            {Array.from({ length: firstWeekday }, (_, index) => (
+              <span className="shiftMapBlank" key={`blank-${index}`} />
+            ))}
             {days.map((day) => {
               const meta = kindMeta(day.kind)
               const effective = getShiftEffectiveMinutes(day)
@@ -333,17 +352,19 @@ export function ShiftMapPage() {
         </div>
 
         <div className="shiftMapLegend" aria-label="Legenda">
-          {dayKinds.map((item) => <span key={item.value}><i className={`shiftMapLegendDot shiftMapLegendDot-${item.value}`} />{item.code} · {item.label}</span>)}
+          {dayKinds.map((item) => (
+            <span key={item.value}>
+              <i className={`shiftMapLegendDot shiftMapLegendDot-${item.value}`} />
+              {item.code} · {item.label}
+            </span>
+          ))}
         </div>
       </section>
 
       {selectedDay ? (
         <section className="shiftMapEditor" aria-labelledby="shift-day-editor-title">
           <div className="shiftMapSectionHeader">
-            <div>
-              <span>DIA SELECIONADO</span>
-              <h2 id="shift-day-editor-title">{dateLabel(selectedDay.date)}</h2>
-            </div>
+            <div><span>DIA SELECIONADO</span><h2 id="shift-day-editor-title">{dateLabel(selectedDay.date)}</h2></div>
             <strong className="shiftMapEffectiveBadge">{formatPlannedMinutes(selectedEffective)} efetivas</strong>
           </div>
 
@@ -407,7 +428,7 @@ export function ShiftMapPage() {
         <section className="shiftMapSalaryPanel" aria-labelledby="salary-map-title">
           <div className="shiftMapSalaryHero">
             <span>VALOR DA PLANIFICAÇÃO</span>
-            <strong>{money(payrollResult.netEstimate)}</strong>
+            <strong id="salary-map-title">{money(payrollResult.netEstimate)}</strong>
             <small>Líquido calculado com os dados atuais de Vencimento</small>
           </div>
           <div className="shiftMapSalaryBreakdown">
