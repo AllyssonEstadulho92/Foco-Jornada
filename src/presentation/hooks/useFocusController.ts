@@ -201,7 +201,13 @@ export function useFocusController(journeyId?: string) {
       setIsBusy(true)
       const result = await completeFocusSession({ focusRepository, journeyId })
       await refresh()
-      if (result.status === 'completed') toast.success('Sessão concluída.')
+      if (result.status === 'completed') {
+        toast.success(
+          result.session.segmentType === 'focus'
+            ? 'Sessão de foco concluída.'
+            : 'Pausa de foco concluída.',
+        )
+      }
     } catch (completeError) {
       const message = completeError instanceof Error ? completeError.message : 'Erro ao concluir a sessão.'
       setError(message)
