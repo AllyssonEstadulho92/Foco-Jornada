@@ -1,0 +1,587 @@
+.shiftMapPage {
+  display: grid;
+  width: min(100%, 1380px);
+  margin: 0 auto;
+  gap: 20px;
+}
+
+.shiftMapHeader,
+.shiftMapCommand,
+.shiftMapSectionHeader,
+.shiftMapCommandActions,
+.shiftMapEditorActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.shiftMapHeader {
+  align-items: flex-end;
+}
+
+.shiftMapHeader h1 {
+  margin: 4px 0 8px;
+  font-size: clamp(30px, 4vw, 48px);
+  letter-spacing: -0.045em;
+}
+
+.shiftMapHeader p {
+  max-width: 760px;
+  margin: 0;
+  color: var(--muted);
+}
+
+.shiftMapMonthPicker {
+  display: grid;
+  min-width: 180px;
+  gap: 6px;
+}
+
+.shiftMapMonthPicker span,
+.shiftMapEditorGrid label > span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.shiftMapCommand,
+.shiftMapPanel,
+.shiftMapEditor,
+.shiftMapSalaryPanel,
+.shiftMapAccountingNote {
+  border: 1px solid rgba(28, 38, 32, 0.08);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 10px 30px rgba(28, 38, 32, 0.055);
+}
+
+.shiftMapCommand {
+  padding: 16px 18px;
+}
+
+.shiftMapCommand > div:first-child {
+  display: grid;
+  gap: 3px;
+}
+
+.shiftMapCommand > div:first-child > span,
+.shiftMapSectionHeader > div > span,
+.shiftMapSalaryHero > span {
+  color: var(--primary);
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: 0.12em;
+}
+
+.shiftMapCommand > div:first-child strong {
+  font-size: 18px;
+  text-transform: capitalize;
+}
+
+.shiftMapCommand > div:first-child small,
+.shiftMapSectionHeader > small {
+  color: var(--muted);
+}
+
+.shiftMapCommandActions button,
+.shiftMapEditorActions button,
+.shiftMapPayrollLink {
+  min-height: 42px;
+  padding: 9px 14px;
+  border: 1px solid rgba(28, 38, 32, 0.09);
+  border-radius: 12px;
+  background: #f7f8f6;
+  color: var(--text);
+  font-weight: 750;
+}
+
+.shiftMapCommandActions button:disabled,
+.shiftMapEditorActions button:disabled {
+  opacity: 0.45;
+}
+
+.shiftMapCommandActions .shiftMapSaveButton {
+  border-color: transparent;
+  background: var(--primary);
+  color: #fff;
+}
+
+.shiftMapOverview {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.shiftMapOverview article {
+  display: grid;
+  min-height: 94px;
+  align-content: center;
+  gap: 6px;
+  padding: 15px;
+  border: 1px solid rgba(28, 38, 32, 0.07);
+  border-radius: 17px;
+  background: #f7f8f6;
+}
+
+.shiftMapOverview article span {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.shiftMapOverview article strong {
+  font-size: 24px;
+  letter-spacing: -0.035em;
+}
+
+.shiftMapOverview .shiftMapOverviewPrimary {
+  background: rgba(31, 157, 99, 0.08);
+}
+
+.shiftMapOverview .shiftMapOverviewPrimary strong {
+  color: var(--primary);
+}
+
+.shiftMapPanel,
+.shiftMapEditor,
+.shiftMapSalaryPanel {
+  padding: 18px;
+}
+
+.shiftMapSectionHeader {
+  align-items: flex-end;
+  margin-bottom: 16px;
+}
+
+.shiftMapSectionHeader > div {
+  display: grid;
+  gap: 3px;
+}
+
+.shiftMapSectionHeader h2 {
+  margin: 0;
+  font-size: 20px;
+  letter-spacing: -0.025em;
+}
+
+.shiftMapSectionHeader > small {
+  max-width: 420px;
+  text-align: right;
+}
+
+.shiftMapCalendarScroll {
+  width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+
+.shiftMapCalendar {
+  display: grid;
+  min-width: 820px;
+  grid-template-columns: repeat(7, minmax(108px, 1fr));
+  gap: 7px;
+}
+
+.shiftMapWeekday {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding: 7px 8px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.shiftMapBlank {
+  min-height: 126px;
+  border-radius: 14px;
+  background: #fafbfa;
+}
+
+.shiftMapDay {
+  position: relative;
+  display: grid;
+  min-height: 126px;
+  grid-template-rows: auto auto auto 1fr auto;
+  align-content: start;
+  gap: 4px;
+  padding: 11px;
+  overflow: hidden;
+  border: 1px solid rgba(28, 38, 32, 0.07);
+  border-radius: 14px;
+  background: #fbfcfa;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+}
+
+.shiftMapDay:hover {
+  border-color: rgba(31, 157, 99, 0.28);
+}
+
+.shiftMapDaySelected {
+  border-color: rgba(31, 157, 99, 0.55);
+  box-shadow: inset 0 0 0 1px rgba(31, 157, 99, 0.22);
+}
+
+.shiftMapDayNumber {
+  position: absolute;
+  top: 9px;
+  right: 10px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.shiftMapDay > strong {
+  width: fit-content;
+  min-width: 29px;
+  padding: 4px 7px;
+  border-radius: 8px;
+  background: rgba(31, 157, 99, 0.09);
+  color: var(--primary);
+  font-size: 11px;
+}
+
+.shiftMapDay > small {
+  margin-top: 5px;
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.shiftMapDay > em,
+.shiftMapDay > b {
+  align-self: end;
+  color: var(--muted);
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 650;
+}
+
+.shiftMapDay > b {
+  color: #a46a00;
+}
+
+.shiftMapDay-rest > strong {
+  background: #eef0ee;
+  color: #707671;
+}
+
+.shiftMapDay-holiday > strong {
+  background: rgba(45, 145, 223, 0.1);
+  color: #247cbf;
+}
+
+.shiftMapDay-vacation > strong {
+  background: rgba(133, 90, 196, 0.1);
+  color: #7650a8;
+}
+
+.shiftMapDay-absence-justified-paid > strong {
+  background: rgba(228, 162, 29, 0.1);
+  color: #a36d08;
+}
+
+.shiftMapDay-absence-justified-unpaid > strong,
+.shiftMapDay-absence-unjustified > strong {
+  background: rgba(219, 90, 90, 0.1);
+  color: #b64949;
+}
+
+.shiftMapLegend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  margin-top: 14px;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.shiftMapLegend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.shiftMapLegendDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--primary);
+}
+
+.shiftMapLegendDot-rest { background: #9ba19c; }
+.shiftMapLegendDot-holiday { background: #2d91df; }
+.shiftMapLegendDot-vacation { background: #8058b0; }
+.shiftMapLegendDot-absence-justified-paid { background: #e4a21d; }
+.shiftMapLegendDot-absence-justified-unpaid,
+.shiftMapLegendDot-absence-unjustified { background: #db5a5a; }
+
+.shiftMapEffectiveBadge {
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: rgba(31, 157, 99, 0.09);
+  color: var(--primary);
+  font-size: 12px;
+}
+
+.shiftMapEditorGrid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.shiftMapEditorGrid label {
+  display: grid;
+  min-width: 0;
+  gap: 6px;
+}
+
+.shiftMapEditorGrid input,
+.shiftMapEditorGrid select,
+.shiftMapMonthPicker input {
+  min-width: 0;
+  min-height: 44px;
+}
+
+.shiftMapEditorWide {
+  grid-column: 1 / -1;
+}
+
+.shiftMapEditorActions {
+  justify-content: flex-start;
+  margin-top: 14px;
+}
+
+.shiftMapLowerGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 16px;
+}
+
+.shiftMapRhPanel dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+}
+
+.shiftMapRhPanel dl > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 12px;
+  border-radius: 12px;
+  background: #f7f8f6;
+}
+
+.shiftMapRhPanel dt {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.shiftMapRhPanel dd {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 850;
+}
+
+.shiftMapSalaryPanel {
+  display: grid;
+  gap: 16px;
+  background: linear-gradient(145deg, rgba(31, 157, 99, 0.08), rgba(255, 255, 255, 0.97) 48%);
+}
+
+.shiftMapSalaryHero {
+  display: grid;
+  gap: 5px;
+}
+
+.shiftMapSalaryHero > strong {
+  color: var(--primary);
+  font-size: clamp(34px, 5vw, 54px);
+  letter-spacing: -0.05em;
+}
+
+.shiftMapSalaryHero > small,
+.shiftMapSalaryPanel > p {
+  color: var(--muted);
+}
+
+.shiftMapSalaryBreakdown {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.shiftMapSalaryBreakdown > div {
+  display: grid;
+  gap: 4px;
+  padding: 10px 11px;
+  border: 1px solid rgba(28, 38, 32, 0.06);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.shiftMapSalaryBreakdown span {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.shiftMapSalaryBreakdown strong {
+  font-size: 14px;
+}
+
+.shiftMapSalaryPanel > p,
+.shiftMapAccountingNote p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.shiftMapPayrollLink {
+  width: fit-content;
+  text-decoration: none;
+}
+
+.shiftMapAccountingNote {
+  padding: 16px 18px;
+  border-left: 4px solid var(--primary);
+}
+
+.shiftMapAccountingNote strong {
+  display: block;
+  margin-bottom: 5px;
+}
+
+@media (max-width: 899px) {
+  .shiftMapPage {
+    width: 100%;
+    gap: 14px;
+  }
+
+  .shiftMapHeader {
+    align-items: stretch;
+  }
+
+  .shiftMapHeader,
+  .shiftMapCommand {
+    flex-direction: column;
+  }
+
+  .shiftMapHeader h1 {
+    font-size: 30px;
+  }
+
+  .shiftMapMonthPicker {
+    width: 100%;
+  }
+
+  .shiftMapCommand {
+    align-items: stretch;
+    padding: 14px;
+  }
+
+  .shiftMapCommandActions {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 8px;
+  }
+
+  .shiftMapOverview {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .shiftMapOverview article {
+    min-height: 78px;
+    padding: 12px;
+  }
+
+  .shiftMapOverview article strong {
+    font-size: 20px;
+  }
+
+  .shiftMapOverview .shiftMapOverviewPrimary {
+    grid-column: 1 / -1;
+  }
+
+  .shiftMapPanel,
+  .shiftMapEditor,
+  .shiftMapSalaryPanel {
+    padding: 14px;
+    border-radius: 18px;
+  }
+
+  .shiftMapSectionHeader {
+    align-items: flex-start;
+  }
+
+  .shiftMapSectionHeader > small {
+    max-width: 180px;
+    font-size: 9px;
+  }
+
+  .shiftMapCalendar {
+    min-width: 760px;
+    grid-template-columns: repeat(7, 101px);
+  }
+
+  .shiftMapBlank,
+  .shiftMapDay {
+    min-height: 116px;
+  }
+
+  .shiftMapEditorGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .shiftMapEditorWide {
+    grid-column: 1 / -1;
+  }
+
+  .shiftMapEditorActions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .shiftMapLowerGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .shiftMapSalaryBreakdown {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 420px) {
+  .shiftMapCommandActions {
+    grid-template-columns: 1fr;
+  }
+
+  .shiftMapSectionHeader {
+    flex-direction: column;
+  }
+
+  .shiftMapSectionHeader > small {
+    max-width: none;
+    text-align: left;
+  }
+
+  .shiftMapEditorGrid,
+  .shiftMapRhPanel dl,
+  .shiftMapSalaryBreakdown {
+    grid-template-columns: 1fr;
+  }
+
+  .shiftMapSalaryHero > strong {
+    font-size: 36px;
+  }
+}
