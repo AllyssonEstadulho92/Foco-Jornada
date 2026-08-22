@@ -1,5 +1,6 @@
 .notificationHeaderActions {
   display: flex;
+  flex-direction: row !important;
   align-items: center;
   gap: 8px;
 }
@@ -17,7 +18,7 @@
 }
 
 .notificationHeaderActions button:hover {
-  border-color: rgba(91, 156, 255, 0.35);
+  border-color: rgba(31, 157, 99, 0.35);
   color: var(--text);
 }
 
@@ -29,17 +30,22 @@
 }
 
 .notificationStatusItem {
-  background: rgba(91, 156, 255, 0.06);
+  background: rgba(31, 157, 99, 0.055);
 }
 
 .notificationItemUnread {
-  border-color: rgba(91, 156, 255, 0.28);
-  background: rgba(91, 156, 255, 0.08);
+  border-color: rgba(31, 157, 99, 0.23);
+  background: rgba(31, 157, 99, 0.065);
 }
 
 .notificationDot-error {
-  background: #f87171;
-  box-shadow: 0 0 0 4px rgba(248, 113, 113, 0.09);
+  background: #d95353;
+  box-shadow: 0 0 0 4px rgba(217, 83, 83, 0.09);
+}
+
+.notificationItemContent {
+  min-width: 0;
+  flex: 1 1 auto;
 }
 
 .notificationItem time {
@@ -49,6 +55,126 @@
   font-variant-numeric: tabular-nums;
 }
 
+.notificationItemActions {
+  display: flex !important;
+  flex: 0 0 auto;
+  flex-direction: row !important;
+  align-items: center;
+  gap: 4px !important;
+}
+
+.notificationItemActions button {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: background 140ms ease, color 140ms ease, transform 140ms ease;
+}
+
+.notificationItemActions button:hover {
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+.notificationItemActions button:active {
+  transform: scale(0.94);
+}
+
+.notificationItemActions .notificationDeleteButton:hover {
+  background: rgba(217, 83, 83, 0.08);
+  color: #c84848;
+}
+
+.notificationItemActions svg {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.notificationEditForm {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.notificationEditForm label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.notificationEditForm label > span {
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.notificationEditForm input,
+.notificationEditForm textarea {
+  width: 100%;
+  min-width: 0;
+  padding: 8px 9px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: #fff;
+  color: var(--text);
+  font: inherit;
+  font-size: 12px;
+  outline: none;
+}
+
+.notificationEditForm textarea {
+  resize: vertical;
+  line-height: 1.4;
+}
+
+.notificationEditForm input:focus,
+.notificationEditForm textarea:focus {
+  border-color: color-mix(in srgb, var(--primary) 45%, var(--line));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 10%, transparent);
+}
+
+.notificationEditActions {
+  display: flex;
+  flex-direction: row !important;
+  justify-content: flex-end;
+  gap: 6px !important;
+}
+
+.notificationEditActions button {
+  min-height: 32px;
+  padding: 6px 10px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: #fff;
+  color: var(--muted);
+  cursor: pointer;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.notificationEditActions button[type='submit'] {
+  border-color: color-mix(in srgb, var(--primary) 28%, var(--line));
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
 @media (max-width: 480px) {
   .notificationPanel {
     position: fixed;
@@ -56,10 +182,20 @@
     right: 10px;
     left: 10px;
     width: auto;
-    max-height: min(70dvh, 560px);
+    max-height: min(74dvh, 590px);
   }
 
   .notificationList {
-    max-height: min(48dvh, 360px);
+    max-height: min(52dvh, 390px);
+  }
+
+  .notificationItem {
+    gap: 9px;
+  }
+
+  .notificationItemActions button {
+    width: 36px;
+    height: 36px;
+    flex-basis: 36px;
   }
 }
