@@ -1,0 +1,256 @@
+/*
+ * Ajustes finais de enquadramento móvel.
+ * Mantém o viewport da aplicação estável e impede que conteúdos internos
+ * alarguem a página inteira no iPhone/Android.
+ */
+@media (max-width: 899px) {
+  .appContent,
+  .appContent > *,
+  .appContent :where(section, article, header, footer, form, fieldset, nav, div) {
+    min-width: 0;
+  }
+
+  .appContent {
+    overflow-x: clip;
+  }
+
+  .shiftMapPage {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .shiftMapPage > *,
+  .shiftMapHeader > *,
+  .shiftMapCommand > *,
+  .shiftMapOverview,
+  .shiftMapPanel,
+  .shiftMapEditor,
+  .shiftMapLowerGrid,
+  .shiftMapSalaryPanel,
+  .shiftMapAccountingNote {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .shiftMapHeader,
+  .shiftMapCommand {
+    width: 100%;
+  }
+
+  .shiftMapMonthPicker {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .shiftMapCommandActions {
+    width: 100%;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .shiftMapCommandActions button,
+  .shiftMapEditorActions button {
+    width: 100%;
+    min-width: 0;
+    white-space: normal;
+  }
+
+  .shiftMapOverview {
+    width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .shiftMapOverview article {
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .shiftMapOverview article span,
+  .shiftMapOverview article strong {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .shiftMapCalendarScroll {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  /*
+   * No telemóvel o calendário passa a ser compacto: as sete colunas cabem
+   * no ecrã. Horário, pausa e horas extra continuam completos no editor do dia.
+   */
+  .shiftMapCalendar {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 4px;
+  }
+
+  .shiftMapWeekday {
+    min-width: 0;
+    padding: 5px 1px;
+    font-size: 10px;
+  }
+
+  .shiftMapBlank,
+  .shiftMapDay {
+    min-width: 0;
+    min-height: 78px;
+    border-radius: 10px;
+  }
+
+  .shiftMapBlank {
+    background: #fafbfa;
+  }
+
+  .shiftMapDay {
+    grid-template-rows: auto 1fr;
+    gap: 2px;
+    padding: 6px 5px;
+  }
+
+  .shiftMapDayNumber {
+    top: 5px;
+    right: 5px;
+    font-size: 9px;
+  }
+
+  .shiftMapDay > strong {
+    min-width: 0;
+    max-width: calc(100% - 14px);
+    padding: 3px 4px;
+    overflow: hidden;
+    border-radius: 6px;
+    font-size: 8px;
+    line-height: 1.1;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .shiftMapDay > small,
+  .shiftMapDay > em,
+  .shiftMapDay > b {
+    display: none;
+  }
+
+  .shiftMapLegend {
+    width: 100%;
+    gap: 7px 10px;
+    font-size: 9px;
+  }
+
+  .shiftMapLegend span {
+    min-width: 0;
+  }
+
+  .shiftMapSectionHeader {
+    min-width: 0;
+    gap: 8px;
+  }
+
+  .shiftMapSectionHeader > div {
+    min-width: 0;
+  }
+
+  .shiftMapSectionHeader > small {
+    min-width: 0;
+    max-width: 45%;
+    overflow-wrap: anywhere;
+  }
+
+  .shiftMapEditorGrid,
+  .shiftMapRhPanel dl,
+  .shiftMapSalaryBreakdown {
+    min-width: 0;
+  }
+
+  .shiftMapEditorGrid label,
+  .shiftMapEditorGrid input,
+  .shiftMapEditorGrid select,
+  .shiftMapEditorGrid .inputWithSuffix {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .shiftMapLowerGrid {
+    width: 100%;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .shiftMapSalaryHero > strong {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+
+  .shiftMapPayrollLink {
+    width: 100%;
+    max-width: 100%;
+    text-align: center;
+  }
+}
+
+@media (max-width: 420px) {
+  .shiftMapPage {
+    gap: 12px;
+  }
+
+  .shiftMapOverview {
+    gap: 7px;
+  }
+
+  .shiftMapOverview article {
+    min-height: 74px;
+    padding: 10px;
+  }
+
+  .shiftMapOverview article strong {
+    font-size: 19px;
+  }
+
+  .shiftMapCalendar {
+    gap: 3px;
+  }
+
+  .shiftMapWeekday {
+    font-size: 9px;
+  }
+
+  .shiftMapBlank,
+  .shiftMapDay {
+    min-height: 68px;
+  }
+
+  .shiftMapDay {
+    padding: 5px 3px;
+  }
+
+  .shiftMapDayNumber {
+    top: 4px;
+    right: 4px;
+    font-size: 8px;
+  }
+
+  .shiftMapDay > strong {
+    max-width: calc(100% - 11px);
+    padding: 2px 3px;
+    font-size: 7px;
+  }
+
+  .shiftMapSectionHeader {
+    align-items: flex-start;
+  }
+
+  .shiftMapSectionHeader > small {
+    max-width: 100%;
+  }
+
+  .shiftMapEditorGrid,
+  .shiftMapRhPanel dl,
+  .shiftMapSalaryBreakdown {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
