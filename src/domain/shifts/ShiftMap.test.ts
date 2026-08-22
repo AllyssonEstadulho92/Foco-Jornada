@@ -33,6 +33,12 @@ describe('ShiftMap', () => {
     expect(getShiftEffectiveMinutes(item)).toBe(450)
   })
 
+  it('não conta horas antigas quando o dia deixou de ser trabalho', () => {
+    const item = day({ kind: 'rest', startTime: '08:00', endTime: '17:00', breakMinutes: 15 })
+    expect(getShiftDurationMinutes(item)).toBe(0)
+    expect(getShiftEffectiveMinutes(item)).toBe(0)
+  })
+
   it('resume RH e converte a planificação para o cálculo salarial', () => {
     const days = [
       day({ date: '2026-08-03', overtimeHours: 1.5, note: 'Fecho' }),

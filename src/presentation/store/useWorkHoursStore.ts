@@ -26,21 +26,26 @@ export const useWorkHoursStore = create<WorkHoursState>()(
           createdAt: new Date().toISOString(),
         }
         set((state) => ({
-          entries: [entry, ...state.entries].slice(0, 500),
+          // A calculadora representa o apuramento diário completo (inclui vários segmentos
+          // da jornada). Guardar novamente a mesma data substitui o apuramento anterior,
+          // impedindo que o resumo mensal conte o mesmo dia duas vezes.
+          entries: [entry, ...state.entries.filter((item) => item.date !== input.date)].slice(0, 500),
         }))
         return entry
       },
       update: (id, input) =>
         set((state) => ({
-          entries: state.entries.map((item) =>
-            item.id === id
-              ? {
-                  ...input,
-                  id: item.id,
-                  createdAt: item.createdAt,
-                }
-              : item,
-          ),
+          entries: state.entries
+            .filter((item) => item.id === id || item.date !== input.date)
+            .map((item) =>
+              item.id === id
+                ? {
+                    ...input,
+                    id: item.id,
+                    createdAt: item.createdAt,
+                  }
+                : item,
+            ),
         })),
       remove: (id) => set((state) => ({ entries: state.entries.filter((item) => item.id !== id) })),
       clearMonth: (monthKey) =>

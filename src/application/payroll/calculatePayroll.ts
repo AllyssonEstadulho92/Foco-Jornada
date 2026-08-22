@@ -79,7 +79,7 @@ export function calculateIrs2026(remuneration: number, profile: IrsProfile2026, 
 
 function calculateOvertimePay(
   plans: PayrollDayPlan[],
-  hourlyRate: number,
+  hourlyRateForCalculation: number,
   overtimeHoursBeforeMonth: number,
 ) {
   let annualHours = nonNegative(overtimeHoursBeforeMonth)
@@ -94,8 +94,8 @@ function calculateOvertimePay(
     const lowerHours = Math.min(remaining, lowerRateCapacity)
     const higherHours = remaining - lowerHours
 
-    totalPay += lowerHours * hourlyRate * (1 + premiumUntil100)
-    totalPay += higherHours * hourlyRate * (1 + premiumAfter100)
+    totalPay += lowerHours * hourlyRateForCalculation * (1 + premiumUntil100)
+    totalPay += higherHours * hourlyRateForCalculation * (1 + premiumAfter100)
     annualHours += remaining
     totalHours += remaining
   }
@@ -124,8 +124,12 @@ function calculateOvertimePay(
 export function calculatePayroll(config: PayrollConfig, plans: PayrollDayPlan[]): PayrollResult {
   const baseSalary = nonNegative(config.baseSalary)
   const weeklyHours = Math.max(1, nonNegative(config.weeklyHours))
-  const automaticHourlyRate = round2((baseSalary * 12) / (52 * weeklyHours))
-  const hourlyRate = manualValue(config.hourlyRateOverride, automaticHourlyRate)
+  const automaticHourlyRateExact = (baseSalary * 12) / (52 * weeklyHours)
+  const hourlyRateForCalculation =
+    config.hourlyRateOverride === null
+      ? automaticHourlyRateExact
+      : nonNegative(config.hourlyRateOverride)
+  const hourlyRate = round2(hourlyRateForCalculation)
   const dailyHours = weeklyHours / 5
 
   const workDays = plans.filter((day) => day.kind === 'work').length
@@ -149,15 +153,25 @@ export function calculatePayroll(config: PayrollConfig, plans: PayrollDayPlan[])
   ).length
   const unjustifiedAbsenceDays = plans.filter((day) => day.kind === 'absence-unjustified').length
 
-  const unpaidAbsenceDays = justifiedUnpaidAbsenceDays + unjustifiedAbsenceDays
-  const automaticAbsenceDeduction = round2(unpaidAbsenceDays * dailyHours * hourlyRate)
+  const unpaidAbsenceHours = round2(
+    plans.reduce((total, day) => {
+      if (Number.isFinite(day.unpaidAbsenceHours)) {
+        return total + nonNegative(day.unpaidAbsenceHours ?? 0)
+      }
+      if (day.kind === 'absence-justified-unpaid' || day.kind === 'absence-unjustified') {
+        return total + dailyHours
+      }
+      return total
+    }, 0),
+  )
+  const automaticAbsenceDeduction = round2(unpaidAbsenceHours * hourlyRateForCalculation)
   const absenceDeduction = manualValue(
     config.absenceDeductionOverride,
     automaticAbsenceDeduction,
   )
   const automaticOvertime = calculateOvertimePay(
     plans,
-    hourlyRate,
+    hourlyRateForCalculation,
     config.overtimeHoursBeforeMonth,
   )
   const overtimeHours = automaticOvertime.overtimeHours
@@ -234,6 +248,7 @@ export function calculatePayroll(config: PayrollConfig, plans: PayrollDayPlan[])
     justifiedPaidAbsenceDays,
     justifiedUnpaidAbsenceDays,
     unjustifiedAbsenceDays,
+    unpaidAbsenceHours,
     overtimeHours,
     hourlyRate,
     absenceDeduction,

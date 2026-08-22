@@ -102,4 +102,53 @@ describe('calculateWorkHours', () => {
     expect(result.overtimeMinutes).toBe(60)
     expect(result.balanceMinutes).toBe(60)
   })
+
+  it('calcula corretamente um turno que atravessa a meia-noite', () => {
+    const result = calculateWorkHours({
+      ...base,
+      plannedStart: '22:00',
+      plannedEnd: '06:00',
+      plannedBreakMinutes: 15,
+      plannedBreaks: [{ start: '02:00', end: '02:15' }],
+      actualStart: '22:00',
+      actualEnd: '06:00',
+      actualBreakMinutes: 15,
+      actualBreaks: [{ start: '02:00', end: '02:15' }],
+    })
+
+    expect(result.plannedMinutes).toBe(465)
+    expect(result.workedMinutes).toBe(465)
+    expect(result.nonWorkedMinutes).toBe(0)
+    expect(result.overtimeMinutes).toBe(0)
+  })
+
+  it('não duplica minutos quando existem pausas sobrepostas', () => {
+    const result = calculateWorkHours({
+      ...base,
+      plannedBreaks: [
+        { start: '12:00', end: '12:15' },
+        { start: '12:10', end: '12:30' },
+      ],
+      actualBreaks: [
+        { start: '12:00', end: '12:15' },
+        { start: '12:10', end: '12:30' },
+      ],
+    })
+
+    expect(result.plannedMinutes).toBe(510)
+    expect(result.workedMinutes).toBe(510)
+  })
+
+  it('retira de uma ocorrência apenas o tempo que seria efetivamente trabalhado', () => {
+    const result = calculateWorkHours({
+      ...base,
+      reason: 'consulta_medica',
+      occurrenceStart: '12:00',
+      occurrenceEnd: '12:30',
+    })
+
+    expect(result.occurrenceMinutes).toBe(15)
+    expect(result.nonWorkedMinutes).toBe(15)
+    expect(result.workedMinutes).toBe(510)
+  })
 })
