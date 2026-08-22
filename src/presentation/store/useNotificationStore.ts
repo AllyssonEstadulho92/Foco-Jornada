@@ -15,6 +15,7 @@ export interface AppNotification {
 interface NotificationState {
   notifications: AppNotification[]
   add: (input: { title: string; detail?: string; tone?: NotificationTone }) => void
+  update: (id: string, input: { title: string; detail?: string; tone?: NotificationTone }) => void
   markAllRead: () => void
   clear: () => void
   remove: (id: string) => void
@@ -42,6 +43,19 @@ export const useNotificationStore = create<NotificationState>()(
             },
             ...state.notifications,
           ].slice(0, 80),
+        })),
+      update: (id, { title, detail = '', tone }) =>
+        set((state) => ({
+          notifications: state.notifications.map((item) =>
+            item.id === id
+              ? {
+                  ...item,
+                  title,
+                  detail,
+                  tone: tone ?? item.tone,
+                }
+              : item,
+          ),
         })),
       markAllRead: () =>
         set((state) => ({
