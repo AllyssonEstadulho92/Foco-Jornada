@@ -20,6 +20,16 @@ export interface NextScheduleEvent {
   state: 'before' | 'work' | 'break' | 'done'
 }
 
+export interface ResolvedWorkSchedule {
+  dateKey: string
+  dayKind: 'weekday' | 'saturday' | 'sunday'
+  isWorkingDay: boolean
+  startTime: string
+  endTime: string
+}
+
+type ScheduleDate = Date | string
+
 export function parseClockMinutes(value: string): number | null {
   if (!/^\d{2}:\d{2}$/.test(value)) return null
   const [hours, minutes] = value.split(':').map(Number)
@@ -33,6 +43,48 @@ export function formatPlannedMinutes(totalMinutes: number): string {
   const hours = Math.floor(safe / 60)
   const minutes = safe % 60
   return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`
+}
+
+function localDateParts(value: ScheduleDate) {
+  if (typeof value === 'string') {
+    const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value)
+    if (match) {
+      const year = Number(match[1])
+      const month = Number(match[2])
+      const day = Number(match[3])
+      const date = new Date(year, month - 1, day)
+      return {
+        date,
+        dateKey: `${String(year).padStart(4, '0')}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`,
+      }
+    }
+  }
+
+  const date = value instanceof Date ? value : new Date(value)
+  return {
+    date,
+    dateKey: `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`,
+  }
+}
+
+export function resolveWorkScheduleForDate(
+  schedule: WorkScheduleSettings,
+  value: ScheduleDate,
+): ResolvedWorkSchedule {
+  const { date, dateKey } = localDateParts(value)
+  const weekday = date.getDay()
+  const isSunday = weekday === 0
+  const isSaturday = weekday === 6
+  const isWeekend = isSaturday || isSunday
+  const isWorkingDay = !isWeekend || schedule.weekendWorkDates.includes(dateKey)
+
+  return {
+    dateKey,
+    dayKind: isSunday ? 'sunday' : isSaturday ? 'saturday' : 'weekday',
+    isWorkingDay,
+    startTime: isSunday ? schedule.sundayStartTime : schedule.startTime,
+    endTime: isSunday ? schedule.sundayEndTime : schedule.endTime,
+  }
 }
 
 function enabledBreaks(schedule: WorkScheduleSettings) {
@@ -49,9 +101,15 @@ function enabledBreaks(schedule: WorkScheduleSettings) {
     .sort((a, b) => a.start - b.start)
 }
 
-export function getScheduleSummary(schedule: WorkScheduleSettings): ScheduleSummary {
-  const start = parseClockMinutes(schedule.startTime)
-  const end = parseClockMinutes(schedule.endTime)
+export function getScheduleSummary(
+  schedule: WorkScheduleSettings,
+  value: ScheduleDate = new Date(),
+): ScheduleSummary {
+  const resolved = resolveWorkScheduleForDate(schedule, value)
+  if (!resolved.isWorkingDay) return { totalMinutes: 0, breakMinutes: 0, effectiveMinutes: 0 }
+
+  const start = parseClockMinutes(resolved.startTime)
+  const end = parseClockMinutes(resolved.endTime)
   if (start === null || end === null || end <= start) {
     return { totalMinutes: 0, breakMinutes: 0, effectiveMinutes: 0 }
   }
@@ -70,13 +128,19 @@ export function getScheduleSummary(schedule: WorkScheduleSettings): ScheduleSumm
   }
 }
 
-export function getScheduleMilestones(schedule: WorkScheduleSettings): ScheduleMilestone[] {
-  const start = parseClockMinutes(schedule.startTime)
-  const end = parseClockMinutes(schedule.endTime)
+export function getScheduleMilestones(
+  schedule: WorkScheduleSettings,
+  value: ScheduleDate = new Date(),
+): ScheduleMilestone[] {
+  const resolved = resolveWorkScheduleForDate(schedule, value)
+  if (!resolved.isWorkingDay) return []
+
+  const start = parseClockMinutes(resolved.startTime)
+  const end = parseClockMinutes(resolved.endTime)
   if (start === null || end === null || end <= start) return []
 
   const milestones: ScheduleMilestone[] = [
-    { id: 'entry', label: 'Entrada', time: schedule.startTime, minutes: start, kind: 'entry' },
+    { id: 'entry', label: 'Entrada', time: resolved.startTime, minutes: start, kind: 'entry' },
   ]
 
   enabledBreaks(schedule).forEach((item, index) => {
@@ -100,19 +164,24 @@ export function getScheduleMilestones(schedule: WorkScheduleSettings): ScheduleM
     }
   })
 
-  milestones.push({ id: 'exit', label: 'Saída', time: schedule.endTime, minutes: end, kind: 'exit' })
+  milestones.push({ id: 'exit', label: 'Saída', time: resolved.endTime, minutes: end, kind: 'exit' })
   return milestones.sort((a, b) => a.minutes - b.minutes)
 }
 
 export function getNextScheduleEvent(schedule: WorkScheduleSettings, now: Date): NextScheduleEvent {
-  const start = parseClockMinutes(schedule.startTime)
-  const end = parseClockMinutes(schedule.endTime)
+  const resolved = resolveWorkScheduleForDate(schedule, now)
+  if (!resolved.isWorkingDay) {
+    return { label: 'Folga planeada', time: 'Hoje', state: 'done' }
+  }
+
+  const start = parseClockMinutes(resolved.startTime)
+  const end = parseClockMinutes(resolved.endTime)
   if (start === null || end === null || end <= start) {
     return { label: 'Horário por configurar', time: null, state: 'before' }
   }
 
   const current = now.getHours() * 60 + now.getMinutes()
-  if (current < start) return { label: 'Entrada', time: schedule.startTime, state: 'before' }
+  if (current < start) return { label: 'Entrada', time: resolved.startTime, state: 'before' }
   if (current >= end) return { label: 'Jornada planeada concluída', time: null, state: 'done' }
 
   for (const item of enabledBreaks(schedule)) {
@@ -124,12 +193,15 @@ export function getNextScheduleEvent(schedule: WorkScheduleSettings, now: Date):
     }
   }
 
-  return { label: 'Saída prevista', time: schedule.endTime, state: 'work' }
+  return { label: 'Saída prevista', time: resolved.endTime, state: 'work' }
 }
 
 export function getScheduleProgress(schedule: WorkScheduleSettings, now: Date): number {
-  const start = parseClockMinutes(schedule.startTime)
-  const end = parseClockMinutes(schedule.endTime)
+  const resolved = resolveWorkScheduleForDate(schedule, now)
+  if (!resolved.isWorkingDay) return 0
+
+  const start = parseClockMinutes(resolved.startTime)
+  const end = parseClockMinutes(resolved.endTime)
   if (start === null || end === null || end <= start) return 0
 
   const current = now.getHours() * 60 + now.getMinutes()
