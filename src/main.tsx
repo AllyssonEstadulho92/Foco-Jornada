@@ -35,6 +35,7 @@ import './styles/today-reference.css'
 import './styles/icon-refinement.css'
 import './styles/mobile-fit.css'
 import './styles/prototype-v2.css'
+import './styles/prototype-v2-settings.css'
 
 const root = document.getElementById('root')
 if (!root) throw new Error('Elemento #root não encontrado.')
