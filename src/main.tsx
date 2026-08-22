@@ -28,6 +28,7 @@ import './styles/payroll.css'
 import './styles/more-redesign.css'
 import './styles/today-modern.css'
 import './styles/mobile-shell.css'
+import './styles/today-reference.css'
 
 const root = document.getElementById('root')
 if (!root) throw new Error('Elemento #root não encontrado.')
