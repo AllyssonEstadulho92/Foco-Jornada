@@ -133,6 +133,12 @@
     height: 24px;
   }
 
+  .todayJourneyEmpty .todayEmptyIcon {
+    display: grid;
+    place-items: center;
+    background: transparent;
+  }
+
   .todayQuickGrid .quickIcon,
   .todayQuickGrid .quickIconAmber,
   .todayQuickGrid .quickIconRed,
