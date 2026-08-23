@@ -1,18 +1,33 @@
 :root[data-theme='dark'] {
-  --bg: #050706;
-  --surface: #101312;
-  --surface-2: #171b19;
-  --surface-3: #222824;
-  --line: rgba(255, 255, 255, 0.14);
-  --line-strong: rgba(255, 255, 255, 0.24);
+  color-scheme: dark;
+  --bg: #000000;
+  --surface: #0b0f0d;
+  --surface-2: #121814;
+  --surface-3: #1b231e;
+  --line: rgba(255, 255, 255, 0.18);
+  --line-strong: rgba(255, 255, 255, 0.30);
   --text: #ffffff;
-  --muted: #d0d7d2;
-  --primary: #78cf83;
-  --primary-strong: #8bd994;
-  --glass: rgba(8, 11, 9, 0.94);
+  --muted: #e0e6e2;
+  --primary: #7bd686;
+  --primary-strong: #90e29a;
+  --primary-soft: rgba(123, 214, 134, 0.15);
+  --danger: #ff6d6d;
+  --warning: #efae50;
+  --glass: rgba(0, 0, 0, 0.94);
+  --prototype-shadow: 0 18px 48px rgba(0, 0, 0, 0.58);
+  --prototype-shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.46);
 }
 
-:root[data-theme='dark'] .appContent,
+:root[data-theme='dark'] html,
+:root[data-theme='dark'] body,
+:root[data-theme='dark'] #root,
+:root[data-theme='dark'] .appShell,
+:root[data-theme='dark'] .appMainArea,
+:root[data-theme='dark'] .appContent {
+  background-color: #000000;
+  color: #ffffff;
+}
+
 :root[data-theme='dark'] .appTopBar,
 :root[data-theme='dark'] .sidebar,
 :root[data-theme='dark'] .mobileDrawer,
@@ -20,41 +35,111 @@
   color: #ffffff;
 }
 
-:root[data-theme='dark'] .appContent :where(h1, h2, h3, h4, strong, b, label) {
-  color: #ffffff;
+:root[data-theme='dark'] .appTopBar,
+:root[data-theme='dark'] .bottomNav.mobileBottomBar {
+  background: rgba(0, 0, 0, 0.94) !important;
+  border-color: var(--line-strong) !important;
 }
 
-:root[data-theme='dark'] .appContent :where(p, small, .mutedText),
-:root[data-theme='dark'] .brandTagline,
-:root[data-theme='dark'] .mobileDrawerTagline,
-:root[data-theme='dark'] .notificationItem time,
-:root[data-theme='dark'] .notificationItem span,
-:root[data-theme='dark'] .notificationPanelFooter {
-  color: #d0d7d2;
-}
-
-:root[data-theme='dark'] :where(input, select, textarea) {
-  color: #ffffff;
-}
-
-:root[data-theme='dark'] :where(input, textarea)::placeholder {
-  color: #aeb8b1;
-  opacity: 1;
-}
-
-:root[data-theme='dark'] .mobileDrawerNav .navLink,
+:root[data-theme='dark'] .appContent :where(h1, h2, h3, h4, h5, strong, b, label),
+:root[data-theme='dark'] .brandLockupText strong,
 :root[data-theme='dark'] .appClock,
+:root[data-theme='dark'] .mobileDrawerNav .navLink,
 :root[data-theme='dark'] .referenceSettingsRow strong,
 :root[data-theme='dark'] .referenceSettingsLinkRow strong,
 :root[data-theme='dark'] .referencePayrollRow strong,
 :root[data-theme='dark'] .referenceHistoryItem strong,
-:root[data-theme='dark'] .referenceTodayCard strong {
+:root[data-theme='dark'] .referenceTodayCard strong,
+:root[data-theme='dark'] .referenceSummaryGrid strong,
+:root[data-theme='dark'] .referenceWorkMetrics strong,
+:root[data-theme='dark'] .referenceNextCard strong,
+:root[data-theme='dark'] .referenceChevron {
   color: #ffffff !important;
 }
 
+:root[data-theme='dark'] .appContent :where(p, small, time, .mutedText),
+:root[data-theme='dark'] .brandTagline,
+:root[data-theme='dark'] .mobileDrawerTagline,
+:root[data-theme='dark'] .notificationItem time,
+:root[data-theme='dark'] .notificationItem span,
+:root[data-theme='dark'] .notificationPanelFooter,
+:root[data-theme='dark'] .referenceGreeting > div:first-child > span,
+:root[data-theme='dark'] .referenceGreeting p,
+:root[data-theme='dark'] .referenceFocusHeader p,
+:root[data-theme='dark'] .referenceSummaryGrid span,
+:root[data-theme='dark'] .referenceNextCard span,
+:root[data-theme='dark'] .referenceNextCard small,
+:root[data-theme='dark'] .referenceWorkMetrics small,
 :root[data-theme='dark'] .referenceSettingsRow small,
-:root[data-theme='dark'] .referenceSettingsLinkRow small {
-  color: #d0d7d2 !important;
+:root[data-theme='dark'] .referenceSettingsLinkRow small,
+:root[data-theme='dark'] .referenceProfileIntro p,
+:root[data-theme='dark'] .referenceProfileFacts span,
+:root[data-theme='dark'] .referenceSettingsExpanded p,
+:root[data-theme='dark'] .referencePayrollHeader p,
+:root[data-theme='dark'] .referencePayrollRow small,
+:root[data-theme='dark'] .referencePayrollNotice p,
+:root[data-theme='dark'] .referencePayrollTotals small,
+:root[data-theme='dark'] .referencePayrollToolbar span,
+:root[data-theme='dark'] .referencePageTitle p {
+  color: #e0e6e2 !important;
+}
+
+:root[data-theme='dark'] :where(input, select, textarea) {
+  border-color: rgba(255, 255, 255, 0.28) !important;
+  background: #101512 !important;
+  color: #ffffff !important;
+}
+
+:root[data-theme='dark'] :where(input, textarea)::placeholder {
+  color: #c3ccc6 !important;
+  opacity: 1;
+}
+
+:root[data-theme='dark'] select option {
+  background: #101512;
+  color: #ffffff;
+}
+
+:root[data-theme='dark'] .referenceFocusCard,
+:root[data-theme='dark'] .referenceSummaryCard,
+:root[data-theme='dark'] .referenceNextCard,
+:root[data-theme='dark'] .referenceWorkPanel,
+:root[data-theme='dark'] .referenceSettingsCard,
+:root[data-theme='dark'] .referencePayrollDetails,
+:root[data-theme='dark'] .referencePayrollNotice,
+:root[data-theme='dark'] .referenceHistoryCard,
+:root[data-theme='dark'] .referenceTodayCard,
+:root[data-theme='dark'] .historySummaryCard,
+:root[data-theme='dark'] .historyTimelinePanel,
+:root[data-theme='dark'] .shiftMapCommand,
+:root[data-theme='dark'] .shiftMapOverview article,
+:root[data-theme='dark'] .shiftMapPanel,
+:root[data-theme='dark'] .shiftMapEditor,
+:root[data-theme='dark'] .shiftMapRhPanel,
+:root[data-theme='dark'] .shiftMapSalaryPanel,
+:root[data-theme='dark'] .payrollHero,
+:root[data-theme='dark'] .payrollPanel,
+:root[data-theme='dark'] .workHoursVerifier,
+:root[data-theme='dark'] .workHoursSummary article,
+:root[data-theme='dark'] .workHoursForm,
+:root[data-theme='dark'] .workHoursMonth,
+:root[data-theme='dark'] .notificationPanel,
+:root[data-theme='dark'] .notificationItem {
+  border-color: var(--line) !important;
+  background-color: var(--surface) !important;
+}
+
+:root[data-theme='dark'] .scheduleBoard,
+:root[data-theme='dark'] .scheduleNextEvent,
+:root[data-theme='dark'] .scheduleLiveMetrics article,
+:root[data-theme='dark'] .schedulePlanSummary,
+:root[data-theme='dark'] .todayQuickAction,
+:root[data-theme='dark'] .todayMetricCard,
+:root[data-theme='dark'] .referenceManualSchedule,
+:root[data-theme='dark'] .referenceSummaryCard header a,
+:root[data-theme='dark'] .mobileDrawerFooter strong {
+  background-color: var(--surface-2) !important;
+  border-color: var(--line) !important;
 }
 
 :root[data-theme='dark'] .navLink,
@@ -63,7 +148,15 @@
 :root[data-theme='dark'] .drawerThemeToggle,
 :root[data-theme='dark'] .bottomNav a,
 :root[data-theme='dark'] .bottomNav button {
-  color: #d0d7d2;
+  color: #e0e6e2;
+}
+
+:root[data-theme='dark'] .navLink svg,
+:root[data-theme='dark'] .sidebarToggle svg,
+:root[data-theme='dark'] .notificationButton svg,
+:root[data-theme='dark'] .bottomNav svg,
+:root[data-theme='dark'] .mobileMenuButton svg {
+  stroke: currentColor;
 }
 
 :root[data-theme='dark'] .navLinkActive,
@@ -72,15 +165,21 @@
   color: var(--primary) !important;
 }
 
-:root[data-theme='dark'] .referenceSettingsCard,
-:root[data-theme='dark'] .referencePayrollDetails,
-:root[data-theme='dark'] .referencePayrollNotice,
-:root[data-theme='dark'] .referenceHistoryCard,
-:root[data-theme='dark'] .referenceTodayCard {
-  border-color: var(--line) !important;
+:root[data-theme='dark'] .referencePayrollRow b:not(.positive):not(.negative),
+:root[data-theme='dark'] .referenceProfileFacts strong,
+:root[data-theme='dark'] .shiftMapDay,
+:root[data-theme='dark'] .workHoursSummary strong {
+  color: #ffffff !important;
 }
 
-/* O relatório A4 mantém a sua folha clara, mesmo quando a aplicação está em modo escuro. */
+:root[data-theme='dark'] .referenceSettingsButtonRow,
+:root[data-theme='dark'] .referenceQuickActions button,
+:root[data-theme='dark'] .referenceQuickActions a,
+:root[data-theme='dark'] .referenceInlineLink {
+  border-color: var(--line-strong) !important;
+}
+
+/* O relatório A4 é um documento independente e mantém a folha clara mesmo com a aplicação em tema escuro. */
 :root[data-theme='dark'] .exportA4Sheet {
   color-scheme: light;
 }
