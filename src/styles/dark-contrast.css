@@ -179,7 +179,101 @@
   border-color: var(--line-strong) !important;
 }
 
-/* O relatório A4 é um documento independente e mantém a folha clara mesmo com a aplicação em tema escuro. */
-:root[data-theme='dark'] .exportA4Sheet {
-  color-scheme: light;
+/* O relatório A4 é um documento independente: permanece claro na pré-visualização e no PDF, mesmo com a aplicação em tema escuro. */
+:root[data-theme='dark'] .appContent .exportA4Sheet {
+  color-scheme: only light;
+  forced-color-adjust: none;
+  background-color: #ffffff !important;
+  background-image:
+    radial-gradient(circle at 96% 5%, rgba(93, 190, 120, 0.16), transparent 18%),
+    radial-gradient(circle at 8% 94%, rgba(90, 181, 112, 0.09), transparent 25%),
+    linear-gradient(180deg, #ffffff 0%, #fcfefc 55%, #f4fbf5 100%) !important;
+  color: #111914 !important;
+}
+
+:root[data-theme='dark'] .appContent .exportA4Sheet .exportA4Brand strong {
+  color: #18342a !important;
+}
+
+:root[data-theme='dark'] .appContent .exportA4Sheet .exportA4DocumentMeta strong {
+  color: #102a21 !important;
+}
+
+:root[data-theme='dark'] .appContent .exportA4Sheet .exportA4Brand small,
+:root[data-theme='dark'] .appContent .exportA4Sheet .exportA4Metric small,
+:root[data-theme='dark'] .appContent .exportA4Sheet .exportA4Performance > span,
+:root[data-theme='dark'] .appContent .exportA4Sheet .exportA4Footer p {
+  color: #5f6963 !important;
+}
+
+:root[data-theme='dark'] .appContent .exportA4Sheet .exportA4Metric > div > span {
+  color: #3f4943 !important;
+}
+
+:root[data-theme='dark'] .appContent .exportA4Sheet .exportA4Metric strong {
+  color: #168b55 !important;
+}
+
+:root[data-theme='dark'] .appContent .exportA4Sheet .exportA4Metric.is-break strong {
+  color: #c86d12 !important;
+}
+
+:root[data-theme='dark'] .appContent .exportA4Sheet .exportA4Metric.is-focus strong {
+  color: #2670c7 !important;
+}
+
+:root[data-theme='dark'] .appContent .exportA4Sheet .exportA4Metric.is-activity strong {
+  color: #7249bd !important;
+}
+
+:root[data-theme='dark'] .appContent .exportA4Sheet .exportA4Metric.is-coffee strong {
+  color: #d75d25 !important;
+}
+
+:root[data-theme='dark'] .appContent .exportA4Sheet .exportA4SectionTitle h2,
+:root[data-theme='dark'] .appContent .exportA4Sheet .exportA4Panel h3 {
+  color: #15834f !important;
+}
+
+:root[data-theme='dark'] .appContent .exportA4Sheet .exportA4SectionTitle > strong {
+  color: #748078 !important;
+}
+
+:root[data-theme='dark'] .appContent .exportA4Sheet .exportA4Empty strong,
+:root[data-theme='dark'] .appContent .exportA4Sheet .exportA4Panel dd {
+  color: #111914 !important;
+}
+
+:root[data-theme='dark'] .appContent .exportA4Sheet .exportA4Performance b {
+  color: #163126 !important;
+}
+
+:root[data-theme='dark'] .appContent .exportA4Sheet .exportA4Progress strong {
+  color: #154833 !important;
+}
+
+:root[data-theme='dark'] .appContent .exportA4Sheet .exportA4Financial p {
+  color: #247248 !important;
+}
+
+:root[data-theme='dark'] .appContent .exportA4Sheet .exportA4Footer strong {
+  color: #46534b !important;
+}
+
+@media print {
+  :root[data-theme='dark'] html,
+  :root[data-theme='dark'] body,
+  :root[data-theme='dark'] #root,
+  :root[data-theme='dark'] .appShell,
+  :root[data-theme='dark'] .appMainArea,
+  :root[data-theme='dark'] .appContent,
+  :root[data-theme='dark'] .exportA4Page {
+    background: #ffffff !important;
+  }
+
+  :root[data-theme='dark'] .appContent .exportA4Sheet {
+    background-color: #ffffff !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
 }
