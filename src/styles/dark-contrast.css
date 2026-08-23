@@ -20,7 +20,28 @@
   color: #ffffff;
 }
 
-:root[data-theme='dark'] .appContent :where(h1, h2, h3, h4, strong, b, label),
+:root[data-theme='dark'] .appContent :where(h1, h2, h3, h4, strong, b, label) {
+  color: #ffffff;
+}
+
+:root[data-theme='dark'] .appContent :where(p, small, .mutedText),
+:root[data-theme='dark'] .brandTagline,
+:root[data-theme='dark'] .mobileDrawerTagline,
+:root[data-theme='dark'] .notificationItem time,
+:root[data-theme='dark'] .notificationItem span,
+:root[data-theme='dark'] .notificationPanelFooter {
+  color: #d0d7d2;
+}
+
+:root[data-theme='dark'] :where(input, select, textarea) {
+  color: #ffffff;
+}
+
+:root[data-theme='dark'] :where(input, textarea)::placeholder {
+  color: #aeb8b1;
+  opacity: 1;
+}
+
 :root[data-theme='dark'] .mobileDrawerNav .navLink,
 :root[data-theme='dark'] .appClock,
 :root[data-theme='dark'] .referenceSettingsRow strong,
@@ -31,24 +52,9 @@
   color: #ffffff !important;
 }
 
-:root[data-theme='dark'] .appContent :where(p, small, .mutedText),
-:root[data-theme='dark'] .brandTagline,
-:root[data-theme='dark'] .mobileDrawerTagline,
-:root[data-theme='dark'] .notificationItem time,
-:root[data-theme='dark'] .notificationItem span,
-:root[data-theme='dark'] .notificationPanelFooter,
 :root[data-theme='dark'] .referenceSettingsRow small,
 :root[data-theme='dark'] .referenceSettingsLinkRow small {
   color: #d0d7d2 !important;
-}
-
-:root[data-theme='dark'] :where(input, select, textarea) {
-  color: #ffffff !important;
-}
-
-:root[data-theme='dark'] :where(input, textarea)::placeholder {
-  color: #aeb8b1 !important;
-  opacity: 1;
 }
 
 :root[data-theme='dark'] .navLink,
@@ -74,8 +80,7 @@
   border-color: var(--line) !important;
 }
 
-/* O relatório A4 continua deliberadamente claro, independentemente do tema da aplicação. */
-:root[data-theme='dark'] .exportA4Sheet,
-:root[data-theme='dark'] .exportA4Sheet * {
+/* O relatório A4 mantém a sua folha clara, mesmo quando a aplicação está em modo escuro. */
+:root[data-theme='dark'] .exportA4Sheet {
   color-scheme: light;
 }
