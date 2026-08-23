@@ -3,7 +3,10 @@ import { Link } from 'react-router-dom'
 import { formatPlannedMinutes, getScheduleSummary } from '../../domain/journey/WorkSchedule'
 import { AppAboutSettings } from '../components/AppAboutSettings'
 import { useSettingsController } from '../hooks/useSettingsController'
+import { useAppServices } from '../providers/AppServicesProvider'
+import { pushAppNotification } from '../store/useNotificationStore'
 import { useUiStore } from '../store/useUiStore'
+import { downloadDayData } from '../utils/downloadDayData'
 
 function currentMonthKey() {
   const now = new Date()
@@ -35,6 +38,7 @@ function breakSummary(enabled: boolean, startTime: string, endTime: string) {
 }
 
 export function SettingsReferencePage() {
+  const services = useAppServices()
   const { settings, setSettings, save, isLoading, isBusy, error } = useSettingsController()
   const theme = useUiStore((state) => state.theme)
   const setTheme = useUiStore((state) => state.setTheme)
@@ -57,6 +61,15 @@ export function SettingsReferencePage() {
 
   async function handleSave() {
     await save({ ...settings, currency: 'EUR' })
+  }
+
+  async function exportToday() {
+    try {
+      await downloadDayData(services)
+      pushAppNotification('success', 'Dados exportados', 'A cópia técnica do dia foi guardada no dispositivo.')
+    } catch {
+      pushAppNotification('error', 'Não foi possível exportar', 'Tenta novamente em Definições.')
+    }
   }
 
   return (
@@ -92,7 +105,7 @@ export function SettingsReferencePage() {
                 <article><span>Moeda</span><strong>{settings.currency}</strong></article>
               </div>
               <div className="referenceProfileActions">
-                <Link to="/exportar">Exportar relatório A4</Link>
+                <Link to="/relatorio">Abrir relatório A4</Link>
                 <Link to="/mais">Ver estado da aplicação</Link>
               </div>
             </div>
@@ -167,7 +180,8 @@ export function SettingsReferencePage() {
 
         <section className="referenceSettingsCard">
           <Link className="referenceSettingsLinkRow" to="/mais"><SettingsIcon>⌁</SettingsIcon><span><strong>Estado da aplicação</strong><small>Verifica se está tudo a funcionar</small></span><span className="referenceChevron">›</span></Link>
-          <Link className="referenceSettingsLinkRow" to="/exportar"><SettingsIcon>⇧</SettingsIcon><span><strong>Exportar dados</strong><small>Abre um relatório A4 para guardar em PDF</small></span><span className="referenceChevron">›</span></Link>
+          <Link className="referenceSettingsLinkRow" to="/relatorio"><SettingsIcon>▤</SettingsIcon><span><strong>Relatório A4</strong><small>Consulta e imprime apenas o relatório do dia</small></span><span className="referenceChevron">›</span></Link>
+          <button type="button" className="referenceSettingsLinkRow referenceSettingsButtonRow" onClick={() => void exportToday()}><SettingsIcon>⇧</SettingsIcon><span><strong>Exportar dados</strong><small>Guarda uma cópia técnica do dia no dispositivo</small></span><span className="referenceChevron">›</span></button>
           <Link className="referenceSettingsLinkRow" to="/mais"><SettingsIcon>⇩</SettingsIcon><span><strong>Importar dados</strong><small>Recupera dados de outro dispositivo</small></span><span className="referenceChevron">›</span></Link>
           <Link className="referenceSettingsLinkRow" to="/mais"><SettingsIcon>☁</SettingsIcon><span><strong>Cópia de segurança</strong><small>Protege e recupera os teus dados</small></span><span className="referenceChevron">›</span></Link>
         </section>
