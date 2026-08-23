@@ -8,6 +8,7 @@ import { DexieFocusRepository } from './infrastructure/repositories/DexieFocusRe
 import { DexieJourneyRepository } from './infrastructure/repositories/DexieJourneyRepository'
 import { DexieSettingsRepository } from './infrastructure/repositories/DexieSettingsRepository'
 import { App } from './presentation/App'
+import { installTodayScheduleMenuReveal } from './presentation/utils/installTodayScheduleMenuReveal'
 import { installNumberInputNormalization } from './shared/utils/numberInput'
 import './styles/tokens.css'
 import './styles/global.css'
@@ -49,6 +50,7 @@ const root = document.getElementById('root')
 if (!root) throw new Error('Elemento #root não encontrado.')
 
 installNumberInputNormalization()
+installTodayScheduleMenuReveal()
 
 function requestPwaUpdate() {
   if (!('serviceWorker' in navigator) || !navigator.onLine) return
