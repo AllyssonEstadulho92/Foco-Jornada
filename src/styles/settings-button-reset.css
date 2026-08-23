@@ -1,0 +1,22 @@
+.referenceSettingsButtonRow{
+  width:100%;
+  margin:0;
+  border:0;
+  border-radius:0;
+  background:transparent;
+  appearance:none;
+  -webkit-appearance:none;
+  font:inherit;
+  text-align:left;
+  cursor:pointer;
+}
+
+.referenceSettingsButtonRow:focus-visible{
+  outline:2px solid var(--primary);
+  outline-offset:-2px;
+}
+
+.referenceSettingsButtonRow:disabled{
+  cursor:not-allowed;
+  opacity:.6;
+}
