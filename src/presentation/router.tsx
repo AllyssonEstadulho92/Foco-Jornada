@@ -30,6 +30,7 @@ export const router = createHashRouter([
       { path: 'vencimento/configurar', element: <PayrollPage /> },
       { path: 'horas', element: <WorkHoursCalculatorPage /> },
       { path: 'estatisticas', element: <StatisticsPage /> },
+      { path: 'relatorio', element: <ExportDataPage /> },
       { path: 'exportar', element: <ExportDataPage /> },
       { path: 'definicoes', element: <SettingsReferencePage /> },
     ],
