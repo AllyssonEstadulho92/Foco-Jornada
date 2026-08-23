@@ -1,0 +1,81 @@
+:root[data-theme='dark'] {
+  --bg: #050706;
+  --surface: #101312;
+  --surface-2: #171b19;
+  --surface-3: #222824;
+  --line: rgba(255, 255, 255, 0.14);
+  --line-strong: rgba(255, 255, 255, 0.24);
+  --text: #ffffff;
+  --muted: #d0d7d2;
+  --primary: #78cf83;
+  --primary-strong: #8bd994;
+  --glass: rgba(8, 11, 9, 0.94);
+}
+
+:root[data-theme='dark'] .appContent,
+:root[data-theme='dark'] .appTopBar,
+:root[data-theme='dark'] .sidebar,
+:root[data-theme='dark'] .mobileDrawer,
+:root[data-theme='dark'] .bottomNav {
+  color: #ffffff;
+}
+
+:root[data-theme='dark'] .appContent :where(h1, h2, h3, h4, strong, b, label),
+:root[data-theme='dark'] .mobileDrawerNav .navLink,
+:root[data-theme='dark'] .appClock,
+:root[data-theme='dark'] .referenceSettingsRow strong,
+:root[data-theme='dark'] .referenceSettingsLinkRow strong,
+:root[data-theme='dark'] .referencePayrollRow strong,
+:root[data-theme='dark'] .referenceHistoryItem strong,
+:root[data-theme='dark'] .referenceTodayCard strong {
+  color: #ffffff !important;
+}
+
+:root[data-theme='dark'] .appContent :where(p, small, .mutedText),
+:root[data-theme='dark'] .brandTagline,
+:root[data-theme='dark'] .mobileDrawerTagline,
+:root[data-theme='dark'] .notificationItem time,
+:root[data-theme='dark'] .notificationItem span,
+:root[data-theme='dark'] .notificationPanelFooter,
+:root[data-theme='dark'] .referenceSettingsRow small,
+:root[data-theme='dark'] .referenceSettingsLinkRow small {
+  color: #d0d7d2 !important;
+}
+
+:root[data-theme='dark'] :where(input, select, textarea) {
+  color: #ffffff !important;
+}
+
+:root[data-theme='dark'] :where(input, textarea)::placeholder {
+  color: #aeb8b1 !important;
+  opacity: 1;
+}
+
+:root[data-theme='dark'] .navLink,
+:root[data-theme='dark'] .sidebarToggle,
+:root[data-theme='dark'] .notificationButton,
+:root[data-theme='dark'] .drawerThemeToggle,
+:root[data-theme='dark'] .bottomNav a,
+:root[data-theme='dark'] .bottomNav button {
+  color: #d0d7d2;
+}
+
+:root[data-theme='dark'] .navLinkActive,
+:root[data-theme='dark'] .bottomNav .active,
+:root[data-theme='dark'] .mobileDrawerNav .navLinkActive {
+  color: var(--primary) !important;
+}
+
+:root[data-theme='dark'] .referenceSettingsCard,
+:root[data-theme='dark'] .referencePayrollDetails,
+:root[data-theme='dark'] .referencePayrollNotice,
+:root[data-theme='dark'] .referenceHistoryCard,
+:root[data-theme='dark'] .referenceTodayCard {
+  border-color: var(--line) !important;
+}
+
+/* O relatório A4 continua deliberadamente claro, independentemente do tema da aplicação. */
+:root[data-theme='dark'] .exportA4Sheet,
+:root[data-theme='dark'] .exportA4Sheet * {
+  color-scheme: light;
+}
