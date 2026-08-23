@@ -4,7 +4,6 @@ import { buildDayReport } from '../../application/reports/buildDayReport'
 import { toLocalDateKey } from '../../shared/utils/dateTime'
 import { NavigationIcon } from '../navigation/NavigationIcon'
 import { useAppServices } from '../providers/AppServicesProvider'
-import { pushAppNotification } from '../store/useNotificationStore'
 
 type ProtectionStatus = 'ok' | 'warning' | 'error' | 'info'
 
@@ -57,33 +56,6 @@ export function MorePage() {
   const [protectionLoading, setProtectionLoading] = useState(false)
   const [protectionChecks, setProtectionChecks] = useState<ProtectionCheck[]>([])
   const [protectionCheckedAt, setProtectionCheckedAt] = useState<Date | null>(null)
-
-  async function exportToday() {
-    try {
-      const date = toLocalDateKey(new Date())
-      const report = await buildDayReport({
-        journeyRepository: services.journeyRepository,
-        breakRepository: services.breakRepository,
-        activityRepository: services.activityRepository,
-        focusRepository: services.focusRepository,
-        coffeeRepository: services.coffeeRepository,
-        date,
-      })
-
-      const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' })
-      const url = URL.createObjectURL(blob)
-      const anchor = document.createElement('a')
-      anchor.href = url
-      anchor.download = `foco-jornada-${date}.json`
-      document.body.append(anchor)
-      anchor.click()
-      anchor.remove()
-      URL.revokeObjectURL(url)
-      pushAppNotification('success', 'Dados exportados', 'A cópia do dia foi guardada no dispositivo.')
-    } catch {
-      pushAppNotification('error', 'Não foi possível exportar', 'Tenta novamente em Ferramentas.')
-    }
-  }
 
   async function runProtectionCheck() {
     setProtectionOpen(true)
@@ -342,14 +314,14 @@ export function MorePage() {
             <RowArrow />
           </Link>
 
-          <button type="button" className="moreRow moreRowButton" onClick={() => void exportToday()}>
+          <Link to="/exportar" className="moreRow">
             <span className="moreRowIcon" aria-hidden="true"><NavigationIcon name="export" /></span>
             <span className="moreRowCopy">
               <strong>Exportar dados</strong>
-              <small>Guarda uma cópia do dia</small>
+              <small>Abre o relatório A4 para guardar em PDF</small>
             </span>
             <RowArrow />
-          </button>
+          </Link>
         </div>
       </section>
 

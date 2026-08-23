@@ -6,12 +6,15 @@ import { VitePWA } from 'vite-plugin-pwa'
 const packageJson = JSON.parse(
   readFileSync(new URL('./package.json', import.meta.url), 'utf8'),
 ) as { version: string }
+const buildDate = new Date().toISOString()
+const buildId = process.env.GITHUB_SHA?.slice(0, 7) ?? `local-${Date.now().toString(36)}`
 
 export default defineConfig({
   base: './',
   define: {
     __APP_VERSION__: JSON.stringify(packageJson.version),
-    __APP_BUILD_DATE__: JSON.stringify(new Date().toISOString()),
+    __APP_BUILD_DATE__: JSON.stringify(buildDate),
+    __APP_BUILD_ID__: JSON.stringify(buildId),
   },
   build: {
     target: 'es2019',
