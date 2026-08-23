@@ -4,6 +4,8 @@ import { buildDayReport } from '../../application/reports/buildDayReport'
 import { toLocalDateKey } from '../../shared/utils/dateTime'
 import { NavigationIcon } from '../navigation/NavigationIcon'
 import { useAppServices } from '../providers/AppServicesProvider'
+import { pushAppNotification } from '../store/useNotificationStore'
+import { downloadDayData } from '../utils/downloadDayData'
 
 type ProtectionStatus = 'ok' | 'warning' | 'error' | 'info'
 
@@ -56,6 +58,15 @@ export function MorePage() {
   const [protectionLoading, setProtectionLoading] = useState(false)
   const [protectionChecks, setProtectionChecks] = useState<ProtectionCheck[]>([])
   const [protectionCheckedAt, setProtectionCheckedAt] = useState<Date | null>(null)
+
+  async function exportToday() {
+    try {
+      await downloadDayData(services)
+      pushAppNotification('success', 'Dados exportados', 'A cópia técnica do dia foi guardada no dispositivo.')
+    } catch {
+      pushAppNotification('error', 'Não foi possível exportar', 'Tenta novamente em Ferramentas.')
+    }
+  }
 
   async function runProtectionCheck() {
     setProtectionOpen(true)
@@ -262,28 +273,19 @@ export function MorePage() {
         <div className="moreList moreListGrouped">
           <Link to="/guia" className="moreRow">
             <span className="moreRowIcon" aria-hidden="true"><NavigationIcon name="guide" /></span>
-            <span className="moreRowCopy">
-              <strong>Guia</strong>
-              <small>Aprende a usar a aplicação</small>
-            </span>
+            <span className="moreRowCopy"><strong>Guia</strong><small>Aprende a usar a aplicação</small></span>
             <RowArrow />
           </Link>
 
           <Link to="/horas" className="moreRow">
             <span className="moreRowIcon" aria-hidden="true"><NavigationIcon name="hours" /></span>
-            <span className="moreRowCopy">
-              <strong>Horas & ausências</strong>
-              <small>Confere horas, faltas e saldo</small>
-            </span>
+            <span className="moreRowCopy"><strong>Horas & ausências</strong><small>Confere horas, faltas e saldo</small></span>
             <RowArrow />
           </Link>
 
           <Link to="/vencimento" className="moreRow">
             <span className="moreRowIcon" aria-hidden="true"><NavigationIcon name="payroll" /></span>
-            <span className="moreRowCopy">
-              <strong>Vencimento</strong>
-              <small>Consulta a estimativa do que vais receber</small>
-            </span>
+            <span className="moreRowCopy"><strong>Vencimento</strong><small>Consulta a estimativa do que vais receber</small></span>
             <RowArrow />
           </Link>
         </div>
@@ -298,30 +300,27 @@ export function MorePage() {
         <div className="moreList moreListGrouped">
           <Link to="/estatisticas" className="moreRow">
             <span className="moreRowIcon" aria-hidden="true"><NavigationIcon name="stats" /></span>
-            <span className="moreRowCopy">
-              <strong>Relatórios</strong>
-              <small>Hoje, semana e mês</small>
-            </span>
+            <span className="moreRowCopy"><strong>Relatórios</strong><small>Hoje, semana e mês</small></span>
+            <RowArrow />
+          </Link>
+
+          <Link to="/relatorio" className="moreRow">
+            <span className="moreRowIcon" aria-hidden="true"><NavigationIcon name="stats" /></span>
+            <span className="moreRowCopy"><strong>Relatório A4</strong><small>Consulta e imprime apenas o relatório do dia</small></span>
             <RowArrow />
           </Link>
 
           <Link to="/definicoes" className="moreRow">
             <span className="moreRowIcon" aria-hidden="true"><NavigationIcon name="settings" /></span>
-            <span className="moreRowCopy">
-              <strong>Definições</strong>
-              <small>Horário, pausas, tema e dados</small>
-            </span>
+            <span className="moreRowCopy"><strong>Definições</strong><small>Horário, pausas, tema e dados</small></span>
             <RowArrow />
           </Link>
 
-          <Link to="/exportar" className="moreRow">
+          <button type="button" className="moreRow moreRowButton" onClick={() => void exportToday()}>
             <span className="moreRowIcon" aria-hidden="true"><NavigationIcon name="export" /></span>
-            <span className="moreRowCopy">
-              <strong>Exportar dados</strong>
-              <small>Abre o relatório A4 para guardar em PDF</small>
-            </span>
+            <span className="moreRowCopy"><strong>Exportar dados</strong><small>Guarda uma cópia técnica do dia no dispositivo</small></span>
             <RowArrow />
-          </Link>
+          </button>
         </div>
       </section>
 
@@ -383,9 +382,7 @@ export function MorePage() {
 
               <div className="moreProtectionFooter">
                 <span>{protectionCheckedAt ? `Última verificação: ${protectionCheckedAt.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })}` : ''}</span>
-                <button type="button" className="button buttonSecondary" onClick={() => void runProtectionCheck()}>
-                  Verificar novamente
-                </button>
+                <button type="button" className="button buttonSecondary" onClick={() => void runProtectionCheck()}>Verificar novamente</button>
               </div>
             </>
           )}
