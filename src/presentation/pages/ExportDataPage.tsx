@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState, type CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
 import { buildDayReport, type DayReport } from '../../application/reports/buildDayReport'
 import { getActivityDurationMs } from '../../domain/activities/Activity'
@@ -293,7 +293,7 @@ export function ExportDataPage() {
 
             <article className="exportA4Panel exportA4Performance">
               <h3>Desempenho</h3>
-              <div className="exportA4Progress" style={{ '--progress': `${productivity * 3.6}deg` } as React.CSSProperties}>
+              <div className="exportA4Progress" style={{ '--progress': `${productivity * 3.6}deg` } as CSSProperties}>
                 <strong>{productivity}%</strong>
               </div>
               <b>Produtividade</b>
