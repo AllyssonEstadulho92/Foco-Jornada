@@ -154,16 +154,18 @@ export class AppBackupService {
 
     await this.db.transaction(
       'rw',
-      this.db.metadata,
-      this.db.journeys,
-      this.db.breaks,
-      this.db.activities,
-      this.db.focusSessions,
-      this.db.coffeeRecords,
-      this.db.stockEntities,
-      this.db.stockMovements,
-      this.db.medicationSchedules,
-      this.db.medicationDoseEvents,
+      [
+        this.db.metadata,
+        this.db.journeys,
+        this.db.breaks,
+        this.db.activities,
+        this.db.focusSessions,
+        this.db.coffeeRecords,
+        this.db.stockEntities,
+        this.db.stockMovements,
+        this.db.medicationSchedules,
+        this.db.medicationDoseEvents,
+      ],
       async () => {
         await this.db.medicationDoseEvents.clear()
         await this.db.medicationSchedules.clear()
