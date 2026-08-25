@@ -17,6 +17,9 @@ export interface AppMetadataRecord {
   updatedAt: string
 }
 
+const STICKS_ENTITY_ID = 'stock:sticks:glo'
+const MAX_SAFE_STICKS = BigInt(Number.MAX_SAFE_INTEGER)
+
 export class AppDatabase extends Dexie {
   metadata!: Table<AppMetadataRecord, string>
   journeys!: Table<Journey, string>
@@ -77,6 +80,16 @@ export class AppDatabase extends Dexie {
       stockMovements: '&id,&operationId,entityId,[entityId+sequence],type,effectiveAt,createdAt,correctionOf',
       medicationSchedules: '&id,medicationId,[medicationId+order],effectiveFrom,effectiveUntil,createdAt',
       medicationDoseEvents: '&id,&operationId,occurrenceKey,medicationId,scheduleId,status,scheduledAt,createdAt',
+    })
+
+    this.table<StockMovement, string>('stockMovements').hook('creating', (_primaryKey, movement) => {
+      if (movement.entityId !== STICKS_ENTITY_ID) return
+      const before = BigInt(movement.balanceBeforeMinor)
+      const quantity = BigInt(movement.quantityMinor)
+      const after = BigInt(movement.balanceAfterMinor)
+      if (before < 0n || after < 0n) throw new Error('Stock de sticks não pode ser negativo.')
+      if (before + quantity !== after) throw new Error('INCONSISTÊNCIA: movimento de sticks inválido.')
+      if (after > MAX_SAFE_STICKS) throw new Error('Stock de sticks excede o limite seguro suportado.')
     })
   }
 }
