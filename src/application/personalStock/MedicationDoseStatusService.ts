@@ -380,16 +380,15 @@ export class MedicationDoseStatusService {
       if (dayOffset > 0) currentDate = addCalendarDays(currentDate, 1)
       const candidates = allSchedules
         .filter((schedule) => schedule.effectiveFrom <= currentDate && (!schedule.effectiveUntil || schedule.effectiveUntil >= currentDate))
-        .map((schedule) => {
+        .flatMap((schedule) => {
           const occurrenceKey = `${schedule.id}:${currentDate}`
           const event = activeEvents.get(occurrenceKey)
-          if (event?.status === 'taken' || event?.status === 'not_taken') return null
+          if (event?.status === 'taken' || event?.status === 'not_taken') return []
           const at = event?.status === 'postponed' && event.postponedTo
             ? new Date(event.postponedTo)
             : resolveZonedLocalDateTime(currentDate, schedule.localTime, medication.timezone, schedule.fold)
-          return { schedule, at }
+          return at.getTime() > now.getTime() ? [{ schedule, at }] : []
         })
-        .filter((item): item is { schedule: (typeof allSchedules)[number]; at: Date } => Boolean(item) && item.at.getTime() > now.getTime())
         .sort((left, right) => left.at.getTime() - right.at.getTime() || left.schedule.order - right.schedule.order || left.schedule.id.localeCompare(right.schedule.id))
 
       for (const item of candidates) {
