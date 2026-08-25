@@ -1,0 +1,355 @@
+/* Correções finais de tema, contraste e alinhamento visual.
+ * Esta folha é carregada por último para neutralizar estilos legados com cores fixas.
+ */
+
+:root {
+  --text-muted: var(--muted);
+  --border-subtle: var(--line);
+  --surface-elevated: var(--surface);
+  --surface-soft: var(--surface-2);
+  --accent: var(--primary);
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #070a08;
+  --surface: #0e1511;
+  --surface-2: #141d18;
+  --surface-3: #1b2720;
+  --line: rgba(236, 246, 239, 0.13);
+  --line-strong: rgba(236, 246, 239, 0.23);
+  --text: #f5f8f6;
+  --muted: #b8c4bc;
+  --primary: #72d68a;
+  --primary-strong: #86e09a;
+  --primary-soft: rgba(114, 214, 138, 0.14);
+  --glass: rgba(7, 10, 8, 0.94);
+  --prototype-shadow: 0 18px 48px rgba(0, 0, 0, 0.48);
+  --prototype-shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.34);
+}
+
+:root[data-theme='dark'] html,
+:root[data-theme='dark'] body,
+:root[data-theme='dark'] #root,
+:root[data-theme='dark'] .appShell,
+:root[data-theme='dark'] .appMainArea,
+:root[data-theme='dark'] .appContent {
+  background: var(--bg) !important;
+  color: var(--text) !important;
+}
+
+:root[data-theme='dark'] .appTopBar,
+:root[data-theme='dark'] .bottomNav.mobileBottomBar {
+  background: var(--glass) !important;
+  border-color: var(--line) !important;
+  color: var(--text) !important;
+}
+
+:root[data-theme='dark'] .mobileDrawer,
+:root[data-theme='dark'] .mobileQuickPanel,
+:root[data-theme='dark'] .notificationPanel {
+  background: color-mix(in srgb, var(--surface) 96%, transparent) !important;
+  border-color: var(--line) !important;
+  color: var(--text) !important;
+}
+
+:root[data-theme='dark'] .mobileDrawerNav .navLink:hover,
+:root[data-theme='dark'] .mobileQuickPanel a,
+:root[data-theme='dark'] .mobileDrawerFooter strong {
+  background: var(--surface-2) !important;
+  color: var(--text) !important;
+}
+
+:root[data-theme='dark'] .mobileMenuButton,
+:root[data-theme='dark'] .notificationButton,
+:root[data-theme='dark'] .drawerThemeToggle {
+  background: transparent !important;
+  border-color: transparent !important;
+  color: var(--muted) !important;
+  box-shadow: none !important;
+}
+
+:root[data-theme='dark'] .notificationButton:hover,
+:root[data-theme='dark'] .notificationButtonActive,
+:root[data-theme='dark'] .mobileMenuButton:hover,
+:root[data-theme='dark'] .mobileMenuButton:focus-visible {
+  background: var(--primary-soft) !important;
+  color: var(--primary) !important;
+}
+
+:root[data-theme='dark'] .appContent :where(input, select, textarea) {
+  border-color: var(--line-strong) !important;
+  background: var(--surface-2) !important;
+  color: var(--text) !important;
+  caret-color: var(--primary);
+}
+
+:root[data-theme='dark'] .appContent :where(input, textarea)::placeholder {
+  color: #9eaaa2 !important;
+  opacity: 1;
+}
+
+/* Stock pessoal: elimina fundos claros residuais e mantém uma hierarquia linear. */
+.personalStockHeader p,
+.stockAppCard p,
+.stockIntegrityNote p,
+.stockProjectionPanel p,
+.stockPanel p,
+.stockMetric > span,
+.stockMetric > small,
+.stockPanelTag,
+.stockInlineForm label,
+.stockFormGrid label,
+.stockMedicationSelector small,
+.stockMedicationHero p,
+.stockMedicationHero > div > strong small,
+.stockLedgerRow small,
+.stockDoseRow small {
+  color: var(--muted) !important;
+}
+
+.personalStockHeaderActions > button,
+.stockPanel button,
+.stockDoseRow button,
+.stockMedicationSelector button {
+  border-color: var(--line) !important;
+  background: var(--surface) !important;
+  color: var(--text) !important;
+}
+
+.personalStockHeaderActions > button {
+  min-height: 48px;
+  padding-inline: 16px;
+}
+
+.personalStockHeaderActions > button:hover,
+.stockPanel button:hover,
+.stockDoseRow button:hover,
+.stockMedicationSelector button:hover {
+  border-color: var(--line-strong) !important;
+  background: var(--surface-2) !important;
+}
+
+.stockPrimaryAction {
+  border-color: transparent !important;
+  background: linear-gradient(135deg, var(--primary-strong), var(--primary)) !important;
+  color: #07110a !important;
+}
+
+:root[data-theme='dark'] .stockAppCard,
+:root[data-theme='dark'] .stockMetric,
+:root[data-theme='dark'] .stockPanel,
+:root[data-theme='dark'] .stockMedicationHero,
+:root[data-theme='dark'] .stockMedicationSelector button,
+:root[data-theme='dark'] .stockExactPanel {
+  border-color: var(--line) !important;
+  background: var(--surface) !important;
+  color: var(--text) !important;
+  box-shadow: var(--prototype-shadow-soft);
+}
+
+:root[data-theme='dark'] .stockIntegrityNote,
+:root[data-theme='dark'] .stockProjectionPanel,
+:root[data-theme='dark'] .stockMessage,
+:root[data-theme='dark'] .stockAppGlyph {
+  border-color: var(--line) !important;
+  background: var(--surface-2) !important;
+  color: var(--text) !important;
+}
+
+.stockMedicationSelector button.active {
+  border-color: var(--primary) !important;
+  background: linear-gradient(180deg, var(--primary-soft), var(--surface)) !important;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary) 45%, transparent) !important;
+}
+
+.stockMedicationHero,
+.stockMetric,
+.stockPanel,
+.stockAppCard,
+.stockIntegrityNote,
+.stockProjectionPanel {
+  overflow: hidden;
+}
+
+/* Ícones do hub de stock: mesma família, tamanho e centro óptico. */
+.stockAppGlyph {
+  display: grid;
+  width: 52px;
+  height: 52px;
+  flex: 0 0 52px;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  line-height: 0;
+}
+
+.stockAppGlyph svg {
+  display: block;
+  width: 26px;
+  height: 26px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.9;
+}
+
+.stockAppChevron {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
+  place-items: center;
+  color: var(--muted);
+  line-height: 0;
+}
+
+.stockAppChevron svg {
+  display: block;
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+}
+
+/* O seletor de tema passa a ter Sistema + Claro + Escuro. */
+.prototypeThemeSegment {
+  min-width: 286px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+/* Auditoria de alinhamento: todos os ícones de navegação partem da mesma caixa. */
+.navMark,
+.mobileBottomBar .navMark,
+.mobileDrawerNav .navMark {
+  display: grid !important;
+  place-items: center !important;
+  line-height: 0 !important;
+}
+
+.navMark svg,
+.mobileBottomBar .navMark svg,
+.mobileDrawerNav .navMark svg {
+  display: block;
+  margin: 0 auto;
+}
+
+@media (max-width: 899px) {
+  .appTopBar {
+    min-height: 72px !important;
+    align-items: center;
+  }
+
+  .mobileAppIdentity,
+  .topBarStatusGroup {
+    min-height: 44px;
+    align-items: center;
+  }
+
+  .mobileMenuButton,
+  .notificationButton {
+    display: grid !important;
+    width: 40px !important;
+    height: 40px !important;
+    flex: 0 0 40px !important;
+    place-items: center !important;
+    padding: 0 !important;
+    line-height: 0;
+  }
+
+  .mobileMenuButton svg,
+  .notificationButton svg,
+  .appClock svg {
+    display: block;
+    flex: 0 0 auto;
+    stroke-width: 1.9 !important;
+  }
+
+  .mobileMenuButton svg {
+    width: 26px !important;
+    height: 26px !important;
+  }
+
+  .notificationButton svg,
+  .appClock svg {
+    width: 21px !important;
+    height: 21px !important;
+  }
+
+  .appClock {
+    display: inline-flex;
+    min-height: 40px !important;
+    height: 40px !important;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 0 4px !important;
+    line-height: 1;
+  }
+
+  .bottomNav.mobileBottomBar {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+
+  .mobileBottomBar .navLink {
+    min-width: 0;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center;
+  }
+
+  .mobileBottomBar .navMark {
+    width: 28px !important;
+    height: 28px !important;
+    flex: 0 0 28px !important;
+    margin-inline: auto;
+  }
+
+  .mobileBottomBar .navMark svg {
+    width: 24px !important;
+    height: 24px !important;
+  }
+
+  .mobileBottomBar .navLabel {
+    width: 100%;
+    line-height: 1.15;
+    text-align: center;
+  }
+
+  .stockAppCard {
+    grid-template-columns: 52px minmax(0, 1fr) 28px;
+    align-items: center;
+  }
+
+  .personalStockHeaderActions > button {
+    width: 100%;
+  }
+
+  .prototypeThemeSegment {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 420px) {
+  .mobileAppIdentity > strong {
+    min-width: 0;
+  }
+
+  .topBarStatusGroup {
+    gap: 2px !important;
+  }
+
+  .appClock {
+    font-size: 15px !important;
+  }
+
+  .prototypeThemeSegment button {
+    padding-inline: 8px;
+    font-size: 12px;
+  }
+}
