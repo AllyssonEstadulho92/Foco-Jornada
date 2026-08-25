@@ -187,6 +187,79 @@ describe('MedicationDoseStatusService', () => {
     }
   })
 
+  it('altera a hora de uma toma adiada sem apagar o registo anterior nem alterar stock', async () => {
+    const db = makeDatabase()
+    try {
+      const { stock, medicationId, schedule } = await makeMedication(db)
+      const statuses = new MedicationDoseStatusService(db)
+      const postponed = await statuses.setMedicationDoseStatus({
+        medicationId,
+        scheduleId: schedule.id,
+        onDate: '2026-08-25',
+        operationId: operationId(),
+        status: 'postponed',
+        postponedToLocalTime: '10:30',
+      })
+
+      const changed = await statuses.replaceMedicationDoseStatus({
+        eventId: postponed.event.id,
+        operationId: operationId(),
+        status: 'postponed',
+        postponedToLocalTime: '11:45',
+      })
+
+      expect(changed.duplicated).toBe(false)
+      expect(changed.event.status).toBe('postponed')
+      expect(changed.event.postponedTo).toBe('2026-08-25T10:45:00.000Z')
+      expect(changed.event.rescheduledFrom).toBe(postponed.event.id)
+      expect((await stock.getMedicationSummary(medicationId)).stock).toBe('5')
+
+      const events = await stock.listDoseEvents(medicationId)
+      expect(events.filter((event) => event.status === 'postponed')).toHaveLength(2)
+      expect(events.filter((event) => event.status === 'corrected')).toHaveLength(1)
+
+      const forecast = await statuses.forecastMedication(medicationId, new Date('2026-08-25T08:00:00.000Z'))
+      expect(forecast.nextDose.scheduledAt).toBe('2026-08-25T10:45:00.000Z')
+
+      const taken = await statuses.confirmPostponedMedicationDose(changed.event.id, operationId())
+      expect(taken.stock).toBe('4')
+    } finally {
+      await db.delete()
+    }
+  })
+
+  it('permite trocar uma toma adiada para não tomada numa única transação auditável', async () => {
+    const db = makeDatabase()
+    try {
+      const { stock, medicationId, schedule } = await makeMedication(db)
+      const statuses = new MedicationDoseStatusService(db)
+      const postponed = await statuses.setMedicationDoseStatus({
+        medicationId,
+        scheduleId: schedule.id,
+        onDate: '2026-08-25',
+        operationId: operationId(),
+        status: 'postponed',
+        postponedToLocalTime: '10:30',
+      })
+
+      const replaced = await statuses.replaceMedicationDoseStatus({
+        eventId: postponed.event.id,
+        operationId: operationId(),
+        status: 'not_taken',
+      })
+
+      expect(replaced.event.status).toBe('not_taken')
+      expect(replaced.event.rescheduledFrom).toBe(postponed.event.id)
+      expect((await stock.getMedicationSummary(medicationId)).stock).toBe('5')
+
+      const events = await stock.listDoseEvents(medicationId)
+      expect(events.filter((event) => event.status === 'corrected')).toHaveLength(1)
+      expect(events.filter((event) => event.status === 'not_taken')).toHaveLength(1)
+    } finally {
+      await db.delete()
+    }
+  })
+
   it('trata o mesmo estado da mesma ocorrência como idempotente', async () => {
     const db = makeDatabase()
     try {
