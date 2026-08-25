@@ -53,6 +53,7 @@ import './styles/dark-contrast.css'
 import './styles/theme-polish.css'
 import './styles/stock-reconciliation.css'
 import './styles/mobile-collapse-scope.css'
+import './styles/mobile-quick-access.css'
 
 const root = document.getElementById('root')
 if (!root) throw new Error('Elemento #root não encontrado.')
