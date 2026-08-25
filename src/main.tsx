@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { AppBackupService } from './application/data/AppBackupService'
 import { MedicationDoseStatusService } from './application/personalStock/MedicationDoseStatusService'
 import { OperationalPersonalStockService } from './application/personalStock/OperationalPersonalStockService'
+import { StockReconciliationService } from './application/personalStock/StockReconciliationService'
 import { db } from './infrastructure/database/appDatabase'
 import { DexieActivityRepository } from './infrastructure/repositories/DexieActivityRepository'
 import { DexieBreakRepository } from './infrastructure/repositories/DexieBreakRepository'
@@ -50,6 +51,7 @@ import './styles/export-a4.css'
 import './styles/personal-stock.css'
 import './styles/dark-contrast.css'
 import './styles/theme-polish.css'
+import './styles/stock-reconciliation.css'
 
 const root = document.getElementById('root')
 if (!root) throw new Error('Elemento #root não encontrado.')
@@ -98,6 +100,7 @@ const services = {
   settingsRepository: new DexieSettingsRepository(db),
   personalStockService,
   medicationDoseStatusService: new MedicationDoseStatusService(db),
+  stockReconciliationService: new StockReconciliationService(db),
   backupService: new AppBackupService(db),
 }
 

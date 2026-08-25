@@ -1,34 +1,62 @@
 import { useCallback, useEffect, useState } from 'react'
-import type { StickSummary, StockMovement } from '../../domain/personalStock/models'
+import type { PhysicalStockCheck, StickSummary, StockMovement } from '../../domain/personalStock/models'
 import { useAppServices } from '../providers/AppServicesProvider'
 
 function operationId(): string {
   return globalThis.crypto.randomUUID()
 }
 
-function movementLabel(type: StockMovement['type']): string {
-  if (type === 'initial_stock') return 'Stock inicial'
-  if (type === 'consumption') return 'Utilização'
-  if (type === 'restock') return 'Reposição'
+function movementLabel(movement: StockMovement): string {
+  if (movement.type === 'initial_stock') return 'Stock inicial'
+  if (movement.type === 'consumption') return 'Utilização'
+  if (movement.type === 'restock') return 'Reposição'
+  if (movement.correctionReason === 'physical_count') return 'Reconciliação física'
+  if (movement.correctionReason === 'undo_restock') return 'Correção de reposição'
   return 'Correção'
 }
 
+function formatPhysicalCheckTime(value?: string): string {
+  if (!value) return 'Nunca verificado'
+  return new Intl.DateTimeFormat('pt-PT', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(new Date(value))
+}
+
+function adjustmentClass(value?: string): string {
+  if (!value || value === '0') return 'stockPhysicalAdjustmentZero'
+  return value.startsWith('-') ? 'stockPhysicalAdjustmentNegative' : 'stockPhysicalAdjustmentPositive'
+}
+
+function signed(value?: string): string {
+  if (!value) return '—'
+  if (value === '0' || value.startsWith('-')) return value
+  return `+${value}`
+}
+
 export function SticksStockPage() {
-  const { personalStockService } = useAppServices()
+  const { personalStockService, stockReconciliationService } = useAppServices()
   const [summary, setSummary] = useState<StickSummary | null>(null)
   const [movements, setMovements] = useState<StockMovement[]>([])
+  const [physicalCheck, setPhysicalCheck] = useState<PhysicalStockCheck | null>(null)
   const [quantity, setQuantity] = useState('20')
+  const [physicalQuantity, setPhysicalQuantity] = useState('')
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState('')
 
   const reload = useCallback(async () => {
-    const [nextSummary, nextMovements] = await Promise.all([
+    const [nextSummary, nextMovements, nextPhysicalCheck] = await Promise.all([
       personalStockService.getSticksSummary(),
       personalStockService.listStickMovements(30),
+      stockReconciliationService.getPhysicalCheck('stock:sticks:glo'),
     ])
     setSummary(nextSummary)
     setMovements(nextMovements)
-  }, [personalStockService])
+    setPhysicalCheck(nextPhysicalCheck)
+  }, [personalStockService, stockReconciliationService])
 
   useEffect(() => {
     void reload().catch((error: unknown) => setMessage(error instanceof Error ? error.message : 'Erro ao carregar o stock.'))
@@ -51,6 +79,8 @@ export function SticksStockPage() {
 
   const parsedQuantity = Number(quantity)
   const canSubmitQuantity = Number.isSafeInteger(parsedQuantity) && parsedQuantity > 0
+  const canSubmitPhysical = /^\d+$/.test(physicalQuantity.trim())
+    && BigInt(physicalQuantity.trim() || '0') <= BigInt(Number.MAX_SAFE_INTEGER)
 
   return (
     <section className="personalStockPage sticksStockPage" aria-labelledby="sticks-title">
@@ -77,6 +107,11 @@ export function SticksStockPage() {
           <span>Reconciliação</span>
           <strong>{summary?.ok ? 'OK' : 'INCONSISTÊNCIA'}</strong>
           <small>{summary?.movementCount ?? 0} movimentos</small>
+        </article>
+        <article className="stockMetric">
+          <span>Última contagem física</span>
+          <strong>{physicalCheck ? physicalCheck.counted : '—'}</strong>
+          <small>{formatPhysicalCheckTime(physicalCheck?.checkedAt)}</small>
         </article>
       </div>
 
@@ -133,25 +168,85 @@ export function SticksStockPage() {
             </button>
           </section>
 
-          <section className="stockPanel">
-            <h2>Adicionar stock</h2>
-            <div className="stockInlineForm">
-              <label>
-                Sticks a adicionar
-                <input inputMode="numeric" value={quantity} onChange={(event) => setQuantity(event.target.value)} />
-              </label>
-              <button
-                type="button"
-                disabled={busy || !canSubmitQuantity}
-                onClick={() => void run(
-                  () => personalStockService.restockSticks(parsedQuantity, operationId()),
-                  'Reposição adicionada ao ledger.',
-                )}
-              >
-                Adicionar
-              </button>
-            </div>
-          </section>
+          <div className="stockTwoPanels">
+            <section className="stockPanel">
+              <h2>Adicionar stock</h2>
+              <div className="stockInlineForm stockInlineFormStack">
+                <label>
+                  Sticks a adicionar
+                  <input inputMode="numeric" value={quantity} onChange={(event) => setQuantity(event.target.value)} />
+                </label>
+                <button
+                  type="button"
+                  disabled={busy || !canSubmitQuantity}
+                  onClick={() => void run(
+                    () => personalStockService.restockSticks(parsedQuantity, operationId()),
+                    'Reposição adicionada ao ledger.',
+                  )}
+                >
+                  Adicionar
+                </button>
+              </div>
+              <div className="stockCorrectionActions">
+                <button
+                  type="button"
+                  className="stockSecondaryAction"
+                  disabled={busy}
+                  onClick={() => void run(
+                    () => stockReconciliationService.undoLastStickRestock(operationId()),
+                    'Última reposição corrigida através de um novo movimento auditável.',
+                  )}
+                >
+                  Corrigir última reposição
+                </button>
+              </div>
+            </section>
+
+            <section className="stockPanel stockPhysicalPanel">
+              <span className="stockPanelTag">CONFERÊNCIA REAL</span>
+              <h2>Contagem física</h2>
+              <p>Conta os sticks que tens fisicamente. Se existir diferença, a aplicação cria uma correção no ledger; nunca altera o saldo silenciosamente.</p>
+              <div className="stockInlineForm stockInlineFormStack stockPhysicalInline">
+                <label>
+                  Quantidade contada
+                  <input
+                    inputMode="numeric"
+                    placeholder="ex.: 18"
+                    value={physicalQuantity}
+                    onChange={(event) => setPhysicalQuantity(event.target.value)}
+                  />
+                </label>
+                <button
+                  type="button"
+                  className="stockPrimaryAction"
+                  disabled={busy || !canSubmitPhysical}
+                  onClick={() => void run(
+                    async () => {
+                      await stockReconciliationService.reconcileSticksPhysicalCount(physicalQuantity, operationId())
+                      setPhysicalQuantity('')
+                    },
+                    'Contagem física guardada. O saldo ficou reconciliado com a quantidade contada.',
+                  )}
+                >
+                  Reconciliar contagem
+                </button>
+              </div>
+
+              {physicalCheck ? (
+                <>
+                  <div className="stockPhysicalGrid" aria-label="Última conferência física">
+                    <div className="stockPhysicalMetric"><span>Calculado antes</span><strong>{physicalCheck.expected}</strong></div>
+                    <div className="stockPhysicalMetric"><span>Contado</span><strong>{physicalCheck.counted}</strong></div>
+                    <div className="stockPhysicalMetric">
+                      <span>Ajuste aplicado</span>
+                      <strong className={adjustmentClass(physicalCheck.adjustment)}>{signed(physicalCheck.adjustment)}</strong>
+                    </div>
+                  </div>
+                  <p className="stockPhysicalCheckTime">Verificado em {formatPhysicalCheckTime(physicalCheck.checkedAt)}.</p>
+                </>
+              ) : null}
+            </section>
+          </div>
         </>
       )}
 
@@ -169,7 +264,7 @@ export function SticksStockPage() {
             {movements.map((movement) => (
               <article className="stockLedgerRow" key={movement.id}>
                 <div>
-                  <strong>{movementLabel(movement.type)}</strong>
+                  <strong>{movementLabel(movement)}</strong>
                   <small>{new Date(movement.effectiveAt).toLocaleString('pt-PT')}</small>
                 </div>
                 <div className="stockLedgerMath">

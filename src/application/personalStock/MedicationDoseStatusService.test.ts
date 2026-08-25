@@ -68,7 +68,7 @@ describe('MedicationDoseStatusService', () => {
     }
   })
 
-  it('regista uma toma adiada sem descontar stock e bloqueia um segundo estado ativo', async () => {
+  it('regista uma toma adiada com nova hora sem descontar stock e bloqueia um segundo estado ativo', async () => {
     const db = makeDatabase()
     try {
       const { stock, medicationId, schedule } = await makeMedication(db)
@@ -80,9 +80,11 @@ describe('MedicationDoseStatusService', () => {
         onDate: '2026-08-25',
         operationId: operationId(),
         status: 'postponed',
+        postponedToLocalTime: '10:30',
       })
 
       expect(postponed.event.status).toBe('postponed')
+      expect(postponed.event.postponedTo).toBe('2026-08-25T09:30:00.000Z')
       expect((await stock.getMedicationSummary(medicationId)).stock).toBe('5')
 
       await expect(statuses.setMedicationDoseStatus({
@@ -94,6 +96,92 @@ describe('MedicationDoseStatusService', () => {
       })).rejects.toThrow('já está marcada como adiada')
 
       expect(await stock.listDoseEvents(medicationId)).toHaveLength(1)
+    } finally {
+      await db.delete()
+    }
+  })
+
+  it('obriga a escolher uma nova hora posterior ao horário original', async () => {
+    const db = makeDatabase()
+    try {
+      const { medicationId, schedule } = await makeMedication(db)
+      const statuses = new MedicationDoseStatusService(db)
+
+      await expect(statuses.setMedicationDoseStatus({
+        medicationId,
+        scheduleId: schedule.id,
+        onDate: '2026-08-25',
+        operationId: operationId(),
+        status: 'postponed',
+      })).rejects.toThrow('Escolhe a nova hora')
+
+      await expect(statuses.setMedicationDoseStatus({
+        medicationId,
+        scheduleId: schedule.id,
+        onDate: '2026-08-25',
+        operationId: operationId(),
+        status: 'postponed',
+        postponedToLocalTime: '07:30',
+      })).rejects.toThrow('posterior')
+    } finally {
+      await db.delete()
+    }
+  })
+
+  it('confirma uma toma adiada uma única vez e mantém o reagendamento auditável', async () => {
+    const db = makeDatabase()
+    try {
+      const { stock, medicationId, schedule } = await makeMedication(db)
+      const statuses = new MedicationDoseStatusService(db)
+      const postponed = await statuses.setMedicationDoseStatus({
+        medicationId,
+        scheduleId: schedule.id,
+        onDate: '2026-08-25',
+        operationId: operationId(),
+        status: 'postponed',
+        postponedToLocalTime: '10:30',
+      })
+
+      const confirmOperation = operationId()
+      const first = await statuses.confirmPostponedMedicationDose(postponed.event.id, confirmOperation)
+      const second = await statuses.confirmPostponedMedicationDose(postponed.event.id, confirmOperation)
+
+      expect(first.duplicated).toBe(false)
+      expect(first.stock).toBe('4')
+      expect(first.event.status).toBe('taken')
+      expect(first.event.scheduledAt).toBe('2026-08-25T09:30:00.000Z')
+      expect(first.event.rescheduledFrom).toBe(postponed.event.id)
+      expect(second.duplicated).toBe(true)
+      expect(second.stock).toBe('4')
+      expect((await stock.getMedicationSummary(medicationId)).movementCount).toBe(2)
+
+      const events = await stock.listDoseEvents(medicationId)
+      expect(events.filter((event) => event.status === 'postponed')).toHaveLength(1)
+      expect(events.filter((event) => event.status === 'corrected')).toHaveLength(1)
+      expect(events.filter((event) => event.status === 'taken')).toHaveLength(1)
+    } finally {
+      await db.delete()
+    }
+  })
+
+  it('inclui a nova hora de uma toma adiada na simulação cronológica', async () => {
+    const db = makeDatabase()
+    try {
+      const { medicationId, schedule } = await makeMedication(db)
+      const statuses = new MedicationDoseStatusService(db)
+      await statuses.setMedicationDoseStatus({
+        medicationId,
+        scheduleId: schedule.id,
+        onDate: '2026-08-25',
+        operationId: operationId(),
+        status: 'postponed',
+        postponedToLocalTime: '10:30',
+      })
+
+      const forecast = await statuses.forecastMedication(medicationId, new Date('2026-08-25T08:00:00.000Z'))
+      expect(forecast.nextDose.scheduledAt).toBe('2026-08-25T09:30:00.000Z')
+      expect(forecast.nextDose.quantity).toBe('1')
+      expect(forecast.exact).toBe(true)
     } finally {
       await db.delete()
     }
@@ -146,6 +234,7 @@ describe('MedicationDoseStatusService', () => {
         onDate: '2026-08-25',
         operationId: operationId(),
         status: 'postponed',
+        postponedToLocalTime: '10:30',
       })).rejects.toThrow('já está marcada como tomada')
       expect((await stock.getMedicationSummary(medicationId)).stock).toBe('4')
     } finally {
