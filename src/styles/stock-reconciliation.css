@@ -266,6 +266,10 @@
   position: relative;
 }
 
+.stockDoseQuickActions > .stockDoseMenuRoot:only-child {
+  margin-left: auto;
+}
+
 .stockDoseMenuButton {
   display: grid;
   width: 44px;
@@ -283,13 +287,17 @@
   top: calc(100% + 6px);
   right: 0;
   display: grid;
-  width: min(260px, calc(100vw - 48px));
+  box-sizing: border-box;
+  width: min(280px, calc(100vw - 32px));
+  max-width: calc(100vw - 32px);
   gap: 3px;
   padding: 6px;
+  overflow: hidden;
   border: 1px solid var(--line-strong);
   border-radius: 14px;
   background: var(--surface);
   box-shadow: 0 16px 42px rgba(0, 0, 0, .18);
+  transform-origin: top right;
 }
 
 .stockDoseMenu button {
@@ -300,6 +308,8 @@
   background: transparent !important;
   color: var(--text) !important;
   text-align: left;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .stockDoseMenu button:hover,
@@ -430,8 +440,16 @@
     justify-self: end;
   }
 
+  .stockDoseQuickActions > .stockDoseMenuRoot:only-child {
+    grid-column: -2 / -1;
+    justify-self: end;
+    margin-left: 0;
+  }
+
   .stockDoseMenu {
     right: 0;
+    width: min(300px, calc(100vw - 32px));
+    max-width: calc(100vw - 32px);
   }
 
   .stockPostponeEditor {
@@ -453,6 +471,10 @@
 
   .stockDoseQuickActions > button.stockPrimaryAction {
     grid-column: 1 / -1;
+  }
+
+  .stockDoseQuickActions > .stockDoseMenuRoot:only-child {
+    grid-column: 2;
   }
 
   .stockPostponePresets {
