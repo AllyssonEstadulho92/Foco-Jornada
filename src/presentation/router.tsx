@@ -5,6 +5,7 @@ import { ExportDataPage } from './pages/ExportDataPage'
 import { FocusPage } from './pages/FocusPage'
 import { GuidePage } from './pages/GuidePage'
 import { HistoryPage } from './pages/HistoryPage'
+import { MedicationActionsGuidePage } from './pages/MedicationActionsGuidePage'
 import { MedicationsStockPage } from './pages/MedicationsStockPage'
 import { MoreWithBackupPage } from './pages/MoreWithBackupPage'
 import { PayrollPage } from './pages/PayrollPage'
@@ -32,6 +33,7 @@ export const router = createHashRouter([
       { path: 'medicamentos', element: <MedicationsStockPage /> },
       { path: 'sticks', element: <SticksStockPage /> },
       { path: 'guia', element: <GuidePage /> },
+      { path: 'guia/medicamentos', element: <MedicationActionsGuidePage /> },
       { path: 'vencimento', element: <PayrollReferencePage /> },
       { path: 'vencimento/configurar', element: <PayrollPage /> },
       { path: 'horas', element: <WorkHoursCalculatorPage /> },
