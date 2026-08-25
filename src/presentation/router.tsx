@@ -3,7 +3,7 @@ import { AppShell } from './layouts/AppShell'
 import { ActivitiesPage } from './pages/ActivitiesPage'
 import { ExportDataPage } from './pages/ExportDataPage'
 import { FocusPage } from './pages/FocusPage'
-import { GuidePage } from './pages/GuidePage'
+import { GuideWithMedicationPage } from './pages/GuideWithMedicationPage'
 import { HistoryPage } from './pages/HistoryPage'
 import { MedicationActionsGuidePage } from './pages/MedicationActionsGuidePage'
 import { MedicationsStockPage } from './pages/MedicationsStockPage'
@@ -32,7 +32,7 @@ export const router = createHashRouter([
       { path: 'stock', element: <PersonalStockHubPage /> },
       { path: 'medicamentos', element: <MedicationsStockPage /> },
       { path: 'sticks', element: <SticksStockPage /> },
-      { path: 'guia', element: <GuidePage /> },
+      { path: 'guia', element: <GuideWithMedicationPage /> },
       { path: 'guia/medicamentos', element: <MedicationActionsGuidePage /> },
       { path: 'vencimento', element: <PayrollReferencePage /> },
       { path: 'vencimento/configurar', element: <PayrollPage /> },
