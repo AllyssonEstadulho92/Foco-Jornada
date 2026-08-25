@@ -8,6 +8,7 @@ import type { FocusRepository } from '../../application/focus/FocusRepository'
 import type { JourneyRepository } from '../../application/journey/JourneyRepository'
 import type { MedicationDoseStatusService } from '../../application/personalStock/MedicationDoseStatusService'
 import type { PersonalStockService } from '../../application/personalStock/PersonalStockService'
+import type { StockReconciliationService } from '../../application/personalStock/StockReconciliationService'
 import type { SettingsRepository } from '../../application/settings/SettingsRepository'
 
 export interface AppServices {
@@ -19,12 +20,14 @@ export interface AppServices {
   settingsRepository: SettingsRepository
   personalStockService?: PersonalStockService
   medicationDoseStatusService?: MedicationDoseStatusService
+  stockReconciliationService?: StockReconciliationService
   backupService?: AppBackupService
 }
 
 type RuntimeAppServices = AppServices & {
   personalStockService: PersonalStockService
   medicationDoseStatusService: MedicationDoseStatusService
+  stockReconciliationService: StockReconciliationService
   backupService: AppBackupService
 }
 
