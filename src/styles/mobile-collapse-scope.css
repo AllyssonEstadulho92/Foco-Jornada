@@ -1,7 +1,8 @@
 /*
- * O estado de recolha pertence apenas à sidebar de desktop.
- * No mobile, o mesmo estado persistido não pode esconder rótulos nem centrar
- * os ícones do drawer como se este fosse a sidebar recolhida.
+ * Ajustes finais de estabilidade para mobile.
+ * 1) O estado de recolha pertence apenas à sidebar de desktop.
+ * 2) O botão ··· das tomas fica sempre na mesma posição, no canto direito
+ *    da grelha de ações, mesmo quando o estado da toma muda ou o menu abre.
  */
 @media (max-width: 899px) {
   .appShellCollapsed .mobileDrawer .navLabel,
@@ -19,5 +20,75 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+}
+
+@media (max-width: 720px) {
+  .stockDoseQuickActions {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) 44px !important;
+    grid-auto-flow: row;
+    width: 100%;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .stockDoseQuickActions > button:not(.stockDoseMenuButton) {
+    grid-row: 1;
+    min-width: 0;
+    width: 100%;
+    min-height: 44px;
+    white-space: normal;
+    line-height: 1.2;
+  }
+
+  .stockDoseMenuRoot,
+  .stockDoseQuickActions > .stockDoseMenuRoot:only-child {
+    display: contents !important;
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    margin: 0 !important;
+  }
+
+  .stockDoseMenuButton {
+    grid-column: 3 !important;
+    grid-row: 1 !important;
+    width: 44px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    justify-self: end !important;
+    align-self: start;
+    margin: 0 !important;
+  }
+
+  .stockDoseMenu {
+    grid-column: 1 / -1 !important;
+    grid-row: 2 !important;
+    position: static !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-top: 0 !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .stockDoseQuickActions {
+    grid-template-columns: minmax(0, 1fr) 44px !important;
+  }
+
+  .stockDoseQuickActions > button:not(.stockDoseMenuButton) {
+    grid-column: 1 !important;
+    grid-row: auto;
+  }
+
+  .stockDoseMenuButton {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+  }
+
+  .stockDoseMenu {
+    grid-column: 1 / -1 !important;
+    grid-row: auto !important;
   }
 }
