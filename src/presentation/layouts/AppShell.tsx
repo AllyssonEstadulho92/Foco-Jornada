@@ -5,6 +5,13 @@ import { NavigationIcon } from '../navigation/NavigationIcon'
 import { primaryNavigation, secondaryNavigation, type NavigationItem } from '../navigation/navigationItems'
 import { useUiStore } from '../store/useUiStore'
 
+type ResolvedTheme = 'light' | 'dark'
+
+function systemTheme(): ResolvedTheme {
+  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return 'light'
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+}
+
 function NavigationLink({ item, compact = false }: { item: NavigationItem; compact?: boolean }) {
   return (
     <NavLink
@@ -75,17 +82,31 @@ export function AppShell() {
   const toggleTheme = useUiStore((state) => state.toggleTheme)
   const location = useLocation()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [deviceTheme, setDeviceTheme] = useState<ResolvedTheme>(systemTheme)
+  const resolvedTheme: ResolvedTheme = theme === 'system' ? deviceTheme : theme
 
   useEffect(() => {
     setMobileMenuOpen(false)
   }, [location.pathname, location.search])
 
   useEffect(() => {
-    document.documentElement.dataset.theme = theme
-    document.documentElement.style.colorScheme = theme
-    const themeColor = theme === 'dark' ? '#090c0b' : '#f7f8f6'
+    if (typeof window.matchMedia !== 'function') return
+    const media = window.matchMedia('(prefers-color-scheme: dark)')
+    const syncTheme = () => setDeviceTheme(media.matches ? 'dark' : 'light')
+    syncTheme()
+    media.addEventListener('change', syncTheme)
+    return () => media.removeEventListener('change', syncTheme)
+  }, [])
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = resolvedTheme
+    document.documentElement.style.colorScheme = resolvedTheme
+    const themeColor = resolvedTheme === 'dark' ? '#070a08' : '#f7f8f6'
     document.querySelector('meta[name="theme-color"]')?.setAttribute('content', themeColor)
-  }, [theme])
+    document
+      .querySelector('meta[name="apple-mobile-web-app-status-bar-style"]')
+      ?.setAttribute('content', resolvedTheme === 'dark' ? 'black-translucent' : 'default')
+  }, [resolvedTheme])
 
   useEffect(() => {
     if (!mobileMenuOpen) return
@@ -147,10 +168,18 @@ export function AppShell() {
             <section className="prototypeThemeCard" aria-label="Tema da aplicação">
               <div>
                 <span>TEMA</span>
-                <strong>Escolhe o tema</strong>
-                <small>Claro ou escuro. A escolha fica guardada.</small>
+                <strong>Escolhe a aparência</strong>
+                <small>Sistema acompanha automaticamente o tema claro ou escuro do telemóvel.</small>
               </div>
               <div className="prototypeThemeSegment" role="group" aria-label="Escolher tema">
+                <button
+                  type="button"
+                  className={theme === 'system' ? 'prototypeThemeActive' : ''}
+                  onClick={() => setTheme('system')}
+                  aria-pressed={theme === 'system'}
+                >
+                  Sistema
+                </button>
                 <button
                   type="button"
                   className={theme === 'light' ? 'prototypeThemeActive' : ''}
@@ -215,7 +244,11 @@ export function AppShell() {
         <footer className="mobileDrawerFooter">
           <button className="drawerThemeToggle" type="button" onClick={toggleTheme}>
             <span>Tema</span>
-            <strong>{theme === 'light' ? 'Claro' : 'Escuro'}</strong>
+            <strong>
+              {theme === 'system'
+                ? `Sistema · ${resolvedTheme === 'dark' ? 'Escuro' : 'Claro'}`
+                : theme === 'light' ? 'Claro' : 'Escuro'}
+            </strong>
           </button>
           <span>Versão <strong>V1</strong></span>
         </footer>
