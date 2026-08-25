@@ -49,6 +49,7 @@ import './styles/settings-functional.css'
 import './styles/export-a4.css'
 import './styles/personal-stock.css'
 import './styles/dark-contrast.css'
+import './styles/theme-polish.css'
 
 const root = document.getElementById('root')
 if (!root) throw new Error('Elemento #root não encontrado.')
