@@ -68,7 +68,7 @@ describe('OperationalPersonalStockService', () => {
     }
   })
 
-  it('bloqueia confirmação de uma toma enquanto estiver adiada', async () => {
+  it('bloqueia a confirmação no horário original enquanto a toma estiver adiada', async () => {
     const db = makeDatabase()
     try {
       const { stock, medicationId, schedule } = await prepareMedication(db)
@@ -79,6 +79,7 @@ describe('OperationalPersonalStockService', () => {
         onDate: '2026-08-25',
         operationId: operationId(),
         status: 'postponed',
+        postponedToLocalTime: '10:00',
       })
 
       await expect(stock.confirmMedicationDose({
