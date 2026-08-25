@@ -1,5 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import { AppBackupService } from './application/data/AppBackupService'
+import { MedicationDoseStatusService } from './application/personalStock/MedicationDoseStatusService'
 import { PersonalStockService } from './application/personalStock/PersonalStockService'
 import { db } from './infrastructure/database/appDatabase'
 import { DexieActivityRepository } from './infrastructure/repositories/DexieActivityRepository'
@@ -84,6 +86,8 @@ function keepInstalledPwaCurrent() {
 
 keepInstalledPwaCurrent()
 
+const personalStockService = new PersonalStockService(db)
+
 const services = {
   journeyRepository: new DexieJourneyRepository(db),
   breakRepository: new DexieBreakRepository(db),
@@ -91,7 +95,9 @@ const services = {
   focusRepository: new DexieFocusRepository(db),
   coffeeRepository: new DexieCoffeeRepository(db),
   settingsRepository: new DexieSettingsRepository(db),
-  personalStockService: new PersonalStockService(db),
+  personalStockService,
+  medicationDoseStatusService: new MedicationDoseStatusService(db),
+  backupService: new AppBackupService(db),
 }
 
 createRoot(root).render(
