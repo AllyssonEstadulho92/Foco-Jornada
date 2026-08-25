@@ -60,6 +60,190 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
 
+function requiredString(value: unknown, label: string): string {
+  if (typeof value !== 'string' || !value) throw new Error(`Cópia inválida: ${label}.`)
+  return value
+}
+
+function integerString(value: unknown, label: string): bigint {
+  const text = requiredString(value, label)
+  try {
+    return BigInt(text)
+  } catch {
+    throw new Error(`Cópia inválida: ${label} não é um número inteiro.`)
+  }
+}
+
+function ensureUnique(values: string[], label: string) {
+  const seen = new Set<string>()
+  for (const value of values) {
+    if (seen.has(value)) throw new Error(`Cópia inválida: ${label} duplicado (${value}).`)
+    seen.add(value)
+  }
+}
+
+function validateStockBackup(payload: AppBackupPayload) {
+  const entities = payload.tables.stockEntities
+  const movements = payload.tables.stockMovements
+  const schedules = payload.tables.medicationSchedules
+  const events = payload.tables.medicationDoseEvents
+
+  for (const entity of entities) {
+    if (!isRecord(entity)) throw new Error('Cópia inválida: entidade de stock malformada.')
+    requiredString(entity.id, 'id da entidade de stock')
+    if (entity.kind !== 'sticks' && entity.kind !== 'medication') {
+      throw new Error('Cópia inválida: tipo de entidade de stock desconhecido.')
+    }
+  }
+  ensureUnique(entities.map((entity) => entity.id), 'id de entidade de stock')
+  const entityById = new Map(entities.map((entity) => [entity.id, entity]))
+
+  for (const movement of movements) {
+    if (!isRecord(movement)) throw new Error('Cópia inválida: movimento de stock malformado.')
+    requiredString(movement.id, 'id do movimento')
+    requiredString(movement.operationId, 'operationId do movimento')
+    requiredString(movement.entityId, 'entidade do movimento')
+    if (!entityById.has(movement.entityId)) {
+      throw new Error(`Cópia inválida: movimento ${movement.id} refere uma entidade inexistente.`)
+    }
+    if (!['initial_stock', 'consumption', 'restock', 'correction'].includes(movement.type)) {
+      throw new Error(`Cópia inválida: tipo do movimento ${movement.id} desconhecido.`)
+    }
+    if (!Number.isSafeInteger(movement.sequence) || movement.sequence < 0) {
+      throw new Error(`Cópia inválida: sequência do movimento ${movement.id}.`)
+    }
+    integerString(movement.quantityMinor, `quantidade do movimento ${movement.id}`)
+    integerString(movement.balanceBeforeMinor, `saldo anterior do movimento ${movement.id}`)
+    integerString(movement.balanceAfterMinor, `saldo posterior do movimento ${movement.id}`)
+  }
+  ensureUnique(movements.map((movement) => movement.id), 'id de movimento')
+  ensureUnique(movements.map((movement) => movement.operationId), 'operationId de movimento')
+  const movementById = new Map(movements.map((movement) => [movement.id, movement]))
+
+  const movementsByEntity = new Map<string, StockMovement[]>()
+  for (const movement of movements) {
+    const group = movementsByEntity.get(movement.entityId) ?? []
+    group.push(movement)
+    movementsByEntity.set(movement.entityId, group)
+  }
+
+  for (const [entityId, group] of movementsByEntity) {
+    const ordered = [...group].sort((left, right) => left.sequence - right.sequence || left.id.localeCompare(right.id))
+    let balance = 0n
+    ordered.forEach((movement, index) => {
+      if (movement.sequence !== index) {
+        throw new Error(`Cópia inválida: sequência do ledger interrompida em ${entityId}.`)
+      }
+      const quantity = integerString(movement.quantityMinor, `quantidade do movimento ${movement.id}`)
+      const before = integerString(movement.balanceBeforeMinor, `saldo anterior do movimento ${movement.id}`)
+      const after = integerString(movement.balanceAfterMinor, `saldo posterior do movimento ${movement.id}`)
+      if (before !== balance) throw new Error(`Cópia inválida: saldo anterior incoerente em ${movement.id}.`)
+      if (movement.type === 'initial_stock' && (index !== 0 || quantity <= 0n)) {
+        throw new Error(`Cópia inválida: stock inicial incoerente em ${movement.id}.`)
+      }
+      if (movement.type === 'restock' && quantity <= 0n) {
+        throw new Error(`Cópia inválida: reposição não positiva em ${movement.id}.`)
+      }
+      if (movement.type === 'consumption' && quantity >= 0n) {
+        throw new Error(`Cópia inválida: consumo não negativo em ${movement.id}.`)
+      }
+      if (movement.type === 'correction' && quantity === 0n) {
+        throw new Error(`Cópia inválida: correção nula em ${movement.id}.`)
+      }
+      if (movement.type !== 'correction' && movement.correctionOf) {
+        throw new Error(`Cópia inválida: correctionOf indevido em ${movement.id}.`)
+      }
+      balance += quantity
+      if (balance < 0n) throw new Error(`Cópia inválida: ledger negativo em ${movement.id}.`)
+      if (after !== balance) throw new Error(`Cópia inválida: saldo posterior incoerente em ${movement.id}.`)
+    })
+  }
+
+  for (const movement of movements) {
+    if (!movement.correctionOf) continue
+    const target = movementById.get(movement.correctionOf)
+    if (!target || target.entityId !== movement.entityId) {
+      throw new Error(`Cópia inválida: correção ${movement.id} refere um movimento inexistente.`)
+    }
+  }
+
+  for (const schedule of schedules) {
+    if (!isRecord(schedule)) throw new Error('Cópia inválida: horário de medicação malformado.')
+    requiredString(schedule.id, 'id do horário')
+    requiredString(schedule.medicationId, 'medicamento do horário')
+    const medication = entityById.get(schedule.medicationId)
+    if (!medication || medication.kind !== 'medication') {
+      throw new Error(`Cópia inválida: horário ${schedule.id} refere um medicamento inexistente.`)
+    }
+    if (integerString(schedule.quantityMinor, `quantidade do horário ${schedule.id}`) <= 0n) {
+      throw new Error(`Cópia inválida: quantidade não positiva no horário ${schedule.id}.`)
+    }
+  }
+  ensureUnique(schedules.map((schedule) => schedule.id), 'id de horário')
+  const scheduleById = new Map(schedules.map((schedule) => [schedule.id, schedule]))
+
+  for (const event of events) {
+    if (!isRecord(event)) throw new Error('Cópia inválida: evento de toma malformado.')
+    requiredString(event.id, 'id do evento de toma')
+    requiredString(event.operationId, 'operationId do evento de toma')
+    requiredString(event.occurrenceKey, 'ocorrência do evento de toma')
+    requiredString(event.medicationId, 'medicamento do evento de toma')
+    requiredString(event.scheduleId, 'horário do evento de toma')
+    const medication = entityById.get(event.medicationId)
+    const schedule = scheduleById.get(event.scheduleId)
+    if (!medication || medication.kind !== 'medication' || !schedule || schedule.medicationId !== event.medicationId) {
+      throw new Error(`Cópia inválida: evento ${event.id} tem referências de medicação incoerentes.`)
+    }
+    if (!['taken', 'not_taken', 'postponed', 'corrected'].includes(event.status)) {
+      throw new Error(`Cópia inválida: estado desconhecido no evento ${event.id}.`)
+    }
+    const quantity = integerString(event.quantityMinor, `quantidade do evento ${event.id}`)
+    if (quantity <= 0n) throw new Error(`Cópia inválida: quantidade não positiva no evento ${event.id}.`)
+
+    if (event.status === 'taken') {
+      const stockMovementId = requiredString(event.stockMovementId, `movimento de stock do evento ${event.id}`)
+      const stockMovement = movementById.get(stockMovementId)
+      if (
+        !stockMovement
+        || stockMovement.entityId !== event.medicationId
+        || stockMovement.type !== 'consumption'
+        || stockMovement.operationId !== event.operationId
+        || integerString(stockMovement.quantityMinor, `quantidade do movimento ${stockMovement.id}`) !== -quantity
+      ) {
+        throw new Error(`Cópia inválida: consumo associado ao evento ${event.id} é incoerente.`)
+      }
+    }
+
+    if ((event.status === 'not_taken' || event.status === 'postponed') && event.stockMovementId) {
+      throw new Error(`Cópia inválida: evento ${event.id} não deve alterar stock.`)
+    }
+
+    if (event.status === 'corrected' && !event.correctionOf) {
+      throw new Error(`Cópia inválida: evento corrigido ${event.id} não identifica o evento original.`)
+    }
+    if (event.status !== 'corrected' && event.correctionOf) {
+      throw new Error(`Cópia inválida: correctionOf indevido no evento ${event.id}.`)
+    }
+  }
+  ensureUnique(events.map((event) => event.id), 'id de evento de toma')
+  ensureUnique(events.map((event) => event.operationId), 'operationId de evento de toma')
+  const eventById = new Map(events.map((event) => [event.id, event]))
+
+  for (const event of events) {
+    if (event.status !== 'corrected' || !event.correctionOf) continue
+    const target = eventById.get(event.correctionOf)
+    if (!target || target.occurrenceKey !== event.occurrenceKey || target.medicationId !== event.medicationId) {
+      throw new Error(`Cópia inválida: correção do evento ${event.id} refere uma toma inexistente.`)
+    }
+    if (event.stockMovementId) {
+      const movement = movementById.get(event.stockMovementId)
+      if (!movement || movement.type !== 'correction' || movement.entityId !== event.medicationId) {
+        throw new Error(`Cópia inválida: movimento de correção do evento ${event.id} é incoerente.`)
+      }
+    }
+  }
+}
+
 function parseBackup(text: string): AppBackupPayload {
   let parsed: unknown
   try {
@@ -93,7 +277,9 @@ function parseBackup(text: string): AppBackupPayload {
     }
   }
 
-  return parsed as unknown as AppBackupPayload
+  const payload = parsed as unknown as AppBackupPayload
+  validateStockBackup(payload)
+  return payload
 }
 
 export class AppBackupService {
