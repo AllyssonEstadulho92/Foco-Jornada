@@ -15,7 +15,7 @@ export interface AppServices {
   focusRepository: FocusRepository
   coffeeRepository: CoffeeRepository
   settingsRepository: SettingsRepository
-  personalStockService: PersonalStockService
+  personalStockService?: PersonalStockService
 }
 
 const AppServicesContext = createContext<AppServices | null>(null)
