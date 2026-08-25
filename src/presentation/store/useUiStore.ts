@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-export type AppTheme = 'light' | 'dark'
+export type AppTheme = 'system' | 'light' | 'dark'
 
 interface UiState {
   sidebarCollapsed: boolean
@@ -16,11 +16,11 @@ export const useUiStore = create<UiState>()(
   persist(
     (set) => ({
       sidebarCollapsed: false,
-      theme: 'light',
+      theme: 'system',
       toggleSidebar: () => set((state) => ({ sidebarCollapsed: !state.sidebarCollapsed })),
       setSidebarCollapsed: (sidebarCollapsed) => set({ sidebarCollapsed }),
       setTheme: (theme) => set({ theme }),
-      toggleTheme: () => set((state) => ({ theme: state.theme === 'light' ? 'dark' : 'light' })),
+      toggleTheme: () => set((state) => ({ theme: state.theme === 'dark' ? 'light' : 'dark' })),
     }),
     {
       name: 'foco-jornada-ui-v2',
