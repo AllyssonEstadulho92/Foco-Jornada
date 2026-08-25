@@ -1,7 +1,16 @@
 export class NonexistentLocalTimeError extends Error {}
 export class AmbiguousLocalTimeError extends Error {}
 
-function partsInZone(date: Date, timeZone: string) {
+interface ZonedParts {
+  year: number
+  month: number
+  day: number
+  hour: number
+  minute: number
+  second: number
+}
+
+function partsInZone(date: Date, timeZone: string): ZonedParts {
   const formatter = new Intl.DateTimeFormat('en-GB', {
     timeZone,
     year: 'numeric',
@@ -25,6 +34,28 @@ function partsInZone(date: Date, timeZone: string) {
   }
 }
 
+function offsetAt(epochMs: number, timeZone: string): number {
+  const parts = partsInZone(new Date(epochMs), timeZone)
+  const representedAsUtc = Date.UTC(
+    parts.year,
+    parts.month - 1,
+    parts.day,
+    parts.hour,
+    parts.minute,
+    parts.second,
+  )
+  return representedAsUtc - epochMs
+}
+
+function sameLocalParts(parts: ZonedParts, target: ZonedParts): boolean {
+  return parts.year === target.year
+    && parts.month === target.month
+    && parts.day === target.day
+    && parts.hour === target.hour
+    && parts.minute === target.minute
+    && parts.second === target.second
+}
+
 export function dateKeyInZone(date: Date, timeZone: string): string {
   const parts = partsInZone(date, timeZone)
   return `${parts.year.toString().padStart(4, '0')}-${parts.month.toString().padStart(2, '0')}-${parts.day.toString().padStart(2, '0')}`
@@ -46,23 +77,18 @@ export function resolveZonedLocalDateTime(
   const [hour, minute] = localTime.split(':').map(Number)
   if (![year, month, day, hour, minute].every(Number.isInteger)) throw new Error('Data ou hora inválida.')
 
-  const approximate = Date.UTC(year, month - 1, day, hour, minute, 0)
-  const candidates: Date[] = []
+  const target: ZonedParts = { year, month, day, hour, minute, second: 0 }
+  const naiveUtc = Date.UTC(year, month - 1, day, hour, minute, 0)
+  const sampleOffsets = new Set<number>([
+    offsetAt(naiveUtc - 36 * 3_600_000, timeZone),
+    offsetAt(naiveUtc, timeZone),
+    offsetAt(naiveUtc + 36 * 3_600_000, timeZone),
+  ])
 
-  for (let offsetMinutes = -240; offsetMinutes <= 240; offsetMinutes += 1) {
-    const candidate = new Date(approximate + offsetMinutes * 60_000)
-    const parts = partsInZone(candidate, timeZone)
-    if (
-      parts.year === year
-      && parts.month === month
-      && parts.day === day
-      && parts.hour === hour
-      && parts.minute === minute
-      && parts.second === 0
-    ) {
-      candidates.push(candidate)
-    }
-  }
+  const candidates = [...sampleOffsets]
+    .map((offset) => new Date(naiveUtc - offset))
+    .filter((candidate) => sameLocalParts(partsInZone(candidate, timeZone), target))
+    .sort((left, right) => left.getTime() - right.getTime())
 
   const unique = [...new Map(candidates.map((candidate) => [candidate.getTime(), candidate])).values()]
   if (unique.length === 0) {
