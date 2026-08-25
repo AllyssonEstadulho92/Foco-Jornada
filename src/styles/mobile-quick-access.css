@@ -1,4 +1,8 @@
-/* Acesso rápido aos cinco módulos principais no drawer móvel. */
+/* Acesso rápido aos módulos principais no drawer e no botão + móvel. */
+.mobileQuickBackdrop {
+  display: none;
+}
+
 @media (max-width: 899px) {
   .mobileDrawerQuickSection {
     display: grid;
@@ -104,15 +108,95 @@
     text-overflow: clip !important;
     white-space: normal !important;
   }
+
+  /* Barra inferior com botão + central e quatro destinos fixos. */
+  .bottomNav.mobileBottomBar {
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+    overflow: visible !important;
+  }
+
+  .mobileQuickButton {
+    z-index: 61;
+    align-self: start;
+    outline: none;
+  }
+
+  .mobileQuickButton:focus-visible {
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 25%, transparent), 0 12px 28px rgba(31, 157, 99, .28);
+  }
+
+  .mobileQuickBackdrop {
+    position: fixed;
+    z-index: 58;
+    inset: 0;
+    display: block;
+    padding: 0;
+    border: 0;
+    background: rgba(7, 10, 8, .12);
+    backdrop-filter: blur(1px);
+  }
+
+  .mobileQuickPanel {
+    z-index: 59;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+    padding: 12px;
+    border-color: var(--line) !important;
+    background: color-mix(in srgb, var(--surface) 96%, transparent) !important;
+  }
+
+  .mobileQuickPanel .mobileQuickLink {
+    display: flex;
+    min-width: 0;
+    min-height: 58px;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 12px;
+    border: 1px solid var(--line);
+    border-radius: 15px;
+    background: var(--surface-2) !important;
+    color: var(--text) !important;
+    font-size: 13px;
+    font-weight: 750;
+    line-height: 1.2;
+    text-decoration: none;
+  }
+
+  .mobileQuickPanel .mobileQuickLink:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .mobileQuickPanel .mobileQuickLink svg {
+    width: 22px;
+    height: 22px;
+    flex: 0 0 22px;
+    color: var(--primary);
+  }
+
+  .mobileQuickPanel .mobileQuickLink span {
+    min-width: 0;
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+  }
+
+  .mobileQuickPanel .mobileQuickLinkActive {
+    border-color: color-mix(in srgb, var(--primary) 56%, var(--line));
+    background: color-mix(in srgb, var(--primary) 12%, var(--surface-2)) !important;
+    color: var(--primary) !important;
+  }
 }
 
 @media (max-width: 360px) {
-  .mobileDrawerQuickAccess {
+  .mobileDrawerQuickAccess,
+  .mobileQuickPanel {
     grid-template-columns: 1fr;
   }
 
   .mobileDrawerQuickAccess .navLink,
-  .mobileDrawerQuickAccess .navLink:last-child {
+  .mobileDrawerQuickAccess .navLink:last-child,
+  .mobileQuickPanel .mobileQuickLink,
+  .mobileQuickPanel .mobileQuickLink:last-child {
     grid-column: 1;
     min-height: 58px;
   }

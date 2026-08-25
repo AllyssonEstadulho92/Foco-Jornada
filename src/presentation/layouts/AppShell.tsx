@@ -85,11 +85,13 @@ export function AppShell() {
   const toggleTheme = useUiStore((state) => state.toggleTheme)
   const location = useLocation()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [mobileQuickOpen, setMobileQuickOpen] = useState(false)
   const [deviceTheme, setDeviceTheme] = useState<ResolvedTheme>(systemTheme)
   const resolvedTheme: ResolvedTheme = theme === 'system' ? deviceTheme : theme
 
   useEffect(() => {
     setMobileMenuOpen(false)
+    setMobileQuickOpen(false)
   }, [location.pathname, location.search])
 
   useEffect(() => {
@@ -112,15 +114,17 @@ export function AppShell() {
   }, [resolvedTheme])
 
   useEffect(() => {
-    if (!mobileMenuOpen) return
+    if (!mobileMenuOpen && !mobileQuickOpen) return
 
     function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === 'Escape') setMobileMenuOpen(false)
+      if (event.key !== 'Escape') return
+      setMobileMenuOpen(false)
+      setMobileQuickOpen(false)
     }
 
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [mobileMenuOpen])
+  }, [mobileMenuOpen, mobileQuickOpen])
 
   useEffect(() => {
     if (!mobileMenuOpen) return
@@ -130,6 +134,16 @@ export function AppShell() {
       document.body.style.overflow = previousOverflow
     }
   }, [mobileMenuOpen])
+
+  const openMobileMenu = () => {
+    setMobileQuickOpen(false)
+    setMobileMenuOpen(true)
+  }
+
+  const toggleMobileQuickMenu = () => {
+    setMobileMenuOpen(false)
+    setMobileQuickOpen((open) => !open)
+  }
 
   return (
     <div className={`appShell${sidebarCollapsed ? ' appShellCollapsed' : ''}${mobileMenuOpen ? ' appShellMobileMenuOpen' : ''}`}>
@@ -165,7 +179,7 @@ export function AppShell() {
       </aside>
 
       <div className="appMainArea">
-        <AppTopBar onOpenMenu={() => setMobileMenuOpen(true)} />
+        <AppTopBar onOpenMenu={openMobileMenu} />
         <main className="appContent" id="main-content" tabIndex={-1}>
           {location.pathname === '/definicoes' ? (
             <section className="prototypeThemeCard" aria-label="Tema da aplicação">
@@ -273,10 +287,44 @@ export function AppShell() {
         </footer>
       </aside>
 
+      {mobileQuickOpen ? (
+        <>
+          <button
+            className="mobileQuickBackdrop"
+            type="button"
+            aria-label="Fechar acessos rápidos"
+            onClick={() => setMobileQuickOpen(false)}
+          />
+          <nav id="mobile-quick-panel" className="mobileQuickPanel" aria-label="Acesso rápido">
+            {mobileQuickNavigation.map((item) => (
+              <NavLink
+                key={`panel-${item.path}-${item.label}`}
+                to={item.path}
+                className={({ isActive }) => `mobileQuickLink${isActive ? ' mobileQuickLinkActive' : ''}`}
+              >
+                <NavigationIcon name={item.icon} />
+                <span>{item.label}</span>
+              </NavLink>
+            ))}
+          </nav>
+        </>
+      ) : null}
+
       <nav className="bottomNav mobileBottomBar" aria-label="Navegação móvel">
-        {mobileBottomNavigation.map((item) => (
-          <NavigationLink key={`${item.path}-${item.label}`} item={item} />
-        ))}
+        <NavigationLink item={mobileBottomNavigation[0]} />
+        <NavigationLink item={mobileBottomNavigation[1]} />
+        <button
+          className={`mobileQuickButton${mobileQuickOpen ? ' mobileQuickButtonActive' : ''}`}
+          type="button"
+          onClick={toggleMobileQuickMenu}
+          aria-label={mobileQuickOpen ? 'Fechar acessos rápidos' : 'Abrir acessos rápidos'}
+          aria-expanded={mobileQuickOpen}
+          aria-controls="mobile-quick-panel"
+        >
+          <span aria-hidden="true">+</span>
+        </button>
+        <NavigationLink item={mobileBottomNavigation[2]} />
+        <NavigationLink item={mobileBottomNavigation[3]} />
       </nav>
     </div>
   )
