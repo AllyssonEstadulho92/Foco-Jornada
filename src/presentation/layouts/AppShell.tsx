@@ -46,16 +46,19 @@ function BrandLockup({ compact = false }: { compact?: boolean }) {
   )
 }
 
-const mobileMainNavigation: NavigationItem[] = [
-  { label: 'Hoje', path: '/', icon: 'home', end: true },
+const mobileQuickNavigation: NavigationItem[] = [
   { label: 'Mapa de turnos', path: '/turnos', icon: 'activities' },
-  { label: 'Atividades', path: '/atividades', icon: 'activities' },
-  { label: 'Histórico', path: '/historico', icon: 'history' },
   { label: 'Stock pessoal', path: '/stock', icon: 'more' },
-  { label: 'Estatísticas', path: '/estatisticas', icon: 'stats' },
   { label: 'Horas', path: '/horas', icon: 'hours' },
   { label: 'Vencimento', path: '/vencimento', icon: 'payroll' },
   { label: 'Foco', path: '/foco', icon: 'focus' },
+]
+
+const mobileMainNavigation: NavigationItem[] = [
+  { label: 'Hoje', path: '/', icon: 'home', end: true },
+  { label: 'Atividades', path: '/atividades', icon: 'activities' },
+  { label: 'Histórico', path: '/historico', icon: 'history' },
+  { label: 'Estatísticas', path: '/estatisticas', icon: 'stats' },
   { label: 'Guia', path: '/guia', icon: 'guide' },
   { label: 'Definições', path: '/definicoes', icon: 'settings' },
 ]
@@ -218,6 +221,22 @@ export function AppShell() {
         </header>
         <p className="mobileDrawerTagline">Organiza o teu tempo, os turnos e o vencimento.</p>
 
+        <section className="mobileDrawerQuickSection" aria-labelledby="mobile-quick-title">
+          <div className="mobileDrawerSectionHeading">
+            <span id="mobile-quick-title">Acesso rápido</span>
+            <small>Principais</small>
+          </div>
+          <nav className="mobileDrawerQuickAccess" aria-label="Acesso rápido aos menus principais">
+            {mobileQuickNavigation.map((item) => (
+              <NavigationLink key={`quick-${item.path}-${item.label}`} item={item} />
+            ))}
+          </nav>
+        </section>
+
+        <div className="mobileDrawerSectionHeading mobileDrawerSectionHeadingSecondary">
+          <span>Menu</span>
+          <small>Outras áreas</small>
+        </div>
         <nav className="mobileDrawerNav" aria-label="Navegação da aplicação">
           {mobileMainNavigation.map((item) => (
             <NavigationLink key={`${item.path}-${item.label}`} item={item} />
