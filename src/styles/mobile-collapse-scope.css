@@ -1,0 +1,23 @@
+/*
+ * O estado de recolha pertence apenas à sidebar de desktop.
+ * No mobile, o mesmo estado persistido não pode esconder rótulos nem centrar
+ * os ícones do drawer como se este fosse a sidebar recolhida.
+ */
+@media (max-width: 899px) {
+  .appShellCollapsed .mobileDrawer .navLabel,
+  .appShellCollapsed .mobileBottomBar .navLabel {
+    display: block;
+  }
+
+  .appShellCollapsed .mobileDrawerNav .navLink {
+    justify-content: flex-start;
+  }
+
+  .appShellCollapsed .mobileDrawerNav .navLabel {
+    min-width: 0;
+    flex: 1 1 auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
