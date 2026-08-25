@@ -135,7 +135,14 @@
   margin-top: 12px;
 }
 
+.medicationsStockPage {
+  width: 100%;
+  min-width: 0;
+  overflow-x: clip;
+}
+
 .stockDosePanel {
+  min-width: 0;
   overflow: visible;
 }
 
@@ -201,7 +208,9 @@
 }
 
 .stockDoseCard {
+  width: 100%;
   min-width: 0;
+  max-width: 100%;
 }
 
 .stockDoseCard + .stockDoseCard {
@@ -209,6 +218,7 @@
 }
 
 .stockDoseRowMain {
+  min-width: 0;
   border-top: 0 !important;
   padding: 14px 0 !important;
 }
@@ -219,6 +229,7 @@
 
 .stockDoseActionCluster {
   display: grid;
+  min-width: 0;
   justify-items: end;
   gap: 8px;
 }
@@ -233,6 +244,7 @@
   display: inline-flex;
   align-items: center;
   width: max-content;
+  max-width: 100%;
   border-radius: 999px;
   padding: 5px 9px;
   font-size: .7rem;
@@ -252,6 +264,7 @@
 
 .stockDoseQuickActions {
   display: flex;
+  min-width: 0;
   flex-wrap: wrap;
   align-items: center;
   justify-content: flex-end;
@@ -264,6 +277,7 @@
 
 .stockDoseMenuRoot {
   position: relative;
+  min-width: 0;
 }
 
 .stockDoseQuickActions > .stockDoseMenuRoot:only-child {
@@ -274,10 +288,11 @@
   display: grid;
   width: 44px;
   min-width: 44px;
-  min-height: 40px;
+  min-height: 44px;
   place-items: center;
   padding: 0 !important;
   font-size: 18px !important;
+  line-height: 1;
   letter-spacing: 2px;
 }
 
@@ -302,7 +317,7 @@
 
 .stockDoseMenu button {
   width: 100%;
-  min-height: 40px;
+  min-height: 44px;
   justify-content: flex-start;
   border: 0 !important;
   background: transparent !important;
@@ -319,6 +334,8 @@
 
 .stockDoseDetails {
   display: grid;
+  min-width: 0;
+  max-width: 100%;
   gap: 12px;
   margin: 0 0 14px;
   padding: 14px;
@@ -355,6 +372,7 @@
   color: var(--text);
   font-size: 12px;
   line-height: 1.35;
+  overflow-wrap: anywhere;
 }
 
 .stockDoseDetailNote {
@@ -364,6 +382,7 @@
 
 .stockDoseHistory {
   display: grid;
+  min-width: 0;
   gap: 8px;
 }
 
@@ -375,6 +394,7 @@
 .stockDoseHistoryRow {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
+  min-width: 0;
   align-items: start;
   gap: 10px;
   padding-top: 8px;
@@ -383,18 +403,21 @@
 
 .stockDoseHistoryRow > div {
   display: grid;
+  min-width: 0;
   gap: 2px;
 }
 
 .stockDoseHistoryRow > div > strong {
   color: var(--text);
   font-size: 11px;
+  overflow-wrap: anywhere;
 }
 
 .stockDoseHistoryRow small {
   color: var(--muted);
   font-size: 10px;
   line-height: 1.4;
+  overflow-wrap: anywhere;
 }
 
 @media (max-width: 860px) {
@@ -410,11 +433,27 @@
     grid-template-columns: 1fr;
   }
 
+  .stockDosePanel,
+  .stockDoseCard,
+  .stockDoseRowMain,
+  .stockDoseActionCluster,
+  .stockDoseQuickActions,
+  .stockDoseMenuRoot,
+  .stockDoseMenu,
+  .stockPostponeEditor,
+  .stockDoseDetails {
+    box-sizing: border-box;
+    min-width: 0;
+    max-width: 100%;
+  }
+
   .stockDoseRowMain {
+    width: 100%;
     align-items: stretch !important;
   }
 
   .stockDoseIdentity {
+    width: 100%;
     min-width: 0;
   }
 
@@ -425,37 +464,65 @@
     justify-content: flex-start;
   }
 
+  .stockDoseStateLine {
+    overflow: hidden;
+  }
+
   .stockDoseQuickActions {
     display: grid;
     width: 100%;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: stretch;
     justify-content: stretch;
+    gap: 8px;
   }
 
   .stockDoseQuickActions > button:not(.stockDoseMenuButton) {
     width: 100%;
+    min-width: 0;
+    min-height: 44px;
   }
 
-  .stockDoseMenuRoot {
-    justify-self: end;
-  }
-
+  .stockDoseMenuRoot,
   .stockDoseQuickActions > .stockDoseMenuRoot:only-child {
-    grid-column: -2 / -1;
-    justify-self: end;
+    position: static;
+    display: grid;
+    grid-column: 1 / -1;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    justify-self: stretch;
+    justify-items: end;
     margin-left: 0;
   }
 
+  .stockDoseMenuButton {
+    width: 44px;
+    min-width: 44px;
+    min-height: 44px;
+  }
+
   .stockDoseMenu {
-    right: 0;
-    width: min(300px, calc(100vw - 32px));
-    max-width: calc(100vw - 32px);
+    position: static;
+    z-index: auto;
+    top: auto;
+    right: auto;
+    width: 100%;
+    max-width: 100%;
+    margin-top: 7px;
+    transform: none;
+    transform-origin: center;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, .14);
+  }
+
+  .stockDoseMenu button {
+    min-height: 46px;
+    padding: 11px 12px;
   }
 
   .stockPostponeEditor {
     width: 100%;
     max-width: none;
-    box-sizing: border-box;
   }
 
   .stockCorrectionActions {
@@ -465,19 +532,35 @@
 }
 
 @media (max-width: 420px) {
+  .stockDosePanel {
+    padding-inline: 14px;
+  }
+
   .stockDoseQuickActions {
-    grid-template-columns: 1fr auto;
+    grid-template-columns: 1fr;
   }
 
+  .stockDoseQuickActions > button,
   .stockDoseQuickActions > button.stockPrimaryAction {
-    grid-column: 1 / -1;
+    grid-column: 1;
+    width: 100%;
   }
 
+  .stockDoseMenuRoot,
   .stockDoseQuickActions > .stockDoseMenuRoot:only-child {
-    grid-column: 2;
+    grid-column: 1;
   }
 
-  .stockPostponePresets {
+  .stockDoseMenuButton {
+    width: 44px !important;
+  }
+
+  .stockDoseDetails {
+    padding: 12px;
+  }
+
+  .stockPostponePresets,
+  .stockPostponeButtons {
     grid-template-columns: 1fr;
   }
 }
