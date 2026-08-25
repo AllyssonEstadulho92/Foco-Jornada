@@ -6,6 +6,7 @@ import type {
   MedicationForecast,
   MedicationSchedule,
   MedicationSummary,
+  PhysicalStockCheck,
 } from '../../domain/personalStock/models'
 import { useAppServices } from '../providers/AppServicesProvider'
 
@@ -35,6 +36,18 @@ function formatDuration(seconds?: number): string {
   return `${hours} h ${minutes} min`
 }
 
+function formatPhysicalCheckTime(value?: string): string {
+  if (!value) return 'Nunca verificado'
+  return new Intl.DateTimeFormat('pt-PT', {
+    timeZone: TIMEZONE,
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(new Date(value))
+}
+
 function doseStatusLabel(status: MedicationDoseEvent['status']): string {
   if (status === 'taken') return 'TOMADA'
   if (status === 'not_taken') return 'NÃO TOMADA'
@@ -49,17 +62,29 @@ function doseStatusClass(status: MedicationDoseEvent['status']): string {
   return 'stockStatusNeutral'
 }
 
+function adjustmentClass(value?: string): string {
+  if (!value || value === '0') return 'stockPhysicalAdjustmentZero'
+  return value.startsWith('-') ? 'stockPhysicalAdjustmentNegative' : 'stockPhysicalAdjustmentPositive'
+}
+
+function signed(value?: string): string {
+  if (!value) return '—'
+  if (value === '0' || value.startsWith('-')) return value
+  return `+${value}`
+}
+
 interface TodayDose {
   schedule: MedicationSchedule
   event?: MedicationDoseEvent
 }
 
 export function MedicationsStockPage() {
-  const { personalStockService, medicationDoseStatusService } = useAppServices()
+  const { personalStockService, medicationDoseStatusService, stockReconciliationService } = useAppServices()
   const [medications, setMedications] = useState<MedicationSummary[]>([])
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [schedules, setSchedules] = useState<MedicationSchedule[]>([])
   const [events, setEvents] = useState<MedicationDoseEvent[]>([])
+  const [physicalCheck, setPhysicalCheck] = useState<PhysicalStockCheck | null>(null)
   const [forecast, setForecast] = useState<MedicationForecast | null>(null)
   const [forecastMessage, setForecastMessage] = useState('')
   const [message, setMessage] = useState('')
@@ -74,6 +99,9 @@ export function MedicationsStockPage() {
   })
   const [scheduleForm, setScheduleForm] = useState({ localTime: '08:00', quantity: '1' })
   const [restockQuantity, setRestockQuantity] = useState('')
+  const [physicalQuantity, setPhysicalQuantity] = useState('')
+  const [postponeScheduleId, setPostponeScheduleId] = useState<string | null>(null)
+  const [postponeTime, setPostponeTime] = useState('')
 
   const today = useMemo(() => dateKeyInZone(new Date(), TIMEZONE), [])
   const selected = medications.find((item) => item.medication.id === selectedId) ?? null
@@ -90,30 +118,36 @@ export function MedicationsStockPage() {
   }, [personalStockService])
 
   const loadSelected = useCallback(async (medicationId: string) => {
-    const [daySchedules, doseEvents] = await Promise.all([
+    const [daySchedules, doseEvents, nextPhysicalCheck] = await Promise.all([
       personalStockService.schedulesForDate(medicationId, today),
       personalStockService.listDoseEvents(medicationId),
+      stockReconciliationService.getPhysicalCheck(medicationId),
     ])
     setSchedules(daySchedules)
     setEvents(doseEvents)
+    setPhysicalCheck(nextPhysicalCheck)
     try {
-      const result = await personalStockService.forecastMedication(medicationId)
+      const result = await medicationDoseStatusService.forecastMedication(medicationId)
       setForecast(result)
       setForecastMessage('')
     } catch (error) {
       setForecast(null)
       setForecastMessage(error instanceof Error ? error.message : 'Não foi possível calcular a autonomia.')
     }
-  }, [personalStockService, today])
+  }, [medicationDoseStatusService, personalStockService, stockReconciliationService, today])
 
   useEffect(() => {
     void loadList().catch((error: unknown) => setMessage(error instanceof Error ? error.message : 'Erro ao carregar medicamentos.'))
   }, [loadList])
 
   useEffect(() => {
+    setPhysicalQuantity('')
+    setPostponeScheduleId(null)
+    setPostponeTime('')
     if (!selectedId) {
       setSchedules([])
       setEvents([])
+      setPhysicalCheck(null)
       setForecast(null)
       return
     }
@@ -293,10 +327,30 @@ export function MedicationsStockPage() {
                     <div>
                       <strong>{schedule.localTime}</strong>
                       <small>{minorToDecimal(schedule.quantityMinor)} {selected.medication.unit}</small>
+                      {event?.status === 'postponed' ? (
+                        <span className="stockDosePostponedTime">
+                          {event.postponedTo ? `Adiada para ${formatDateTime(event.postponedTo)}` : 'Adiada sem nova hora definida'}
+                        </span>
+                      ) : null}
                     </div>
                     {event ? (
                       <div className="stockDoseActions">
                         <span className={doseStatusClass(event.status)}>{doseStatusLabel(event.status)}</span>
+                        {event.status === 'postponed' && event.postponedTo ? (
+                          <button
+                            type="button"
+                            className="stockPrimaryAction"
+                            disabled={busy}
+                            onClick={() => void run(
+                              async () => {
+                                await medicationDoseStatusService.confirmPostponedMedicationDose(event.id, operationId())
+                              },
+                              'Toma adiada confirmada. O stock foi descontado uma única vez e o reagendamento ficou auditado.',
+                            )}
+                          >
+                            Confirmar toma adiada
+                          </button>
+                        ) : null}
                         <button
                           type="button"
                           disabled={busy}
@@ -309,6 +363,52 @@ export function MedicationsStockPage() {
                         >
                           Corrigir
                         </button>
+                      </div>
+                    ) : postponeScheduleId === schedule.id ? (
+                      <div className="stockPostponeEditor">
+                        <label>
+                          Nova hora
+                          <input
+                            type="time"
+                            value={postponeTime}
+                            onChange={(event) => setPostponeTime(event.target.value)}
+                          />
+                        </label>
+                        <span className="stockPostponeHint">A nova hora é escolhida por ti e tem de ser posterior à hora programada.</span>
+                        <div className="stockPostponeButtons">
+                          <button
+                            type="button"
+                            disabled={busy}
+                            onClick={() => {
+                              setPostponeScheduleId(null)
+                              setPostponeTime('')
+                            }}
+                          >
+                            Cancelar
+                          </button>
+                          <button
+                            type="button"
+                            className="stockPrimaryAction"
+                            disabled={busy || !postponeTime}
+                            onClick={() => void run(
+                              async () => {
+                                await medicationDoseStatusService.setMedicationDoseStatus({
+                                  medicationId: selected.medication.id,
+                                  scheduleId: schedule.id,
+                                  onDate: today,
+                                  operationId: operationId(),
+                                  status: 'postponed',
+                                  postponedToLocalTime: postponeTime,
+                                })
+                                setPostponeScheduleId(null)
+                                setPostponeTime('')
+                              },
+                              'Toma adiada para a nova hora. O stock não foi alterado.',
+                            )}
+                          >
+                            Guardar nova hora
+                          </button>
+                        </div>
                       </div>
                     ) : (
                       <div className="stockDoseChoiceActions">
@@ -351,18 +451,10 @@ export function MedicationsStockPage() {
                         <button
                           type="button"
                           disabled={busy}
-                          onClick={() => void run(
-                            async () => {
-                              await medicationDoseStatusService.setMedicationDoseStatus({
-                                medicationId: selected.medication.id,
-                                scheduleId: schedule.id,
-                                onDate: today,
-                                operationId: operationId(),
-                                status: 'postponed',
-                              })
-                            },
-                            'Toma marcada como adiada. O stock não foi alterado.',
-                          )}
+                          onClick={() => {
+                            setPostponeScheduleId(schedule.id)
+                            setPostponeTime('')
+                          }}
                         >
                           Adiar
                         </button>
@@ -418,8 +510,72 @@ export function MedicationsStockPage() {
                   Adicionar stock
                 </button>
               </div>
+              <div className="stockCorrectionActions">
+                <button
+                  type="button"
+                  className="stockSecondaryAction"
+                  disabled={busy}
+                  onClick={() => void run(
+                    async () => {
+                      await stockReconciliationService.undoLastMedicationRestock(selected.medication.id, operationId())
+                    },
+                    'Última reposição corrigida através de um novo movimento auditável.',
+                  )}
+                >
+                  Corrigir última reposição
+                </button>
+              </div>
             </section>
           </div>
+
+          <section className="stockPanel stockPhysicalPanel">
+            <span className="stockPanelTag">CONFERÊNCIA REAL</span>
+            <h2>Contagem física do medicamento</h2>
+            <p>Indica a quantidade que tens realmente. A aplicação compara com o ledger e, se necessário, cria uma correção auditável.</p>
+            <div className="stockInlineForm stockInlineFormStack stockPhysicalInline">
+              <label>
+                Quantidade contada ({selected.medication.unit})
+                <input
+                  inputMode="decimal"
+                  placeholder={`ex.: ${selected.stock}`}
+                  value={physicalQuantity}
+                  onChange={(event) => setPhysicalQuantity(event.target.value)}
+                />
+              </label>
+              <button
+                type="button"
+                className="stockPrimaryAction"
+                disabled={busy || !physicalQuantity.trim()}
+                onClick={() => void run(
+                  async () => {
+                    await stockReconciliationService.reconcileMedicationPhysicalCount(
+                      selected.medication.id,
+                      physicalQuantity,
+                      operationId(),
+                    )
+                    setPhysicalQuantity('')
+                  },
+                  'Contagem física guardada. O stock ficou reconciliado com a quantidade contada.',
+                )}
+              >
+                Reconciliar contagem
+              </button>
+            </div>
+
+            {physicalCheck ? (
+              <>
+                <div className="stockPhysicalGrid" aria-label="Última conferência física">
+                  <div className="stockPhysicalMetric"><span>Calculado antes</span><strong>{physicalCheck.expected}</strong></div>
+                  <div className="stockPhysicalMetric"><span>Contado</span><strong>{physicalCheck.counted}</strong></div>
+                  <div className="stockPhysicalMetric">
+                    <span>Ajuste aplicado</span>
+                    <strong className={adjustmentClass(physicalCheck.adjustment)}>{signed(physicalCheck.adjustment)}</strong>
+                  </div>
+                </div>
+                <p className="stockPhysicalCheckTime">Verificado em {formatPhysicalCheckTime(physicalCheck.checkedAt)}.</p>
+              </>
+            ) : <p className="stockPhysicalCheckTime">Ainda não foi feita uma contagem física deste medicamento.</p>}
+          </section>
 
           <section className="stockProjectionPanel stockExactPanel">
             <span>EXATO</span>
