@@ -15,16 +15,18 @@ function makeDatabase(): AppDatabase {
 async function clearAll(db: AppDatabase) {
   await db.transaction(
     'rw',
-    db.metadata,
-    db.journeys,
-    db.breaks,
-    db.activities,
-    db.focusSessions,
-    db.coffeeRecords,
-    db.stockEntities,
-    db.stockMovements,
-    db.medicationSchedules,
-    db.medicationDoseEvents,
+    [
+      db.metadata,
+      db.journeys,
+      db.breaks,
+      db.activities,
+      db.focusSessions,
+      db.coffeeRecords,
+      db.stockEntities,
+      db.stockMovements,
+      db.medicationSchedules,
+      db.medicationDoseEvents,
+    ],
     async () => {
       await db.medicationDoseEvents.clear()
       await db.medicationSchedules.clear()
