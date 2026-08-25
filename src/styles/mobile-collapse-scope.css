@@ -3,8 +3,8 @@
  * 1) O estado de recolha pertence apenas à sidebar de desktop.
  * 2) No mobile, os rótulos do drawer e da barra inferior nunca podem herdar
  *    o display:none do estado recolhido do desktop.
- * 3) O botão ··· das tomas fica sempre na mesma posição, no canto direito
- *    da grelha de ações, mesmo quando o estado da toma muda ou o menu abre.
+ * 3) Nas tomas, o botão ··· fica ancorado no canto superior direito do bloco
+ *    de ações. O menu abre diretamente por baixo dele sem deslocar o botão.
  */
 @media (max-width: 899px) {
   .appShell.appShellCollapsed .mobileDrawer .navLink .navLabel {
@@ -42,71 +42,140 @@
 }
 
 @media (max-width: 720px) {
-  .stockDoseQuickActions {
+  /*
+   * A grelha pertence ao cluster inteiro, não ao menu. Assim o estado fica
+   * à esquerda, o ··· fica sempre na última coluna e os botões principais
+   * ocupam a linha de baixo. Abrir o menu não recalcula a posição do ···.
+   */
+  .stockDoseActionCluster {
+    position: relative;
     display: grid !important;
-    grid-template-columns: repeat(2, minmax(0, 1fr)) 44px !important;
-    grid-auto-flow: row;
-    width: 100%;
-    align-items: stretch;
+    width: 100% !important;
+    min-width: 0;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) 44px;
+    grid-auto-rows: auto;
+    align-items: start;
+    justify-items: stretch !important;
     gap: 8px;
   }
 
-  .stockDoseQuickActions > button:not(.stockDoseMenuButton) {
+  .stockDoseStateLine {
+    grid-column: 1 / 3;
     grid-row: 1;
+    width: auto !important;
     min-width: 0;
-    width: 100%;
+    align-self: center;
+    justify-content: flex-start !important;
+    overflow: hidden;
+  }
+
+  .stockDoseQuickActions {
+    display: contents !important;
+  }
+
+  .stockDoseQuickActions > button:not(.stockDoseMenuButton) {
+    grid-row: 2;
+    width: 100% !important;
+    min-width: 0;
     min-height: 44px;
     white-space: normal;
     line-height: 1.2;
   }
 
-  .stockDoseMenuRoot,
-  .stockDoseQuickActions > .stockDoseMenuRoot:only-child {
-    display: contents !important;
-    width: auto !important;
-    min-width: 0 !important;
-    max-width: none !important;
-    margin: 0 !important;
+  .stockDoseQuickActions > button:nth-of-type(1) {
+    grid-column: 1;
   }
 
-  .stockDoseMenuButton {
+  .stockDoseQuickActions > button:nth-of-type(2) {
+    grid-column: 2;
+  }
+
+  .stockDoseMenuRoot,
+  .stockDoseQuickActions > .stockDoseMenuRoot:only-child {
+    position: relative !important;
+    display: block !important;
     grid-column: 3 !important;
     grid-row: 1 !important;
     width: 44px !important;
     min-width: 44px !important;
-    min-height: 44px !important;
+    max-width: 44px !important;
+    min-height: 44px;
     justify-self: end !important;
     align-self: start;
     margin: 0 !important;
+    z-index: 40;
+  }
+
+  .stockDoseMenuButton {
+    display: grid !important;
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    place-items: center !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    line-height: 1 !important;
+    text-align: center;
   }
 
   .stockDoseMenu {
-    grid-column: 1 / -1 !important;
-    grid-row: 2 !important;
-    position: static !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    margin-top: 0 !important;
+    position: absolute !important;
+    z-index: 50 !important;
+    top: calc(100% + 8px) !important;
+    right: 0 !important;
+    left: auto !important;
+    display: grid !important;
+    width: min(280px, calc(100vw - 48px)) !important;
+    min-width: min(238px, calc(100vw - 48px));
+    max-width: calc(100vw - 48px) !important;
+    margin: 0 !important;
+    box-sizing: border-box;
+    transform: none !important;
+    transform-origin: top right;
+    box-shadow: 0 14px 34px rgba(0, 0, 0, .18);
+  }
+
+  .stockDoseMenu button {
+    width: 100%;
+    min-height: 46px;
+    padding: 11px 12px;
+    justify-content: flex-start;
+    text-align: left;
   }
 }
 
 @media (max-width: 360px) {
-  .stockDoseQuickActions {
-    grid-template-columns: minmax(0, 1fr) 44px !important;
+  .stockDoseActionCluster {
+    grid-template-columns: minmax(0, 1fr) 44px;
   }
 
-  .stockDoseQuickActions > button:not(.stockDoseMenuButton) {
-    grid-column: 1 !important;
-    grid-row: auto;
+  .stockDoseStateLine {
+    grid-column: 1;
+    grid-row: 1;
   }
 
-  .stockDoseMenuButton {
+  .stockDoseMenuRoot,
+  .stockDoseQuickActions > .stockDoseMenuRoot:only-child {
     grid-column: 2 !important;
     grid-row: 1 !important;
   }
 
-  .stockDoseMenu {
+  .stockDoseQuickActions > button:not(.stockDoseMenuButton) {
     grid-column: 1 / -1 !important;
-    grid-row: auto !important;
+  }
+
+  .stockDoseQuickActions > button:nth-of-type(1) {
+    grid-row: 2;
+  }
+
+  .stockDoseQuickActions > button:nth-of-type(2) {
+    grid-row: 3;
+  }
+
+  .stockDoseMenu {
+    width: min(260px, calc(100vw - 32px)) !important;
+    min-width: min(220px, calc(100vw - 32px));
+    max-width: calc(100vw - 32px) !important;
   }
 }
