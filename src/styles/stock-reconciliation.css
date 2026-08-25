@@ -63,11 +63,28 @@
 
 .stockPostponeEditor {
   display: grid;
-  min-width: min(100%, 230px);
-  gap: 8px;
-  padding: 10px;
+  min-width: min(100%, 290px);
+  max-width: 430px;
+  gap: 10px;
+  padding: 12px;
   border: 1px solid var(--line);
   border-radius: 14px;
+}
+
+.stockPostponeTitle {
+  display: grid;
+  gap: 3px;
+}
+
+.stockPostponeTitle strong {
+  color: var(--text);
+  font-size: 13px;
+}
+
+.stockPostponeTitle span {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.45;
 }
 
 .stockPostponeEditor label {
@@ -88,6 +105,18 @@
   color: var(--text);
 }
 
+.stockPostponePresets {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.stockPostponePresets button {
+  min-width: 0;
+  padding-inline: 8px;
+  white-space: nowrap;
+}
+
 .stockPostponeButtons {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -106,17 +135,327 @@
   margin-top: 12px;
 }
 
+.stockDosePanel {
+  overflow: visible;
+}
+
+.stockDoseGuide {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface-2);
+}
+
+.stockDoseGuide summary {
+  min-height: 44px;
+  padding: 11px 13px;
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.stockDoseGuideGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  padding: 0 13px 12px;
+}
+
+.stockDoseGuideGrid > div {
+  display: grid;
+  gap: 4px;
+  padding: 11px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+.stockDoseGuideGrid strong {
+  color: var(--text);
+  font-size: 12px;
+}
+
+.stockDoseGuideGrid span {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.stockDoseGuide > p {
+  padding: 0 13px;
+  font-size: 11px;
+}
+
+.stockDoseGuideLink {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  margin: 0 13px 13px;
+  padding: 8px 11px;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.stockDoseCard {
+  min-width: 0;
+}
+
+.stockDoseCard + .stockDoseCard {
+  border-top: 1px solid var(--line);
+}
+
+.stockDoseRowMain {
+  border-top: 0 !important;
+  padding: 14px 0 !important;
+}
+
+.stockDoseIdentity {
+  min-width: 120px;
+}
+
+.stockDoseActionCluster {
+  display: grid;
+  justify-items: end;
+  gap: 8px;
+}
+
+.stockDoseStateLine {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.stockStatusPending,
+.stockStatusLate {
+  display: inline-flex;
+  align-items: center;
+  width: max-content;
+  border-radius: 999px;
+  padding: 5px 9px;
+  font-size: .7rem;
+  font-weight: 850;
+  letter-spacing: .05em;
+}
+
+.stockStatusPending {
+  background: color-mix(in srgb, var(--primary) 11%, transparent);
+  color: var(--primary);
+}
+
+.stockStatusLate {
+  background: color-mix(in srgb, var(--warning) 15%, transparent);
+  color: var(--warning);
+}
+
+.stockDoseQuickActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 7px;
+}
+
+.stockDoseQuickActions > button {
+  min-height: 40px;
+}
+
+.stockDoseMenuRoot {
+  position: relative;
+}
+
+.stockDoseMenuButton {
+  display: grid;
+  width: 44px;
+  min-width: 44px;
+  min-height: 40px;
+  place-items: center;
+  padding: 0 !important;
+  font-size: 18px !important;
+  letter-spacing: 2px;
+}
+
+.stockDoseMenu {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 6px);
+  right: 0;
+  display: grid;
+  width: min(260px, calc(100vw - 48px));
+  gap: 3px;
+  padding: 6px;
+  border: 1px solid var(--line-strong);
+  border-radius: 14px;
+  background: var(--surface);
+  box-shadow: 0 16px 42px rgba(0, 0, 0, .18);
+}
+
+.stockDoseMenu button {
+  width: 100%;
+  min-height: 40px;
+  justify-content: flex-start;
+  border: 0 !important;
+  background: transparent !important;
+  color: var(--text) !important;
+  text-align: left;
+}
+
+.stockDoseMenu button:hover,
+.stockDoseMenu button:focus-visible {
+  background: var(--surface-2) !important;
+}
+
+.stockDoseDetails {
+  display: grid;
+  gap: 12px;
+  margin: 0 0 14px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface-2);
+}
+
+.stockDoseDetailsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.stockDoseDetailsGrid > div {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: var(--surface);
+}
+
+.stockDoseDetailsGrid span {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 750;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+
+.stockDoseDetailsGrid strong {
+  color: var(--text);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.stockDoseDetailNote {
+  color: var(--muted) !important;
+  font-size: 12px;
+}
+
+.stockDoseHistory {
+  display: grid;
+  gap: 8px;
+}
+
+.stockDoseHistory > strong {
+  color: var(--text);
+  font-size: 12px;
+}
+
+.stockDoseHistoryRow {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+
+.stockDoseHistoryRow > div {
+  display: grid;
+  gap: 2px;
+}
+
+.stockDoseHistoryRow > div > strong {
+  color: var(--text);
+  font-size: 11px;
+}
+
+.stockDoseHistoryRow small {
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+@media (max-width: 860px) {
+  .stockDoseDetailsGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 720px) {
-  .stockPhysicalGrid {
+  .stockPhysicalGrid,
+  .stockDoseGuideGrid,
+  .stockDoseDetailsGrid {
     grid-template-columns: 1fr;
+  }
+
+  .stockDoseRowMain {
+    align-items: stretch !important;
+  }
+
+  .stockDoseIdentity {
+    min-width: 0;
+  }
+
+  .stockDoseActionCluster,
+  .stockDoseStateLine {
+    width: 100%;
+    justify-items: stretch;
+    justify-content: flex-start;
+  }
+
+  .stockDoseQuickActions {
+    display: grid;
+    width: 100%;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+    justify-content: stretch;
+  }
+
+  .stockDoseQuickActions > button:not(.stockDoseMenuButton) {
+    width: 100%;
+  }
+
+  .stockDoseMenuRoot {
+    justify-self: end;
+  }
+
+  .stockDoseMenu {
+    right: 0;
   }
 
   .stockPostponeEditor {
     width: 100%;
+    max-width: none;
+    box-sizing: border-box;
   }
 
   .stockCorrectionActions {
     display: grid;
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 420px) {
+  .stockDoseQuickActions {
+    grid-template-columns: 1fr auto;
+  }
+
+  .stockDoseQuickActions > button.stockPrimaryAction {
+    grid-column: 1 / -1;
+  }
+
+  .stockPostponePresets {
     grid-template-columns: 1fr;
   }
 }
