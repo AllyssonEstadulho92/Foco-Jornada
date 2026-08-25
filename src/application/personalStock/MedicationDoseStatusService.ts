@@ -242,6 +242,125 @@ export class MedicationDoseStatusService {
     return { event: resultEvent, duplicated }
   }
 
+  async replaceMedicationDoseStatus(input: {
+    eventId: string
+    operationId: string
+    status: OperationalDoseStatus
+    postponedToLocalTime?: string
+  }): Promise<{ event: MedicationDoseEvent; duplicated: boolean }> {
+    if (input.status !== 'not_taken' && input.status !== 'postponed') {
+      throw new Error('Estado operacional inválido.')
+    }
+    if (input.status === 'postponed' && !isLocalTime(input.postponedToLocalTime ?? '')) {
+      throw new Error('Escolhe a nova hora da toma adiada.')
+    }
+
+    let resultEvent: MedicationDoseEvent | null = null
+    let duplicated = false
+
+    await this.db.transaction(
+      'rw',
+      this.db.stockEntities,
+      this.db.medicationSchedules,
+      this.db.medicationDoseEvents,
+      async () => {
+        const target = await this.db.medicationDoseEvents.get(input.eventId)
+        if (!target || (target.status !== 'not_taken' && target.status !== 'postponed')) {
+          throw new Error('Estado de toma não encontrado.')
+        }
+
+        const occurrenceEvents = await this.db.medicationDoseEvents.where('occurrenceKey').equals(target.occurrenceKey).toArray()
+        const current = activeEvent(occurrenceEvents)
+        if (!current || current.id !== target.id) {
+          throw new Error('O estado desta toma já foi corrigido ou substituído.')
+        }
+
+        const existingReplacement = await this.db.medicationDoseEvents.where('operationId').equals(input.operationId).first()
+        if (existingReplacement) {
+          if (
+            existingReplacement.occurrenceKey !== target.occurrenceKey
+            || existingReplacement.medicationId !== target.medicationId
+            || existingReplacement.scheduleId !== target.scheduleId
+            || existingReplacement.status !== input.status
+          ) {
+            throw new Error('operationId já existe com um conteúdo diferente.')
+          }
+          resultEvent = existingReplacement
+          duplicated = true
+          return
+        }
+
+        const correctionOperationId = `${input.operationId}:replacement`
+        if (await this.db.medicationDoseEvents.where('operationId').equals(correctionOperationId).first()) {
+          throw new Error('INCONSISTÊNCIA: substituição de estado parcialmente duplicada.')
+        }
+
+        const medication = await this.db.stockEntities.get(target.medicationId)
+        if (!medication || medication.kind !== 'medication') throw new Error('Medicamento não encontrado.')
+        const schedule = await this.db.medicationSchedules.get(target.scheduleId)
+        if (!schedule || schedule.medicationId !== target.medicationId) throw new Error('Horário não encontrado.')
+
+        let postponedTo: string | undefined
+        if (input.status === 'postponed') {
+          const onDate = dateKeyInZone(new Date(target.scheduledAt), medication.timezone)
+          const postponedAt = resolveZonedLocalDateTime(
+            onDate,
+            input.postponedToLocalTime as string,
+            medication.timezone,
+            schedule.fold,
+          )
+          if (postponedAt.getTime() <= new Date(target.scheduledAt).getTime()) {
+            throw new Error('A nova hora tem de ser posterior à hora originalmente programada.')
+          }
+          postponedTo = postponedAt.toISOString()
+          if (target.status === 'postponed' && target.postponedTo === postponedTo) {
+            resultEvent = target
+            duplicated = true
+            return
+          }
+        } else if (target.status === 'not_taken') {
+          resultEvent = target
+          duplicated = true
+          return
+        }
+
+        const createdAt = new Date().toISOString()
+        const correctionEvent: MedicationDoseEvent = {
+          id: newId(),
+          operationId: correctionOperationId,
+          occurrenceKey: target.occurrenceKey,
+          medicationId: target.medicationId,
+          scheduleId: target.scheduleId,
+          scheduledAt: target.scheduledAt,
+          quantityMinor: target.quantityMinor,
+          status: 'corrected',
+          createdAt,
+          correctionOf: target.id,
+        }
+        await this.db.medicationDoseEvents.add(correctionEvent)
+
+        const replacementEvent: MedicationDoseEvent = {
+          id: newId(),
+          operationId: input.operationId,
+          occurrenceKey: target.occurrenceKey,
+          medicationId: target.medicationId,
+          scheduleId: target.scheduleId,
+          scheduledAt: target.scheduledAt,
+          quantityMinor: target.quantityMinor,
+          status: input.status,
+          createdAt: new Date(Date.now() + 1).toISOString(),
+          postponedTo,
+          rescheduledFrom: target.id,
+        }
+        await this.db.medicationDoseEvents.add(replacementEvent)
+        resultEvent = replacementEvent
+      },
+    )
+
+    if (!resultEvent) throw new Error('Não foi possível substituir o estado da toma.')
+    return { event: resultEvent, duplicated }
+  }
+
   async confirmPostponedMedicationDose(
     eventId: string,
     operationId: string,
