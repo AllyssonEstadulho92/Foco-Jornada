@@ -27,9 +27,10 @@ describe('StockReconciliationService', () => {
       expect((await stock.getSticksSummary()).stock).toBe(17)
 
       const movements = await db.stockMovements.where('entityId').equals(STICKS_ENTITY_ID).sortBy('sequence')
-      expect(movements.at(-1)?.type).toBe('correction')
-      expect(movements.at(-1)?.correctionReason).toBe('physical_count')
-      expect(movements.at(-1)?.quantityMinor).toBe('-2')
+      const lastMovement = movements[movements.length - 1]
+      expect(lastMovement?.type).toBe('correction')
+      expect(lastMovement?.correctionReason).toBe('physical_count')
+      expect(lastMovement?.quantityMinor).toBe('-2')
 
       const saved = await reconciliation.getPhysicalCheck(STICKS_ENTITY_ID)
       expect(saved?.counted).toBe('17')
@@ -97,7 +98,7 @@ describe('StockReconciliationService', () => {
 
       const movements = await db.stockMovements.where('entityId').equals(STICKS_ENTITY_ID).sortBy('sequence')
       const restock = movements.find((movement) => movement.type === 'restock')
-      const correction = movements.at(-1)
+      const correction = movements[movements.length - 1]
       expect(correction?.type).toBe('correction')
       expect(correction?.correctionReason).toBe('undo_restock')
       expect(correction?.correctionOf).toBe(restock?.id)
