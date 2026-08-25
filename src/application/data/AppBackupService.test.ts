@@ -121,4 +121,35 @@ describe('AppBackupService', () => {
       await db.delete()
     }
   })
+
+  it('valida o ledger do stock antes de substituir os dados locais', async () => {
+    const db = makeDatabase()
+    try {
+      const stock = new PersonalStockService(db)
+      const backup = new AppBackupService(db)
+      await stock.initializeSticks(3, operationId())
+      await stock.consumeStick(operationId())
+
+      const payload = JSON.parse(await backup.exportText()) as {
+        tables: {
+          stockMovements: Array<{
+            entityId: string
+            sequence: number
+            balanceAfterMinor: string
+          }>
+        }
+      }
+      const consumption = payload.tables.stockMovements.find((movement) => movement.sequence === 1)
+      if (!consumption) throw new Error('Movimento de teste não encontrado.')
+      consumption.balanceAfterMinor = '99'
+
+      await db.metadata.put({ key: 'sentinel', value: 'manter', updatedAt: new Date().toISOString() })
+
+      await expect(backup.restoreFromText(JSON.stringify(payload))).rejects.toThrow('saldo posterior incoerente')
+      expect((await db.metadata.get('sentinel'))?.value).toBe('manter')
+      expect((await stock.getSticksSummary()).stock).toBe(2)
+    } finally {
+      await db.delete()
+    }
+  })
 })
