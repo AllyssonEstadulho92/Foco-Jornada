@@ -6,11 +6,37 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, viewport-fit=cover"
     />
-    <meta name="theme-color" content="#f6f7f5" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#f7f8f6" />
     <meta name="description" content="Foco & Jornada — produtividade pessoal e profissional." />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <script>
+      ;(() => {
+        const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false
+        let preference = 'system'
+
+        try {
+          const persisted = JSON.parse(localStorage.getItem('foco-jornada-ui-v2') || '{}')
+          const storedTheme = persisted?.state?.theme
+          if (storedTheme === 'light' || storedTheme === 'dark' || storedTheme === 'system') {
+            preference = storedTheme
+          }
+        } catch {
+          // Um valor local inválido não deve impedir o arranque da aplicação.
+        }
+
+        const resolved = preference === 'system' ? (prefersDark ? 'dark' : 'light') : preference
+        const themeColor = resolved === 'dark' ? '#070a08' : '#f7f8f6'
+        document.documentElement.dataset.theme = resolved
+        document.documentElement.style.colorScheme = resolved
+        document.querySelector('meta[name="theme-color"]')?.setAttribute('content', themeColor)
+        document
+          .querySelector('meta[name="apple-mobile-web-app-status-bar-style"]')
+          ?.setAttribute('content', resolved === 'dark' ? 'black-translucent' : 'default')
+      })()
+    </script>
     <link rel="icon" type="image/svg+xml" href="%BASE_URL%icon.svg" />
     <title>Foco & Jornada</title>
   </head>
