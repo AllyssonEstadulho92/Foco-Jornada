@@ -1,5 +1,6 @@
 export type StockEntityKind = 'sticks' | 'medication'
 export type StockMovementType = 'initial_stock' | 'consumption' | 'restock' | 'correction'
+export type StockCorrectionReason = 'physical_count' | 'undo_restock'
 export type DoseEventStatus = 'taken' | 'not_taken' | 'postponed' | 'corrected'
 
 export interface StockEntity {
@@ -11,6 +12,10 @@ export interface StockEntity {
   timezone: string
   startDate?: string
   createdAt: string
+  lastPhysicalCountMinor?: string
+  lastPhysicalExpectedMinor?: string
+  lastPhysicalAdjustmentMinor?: string
+  lastPhysicalCountAt?: string
 }
 
 export interface StockMovement {
@@ -25,6 +30,7 @@ export interface StockMovement {
   effectiveAt: string
   createdAt: string
   correctionOf?: string
+  correctionReason?: StockCorrectionReason
 }
 
 export interface MedicationSchedule {
@@ -51,6 +57,8 @@ export interface MedicationDoseEvent {
   createdAt: string
   correctionOf?: string
   stockMovementId?: string
+  postponedTo?: string
+  rescheduledFrom?: string
 }
 
 export interface ReconciliationResult {
@@ -85,4 +93,12 @@ export interface MedicationForecast {
   missingQuantity: string
   autonomySeconds: number
   exact: true
+}
+
+export interface PhysicalStockCheck {
+  entityId: string
+  checkedAt: string
+  expected: string
+  counted: string
+  adjustment: string
 }
