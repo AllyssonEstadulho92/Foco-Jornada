@@ -1,25 +1,43 @@
 /*
  * Ajustes finais de estabilidade para mobile.
  * 1) O estado de recolha pertence apenas à sidebar de desktop.
- * 2) O botão ··· das tomas fica sempre na mesma posição, no canto direito
+ * 2) No mobile, os rótulos do drawer e da barra inferior nunca podem herdar
+ *    o display:none do estado recolhido do desktop.
+ * 3) O botão ··· das tomas fica sempre na mesma posição, no canto direito
  *    da grelha de ações, mesmo quando o estado da toma muda ou o menu abre.
  */
 @media (max-width: 899px) {
-  .appShellCollapsed .mobileDrawer .navLabel,
-  .appShellCollapsed .mobileBottomBar .navLabel {
-    display: block;
-  }
-
-  .appShellCollapsed .mobileDrawerNav .navLink {
-    justify-content: flex-start;
-  }
-
-  .appShellCollapsed .mobileDrawerNav .navLabel {
-    min-width: 0;
-    flex: 1 1 auto;
+  .appShell.appShellCollapsed .mobileDrawer .navLink .navLabel {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    flex: 1 1 auto !important;
     overflow: hidden;
+    color: inherit !important;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+
+  .appShell.appShellCollapsed .mobileBottomBar .navLink .navLabel {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    color: inherit !important;
+    text-align: center;
+  }
+
+  .appShell.appShellCollapsed .mobileDrawerNav .navLink {
+    display: flex !important;
+    justify-content: flex-start !important;
+  }
+
+  .appShell.appShellCollapsed .mobileBottomBar .navLink {
+    display: flex !important;
+    justify-content: center !important;
   }
 }
 
