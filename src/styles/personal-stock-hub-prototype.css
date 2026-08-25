@@ -1,0 +1,455 @@
+/* Hub de Stock Pessoal — composição inspirada no protótipo mobile aprovado. */
+.personalStockHubPage {
+  --stock-neon: #62df73;
+  --stock-neon-strong: #7cf28a;
+  --stock-neon-soft: color-mix(in srgb, var(--stock-neon) 12%, transparent);
+  gap: 22px;
+  padding: 28px;
+  border: 1px solid color-mix(in srgb, var(--stock-neon) 22%, var(--border-subtle, #dfe4df));
+  border-radius: 30px;
+  background:
+    radial-gradient(circle at 10% 0%, color-mix(in srgb, var(--stock-neon) 8%, transparent), transparent 34%),
+    var(--surface-elevated, #fff);
+  box-shadow: 0 24px 70px rgb(20 31 25 / .08);
+  overflow: hidden;
+}
+
+.stockHubHeader {
+  gap: 10px;
+}
+
+.stockHubTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.stockHubTitleRow h1 {
+  min-width: 0;
+}
+
+.stockHubTitleIcon {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  flex: 0 0 48px;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--stock-neon) 45%, transparent);
+  border-radius: 16px;
+  background: var(--stock-neon-soft);
+  color: var(--stock-neon);
+  box-shadow: inset 0 0 22px color-mix(in srgb, var(--stock-neon) 7%, transparent);
+}
+
+.stockHubTitleIcon svg,
+.stockHubGlyph svg,
+.stockHubChevron svg,
+.stockHubIntegrityIcon svg,
+.stockHubTrustItem > span svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.stockHubTitleIcon svg {
+  width: 27px;
+  height: 27px;
+}
+
+.stockHubAppGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.stockHubAppCard {
+  position: relative;
+  isolation: isolate;
+  min-height: 174px;
+  grid-template-columns: 72px minmax(0, 1fr) 48px;
+  gap: 18px;
+  padding: 22px 20px 22px 24px;
+  border-color: color-mix(in srgb, var(--stock-neon) 24%, var(--border-subtle, #dfe4df));
+  border-radius: 24px;
+  overflow: hidden;
+  transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease, background-color .18s ease;
+}
+
+.stockHubAppCard::before {
+  position: absolute;
+  inset: 18px auto 18px 0;
+  width: 3px;
+  border-radius: 0 999px 999px 0;
+  background: linear-gradient(180deg, var(--stock-neon-strong), var(--stock-neon));
+  box-shadow: 0 0 16px color-mix(in srgb, var(--stock-neon) 40%, transparent);
+  content: '';
+}
+
+.stockHubAppCard:hover,
+.stockHubAppCard:focus-visible {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--stock-neon) 52%, var(--border-subtle, #dfe4df));
+  box-shadow: 0 18px 42px color-mix(in srgb, var(--stock-neon) 10%, rgb(20 31 25 / .12));
+  outline: none;
+}
+
+.stockHubGlyph {
+  width: 68px;
+  height: 68px;
+  border: 1px solid color-mix(in srgb, var(--stock-neon) 42%, var(--border-subtle, #dfe4df));
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at 50% 28%, color-mix(in srgb, var(--stock-neon) 16%, transparent), transparent 60%),
+    color-mix(in srgb, var(--stock-neon) 8%, var(--surface-soft, #f0f4f1));
+  color: var(--stock-neon);
+  box-shadow: inset 0 0 24px color-mix(in srgb, var(--stock-neon) 7%, transparent);
+}
+
+.stockHubGlyph svg {
+  width: 37px;
+  height: 37px;
+  stroke-width: 2;
+}
+
+.stockHubCardCopy {
+  align-self: center;
+  min-width: 0;
+}
+
+.stockHubCardCopy strong {
+  font-size: clamp(1.05rem, 1.5vw, 1.24rem);
+  line-height: 1.2;
+  letter-spacing: -.02em;
+}
+
+.stockHubCardCopy p {
+  margin-top: 8px;
+  font-size: .96rem;
+  line-height: 1.55;
+}
+
+.stockHubChevron {
+  display: grid;
+  width: 46px;
+  height: 46px;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--stock-neon) 36%, var(--border-subtle, #dfe4df));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--stock-neon) 10%, var(--surface-soft, #f0f4f1));
+  color: var(--stock-neon);
+  transition: transform .18s ease, background-color .18s ease;
+}
+
+.stockHubChevron svg {
+  width: 22px;
+  height: 22px;
+  stroke-width: 2.2;
+}
+
+.stockHubAppCard:hover .stockHubChevron,
+.stockHubAppCard:focus-visible .stockHubChevron {
+  transform: translateX(2px);
+  background: color-mix(in srgb, var(--stock-neon) 16%, var(--surface-soft, #f0f4f1));
+}
+
+.stockHubIntegrityNote {
+  display: grid;
+  grid-template-columns: 62px minmax(0, 1fr);
+  align-items: center;
+  gap: 18px;
+  padding: 20px 22px;
+  border-color: color-mix(in srgb, var(--stock-neon) 18%, var(--border-subtle, #dfe4df));
+  border-radius: 22px;
+}
+
+.stockHubIntegrityIcon {
+  display: grid;
+  width: 58px;
+  height: 58px;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--stock-neon) 36%, transparent);
+  border-radius: 18px;
+  background: var(--stock-neon-soft);
+  color: var(--stock-neon);
+}
+
+.stockHubIntegrityIcon svg {
+  width: 34px;
+  height: 34px;
+  stroke-width: 1.9;
+}
+
+.stockHubIntegrityNote strong {
+  display: block;
+  font-size: 1.05rem;
+  letter-spacing: -.015em;
+}
+
+.stockHubIntegrityNote p {
+  margin-top: 6px;
+}
+
+.stockHubTrustStrip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border: 1px solid color-mix(in srgb, var(--stock-neon) 18%, var(--border-subtle, #dfe4df));
+  border-radius: 22px;
+  background: color-mix(in srgb, var(--stock-neon) 3%, var(--surface-soft, #f5f7f5));
+  overflow: hidden;
+}
+
+.stockHubTrustItem {
+  position: relative;
+  display: grid;
+  min-width: 0;
+  min-height: 118px;
+  place-items: center;
+  align-content: center;
+  gap: 5px;
+  padding: 16px 10px;
+  text-align: center;
+}
+
+.stockHubTrustItem + .stockHubTrustItem::before {
+  position: absolute;
+  inset: 20px auto 20px 0;
+  width: 1px;
+  background: color-mix(in srgb, var(--stock-neon) 18%, var(--border-subtle, #dfe4df));
+  content: '';
+}
+
+.stockHubTrustItem > span {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  color: var(--stock-neon);
+}
+
+.stockHubTrustItem > span svg {
+  width: 26px;
+  height: 26px;
+}
+
+.stockHubTrustItem strong {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: 1rem;
+  line-height: 1.15;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.stockHubTrustItem small {
+  color: var(--text-muted, #66706a);
+  font-size: .75rem;
+  line-height: 1.3;
+}
+
+[data-theme="dark"] .personalStockHubPage {
+  border-color: #21372a;
+  background:
+    radial-gradient(circle at 13% 0%, rgb(98 223 115 / .09), transparent 32%),
+    linear-gradient(160deg, #07100a 0%, #050a07 52%, #07100a 100%);
+  box-shadow: 0 28px 90px rgb(0 0 0 / .34), inset 0 0 0 1px rgb(98 223 115 / .02);
+}
+
+[data-theme="dark"] .stockHubAppCard {
+  border-color: #25412e;
+  background:
+    radial-gradient(circle at 18% 34%, rgb(98 223 115 / .075), transparent 30%),
+    linear-gradient(145deg, #0d1710 0%, #09110c 100%);
+  box-shadow: inset 0 0 26px rgb(98 223 115 / .018);
+}
+
+[data-theme="dark"] .stockHubAppCard:hover,
+[data-theme="dark"] .stockHubAppCard:focus-visible {
+  border-color: rgb(98 223 115 / .55);
+  box-shadow: 0 18px 44px rgb(0 0 0 / .34), 0 0 24px rgb(98 223 115 / .07);
+}
+
+[data-theme="dark"] .stockHubGlyph,
+[data-theme="dark"] .stockHubTitleIcon,
+[data-theme="dark"] .stockHubIntegrityIcon {
+  border-color: rgb(98 223 115 / .34);
+  background: linear-gradient(145deg, rgb(98 223 115 / .12), rgb(98 223 115 / .035));
+  box-shadow: inset 0 0 28px rgb(98 223 115 / .06), 0 0 24px rgb(98 223 115 / .035);
+}
+
+[data-theme="dark"] .stockHubChevron {
+  border-color: rgb(98 223 115 / .34);
+  background: linear-gradient(145deg, rgb(98 223 115 / .16), rgb(98 223 115 / .04));
+  box-shadow: inset 0 0 18px rgb(98 223 115 / .05);
+}
+
+[data-theme="dark"] .stockHubIntegrityNote,
+[data-theme="dark"] .stockHubTrustStrip {
+  border-color: #233a2a;
+  background: linear-gradient(145deg, #0d1710, #09110c);
+}
+
+@media (max-width: 820px) {
+  .personalStockHubPage {
+    max-width: 760px;
+  }
+
+  .stockHubAppGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .stockHubAppCard {
+    min-height: 150px;
+  }
+}
+
+@media (max-width: 560px) {
+  .personalStockHubPage {
+    gap: 18px;
+    margin-inline: -2px;
+    padding: 20px 14px 22px;
+    border-radius: 26px;
+  }
+
+  .stockHubTitleRow {
+    align-items: flex-start;
+  }
+
+  .stockHubTitleIcon {
+    width: 42px;
+    height: 42px;
+    flex-basis: 42px;
+    border-radius: 14px;
+  }
+
+  .stockHubTitleIcon svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .stockHubAppGrid {
+    gap: 14px;
+  }
+
+  .stockHubAppCard {
+    min-height: 0;
+    grid-template-columns: 62px minmax(0, 1fr) 42px;
+    gap: 14px;
+    padding: 18px 14px 18px 18px;
+    border-radius: 22px;
+  }
+
+  .stockHubAppCard::before {
+    inset-block: 16px;
+  }
+
+  .stockHubGlyph {
+    width: 60px;
+    height: 60px;
+    border-radius: 18px;
+  }
+
+  .stockHubGlyph svg {
+    width: 33px;
+    height: 33px;
+  }
+
+  .stockHubCardCopy strong {
+    font-size: 1rem;
+  }
+
+  .stockHubCardCopy p {
+    margin-top: 6px;
+    font-size: .9rem;
+    line-height: 1.48;
+  }
+
+  .stockHubChevron {
+    width: 40px;
+    height: 40px;
+  }
+
+  .stockHubChevron svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .stockHubIntegrityNote {
+    grid-template-columns: 52px minmax(0, 1fr);
+    gap: 14px;
+    padding: 17px 16px;
+    border-radius: 20px;
+  }
+
+  .stockHubIntegrityIcon {
+    width: 50px;
+    height: 50px;
+    border-radius: 16px;
+  }
+
+  .stockHubIntegrityIcon svg {
+    width: 30px;
+    height: 30px;
+  }
+
+  .stockHubTrustStrip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .stockHubTrustItem {
+    min-height: 105px;
+    padding: 14px 8px;
+  }
+
+  .stockHubTrustItem:nth-child(3),
+  .stockHubTrustItem:nth-child(4) {
+    border-top: 1px solid color-mix(in srgb, var(--stock-neon) 18%, var(--border-subtle, #dfe4df));
+  }
+
+  .stockHubTrustItem:nth-child(3)::before {
+    display: none;
+  }
+
+  .stockHubTrustItem strong {
+    font-size: .92rem;
+  }
+}
+
+@media (max-width: 390px) {
+  .personalStockHubPage {
+    padding-inline: 12px;
+  }
+
+  .stockHubAppCard {
+    grid-template-columns: 56px minmax(0, 1fr) 38px;
+    gap: 11px;
+    padding-inline: 16px 10px;
+  }
+
+  .stockHubGlyph {
+    width: 54px;
+    height: 54px;
+  }
+
+  .stockHubGlyph svg {
+    width: 29px;
+    height: 29px;
+  }
+
+  .stockHubChevron {
+    width: 38px;
+    height: 38px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stockHubAppCard,
+  .stockHubChevron {
+    transition: none;
+  }
+}
