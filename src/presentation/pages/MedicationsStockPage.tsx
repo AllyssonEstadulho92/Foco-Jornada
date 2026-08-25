@@ -35,13 +35,27 @@ function formatDuration(seconds?: number): string {
   return `${hours} h ${minutes} min`
 }
 
+function doseStatusLabel(status: MedicationDoseEvent['status']): string {
+  if (status === 'taken') return 'TOMADA'
+  if (status === 'not_taken') return 'NÃO TOMADA'
+  if (status === 'postponed') return 'ADIADA'
+  return 'CORRIGIDA'
+}
+
+function doseStatusClass(status: MedicationDoseEvent['status']): string {
+  if (status === 'taken') return 'stockStatusOk'
+  if (status === 'postponed') return 'stockStatusWarning'
+  if (status === 'not_taken') return 'stockStatusNeutral'
+  return 'stockStatusNeutral'
+}
+
 interface TodayDose {
   schedule: MedicationSchedule
-  taken?: MedicationDoseEvent
+  event?: MedicationDoseEvent
 }
 
 export function MedicationsStockPage() {
-  const { personalStockService } = useAppServices()
+  const { personalStockService, medicationDoseStatusService } = useAppServices()
   const [medications, setMedications] = useState<MedicationSummary[]>([])
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [schedules, setSchedules] = useState<MedicationSchedule[]>([])
@@ -122,20 +136,30 @@ export function MedicationsStockPage() {
     }
   }
 
-  const correctedIds = useMemo(
-    () => new Set(events.filter((event) => event.status === 'corrected' && event.correctionOf).map((event) => event.correctionOf)),
-    [events],
-  )
+  const activeEvents = useMemo(() => {
+    const correctedIds = new Set(
+      events
+        .filter((event) => event.status === 'corrected' && event.correctionOf)
+        .map((event) => event.correctionOf as string),
+    )
+    const map = new Map<string, MedicationDoseEvent>()
+    for (const event of events) {
+      if (event.status === 'corrected' || correctedIds.has(event.id)) continue
+      const current = map.get(event.occurrenceKey)
+      if (!current || current.createdAt < event.createdAt || (current.createdAt === event.createdAt && current.id < event.id)) {
+        map.set(event.occurrenceKey, event)
+      }
+    }
+    return map
+  }, [events])
 
-  const todayDoses: TodayDose[] = schedules.map((schedule) => ({
-    schedule,
-    taken: events.find(
-      (event) => event.scheduleId === schedule.id
-        && event.occurrenceKey === `${schedule.id}:${today}`
-        && event.status === 'taken'
-        && !correctedIds.has(event.id),
-    ),
-  }))
+  const todayDoses: TodayDose[] = useMemo(
+    () => schedules.map((schedule) => ({
+      schedule,
+      event: activeEvents.get(`${schedule.id}:${today}`),
+    })),
+    [activeEvents, schedules, today],
+  )
 
   async function createMedication() {
     const medicationId = globalThis.crypto.randomUUID()
@@ -154,6 +178,18 @@ export function MedicationsStockPage() {
     setShowCreate(false)
     await loadList(medicationId)
     setSelectedId(medicationId)
+  }
+
+  async function correctDoseEvent(event: MedicationDoseEvent) {
+    if (event.status === 'taken') {
+      await personalStockService.undoMedicationDose(event.id, operationId())
+      return
+    }
+    if (event.status === 'not_taken' || event.status === 'postponed') {
+      await medicationDoseStatusService.correctMedicationDoseStatus(event.id, operationId())
+      return
+    }
+    throw new Error('Este estado já está corrigido.')
   }
 
   return (
@@ -252,44 +288,85 @@ export function MedicationsStockPage() {
             </div>
             {todayDoses.length ? (
               <div className="stockDoseList">
-                {todayDoses.map(({ schedule, taken }) => (
+                {todayDoses.map(({ schedule, event }) => (
                   <article className="stockDoseRow" key={schedule.id}>
                     <div>
                       <strong>{schedule.localTime}</strong>
                       <small>{minorToDecimal(schedule.quantityMinor)} {selected.medication.unit}</small>
                     </div>
-                    {taken ? (
+                    {event ? (
                       <div className="stockDoseActions">
-                        <span className="stockStatusOk">TOMADA</span>
+                        <span className={doseStatusClass(event.status)}>{doseStatusLabel(event.status)}</span>
                         <button
                           type="button"
                           disabled={busy}
                           onClick={() => void run(
-                            async () => { await personalStockService.undoMedicationDose(taken.id, operationId()) },
-                            'Toma corrigida. O stock foi reposto através de um movimento de correção.',
+                            async () => { await correctDoseEvent(event) },
+                            event.status === 'taken'
+                              ? 'Toma corrigida. O stock foi reposto através de um movimento de correção.'
+                              : 'Estado corrigido. A toma voltou a ficar disponível para registo.',
                           )}
                         >
                           Corrigir
                         </button>
                       </div>
                     ) : (
-                      <button
-                        type="button"
-                        disabled={busy}
-                        onClick={() => void run(
-                          async () => {
-                            await personalStockService.confirmMedicationDose({
-                              medicationId: selected.medication.id,
-                              scheduleId: schedule.id,
-                              onDate: today,
-                              operationId: operationId(),
-                            })
-                          },
-                          'Toma confirmada. O stock foi descontado na transação.',
-                        )}
-                      >
-                        Confirmar toma
-                      </button>
+                      <div className="stockDoseChoiceActions">
+                        <button
+                          className="stockPrimaryAction"
+                          type="button"
+                          disabled={busy}
+                          onClick={() => void run(
+                            async () => {
+                              await personalStockService.confirmMedicationDose({
+                                medicationId: selected.medication.id,
+                                scheduleId: schedule.id,
+                                onDate: today,
+                                operationId: operationId(),
+                              })
+                            },
+                            'Toma confirmada. O stock foi descontado na transação.',
+                          )}
+                        >
+                          Confirmar toma
+                        </button>
+                        <button
+                          type="button"
+                          disabled={busy}
+                          onClick={() => void run(
+                            async () => {
+                              await medicationDoseStatusService.setMedicationDoseStatus({
+                                medicationId: selected.medication.id,
+                                scheduleId: schedule.id,
+                                onDate: today,
+                                operationId: operationId(),
+                                status: 'not_taken',
+                              })
+                            },
+                            'Toma marcada como não tomada. O stock não foi alterado.',
+                          )}
+                        >
+                          Não tomada
+                        </button>
+                        <button
+                          type="button"
+                          disabled={busy}
+                          onClick={() => void run(
+                            async () => {
+                              await medicationDoseStatusService.setMedicationDoseStatus({
+                                medicationId: selected.medication.id,
+                                scheduleId: schedule.id,
+                                onDate: today,
+                                operationId: operationId(),
+                                status: 'postponed',
+                              })
+                            },
+                            'Toma marcada como adiada. O stock não foi alterado.',
+                          )}
+                        >
+                          Adiar
+                        </button>
+                      </div>
                     )}
                   </article>
                 ))}

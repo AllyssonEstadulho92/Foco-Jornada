@@ -6,7 +6,7 @@ import { FocusPage } from './pages/FocusPage'
 import { GuidePage } from './pages/GuidePage'
 import { HistoryPage } from './pages/HistoryPage'
 import { MedicationsStockPage } from './pages/MedicationsStockPage'
-import { MorePage } from './pages/MorePage'
+import { MoreWithBackupPage } from './pages/MoreWithBackupPage'
 import { PayrollPage } from './pages/PayrollPage'
 import { PayrollReferencePage } from './pages/PayrollReferencePage'
 import { PersonalStockHubPage } from './pages/PersonalStockHubPage'
@@ -27,7 +27,7 @@ export const router = createHashRouter([
       { path: 'atividades', element: <ActivitiesPage /> },
       { path: 'foco', element: <FocusPage /> },
       { path: 'historico', element: <HistoryPage /> },
-      { path: 'mais', element: <MorePage /> },
+      { path: 'mais', element: <MoreWithBackupPage /> },
       { path: 'stock', element: <PersonalStockHubPage /> },
       { path: 'medicamentos', element: <MedicationsStockPage /> },
       { path: 'sticks', element: <SticksStockPage /> },
