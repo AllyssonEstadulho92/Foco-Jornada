@@ -13,6 +13,7 @@ export const primaryNavigation: NavigationItem[] = [
   { label: 'Atividades', path: '/atividades', icon: 'activities' },
   { label: 'Foco', path: '/foco', icon: 'focus' },
   { label: 'Histórico', path: '/historico', icon: 'history' },
+  { label: 'Stock pessoal', path: '/stock', icon: 'more' },
   { label: 'Mais', path: '/mais', icon: 'more' },
 ]
 

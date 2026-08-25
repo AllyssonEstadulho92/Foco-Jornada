@@ -5,6 +5,7 @@ import type { BreakRepository } from '../../application/breaks/BreakRepository'
 import type { CoffeeRepository } from '../../application/coffee/CoffeeRepository'
 import type { FocusRepository } from '../../application/focus/FocusRepository'
 import type { JourneyRepository } from '../../application/journey/JourneyRepository'
+import type { PersonalStockService } from '../../application/personalStock/PersonalStockService'
 import type { SettingsRepository } from '../../application/settings/SettingsRepository'
 
 export interface AppServices {
@@ -14,7 +15,10 @@ export interface AppServices {
   focusRepository: FocusRepository
   coffeeRepository: CoffeeRepository
   settingsRepository: SettingsRepository
+  personalStockService?: PersonalStockService
 }
+
+type RuntimeAppServices = AppServices & { personalStockService: PersonalStockService }
 
 const AppServicesContext = createContext<AppServices | null>(null)
 
@@ -22,8 +26,8 @@ export function AppServicesProvider({ services, children }: { services: AppServi
   return <AppServicesContext.Provider value={services}>{children}</AppServicesContext.Provider>
 }
 
-export function useAppServices(): AppServices {
+export function useAppServices(): RuntimeAppServices {
   const services = useContext(AppServicesContext)
   if (!services) throw new Error('AppServicesProvider não foi configurado.')
-  return services
+  return services as RuntimeAppServices
 }

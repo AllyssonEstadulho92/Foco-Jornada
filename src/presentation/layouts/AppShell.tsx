@@ -44,6 +44,7 @@ const mobileMainNavigation: NavigationItem[] = [
   { label: 'Mapa de turnos', path: '/turnos', icon: 'activities' },
   { label: 'Atividades', path: '/atividades', icon: 'activities' },
   { label: 'Histórico', path: '/historico', icon: 'history' },
+  { label: 'Stock pessoal', path: '/stock', icon: 'more' },
   { label: 'Estatísticas', path: '/estatisticas', icon: 'stats' },
   { label: 'Horas', path: '/horas', icon: 'hours' },
   { label: 'Vencimento', path: '/vencimento', icon: 'payroll' },

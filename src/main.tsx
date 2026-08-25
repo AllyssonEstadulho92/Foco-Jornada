@@ -1,5 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import { PersonalStockService } from './application/personalStock/PersonalStockService'
 import { db } from './infrastructure/database/appDatabase'
 import { DexieActivityRepository } from './infrastructure/repositories/DexieActivityRepository'
 import { DexieBreakRepository } from './infrastructure/repositories/DexieBreakRepository'
@@ -44,6 +45,7 @@ import './styles/settings-button-reset.css'
 import './styles/reference-finance.css'
 import './styles/settings-functional.css'
 import './styles/export-a4.css'
+import './styles/personal-stock.css'
 import './styles/dark-contrast.css'
 
 const root = document.getElementById('root')
@@ -89,6 +91,7 @@ const services = {
   focusRepository: new DexieFocusRepository(db),
   coffeeRepository: new DexieCoffeeRepository(db),
   settingsRepository: new DexieSettingsRepository(db),
+  personalStockService: new PersonalStockService(db),
 }
 
 createRoot(root).render(
