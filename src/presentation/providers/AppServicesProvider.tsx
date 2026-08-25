@@ -5,6 +5,7 @@ import type { BreakRepository } from '../../application/breaks/BreakRepository'
 import type { CoffeeRepository } from '../../application/coffee/CoffeeRepository'
 import type { FocusRepository } from '../../application/focus/FocusRepository'
 import type { JourneyRepository } from '../../application/journey/JourneyRepository'
+import type { PersonalStockService } from '../../application/personalStock/PersonalStockService'
 import type { SettingsRepository } from '../../application/settings/SettingsRepository'
 
 export interface AppServices {
@@ -14,6 +15,7 @@ export interface AppServices {
   focusRepository: FocusRepository
   coffeeRepository: CoffeeRepository
   settingsRepository: SettingsRepository
+  personalStockService: PersonalStockService
 }
 
 const AppServicesContext = createContext<AppServices | null>(null)
