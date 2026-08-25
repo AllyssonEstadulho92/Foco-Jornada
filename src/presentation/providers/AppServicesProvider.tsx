@@ -18,14 +18,16 @@ export interface AppServices {
   personalStockService?: PersonalStockService
 }
 
+type RuntimeAppServices = AppServices & { personalStockService: PersonalStockService }
+
 const AppServicesContext = createContext<AppServices | null>(null)
 
 export function AppServicesProvider({ services, children }: { services: AppServices; children: ReactNode }) {
   return <AppServicesContext.Provider value={services}>{children}</AppServicesContext.Provider>
 }
 
-export function useAppServices(): AppServices {
+export function useAppServices(): RuntimeAppServices {
   const services = useContext(AppServicesContext)
   if (!services) throw new Error('AppServicesProvider não foi configurado.')
-  return services
+  return services as RuntimeAppServices
 }
