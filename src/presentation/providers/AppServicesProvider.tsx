@@ -7,6 +7,7 @@ import type { CoffeeRepository } from '../../application/coffee/CoffeeRepository
 import type { FocusRepository } from '../../application/focus/FocusRepository'
 import type { JourneyRepository } from '../../application/journey/JourneyRepository'
 import type { MedicationDoseStatusService } from '../../application/personalStock/MedicationDoseStatusService'
+import type { NicotineAwarenessService } from '../../application/personalStock/NicotineAwarenessService'
 import type { PersonalStockService } from '../../application/personalStock/PersonalStockService'
 import type { StockReconciliationService } from '../../application/personalStock/StockReconciliationService'
 import type { SettingsRepository } from '../../application/settings/SettingsRepository'
@@ -21,6 +22,7 @@ export interface AppServices {
   personalStockService?: PersonalStockService
   medicationDoseStatusService?: MedicationDoseStatusService
   stockReconciliationService?: StockReconciliationService
+  nicotineAwarenessService?: NicotineAwarenessService
   backupService?: AppBackupService
 }
 
@@ -28,6 +30,7 @@ type RuntimeAppServices = AppServices & {
   personalStockService: PersonalStockService
   medicationDoseStatusService: MedicationDoseStatusService
   stockReconciliationService: StockReconciliationService
+  nicotineAwarenessService: NicotineAwarenessService
   backupService: AppBackupService
 }
 
