@@ -49,6 +49,10 @@ function nicotineAmount(minMg?: string, maxMg?: string): string {
   return minMg === maxMg ? `${local(minMg)} mg` : `${local(minMg)}–${local(maxMg)} mg`
 }
 
+function localDecimal(value: string): string {
+  return value.replace('.', ',')
+}
+
 export function SticksStockPage() {
   const { personalStockService, stockReconciliationService, nicotineAwarenessService } = useAppServices()
   const [summary, setSummary] = useState<StickSummary | null>(null)
@@ -95,6 +99,10 @@ export function SticksStockPage() {
         customMinMg: nicotineSettings.customMinMg,
         customMaxMg: nicotineSettings.customMaxMg,
         notes: nicotineSettings.notes,
+        reductionPlanEnabled: nicotineSettings.reductionPlanEnabled,
+        dailyBaselineSticks: nicotineSettings.dailyBaselineSticks,
+        weeklyReductionStep: nicotineSettings.weeklyReductionStep,
+        reductionPlanStartDate: nicotineSettings.reductionPlanStartDate,
       }).then(async () => {
         setNicotineSaveState('Guardado automaticamente no dispositivo e incluído no backup.')
         setNicotineSummary(await nicotineAwarenessService.getSummary())
@@ -109,6 +117,10 @@ export function SticksStockPage() {
     nicotineSettings?.customMinMg,
     nicotineSettings?.customMaxMg,
     nicotineSettings?.notes,
+    nicotineSettings?.reductionPlanEnabled,
+    nicotineSettings?.dailyBaselineSticks,
+    nicotineSettings?.weeklyReductionStep,
+    nicotineSettings?.reductionPlanStartDate,
     nicotineSettingsReady,
   ])
 
@@ -138,6 +150,21 @@ export function SticksStockPage() {
   ) => {
     setNicotineSettings((current) => current ? { ...current, [key]: value } : current)
   }
+
+  const reductionPlan = nicotineSummary?.reductionPlan
+  const reductionStatus = reductionPlan
+    ? !reductionPlan.enabled
+      ? 'Plano pausado'
+      : reductionPlan.overTargetBy > 0
+        ? `Acima da meta pessoal por ${reductionPlan.overTargetBy}`
+        : reductionPlan.consumedToday === reductionPlan.targetToday
+          ? 'Meta pessoal atingida'
+          : `Abaixo da meta pessoal por ${reductionPlan.remainingToTarget}`
+    : 'A carregar…'
+  const trendValue = reductionPlan ? Number(reductionPlan.trendDelta) : 0
+  const trendText = reductionPlan
+    ? `${trendValue > 0 ? '+' : ''}${localDecimal(reductionPlan.trendDelta)} sticks/dia`
+    : '—'
 
   return (
     <section className="personalStockPage sticksStockPage" aria-labelledby="sticks-title">
@@ -202,6 +229,90 @@ export function SticksStockPage() {
             <small>{nicotineSummary?.allTime.sticks ?? 0} sticks líquidos após correções</small>
           </article>
         </div>
+
+        {nicotineSettings && reductionPlan ? (
+          <section className="nicotineReductionPlan" aria-labelledby="nicotine-reduction-title">
+            <div className="nicotineReductionHeading">
+              <div>
+                <span className="stockPanelTag">PLANO PESSOAL DE REDUÇÃO</span>
+                <h3 id="nicotine-reduction-title">Linha de base: 13 sticks/dia</h3>
+              </div>
+              <span className="nicotineReductionBadge">META PESSOAL</span>
+            </div>
+
+            <div className="nicotineReductionGrid">
+              <article>
+                <span>Hoje</span>
+                <strong>{reductionPlan.consumedToday} / {reductionPlan.targetToday}</strong>
+                <small>registados / meta pessoal</small>
+              </article>
+              <article>
+                <span>Situação</span>
+                <strong>{reductionStatus}</strong>
+                <small>não é um limite seguro</small>
+              </article>
+              <article>
+                <span>Média dos últimos 7 dias</span>
+                <strong>{localDecimal(reductionPlan.last7DaysAverage)}</strong>
+                <small>sticks/dia</small>
+              </article>
+              <article>
+                <span>Tendência vs. 7 dias anteriores</span>
+                <strong className={trendValue > 0 ? 'nicotineTrendUp' : trendValue < 0 ? 'nicotineTrendDown' : ''}>{trendText}</strong>
+                <small>{reductionPlan.daysOverTargetLast7} dias acima da meta nos últimos 7</small>
+              </article>
+            </div>
+
+            <div className="nicotinePlanSettings">
+              <label className="nicotinePlanToggle">
+                <input
+                  type="checkbox"
+                  checked={nicotineSettings.reductionPlanEnabled}
+                  onChange={(event) => updateNicotineSetting('reductionPlanEnabled', event.target.checked)}
+                />
+                Plano automático ativo
+              </label>
+              <label>
+                Linha de base diária
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  min="1"
+                  max="200"
+                  value={nicotineSettings.dailyBaselineSticks}
+                  onChange={(event) => updateNicotineSetting('dailyBaselineSticks', Number(event.target.value))}
+                />
+              </label>
+              <label>
+                Redução por semana
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  min="1"
+                  max="50"
+                  value={nicotineSettings.weeklyReductionStep}
+                  onChange={(event) => updateNicotineSetting('weeklyReductionStep', Number(event.target.value))}
+                />
+              </label>
+              <label>
+                Início do plano
+                <input
+                  type="date"
+                  value={nicotineSettings.reductionPlanStartDate}
+                  onChange={(event) => updateNicotineSetting('reductionPlanStartDate', event.target.value)}
+                />
+              </label>
+            </div>
+
+            <div className="nicotinePlanProjection">
+              <strong>Semana {reductionPlan.weekNumber}: meta pessoal {reductionPlan.targetToday}/dia</strong>
+              <span>Próxima semana: {reductionPlan.nextWeekTarget}/dia · trajetória matemática até 0 em {reductionPlan.zeroTargetDate}.</span>
+            </div>
+            <p className="nicotinePlanSafety">
+              Esta meta serve apenas para acompanhar uma redução pessoal. Não significa que seja seguro consumir até esse número e a aplicação não usa a meta para incentivar novas utilizações.
+            </p>
+          </section>
+        ) : null}
 
         {nicotineSettings ? (
           <div className="nicotineSettingsGrid">
@@ -270,8 +381,8 @@ export function SticksStockPage() {
           A absorção depende do dispositivo, modo, produto e padrão de utilização; por isso a aplicação não apresenta este valor como dose corporal exata.
         </p>
         <p className="nicotineWhoNote">
-          A OMS classifica os produtos de tabaco aquecido como produtos que geram aerossóis com nicotina e substâncias tóxicas e salienta que a nicotina é altamente aditiva.{' '}
-          <a href="https://www.who.int/europe/news-room/fact-sheets/item/effects-of-tobacco-on-health" target="_blank" rel="noreferrer">Consultar OMS</a>.
+          A OMS refere que todas as formas de tabaco são nocivas, que não existe nível seguro de exposição ao tabaco e que a nicotina é altamente aditiva.{' '}
+          <a href="https://www.who.int/en/news-room/fact-sheets/detail/tobacco" target="_blank" rel="noreferrer">Consultar OMS</a>.
         </p>
       </section>
 
@@ -310,7 +421,7 @@ export function SticksStockPage() {
               disabled={busy || (summary.stock ?? 0) <= 0}
               onClick={() => void run(
                 () => personalStockService.consumeStick(operationId()),
-                '1 stick utilizado. Stock e estimativa de nicotina atualizados.',
+                '1 stick utilizado. Stock, meta pessoal e estimativa de nicotina atualizados.',
               )}
             >
               + 1 stick utilizado
