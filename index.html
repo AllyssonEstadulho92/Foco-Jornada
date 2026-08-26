@@ -2,10 +2,7 @@
 <html lang="pt-PT">
   <head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="color-scheme" content="light dark" />
     <meta name="theme-color" content="#f7f8f6" />
     <meta name="description" content="Foco & Jornada — produtividade pessoal e profissional." />
@@ -16,199 +13,37 @@
       ;(() => {
         const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false
         let preference = 'system'
-
         try {
           const persisted = JSON.parse(localStorage.getItem('foco-jornada-ui-v2') || '{}')
           const storedTheme = persisted?.state?.theme
-          if (storedTheme === 'light' || storedTheme === 'dark' || storedTheme === 'system') {
-            preference = storedTheme
-          }
-        } catch {
-          // Um valor local inválido não deve impedir o arranque da aplicação.
-        }
-
+          if (storedTheme === 'light' || storedTheme === 'dark' || storedTheme === 'system') preference = storedTheme
+        } catch {}
         const resolved = preference === 'system' ? (prefersDark ? 'dark' : 'light') : preference
         const themeColor = resolved === 'dark' ? '#070a08' : '#f7f8f6'
         document.documentElement.dataset.theme = resolved
         document.documentElement.style.colorScheme = resolved
         document.querySelector('meta[name="theme-color"]')?.setAttribute('content', themeColor)
-        document
-          .querySelector('meta[name="apple-mobile-web-app-status-bar-style"]')
-          ?.setAttribute('content', resolved === 'dark' ? 'black-translucent' : 'default')
-      })()
-    </script>
-    <script>
-      ;(() => {
-        const recoveryKey = 'foco-jornada-boot-recovery-v2'
-        let recovering = false
-        const errors = []
-
-        function rememberError(value) {
-          const text = value instanceof Error ? value.message : String(value || 'Erro de arranque desconhecido')
-          if (text && !errors.includes(text)) errors.push(text)
-        }
-
-        async function recoverBoot(reason = 'arranque bloqueado') {
-          if (recovering) return
-          recovering = true
-          rememberError(reason)
-
-          let alreadyRecovered = false
-          try {
-            alreadyRecovered = sessionStorage.getItem(recoveryKey) === '1'
-          } catch {
-            // Safari pode restringir storage em alguns modos; a recuperação continua.
-          }
-
-          if (alreadyRecovered) {
-            const fallback = document.getElementById('app-boot-fallback')
-            const message = document.getElementById('app-boot-message')
-            const detail = document.getElementById('app-boot-detail')
-            if (fallback) fallback.dataset.stalled = 'true'
-            if (message) message.textContent = 'A aplicação continua sem iniciar após a recuperação automática.'
-            if (detail && errors.length) detail.textContent = errors[errors.length - 1]
-            recovering = false
-            return
-          }
-
-          try {
-            sessionStorage.setItem(recoveryKey, '1')
-          } catch {
-            // Prosseguir mesmo sem sessionStorage.
-          }
-
-          try {
-            if ('serviceWorker' in navigator) {
-              const registrations = await navigator.serviceWorker.getRegistrations()
-              await Promise.all(
-                registrations
-                  .filter((registration) => {
-                    try {
-                      return new URL(registration.scope).pathname.startsWith('/Foco-Jornada/')
-                    } catch {
-                      return false
-                    }
-                  })
-                  .map((registration) => registration.unregister()),
-              )
-            }
-          } catch (error) {
-            rememberError(error)
-          }
-
-          const cleanUrl = new URL('/Foco-Jornada/', window.location.origin)
-          cleanUrl.searchParams.set('boot-recovery', Date.now().toString())
-          cleanUrl.hash = window.location.hash
-          window.location.replace(cleanUrl.toString())
-        }
-
-        window.__focoRecoverBoot = recoverBoot
-        window.__focoBootErrors = errors
-
-        window.addEventListener(
-          'error',
-          (event) => {
-            if (event.error) rememberError(event.error)
-            else if (event.message) rememberError(event.message)
-            else if (event.target instanceof HTMLScriptElement) rememberError(`Falha ao carregar script: ${event.target.src}`)
-            else if (event.target instanceof HTMLLinkElement) rememberError(`Falha ao carregar recurso: ${event.target.href}`)
-          },
-          true,
-        )
-
-        window.addEventListener('unhandledrejection', (event) => rememberError(event.reason))
+        document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]')?.setAttribute('content', resolved === 'dark' ? 'black-translucent' : 'default')
       })()
     </script>
     <style>
-      html,
-      body,
-      #root {
-        min-height: 100%;
-        margin: 0;
-      }
-
-      body {
-        background: #f7f8f6;
-      }
-
-      [data-theme='dark'] body {
-        background: #070a08;
-      }
-
-      .appBootFallback {
-        min-height: 100dvh;
-        box-sizing: border-box;
-        display: grid;
-        place-items: center;
-        padding: 32px 24px;
-        background: #f7f8f6;
-        color: #17201b;
-        font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-        text-align: center;
-      }
-
-      [data-theme='dark'] .appBootFallback {
-        background: #070a08;
-        color: #f4f6f5;
-      }
-
-      .appBootFallbackInner {
-        display: grid;
-        gap: 10px;
-        justify-items: center;
-        max-width: 340px;
-      }
-
-      .appBootFallback strong {
-        font-size: 1.1rem;
-      }
-
-      .appBootFallback p {
-        margin: 0;
-        color: #66706a;
-        line-height: 1.5;
-      }
-
-      [data-theme='dark'] .appBootFallback p {
-        color: #aeb8b2;
-      }
-
-      .appBootFallback small {
-        display: none;
-        max-width: 100%;
-        overflow-wrap: anywhere;
-        color: #8a4d45;
-        font-size: .78rem;
-        line-height: 1.4;
-      }
-
-      .appBootFallback[data-stalled='true'] small {
-        display: block;
-      }
-
-      .appBootFallback button {
-        display: none;
-        min-height: 48px;
-        margin-top: 8px;
-        padding: 11px 18px;
-        border: 0;
-        border-radius: 999px;
-        background: #2f8f5b;
-        color: #fff;
-        font: inherit;
-        font-weight: 750;
-        cursor: pointer;
-      }
-
-      .appBootFallback[data-stalled='true'] button {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-      }
+      html, body, #root { min-height: 100%; margin: 0; }
+      body { background: #f7f8f6; }
+      [data-theme='dark'] body { background: #070a08; }
+      .appBootFallback { min-height: 100dvh; box-sizing: border-box; display: grid; place-items: center; padding: 32px 24px; background: #f7f8f6; color: #17201b; font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; text-align: center; }
+      [data-theme='dark'] .appBootFallback { background: #070a08; color: #f4f6f5; }
+      .appBootFallbackInner { display: grid; gap: 10px; justify-items: center; max-width: 340px; }
+      .appBootFallback strong { font-size: 1.1rem; }
+      .appBootFallback p { margin: 0; color: #66706a; line-height: 1.5; }
+      [data-theme='dark'] .appBootFallback p { color: #aeb8b2; }
+      .appBootFallback small { display: none; max-width: 100%; overflow-wrap: anywhere; color: #8a4d45; font-size: .78rem; line-height: 1.4; }
+      .appBootFallback[data-stalled='true'] small { display: block; }
     </style>
-    <link rel="icon" type="image/svg+xml" href="%BASE_URL%icon.svg" />
+    <link rel="icon" type="image/svg+xml" href="/Foco-Jornada/icon.svg" />
     <title>Foco & Jornada</title>
-  </head>
+    <script type="module" crossorigin src="/Foco-Jornada/assets/index-CH4q9r24.js"></script>
+    <link rel="stylesheet" crossorigin href="/Foco-Jornada/assets/index-BIuTK7u5.css">
+  <link rel="manifest" href="/Foco-Jornada/manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="/Foco-Jornada/registerSW.js"></script></head>
   <body>
     <div id="root">
       <div class="appBootFallback" id="app-boot-fallback" role="status" aria-live="polite">
@@ -216,32 +51,23 @@
           <strong>Foco Jornada</strong>
           <p id="app-boot-message">A carregar a aplicação…</p>
           <small id="app-boot-detail"></small>
-          <button type="button" id="app-boot-retry">Reparar e reabrir</button>
         </div>
       </div>
     </div>
     <script>
-      ;(() => {
-        const retry = document.getElementById('app-boot-retry')
-        retry?.addEventListener('click', () => window.__focoRecoverBoot?.('recuperação manual'))
-
-        window.setTimeout(() => {
-          const fallback = document.getElementById('app-boot-fallback')
-          if (!fallback) {
-            try {
-              sessionStorage.removeItem('foco-jornada-boot-recovery-v2')
-            } catch {
-              // Nada a fazer.
-            }
-            return
-          }
-
-          const message = document.getElementById('app-boot-message')
-          if (message) message.textContent = 'A reparar o arranque da aplicação…'
-          void window.__focoRecoverBoot?.(window.__focoBootErrors?.at(-1) || 'tempo limite de arranque')
-        }, 6500)
-      })()
+      window.addEventListener('error', (event) => {
+        const detail = document.getElementById('app-boot-detail')
+        if (!detail) return
+        if (event.target instanceof HTMLScriptElement) detail.textContent = `Falha ao carregar script: ${event.target.src}`
+        else if (event.message) detail.textContent = event.message
+      }, true)
+      window.setTimeout(() => {
+        const fallback = document.getElementById('app-boot-fallback')
+        const message = document.getElementById('app-boot-message')
+        if (!fallback || !message) return
+        fallback.dataset.stalled = 'true'
+        message.textContent = 'A aplicação não iniciou. Atualiza a página para tentar novamente.'
+      }, 8000)
     </script>
-    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
