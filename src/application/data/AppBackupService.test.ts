@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { AppDatabase } from '../../infrastructure/database/appDatabase'
+import { MedicationDataProtectionService } from '../personalStock/MedicationDataProtectionService'
 import { MedicationDoseStatusService } from '../personalStock/MedicationDoseStatusService'
 import { PersonalStockService } from '../personalStock/PersonalStockService'
 import { AppBackupService, BACKUP_APP_VERSION, BACKUP_FORMAT } from './AppBackupService'
@@ -152,4 +153,55 @@ describe('AppBackupService', () => {
       await db.delete()
     }
   })
+
+  it('preserva registos locais de medicação criados depois de uma cópia integral mais antiga', async () => {
+    const db = makeDatabase()
+    try {
+      const stock = new PersonalStockService(db)
+      const backup = new AppBackupService(db)
+      const medicationId = operationId()
+      await stock.createMedication({
+        medicationId,
+        operationId: operationId(),
+        name: 'Medicamento preservado',
+        dosage: '20 mg',
+        unit: 'comprimidos',
+        initialStock: '12',
+        startDate: '2026-08-26',
+      })
+      await stock.addMedicationSchedule({
+        medicationId,
+        localTime: '08:00',
+        quantity: '1',
+        effectiveFrom: '2026-08-26',
+      })
+
+      const olderBackup = await backup.exportText()
+
+      const laterSchedule = await stock.addMedicationSchedule({
+        medicationId,
+        localTime: '20:00',
+        quantity: '1',
+        effectiveFrom: '2026-08-26',
+      })
+      await stock.confirmMedicationDose({
+        medicationId,
+        scheduleId: laterSchedule.id,
+        onDate: '2026-08-26',
+        operationId: operationId(),
+      })
+      const protection = new MedicationDataProtectionService(db)
+      await protection.saveProtectedNote(medicationId, 'Nota criada depois da cópia antiga.')
+
+      await backup.restoreFromText(olderBackup)
+
+      expect((await db.medicationSchedules.where('medicationId').equals(medicationId).toArray())).toHaveLength(2)
+      expect((await db.medicationDoseEvents.where('medicationId').equals(medicationId).toArray())).toHaveLength(1)
+      expect(await protection.getProtectedNote(medicationId)).toBe('Nota criada depois da cópia antiga.')
+      expect((await stock.getMedicationSummary(medicationId)).stock).toBe('11')
+    } finally {
+      await db.delete()
+    }
+  })
+
 })

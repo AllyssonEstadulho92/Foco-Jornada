@@ -172,7 +172,7 @@ export function MedicationProtectionPanel() {
   if (!medications.length) return null
 
   return (
-    <section className="medicationProtectionPanel" aria-labelledby="medication-protection-title">
+    <section className="medicationProtectionPanel" id="medication-protection-integrated" aria-labelledby="medication-protection-title">
       <div className="medicationProtectionHeading">
         <div>
           <span className="stockPanelTag">PROTEÇÃO INTEGRADA · MEDICAÇÃO</span>

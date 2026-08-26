@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { AppBackupService } from '../data/AppBackupService'
 import { AppDatabase } from '../../infrastructure/database/appDatabase'
 import { MedicationDataProtectionService } from './MedicationDataProtectionService'
+import { MedicationDoseStatusService } from './MedicationDoseStatusService'
 import { PersonalStockService } from './PersonalStockService'
 
 function operationId(): string {
@@ -111,4 +112,119 @@ describe('MedicationDataProtectionService', () => {
       await target.delete()
     }
   })
+
+  it('keeps protected profile revisions and exposes them in the never-delete timeline', async () => {
+    const db = makeDatabase('profile-history')
+    try {
+      const { medicationId } = await createMedication(db)
+      const protection = new MedicationDataProtectionService(db)
+
+      await protection.saveProfile(medicationId, {
+        status: 'active',
+        prescribedBy: 'Profissional A',
+        observation: 'Primeira observação.',
+      })
+      await protection.saveProfile(medicationId, {
+        status: 'paused',
+        prescribedBy: 'Profissional A',
+        observation: 'Segunda observação sem apagar a primeira.',
+      })
+
+      const profile = await protection.getProfile(medicationId)
+      const revisions = await protection.listProfileRevisions(medicationId)
+      const timeline = await protection.getMedicationTimeline(medicationId)
+      const summary = await protection.verifyMedication(medicationId)
+
+      expect(profile.status).toBe('paused')
+      expect(profile.observation).toContain('Segunda')
+      expect(revisions).toHaveLength(2)
+      expect(revisions[0].observation).toContain('Primeira')
+      expect(summary.profileRevisionCount).toBe(2)
+      expect(timeline.filter((item) => item.kind === 'profile')).toHaveLength(2)
+    } finally {
+      await db.delete()
+    }
+  })
+
+  it('merges a protected medication backup without clearing unrelated local data', async () => {
+    const source = makeDatabase('merge-source')
+    const target = makeDatabase('merge-target')
+    try {
+      const { stock, medicationId } = await createMedication(source)
+      await stock.addMedicationSchedule({
+        medicationId,
+        localTime: '08:00',
+        quantity: '1',
+        effectiveFrom: '2026-08-26',
+      })
+      const sourceProtection = new MedicationDataProtectionService(source)
+      await sourceProtection.saveProtectedNote(medicationId, 'Nota que tem de sobreviver.')
+      await sourceProtection.saveProfile(medicationId, {
+        status: 'active',
+        prescribedBy: 'Profissional B',
+        observation: 'Tomar conforme prescrição registada.',
+      })
+      await sourceProtection.recordCheckpoint(medicationId, 'antes de exportar')
+
+      const text = await sourceProtection.exportMedicationSnapshotText()
+      await target.metadata.put({ key: 'sentinel', value: 'não apagar', updatedAt: new Date().toISOString() })
+
+      const targetProtection = new MedicationDataProtectionService(target)
+      const first = await targetProtection.mergeMedicationSnapshotText(text)
+      const second = await targetProtection.mergeMedicationSnapshotText(text)
+
+      expect(first.medicationCount).toBe(1)
+      expect(first.addedRecords).toBeGreaterThan(0)
+      expect(second.addedRecords).toBe(0)
+      expect((await target.metadata.get('sentinel'))?.value).toBe('não apagar')
+      expect(await targetProtection.getProtectedNote(medicationId)).toBe('Nota que tem de sobreviver.')
+      expect((await targetProtection.getProfile(medicationId)).prescribedBy).toBe('Profissional B')
+      expect((await targetProtection.verifyMedication(medicationId)).status).toBe('OK')
+    } finally {
+      await source.delete()
+      await target.delete()
+    }
+  })
+
+  it('calculates the today dashboard from active scheduled dose records without clinical inference', async () => {
+    const db = makeDatabase('dashboard')
+    try {
+      const { stock, medicationId } = await createMedication(db)
+      const first = await stock.addMedicationSchedule({
+        medicationId,
+        localTime: '08:00',
+        quantity: '1',
+        effectiveFrom: '2026-08-26',
+      })
+      const second = await stock.addMedicationSchedule({
+        medicationId,
+        localTime: '20:00',
+        quantity: '1',
+        effectiveFrom: '2026-08-26',
+      })
+      await stock.confirmMedicationDose({
+        medicationId,
+        scheduleId: first.id,
+        onDate: '2026-08-26',
+        operationId: operationId(),
+      })
+      await new MedicationDoseStatusService(db).setMedicationDoseStatus({
+        medicationId,
+        scheduleId: second.id,
+        onDate: '2026-08-26',
+        operationId: operationId(),
+        status: 'not_taken',
+      })
+
+      const dashboard = await new MedicationDataProtectionService(db).getTodayDashboard('2026-08-26')
+      expect(dashboard.medicationCount).toBe(1)
+      expect(dashboard.scheduledDoseCount).toBe(2)
+      expect(dashboard.takenDoseCount).toBe(1)
+      expect(dashboard.notTakenDoseCount).toBe(1)
+      expect(dashboard.pendingDoseCount).toBe(0)
+    } finally {
+      await db.delete()
+    }
+  })
+
 })
