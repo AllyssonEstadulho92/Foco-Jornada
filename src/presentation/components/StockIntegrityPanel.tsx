@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { minorToDecimal } from '../../application/personalStock/decimal'
 import type { ReconciliationResult } from '../../domain/personalStock/models'
@@ -35,13 +35,15 @@ function storageLabel(value: StorageProtection): string {
 
 export function StockIntegrityPanel({ scope }: { scope: IntegrityScope }) {
   const { personalStockService, backupService } = useAppServices()
+  const checkingRef = useRef(false)
   const [audit, setAudit] = useState<IntegrityAudit | null>(null)
   const [checking, setChecking] = useState(false)
   const [message, setMessage] = useState('')
   const [storageProtection, setStorageProtection] = useState<StorageProtection>('checking')
 
   const verify = useCallback(async () => {
-    if (checking) return
+    if (checkingRef.current) return
+    checkingRef.current = true
     setChecking(true)
     setMessage('')
     try {
@@ -96,9 +98,10 @@ export function StockIntegrityPanel({ scope }: { scope: IntegrityScope }) {
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'Não foi possível verificar a integridade.')
     } finally {
+      checkingRef.current = false
       setChecking(false)
     }
-  }, [backupService, checking, personalStockService, scope])
+  }, [backupService, personalStockService, scope])
 
   useEffect(() => {
     void verify()
