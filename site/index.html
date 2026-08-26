@@ -37,12 +37,98 @@
           ?.setAttribute('content', resolved === 'dark' ? 'black-translucent' : 'default')
       })()
     </script>
-    <link rel="icon" type="image/svg+xml" href="./icon.svg" />
+    <style>
+      html,
+      body,
+      #root {
+        min-height: 100%;
+        margin: 0;
+      }
+
+      body {
+        background: #f7f8f6;
+      }
+
+      [data-theme='dark'] body {
+        background: #070a08;
+      }
+
+      .appBootFallback {
+        min-height: 100dvh;
+        box-sizing: border-box;
+        display: grid;
+        place-items: center;
+        padding: 32px 24px;
+        background: #f7f8f6;
+        color: #17201b;
+        font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        text-align: center;
+      }
+
+      [data-theme='dark'] .appBootFallback {
+        background: #070a08;
+        color: #f4f6f5;
+      }
+
+      .appBootFallbackInner {
+        display: grid;
+        gap: 10px;
+        justify-items: center;
+        max-width: 320px;
+      }
+
+      .appBootFallback strong {
+        font-size: 1.1rem;
+      }
+
+      .appBootFallback p {
+        margin: 0;
+        color: #66706a;
+        line-height: 1.5;
+      }
+
+      [data-theme='dark'] .appBootFallback p {
+        color: #aeb8b2;
+      }
+
+      .appBootFallback a {
+        display: none;
+        margin-top: 8px;
+        padding: 11px 16px;
+        border-radius: 999px;
+        background: #2f8f5b;
+        color: #fff;
+        font-weight: 750;
+        text-decoration: none;
+      }
+
+      .appBootFallback[data-stalled='true'] a {
+        display: inline-flex;
+      }
+    </style>
+    <link rel="icon" type="image/svg+xml" href="/Foco-Jornada/icon.svg" />
     <title>Foco & Jornada</title>
-    <script type="module" crossorigin src="./assets/index-KemPcDFd.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-Vd3G5PC7.css">
-  <link rel="manifest" href="./manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="./registerSW.js"></script></head>
+    <script type="module" crossorigin src="/Foco-Jornada/assets/index-pzgRivxe.js"></script>
+    <link rel="stylesheet" crossorigin href="/Foco-Jornada/assets/index-Vd3G5PC7.css">
+  <link rel="manifest" href="/Foco-Jornada/manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="/Foco-Jornada/registerSW.js"></script></head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div class="appBootFallback" id="app-boot-fallback" role="status" aria-live="polite">
+        <div class="appBootFallbackInner">
+          <strong>Foco Jornada</strong>
+          <p id="app-boot-message">A carregar a aplicação…</p>
+          <a href="/Foco-Jornada/" id="app-boot-retry">Reabrir aplicação</a>
+        </div>
+      </div>
+    </div>
+    <script>
+      window.setTimeout(() => {
+        const fallback = document.getElementById('app-boot-fallback')
+        const message = document.getElementById('app-boot-message')
+        if (!fallback || !message) return
+        fallback.dataset.stalled = 'true'
+        message.textContent = 'A aplicação não iniciou. Tenta reabrir pela ligação principal.'
+      }, 8000)
+    </script>
   </body>
 </html>
