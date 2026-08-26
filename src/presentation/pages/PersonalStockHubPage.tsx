@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAppServices } from '../providers/AppServicesProvider'
 
@@ -120,13 +120,15 @@ function formatAuditTime(value: string): string {
 
 export function PersonalStockHubPage() {
   const { personalStockService, backupService } = useAppServices()
+  const loadingRef = useRef(false)
   const [activeView, setActiveView] = useState<TrustView>('integrity')
   const [overview, setOverview] = useState<StockHubOverview | null>(null)
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
 
   const refreshOverview = useCallback(async () => {
-    if (loading) return
+    if (loadingRef.current) return
+    loadingRef.current = true
     setLoading(true)
     setMessage('')
     try {
@@ -181,9 +183,10 @@ export function PersonalStockHubPage() {
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'Não foi possível verificar o stock pessoal.')
     } finally {
+      loadingRef.current = false
       setLoading(false)
     }
-  }, [backupService, loading, personalStockService])
+  }, [backupService, personalStockService])
 
   useEffect(() => {
     void refreshOverview()
