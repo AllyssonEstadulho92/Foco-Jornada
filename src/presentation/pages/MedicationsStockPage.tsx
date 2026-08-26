@@ -257,6 +257,21 @@ export function MedicationsStockPage() {
     [activeEvents, schedules, today],
   )
 
+  function scrollToMedicationSection(id: string) {
+    window.setTimeout(() => {
+      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 60)
+  }
+
+  function toggleCreateMedication() {
+    if (showCreate) {
+      setShowCreate(false)
+      return
+    }
+    setShowCreate(true)
+    scrollToMedicationSection('medication-create-form')
+  }
+
   async function createMedication() {
     const medicationId = globalThis.crypto.randomUUID()
     await personalStockService.createMedication({
@@ -277,6 +292,7 @@ export function MedicationsStockPage() {
     setShowCreate(false)
     await loadList(medicationId)
     setSelectedId(medicationId)
+    scrollToMedicationSection('medication-workspace')
   }
 
   async function correctDoseEvent(event: MedicationDoseEvent) {
@@ -371,30 +387,20 @@ export function MedicationsStockPage() {
           <h1 id="medications-title">Medicamentos</h1>
           <p>Gestão de stock e horários prescritos. A aplicação não recomenda nem altera tratamentos.</p>
         </div>
-        <button type="button" onClick={() => setShowCreate((value) => !value)}>
+        <button
+          type="button"
+          aria-expanded={showCreate}
+          aria-controls="medication-create-form"
+          onClick={toggleCreateMedication}
+        >
           {showCreate ? 'Fechar' : '+ Medicamento'}
         </button>
       </header>
 
       {message ? <div className="stockMessage" role="status">{message}</div> : null}
 
-      <MedicationPrototypeWorkspace
-        medications={medications}
-        selectedId={selectedId}
-        today={today}
-        onSelect={setSelectedId}
-        onAddMedication={() => {
-          setShowCreate(true)
-          window.setTimeout(() => document.getElementById('medication-create-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 0)
-        }}
-        onDataChanged={async () => {
-          await loadList(selectedId ?? undefined)
-          if (selectedId) await loadSelected(selectedId)
-        }}
-      />
-
       {showCreate || medications.length === 0 ? (
-        <section className="stockPanel" id="medication-create-form">
+        <section className="stockPanel" id="medication-create-form" tabIndex={-1}>
           <h2>Novo medicamento</h2>
           <div className="stockFormGrid">
             <label>Nome<input value={createForm.name} onChange={(event) => setCreateForm({ ...createForm, name: event.target.value })} /></label>
@@ -413,6 +419,23 @@ export function MedicationsStockPage() {
           </button>
         </section>
       ) : null}
+
+      <div id="medication-workspace">
+        <MedicationPrototypeWorkspace
+          medications={medications}
+          selectedId={selectedId}
+          today={today}
+          onSelect={setSelectedId}
+          onAddMedication={() => {
+            setShowCreate(true)
+            scrollToMedicationSection('medication-create-form')
+          }}
+          onDataChanged={async () => {
+            await loadList(selectedId ?? undefined)
+            if (selectedId) await loadSelected(selectedId)
+          }}
+        />
+      </div>
 
       {medications.length > 0 ? (
         <div className="stockMedicationSelector" role="tablist" aria-label="Medicamentos">
