@@ -26,6 +26,41 @@ jobs:
         run: npm test
       - name: Build
         run: npm run build
+      - name: Smoke test de arranque no browser
+        shell: bash
+        run: |
+          set -euo pipefail
+          CHROME_BIN="$(command -v google-chrome || command -v chromium || command -v chromium-browser || true)"
+          if [ -z "$CHROME_BIN" ]; then
+            echo "Nenhum browser Chromium disponível no runner."
+            exit 1
+          fi
+          mkdir -p .smoke/Foco-Jornada
+          cp -R dist/. .smoke/Foco-Jornada/
+          python3 -m http.server 4173 --directory .smoke >/tmp/foco-http.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID || true' EXIT
+          sleep 2
+          "$CHROME_BIN" \
+            --headless \
+            --no-sandbox \
+            --disable-gpu \
+            --virtual-time-budget=12000 \
+            --dump-dom \
+            http://127.0.0.1:4173/Foco-Jornada/ \
+            >/tmp/foco-dom.html 2>/tmp/foco-chrome.log || true
+          echo '--- browser stderr ---'
+          cat /tmp/foco-chrome.log || true
+          echo '--- fim browser stderr ---'
+          if grep -q 'id="app-boot-fallback"' /tmp/foco-dom.html; then
+            echo 'ERRO: a aplicação não substituiu o fallback de arranque.'
+            grep -n -E 'app-boot-fallback|A aplicação não iniciou|A carregar a aplicação' /tmp/foco-dom.html || true
+            exit 1
+          fi
+          if ! grep -q 'id="root"' /tmp/foco-dom.html; then
+            echo 'ERRO: o documento final não contém #root.'
+            exit 1
+          fi
       - name: Guardar build como artefacto
         uses: actions/upload-artifact@v4
         with:
