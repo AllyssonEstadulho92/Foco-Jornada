@@ -37,6 +37,88 @@
           ?.setAttribute('content', resolved === 'dark' ? 'black-translucent' : 'default')
       })()
     </script>
+    <script>
+      ;(() => {
+        const recoveryKey = 'foco-jornada-boot-recovery-v2'
+        let recovering = false
+        const errors = []
+
+        function rememberError(value) {
+          const text = value instanceof Error ? value.message : String(value || 'Erro de arranque desconhecido')
+          if (text && !errors.includes(text)) errors.push(text)
+        }
+
+        async function recoverBoot(reason = 'arranque bloqueado') {
+          if (recovering) return
+          recovering = true
+          rememberError(reason)
+
+          let alreadyRecovered = false
+          try {
+            alreadyRecovered = sessionStorage.getItem(recoveryKey) === '1'
+          } catch {
+            // Safari pode restringir storage em alguns modos; a recuperação continua.
+          }
+
+          if (alreadyRecovered) {
+            const fallback = document.getElementById('app-boot-fallback')
+            const message = document.getElementById('app-boot-message')
+            const detail = document.getElementById('app-boot-detail')
+            if (fallback) fallback.dataset.stalled = 'true'
+            if (message) message.textContent = 'A aplicação continua sem iniciar após a recuperação automática.'
+            if (detail && errors.length) detail.textContent = errors[errors.length - 1]
+            recovering = false
+            return
+          }
+
+          try {
+            sessionStorage.setItem(recoveryKey, '1')
+          } catch {
+            // Prosseguir mesmo sem sessionStorage.
+          }
+
+          try {
+            if ('serviceWorker' in navigator) {
+              const registrations = await navigator.serviceWorker.getRegistrations()
+              await Promise.all(
+                registrations
+                  .filter((registration) => {
+                    try {
+                      return new URL(registration.scope).pathname.startsWith('/Foco-Jornada/')
+                    } catch {
+                      return false
+                    }
+                  })
+                  .map((registration) => registration.unregister()),
+              )
+            }
+          } catch (error) {
+            rememberError(error)
+          }
+
+          const cleanUrl = new URL('/Foco-Jornada/', window.location.origin)
+          cleanUrl.searchParams.set('boot-recovery', Date.now().toString())
+          cleanUrl.hash = window.location.hash
+          window.location.replace(cleanUrl.toString())
+        }
+
+        window.__focoRecoverBoot = recoverBoot
+        window.__focoBootErrors = errors
+
+        window.addEventListener(
+          'error',
+          (event) => {
+            if (event.error) rememberError(event.error)
+            else if (event.message) rememberError(event.message)
+            else if (event.target instanceof HTMLScriptElement) rememberError(`Falha ao carregar script: ${event.target.src}`)
+            else if (event.target instanceof HTMLLinkElement) rememberError(`Falha ao carregar recurso: ${event.target.href}`)
+          },
+          true,
+        )
+
+        window.addEventListener('unhandledrejection', (event) => rememberError(event.reason))
+      })()
+    </script>
     <style>
       html,
       body,
@@ -74,7 +156,7 @@
         display: grid;
         gap: 10px;
         justify-items: center;
-        max-width: 320px;
+        max-width: 340px;
       }
 
       .appBootFallback strong {
@@ -91,19 +173,37 @@
         color: #aeb8b2;
       }
 
-      .appBootFallback a {
+      .appBootFallback small {
         display: none;
+        max-width: 100%;
+        overflow-wrap: anywhere;
+        color: #8a4d45;
+        font-size: .78rem;
+        line-height: 1.4;
+      }
+
+      .appBootFallback[data-stalled='true'] small {
+        display: block;
+      }
+
+      .appBootFallback button {
+        display: none;
+        min-height: 48px;
         margin-top: 8px;
-        padding: 11px 16px;
+        padding: 11px 18px;
+        border: 0;
         border-radius: 999px;
         background: #2f8f5b;
         color: #fff;
+        font: inherit;
         font-weight: 750;
-        text-decoration: none;
+        cursor: pointer;
       }
 
-      .appBootFallback[data-stalled='true'] a {
+      .appBootFallback[data-stalled='true'] button {
         display: inline-flex;
+        align-items: center;
+        justify-content: center;
       }
     </style>
     <link rel="icon" type="image/svg+xml" href="%BASE_URL%icon.svg" />
@@ -115,18 +215,32 @@
         <div class="appBootFallbackInner">
           <strong>Foco Jornada</strong>
           <p id="app-boot-message">A carregar a aplicação…</p>
-          <a href="/Foco-Jornada/" id="app-boot-retry">Reabrir aplicação</a>
+          <small id="app-boot-detail"></small>
+          <button type="button" id="app-boot-retry">Reparar e reabrir</button>
         </div>
       </div>
     </div>
     <script>
-      window.setTimeout(() => {
-        const fallback = document.getElementById('app-boot-fallback')
-        const message = document.getElementById('app-boot-message')
-        if (!fallback || !message) return
-        fallback.dataset.stalled = 'true'
-        message.textContent = 'A aplicação não iniciou. Tenta reabrir pela ligação principal.'
-      }, 8000)
+      ;(() => {
+        const retry = document.getElementById('app-boot-retry')
+        retry?.addEventListener('click', () => window.__focoRecoverBoot?.('recuperação manual'))
+
+        window.setTimeout(() => {
+          const fallback = document.getElementById('app-boot-fallback')
+          if (!fallback) {
+            try {
+              sessionStorage.removeItem('foco-jornada-boot-recovery-v2')
+            } catch {
+              // Nada a fazer.
+            }
+            return
+          }
+
+          const message = document.getElementById('app-boot-message')
+          if (message) message.textContent = 'A reparar o arranque da aplicação…'
+          void window.__focoRecoverBoot?.(window.__focoBootErrors?.at(-1) || 'tempo limite de arranque')
+        }, 6500)
+      })()
     </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
