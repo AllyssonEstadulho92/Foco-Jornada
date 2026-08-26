@@ -282,6 +282,55 @@ function parseBackup(text: string): AppBackupPayload {
   return payload
 }
 
+
+function mergeAppendOnlyById<T>(
+  incoming: T[],
+  local: T[],
+  idOf: (item: T) => string,
+  label: string,
+): T[] {
+  const merged = [...incoming]
+  const byId = new Map(incoming.map((item) => [idOf(item), item]))
+  for (const item of local) {
+    const id = idOf(item)
+    const existing = byId.get(id)
+    if (!existing) {
+      merged.push(item)
+      byId.set(id, item)
+      continue
+    }
+    if (JSON.stringify(existing) !== JSON.stringify(item)) {
+      throw new Error(`Restauro protegido recusado: ${label} ${id} tem conteúdo diferente entre a cópia e os dados locais.`)
+    }
+  }
+  return merged
+}
+
+function mergeProtectedMetadata(incoming: AppMetadataRecord[], local: AppMetadataRecord[]): AppMetadataRecord[] {
+  const merged = [...incoming]
+  const byKey = new Map(incoming.map((item) => [item.key, item]))
+  for (const item of local) {
+    const existing = byKey.get(item.key)
+    if (!existing) {
+      merged.push(item)
+      byKey.set(item.key, item)
+      continue
+    }
+    if (JSON.stringify(existing) === JSON.stringify(item)) continue
+
+    const replaceableCurrent = item.key.startsWith('medication-protection:note-current:')
+      || item.key.startsWith('medication-protection:profile-current:')
+    if (!replaceableCurrent) {
+      throw new Error(`Restauro protegido recusado: o registo ${item.key} diverge da cópia.`)
+    }
+    const preferred = item.updatedAt > existing.updatedAt ? item : existing
+    const index = merged.findIndex((candidate) => candidate.key === item.key)
+    if (index >= 0) merged[index] = preferred
+    byKey.set(item.key, preferred)
+  }
+  return merged
+}
+
 export class AppBackupService {
   constructor(private readonly db: AppDatabase) {}
 
@@ -336,7 +385,56 @@ export class AppBackupService {
   }
 
   async restoreFromText(text: string): Promise<BackupRestoreSummary> {
-    const payload = parseBackup(text)
+    const incomingPayload = parseBackup(text)
+
+    const [localEntities, localMovements, localSchedules, localDoseEvents, localMetadata] = await Promise.all([
+      this.db.stockEntities.toArray(),
+      this.db.stockMovements.toArray(),
+      this.db.medicationSchedules.toArray(),
+      this.db.medicationDoseEvents.toArray(),
+      this.db.metadata.toArray(),
+    ])
+    const localMedicationIds = new Set(
+      localEntities.filter((entity) => entity.kind === 'medication').map((entity) => entity.id),
+    )
+    const localMedicationEntities = localEntities.filter((entity) => localMedicationIds.has(entity.id))
+    const localMedicationMovements = localMovements.filter((movement) => localMedicationIds.has(movement.entityId))
+    const localMedicationSchedules = localSchedules.filter((schedule) => localMedicationIds.has(schedule.medicationId))
+    const localMedicationDoseEvents = localDoseEvents.filter((event) => localMedicationIds.has(event.medicationId))
+    const localProtectedMetadata = localMetadata.filter((record) => record.key.startsWith('medication-protection:'))
+
+    const payload: AppBackupPayload = {
+      ...incomingPayload,
+      tables: {
+        ...incomingPayload.tables,
+        metadata: mergeProtectedMetadata(incomingPayload.tables.metadata, localProtectedMetadata),
+        stockEntities: mergeAppendOnlyById(
+          incomingPayload.tables.stockEntities,
+          localMedicationEntities,
+          (item) => item.id,
+          'medicamento',
+        ),
+        stockMovements: mergeAppendOnlyById(
+          incomingPayload.tables.stockMovements,
+          localMedicationMovements,
+          (item) => item.id,
+          'movimento de medicação',
+        ),
+        medicationSchedules: mergeAppendOnlyById(
+          incomingPayload.tables.medicationSchedules,
+          localMedicationSchedules,
+          (item) => item.id,
+          'horário de medicação',
+        ),
+        medicationDoseEvents: mergeAppendOnlyById(
+          incomingPayload.tables.medicationDoseEvents,
+          localMedicationDoseEvents,
+          (item) => item.id,
+          'evento de toma',
+        ),
+      },
+    }
+    validateStockBackup(payload)
 
     await this.db.transaction(
       'rw',
