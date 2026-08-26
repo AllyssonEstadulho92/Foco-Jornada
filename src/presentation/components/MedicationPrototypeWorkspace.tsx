@@ -19,6 +19,7 @@ interface MedicationPrototypeWorkspaceProps {
   selectedId: string | null
   today: string
   onSelect: (medicationId: string) => void
+  onAddMedication: () => void
   onDataChanged: () => Promise<void>
 }
 
@@ -107,6 +108,7 @@ export function MedicationPrototypeWorkspace({
   selectedId,
   today,
   onSelect,
+  onAddMedication,
   onDataChanged,
 }: MedicationPrototypeWorkspaceProps) {
   const {
@@ -300,7 +302,7 @@ export function MedicationPrototypeWorkspace({
           <h2 id="med-proto-title">Medicação</h2>
           <p>Registos persistentes, ações auditáveis e informação protegida. O sistema não altera nem recomenda tratamentos.</p>
         </div>
-        <button type="button" className="medProtoAddButton" onClick={() => scrollTo('medication-create-form')}>+ Medicamento</button>
+        <button type="button" className="medProtoAddButton" onClick={onAddMedication}>+ Medicamento</button>
       </header>
 
       <div className="medProtoSummary">
