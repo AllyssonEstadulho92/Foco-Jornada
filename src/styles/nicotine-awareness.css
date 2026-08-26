@@ -1,0 +1,186 @@
+.nicotineAwarenessPanel {
+  display: grid;
+  gap: 18px;
+}
+
+.nicotineAwarenessHeading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.nicotineAwarenessBadge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 0 12px;
+  border: 1px solid color-mix(in srgb, #d29a35 44%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, #d29a35 11%, transparent);
+  color: #9b6814;
+  font-size: .76rem;
+  font-weight: 800;
+  letter-spacing: .06em;
+  white-space: nowrap;
+}
+
+[data-theme='dark'] .nicotineAwarenessBadge {
+  color: #f1c56c;
+}
+
+.nicotineMetricGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.nicotineMetric {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 18px;
+  background: var(--surface-soft);
+}
+
+.nicotineMetric span,
+.nicotineMetric small {
+  color: var(--text-secondary);
+}
+
+.nicotineMetric strong {
+  font-size: clamp(1.15rem, 3vw, 1.55rem);
+  line-height: 1.1;
+}
+
+.nicotineMetric small {
+  font-size: .78rem;
+  line-height: 1.35;
+}
+
+.nicotineSettingsGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 14px;
+}
+
+.nicotineSettingsGrid label,
+.nicotineNotesLabel {
+  display: grid;
+  gap: 7px;
+  color: var(--text-secondary);
+  font-size: .86rem;
+  font-weight: 700;
+}
+
+.nicotineSettingsGrid select,
+.nicotineSettingsGrid input,
+.nicotineNotesLabel textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  background: var(--surface-elevated);
+  color: var(--text-primary);
+  font: inherit;
+}
+
+.nicotineSettingsGrid select,
+.nicotineSettingsGrid input {
+  min-height: 46px;
+  padding: 0 12px;
+}
+
+.nicotineNotesLabel textarea {
+  min-height: 92px;
+  resize: vertical;
+  padding: 12px;
+  line-height: 1.45;
+}
+
+.nicotineCustomRange {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.nicotineSaveRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.nicotineSaveState {
+  color: var(--text-secondary);
+  font-size: .82rem;
+}
+
+.nicotineSourceBox {
+  display: grid;
+  gap: 8px;
+  padding: 14px 16px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--surface-soft) 88%, transparent);
+}
+
+.nicotineSourceBox strong {
+  font-size: .92rem;
+}
+
+.nicotineSourceBox p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: .84rem;
+  line-height: 1.5;
+}
+
+.nicotineSourceBox a {
+  color: var(--accent, #2f8f5b);
+  font-weight: 750;
+  text-underline-offset: 3px;
+}
+
+.nicotineWarning {
+  margin: 0;
+  padding: 14px 16px;
+  border-left: 3px solid #d29a35;
+  border-radius: 10px;
+  background: color-mix(in srgb, #d29a35 8%, transparent);
+  color: var(--text-secondary);
+  font-size: .84rem;
+  line-height: 1.55;
+}
+
+.nicotineWhoNote {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: .82rem;
+  line-height: 1.5;
+}
+
+.nicotineWhoNote a {
+  color: var(--accent, #2f8f5b);
+  font-weight: 750;
+}
+
+@media (max-width: 720px) {
+  .nicotineMetricGrid,
+  .nicotineSettingsGrid,
+  .nicotineCustomRange {
+    grid-template-columns: 1fr;
+  }
+
+  .nicotineCustomRange {
+    grid-column: auto;
+  }
+
+  .nicotineAwarenessHeading {
+    align-items: flex-start;
+  }
+}
