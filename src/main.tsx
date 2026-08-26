@@ -57,6 +57,7 @@ import './styles/mobile-collapse-scope.css'
 import './styles/mobile-quick-access.css'
 import './styles/personal-stock-hub-prototype.css'
 import './styles/nicotine-awareness.css'
+import './styles/stock-integrity-console.css'
 
 const root = document.getElementById('root')
 if (!root) throw new Error('Elemento #root não encontrado.')
