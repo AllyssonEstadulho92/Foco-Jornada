@@ -2,6 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { AppBackupService } from './application/data/AppBackupService'
 import { MedicationDoseStatusService } from './application/personalStock/MedicationDoseStatusService'
+import { NicotineAwarenessService } from './application/personalStock/NicotineAwarenessService'
 import { OperationalPersonalStockService } from './application/personalStock/OperationalPersonalStockService'
 import { StockReconciliationService } from './application/personalStock/StockReconciliationService'
 import { db } from './infrastructure/database/appDatabase'
@@ -55,6 +56,7 @@ import './styles/stock-reconciliation.css'
 import './styles/mobile-collapse-scope.css'
 import './styles/mobile-quick-access.css'
 import './styles/personal-stock-hub-prototype.css'
+import './styles/nicotine-awareness.css'
 
 const root = document.getElementById('root')
 if (!root) throw new Error('Elemento #root não encontrado.')
@@ -104,6 +106,7 @@ const services = {
   personalStockService,
   medicationDoseStatusService: new MedicationDoseStatusService(db),
   stockReconciliationService: new StockReconciliationService(db),
+  nicotineAwarenessService: new NicotineAwarenessService(db),
   backupService: new AppBackupService(db),
 }
 
