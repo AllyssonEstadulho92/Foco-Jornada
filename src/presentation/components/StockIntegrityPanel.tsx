@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { minorToDecimal } from '../../application/personalStock/decimal'
 import type { ReconciliationResult } from '../../domain/personalStock/models'
 import { useAppServices } from '../providers/AppServicesProvider'
+import { MedicationProtectionPanel } from './MedicationProtectionPanel'
 
 type IntegrityScope = 'sticks' | 'medications'
 type StorageProtection = 'checking' | 'persistent' | 'best-effort' | 'unsupported'
@@ -144,66 +145,70 @@ export function StockIntegrityPanel({ scope }: { scope: IntegrityScope }) {
       : 'stockStatusNeutral'
 
   return (
-    <section className="stockIntegrityConsole" aria-labelledby={`stock-integrity-${scope}`}>
-      <div className="stockIntegrityConsoleHeading">
-        <div>
-          <span className="stockPanelTag">REGRA DE INTEGRIDADE · FUNCIONAL</span>
-          <h2 id={`stock-integrity-${scope}`}>Verificação de {scopeTitle}</h2>
-          <p>
-            Nas operações normais, o saldo nunca é reescrito manualmente: é reconstruído pelo ledger. Correções acrescentam
-            movimentos ou eventos de correção e mantêm o registo anterior para auditoria.
-          </p>
+    <>
+      <section className="stockIntegrityConsole" aria-labelledby={`stock-integrity-${scope}`}>
+        <div className="stockIntegrityConsoleHeading">
+          <div>
+            <span className="stockPanelTag">REGRA DE INTEGRIDADE · FUNCIONAL</span>
+            <h2 id={`stock-integrity-${scope}`}>Verificação de {scopeTitle}</h2>
+            <p>
+              Nas operações normais, o saldo nunca é reescrito manualmente: é reconstruído pelo ledger. Correções acrescentam
+              movimentos ou eventos de correção e mantêm o registo anterior para auditoria.
+            </p>
+          </div>
+          <span className={statusClass}>{checking ? 'A VERIFICAR' : audit?.status ?? 'A VERIFICAR'}</span>
         </div>
-        <span className={statusClass}>{checking ? 'A VERIFICAR' : audit?.status ?? 'A VERIFICAR'}</span>
-      </div>
 
-      <div className="stockIntegrityMetricGrid">
-        <article>
-          <span>Entidades verificadas</span>
-          <strong>{audit?.entityCount ?? '—'}</strong>
-          <small>{scope === 'sticks' ? 'Gestor de sticks' : 'Medicamentos guardados'}</small>
-        </article>
-        <article>
-          <span>Movimentos auditados</span>
-          <strong>{audit?.movementCount ?? '—'}</strong>
-          <small>Sequência e saldos reconstruídos</small>
-        </article>
-        <article>
-          <span>Resultado reconstruído</span>
-          <strong>{audit?.balanceLabel ?? '—'}</strong>
-          <small>{audit?.checkedAt ? `Verificado em ${formatCheckTime(audit.checkedAt)}` : 'Ainda não verificado'}</small>
-        </article>
-        <article>
-          <span>Proteção local</span>
-          <strong>{storageLabel(storageProtection)}</strong>
-          <small>IndexedDB + pedido de persistência do navegador</small>
-        </article>
-        <article>
-          <span>Cobertura da cópia</span>
-          <strong>{audit?.backupRecords ?? '—'} registos</strong>
-          <small>{audit?.metadataRecords ?? '—'} notas/configurações em metadata</small>
-        </article>
-      </div>
+        <div className="stockIntegrityMetricGrid">
+          <article>
+            <span>Entidades verificadas</span>
+            <strong>{audit?.entityCount ?? '—'}</strong>
+            <small>{scope === 'sticks' ? 'Gestor de sticks' : 'Medicamentos guardados'}</small>
+          </article>
+          <article>
+            <span>Movimentos auditados</span>
+            <strong>{audit?.movementCount ?? '—'}</strong>
+            <small>Sequência e saldos reconstruídos</small>
+          </article>
+          <article>
+            <span>Resultado reconstruído</span>
+            <strong>{audit?.balanceLabel ?? '—'}</strong>
+            <small>{audit?.checkedAt ? `Verificado em ${formatCheckTime(audit.checkedAt)}` : 'Ainda não verificado'}</small>
+          </article>
+          <article>
+            <span>Proteção local</span>
+            <strong>{storageLabel(storageProtection)}</strong>
+            <small>IndexedDB + pedido de persistência do navegador</small>
+          </article>
+          <article>
+            <span>Cobertura da cópia</span>
+            <strong>{audit?.backupRecords ?? '—'} registos</strong>
+            <small>{audit?.metadataRecords ?? '—'} notas/configurações em metadata</small>
+          </article>
+        </div>
 
-      <div className="stockIntegrityActions">
-        <button type="button" className="stockPrimaryAction" disabled={checking} onClick={() => void verify()}>
-          {checking ? 'A verificar…' : 'Verificar integridade agora'}
-        </button>
-        {storageProtection !== 'persistent' ? (
-          <button type="button" disabled={checking} onClick={() => void requestPersistentStorage()}>
-            Proteger armazenamento
+        <div className="stockIntegrityActions">
+          <button type="button" className="stockPrimaryAction" disabled={checking} onClick={() => void verify()}>
+            {checking ? 'A verificar…' : 'Verificar integridade agora'}
           </button>
-        ) : null}
-        <Link to="/mais">Abrir cópia e restauro</Link>
-      </div>
+          {storageProtection !== 'persistent' ? (
+            <button type="button" disabled={checking} onClick={() => void requestPersistentStorage()}>
+              Proteger armazenamento
+            </button>
+          ) : null}
+          <Link to="/mais">Abrir cópia e restauro</Link>
+        </div>
 
-      {message ? <div className="stockIntegrityMessage" role="status">{message}</div> : null}
+        {message ? <div className="stockIntegrityMessage" role="status">{message}</div> : null}
 
-      <p className="stockIntegritySafetyNote">
-        <strong>Regra de preservação:</strong> a aplicação valida a cópia antes do restauro e inclui entidades, movimentos,
-        horários, eventos de toma, notas e configurações. Nenhum navegador consegue garantir perda zero sozinho; para máxima
-        proteção, mantém também uma cópia integral externa atualizada.
-      </p>
-    </section>
+        <p className="stockIntegritySafetyNote">
+          <strong>Regra de preservação:</strong> a aplicação valida a cópia antes do restauro e inclui entidades, movimentos,
+          horários, eventos de toma, notas e configurações. Nenhum navegador consegue garantir perda zero sozinho; para máxima
+          proteção, mantém também uma cópia integral externa atualizada.
+        </p>
+      </section>
+
+      {scope === 'medications' ? <MedicationProtectionPanel /> : null}
+    </>
   )
 }
