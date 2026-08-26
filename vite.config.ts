@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
@@ -9,8 +10,13 @@ const packageJson = JSON.parse(
 const buildDate = new Date().toISOString()
 const buildId = process.env.GITHUB_SHA?.slice(0, 7) ?? `local-${Date.now().toString(36)}`
 const githubPagesBase = '/Foco-Jornada/'
+const sourceRoot = fileURLToPath(new URL('./src', import.meta.url))
+const publicDir = fileURLToPath(new URL('./public', import.meta.url))
+const distDir = fileURLToPath(new URL('./dist', import.meta.url))
 
 export default defineConfig({
+  root: sourceRoot,
+  publicDir,
   base: githubPagesBase,
   define: {
     __APP_VERSION__: JSON.stringify(packageJson.version),
@@ -19,10 +25,12 @@ export default defineConfig({
   },
   build: {
     target: 'es2019',
+    outDir: distDir,
+    emptyOutDir: true,
   },
   resolve: {
     alias: {
-      'react-hot-toast': '/src/shared/notifications/hotToastBridge.tsx',
+      'react-hot-toast': fileURLToPath(new URL('./src/shared/notifications/hotToastBridge.tsx', import.meta.url)),
     },
   },
   plugins: [
