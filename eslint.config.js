@@ -5,7 +5,18 @@ import globals from 'globals'
 import tseslint from 'typescript-eslint'
 
 export default tseslint.config(
-  { ignores: ['dist/**', 'site/**', 'coverage/**', 'node_modules/**'] },
+  {
+    ignores: [
+      'dist/**',
+      'site/**',
+      'coverage/**',
+      'node_modules/**',
+      'assets/**',
+      'sw.js',
+      'registerSW.js',
+      'workbox-*.js',
+    ],
+  },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
