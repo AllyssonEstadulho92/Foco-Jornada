@@ -1,6 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { AppBackupService } from './application/data/AppBackupService'
+import { MedicationDataProtectionService } from './application/personalStock/MedicationDataProtectionService'
 import { MedicationDoseStatusService } from './application/personalStock/MedicationDoseStatusService'
 import { NicotineAwarenessService } from './application/personalStock/NicotineAwarenessService'
 import { OperationalPersonalStockService } from './application/personalStock/OperationalPersonalStockService'
@@ -58,6 +59,7 @@ import './styles/mobile-quick-access.css'
 import './styles/personal-stock-hub-prototype.css'
 import './styles/nicotine-awareness.css'
 import './styles/stock-integrity-console.css'
+import './styles/medication-protection.css'
 
 const root = document.getElementById('root')
 if (!root) throw new Error('Elemento #root não encontrado.')
@@ -106,6 +108,7 @@ const services = {
   settingsRepository: new DexieSettingsRepository(db),
   personalStockService,
   medicationDoseStatusService: new MedicationDoseStatusService(db),
+  medicationDataProtectionService: new MedicationDataProtectionService(db),
   stockReconciliationService: new StockReconciliationService(db),
   nicotineAwarenessService: new NicotineAwarenessService(db),
   backupService: new AppBackupService(db),
