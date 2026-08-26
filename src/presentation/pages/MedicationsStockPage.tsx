@@ -9,6 +9,7 @@ import type {
   MedicationSummary,
   PhysicalStockCheck,
 } from '../../domain/personalStock/models'
+import { MedicationPrototypeWorkspace } from '../components/MedicationPrototypeWorkspace'
 import { useAppServices } from '../providers/AppServicesProvider'
 
 const TIMEZONE = 'Europe/Lisbon'
@@ -104,7 +105,7 @@ interface TodayDose {
 }
 
 export function MedicationsStockPage() {
-  const { personalStockService, medicationDoseStatusService, stockReconciliationService } = useAppServices()
+  const { personalStockService, medicationDoseStatusService, stockReconciliationService, medicationDataProtectionService } = useAppServices()
   const [medications, setMedications] = useState<MedicationSummary[]>([])
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [schedules, setSchedules] = useState<MedicationSchedule[]>([])
@@ -166,8 +167,14 @@ export function MedicationsStockPage() {
   }, [medicationDoseStatusService, personalStockService, stockReconciliationService, today])
 
   useEffect(() => {
-    void loadList().catch((error: unknown) => setMessage(error instanceof Error ? error.message : 'Erro ao carregar medicamentos.'))
-  }, [loadList])
+    void (async () => {
+      const recovery = await medicationDataProtectionService.recoverFromRedundantSnapshotIfNeeded()
+      await loadList()
+      if (recovery.recovered) {
+        setMessage('Dados de medicação recuperados automaticamente a partir da cópia redundante local.')
+      }
+    })().catch((error: unknown) => setMessage(error instanceof Error ? error.message : 'Erro ao carregar medicamentos.'))
+  }, [loadList, medicationDataProtectionService])
 
   useEffect(() => {
     const timer = window.setInterval(() => setNow(new Date()), 30_000)
@@ -209,7 +216,15 @@ export function MedicationsStockPage() {
       await action()
       await loadList(selectedId ?? undefined)
       if (selectedId) await loadSelected(selectedId)
-      setMessage(success)
+      let protectionWarning = ''
+      try {
+        if (selectedId) await medicationDataProtectionService.recordCheckpoint(selectedId, 'operação de medicação concluída')
+        const snapshot = await medicationDataProtectionService.syncRedundantSnapshot()
+        if (!snapshot.available) protectionWarning = ' A cópia redundante local não ficou disponível neste navegador.'
+      } catch (protectionError) {
+        protectionWarning = ` Proteção adicional: ${protectionError instanceof Error ? protectionError.message : 'não foi possível atualizar o ponto de proteção.'}`
+      }
+      setMessage(`${success}${protectionWarning}`)
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'Não foi possível concluir a operação.')
     } finally {
@@ -249,6 +264,9 @@ export function MedicationsStockPage() {
       medicationId,
       operationId: operationId(),
     })
+    await medicationDataProtectionService.ensureProtected(medicationId)
+    await medicationDataProtectionService.recordCheckpoint(medicationId, 'medicamento criado')
+    await medicationDataProtectionService.syncRedundantSnapshot()
     setCreateForm({
       name: '',
       dosage: '',
@@ -360,8 +378,19 @@ export function MedicationsStockPage() {
 
       {message ? <div className="stockMessage" role="status">{message}</div> : null}
 
+      <MedicationPrototypeWorkspace
+        medications={medications}
+        selectedId={selectedId}
+        today={today}
+        onSelect={setSelectedId}
+        onDataChanged={async () => {
+          await loadList(selectedId ?? undefined)
+          if (selectedId) await loadSelected(selectedId)
+        }}
+      />
+
       {showCreate || medications.length === 0 ? (
-        <section className="stockPanel">
+        <section className="stockPanel" id="medication-create-form">
           <h2>Novo medicamento</h2>
           <div className="stockFormGrid">
             <label>Nome<input value={createForm.name} onChange={(event) => setCreateForm({ ...createForm, name: event.target.value })} /></label>
@@ -434,7 +463,7 @@ export function MedicationsStockPage() {
             </article>
           </div>
 
-          <section className="stockPanel stockDosePanel">
+          <section className="stockPanel stockDosePanel" id="medication-today-doses">
             <div className="stockPanelHeading">
               <div><span className="stockPanelTag">HOJE</span><h2>Tomas programadas</h2></div>
               <span>{today}</span>
