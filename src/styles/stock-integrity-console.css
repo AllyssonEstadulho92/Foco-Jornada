@@ -1,0 +1,311 @@
+.stockIntegrityConsole {
+  display: grid;
+  gap: 18px;
+  margin-top: 22px;
+  padding: 22px;
+  border: 1px solid color-mix(in srgb, var(--accent, #2f8f5b) 22%, var(--border-subtle));
+  border-radius: 24px;
+  background: color-mix(in srgb, var(--surface-elevated) 96%, var(--accent, #2f8f5b) 4%);
+}
+
+.stockIntegrityConsoleHeading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.stockIntegrityConsoleHeading > div {
+  min-width: 0;
+}
+
+.stockIntegrityConsoleHeading h2 {
+  margin: 5px 0 7px;
+}
+
+.stockIntegrityConsoleHeading p,
+.stockIntegritySafetyNote {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+.stockIntegrityMetricGrid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.stockIntegrityMetricGrid article {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  min-width: 0;
+  padding: 15px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 17px;
+  background: var(--surface-soft);
+}
+
+.stockIntegrityMetricGrid span,
+.stockIntegrityMetricGrid small {
+  color: var(--text-secondary);
+}
+
+.stockIntegrityMetricGrid span {
+  font-size: .76rem;
+  font-weight: 800;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.stockIntegrityMetricGrid strong {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: 1rem;
+  line-height: 1.35;
+}
+
+.stockIntegrityMetricGrid small {
+  font-size: .76rem;
+  line-height: 1.35;
+}
+
+.stockIntegrityActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.stockIntegrityActions button,
+.stockIntegrityActions a {
+  min-height: 44px;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 15px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  background: var(--surface-elevated);
+  color: var(--text-primary);
+  font: inherit;
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.stockIntegrityActions .stockPrimaryAction {
+  border-color: transparent;
+}
+
+.stockIntegrityMessage {
+  padding: 12px 14px;
+  border: 1px solid color-mix(in srgb, var(--accent, #2f8f5b) 25%, var(--border-subtle));
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--accent, #2f8f5b) 8%, var(--surface-soft));
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+.stockIntegritySafetyNote {
+  padding-top: 4px;
+  font-size: .84rem;
+}
+
+.stockHubTrustButton {
+  width: 100%;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.stockHubTrustButton:hover,
+.stockHubTrustButton:focus-visible,
+.stockHubTrustButtonActive {
+  background: color-mix(in srgb, var(--stock-neon, #62df73) 10%, transparent);
+  outline: none;
+}
+
+.stockHubTrustButton:focus-visible {
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--stock-neon, #62df73) 62%, transparent);
+}
+
+.stockHubTrustStripFunctional {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.stockHubFunctionalPanel {
+  display: grid;
+  gap: 14px;
+  padding: 20px;
+  border: 1px solid color-mix(in srgb, var(--stock-neon, #62df73) 22%, var(--border-subtle));
+  border-radius: 20px;
+  background: color-mix(in srgb, var(--stock-neon, #62df73) 4%, var(--surface-soft));
+}
+
+.stockHubFunctionalPanelHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.stockHubFunctionalPanelHeader h2 {
+  margin: 3px 0 0;
+  font-size: 1.05rem;
+}
+
+.stockHubFunctionalPanelHeader button {
+  min-height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  background: var(--surface-elevated);
+  color: var(--text-primary);
+  font: inherit;
+  font-weight: 750;
+}
+
+.stockHubFunctionalGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.stockHubFunctionalMetric {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  padding: 13px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 15px;
+  background: var(--surface-elevated);
+}
+
+.stockHubFunctionalMetric span,
+.stockHubFunctionalMetric small {
+  color: var(--text-secondary);
+}
+
+.stockHubFunctionalMetric strong {
+  overflow-wrap: anywhere;
+}
+
+.stockHubFunctionalLinks,
+.stockHubFunctionalHistory {
+  display: grid;
+  gap: 8px;
+}
+
+.stockHubFunctionalLinks a {
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 13px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 13px;
+  background: var(--surface-elevated);
+  color: var(--text-primary);
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.stockHubFunctionalHistory article {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.stockHubFunctionalHistory article:last-child {
+  border-bottom: 0;
+}
+
+.stockHubFunctionalHistory strong,
+.stockHubFunctionalHistory small {
+  display: block;
+}
+
+.stockHubFunctionalHistory small,
+.stockHubFunctionalEmpty,
+.stockHubFunctionalNote {
+  color: var(--text-secondary);
+}
+
+.stockHubFunctionalNote,
+.stockHubFunctionalEmpty {
+  margin: 0;
+  line-height: 1.5;
+}
+
+@media (max-width: 980px) {
+  .stockIntegrityMetricGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .stockHubTrustStripFunctional {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .stockIntegrityConsole {
+    margin-top: 18px;
+    padding: 18px 14px;
+    border-radius: 20px;
+  }
+
+  .stockIntegrityConsoleHeading {
+    display: grid;
+  }
+
+  .stockIntegrityMetricGrid,
+  .stockHubFunctionalGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .stockIntegrityActions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .stockIntegrityActions button,
+  .stockIntegrityActions a {
+    width: 100%;
+  }
+
+  .stockHubTrustStripFunctional {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .stockHubTrustStripFunctional .stockHubTrustItem:nth-child(n) {
+    border-top: 0;
+  }
+
+  .stockHubTrustStripFunctional .stockHubTrustItem:nth-child(n + 3) {
+    border-top: 1px solid color-mix(in srgb, var(--stock-neon, #62df73) 18%, var(--border-subtle));
+  }
+
+  .stockHubTrustStripFunctional .stockHubTrustItem:nth-child(odd)::before {
+    display: none;
+  }
+
+  .stockHubFunctionalPanel {
+    padding: 16px 14px;
+  }
+
+  .stockHubFunctionalPanelHeader {
+    display: grid;
+  }
+
+  .stockHubFunctionalPanelHeader button {
+    width: 100%;
+  }
+}
