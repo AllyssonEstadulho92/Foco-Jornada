@@ -1,0 +1,143 @@
+.medicationProtectionPanel {
+  display: grid;
+  gap: 18px;
+  margin-top: 20px;
+  padding: clamp(18px, 3vw, 26px);
+  border: 1px solid var(--border-subtle);
+  border-radius: 24px;
+  background: var(--surface-elevated);
+}
+
+.medicationProtectionHeading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.medicationProtectionHeading h2 {
+  margin: 6px 0 8px;
+}
+
+.medicationProtectionHeading p,
+.medicationProtectionFootnote {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+.medicationProtectionSelector,
+.medicationProtectedNotes {
+  display: grid;
+  gap: 8px;
+  color: var(--text-secondary);
+  font-size: .88rem;
+  font-weight: 750;
+}
+
+.medicationProtectionSelector select,
+.medicationProtectedNotes textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  background: var(--surface-soft);
+  color: var(--text-primary);
+  font: inherit;
+}
+
+.medicationProtectionSelector select {
+  min-height: 48px;
+  padding: 0 12px;
+}
+
+.medicationProtectedNotes textarea {
+  min-height: 118px;
+  resize: vertical;
+  padding: 13px 14px;
+  line-height: 1.5;
+}
+
+.medicationProtectedNotes small {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.medicationProtectionGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.medicationProtectionGrid article {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  padding: 15px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 17px;
+  background: var(--surface-soft);
+}
+
+.medicationProtectionGrid span,
+.medicationProtectionGrid small {
+  color: var(--text-secondary);
+}
+
+.medicationProtectionGrid strong {
+  overflow-wrap: anywhere;
+}
+
+.medicationProtectionCode {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: .84rem;
+  letter-spacing: .02em;
+}
+
+.medicationProtectionActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.medicationProtectionActions button {
+  min-height: 44px;
+}
+
+.medicationProtectionProblems {
+  display: grid;
+  gap: 8px;
+  padding: 14px 16px;
+  border: 1px solid color-mix(in srgb, #c84d4d 35%, transparent);
+  border-radius: 14px;
+  background: color-mix(in srgb, #c84d4d 8%, transparent);
+}
+
+.medicationProtectionProblems span {
+  color: var(--text-secondary);
+  font-size: .84rem;
+  line-height: 1.45;
+}
+
+.medicationProtectionFootnote {
+  padding-top: 2px;
+  font-size: .82rem;
+}
+
+@media (max-width: 760px) {
+  .medicationProtectionHeading {
+    display: grid;
+  }
+
+  .medicationProtectionGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .medicationProtectionActions {
+    display: grid;
+  }
+
+  .medicationProtectionActions button {
+    width: 100%;
+  }
+}
