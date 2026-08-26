@@ -383,6 +383,10 @@ export function MedicationsStockPage() {
         selectedId={selectedId}
         today={today}
         onSelect={setSelectedId}
+        onAddMedication={() => {
+          setShowCreate(true)
+          window.setTimeout(() => document.getElementById('medication-create-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 0)
+        }}
         onDataChanged={async () => {
           await loadList(selectedId ?? undefined)
           if (selectedId) await loadSelected(selectedId)
