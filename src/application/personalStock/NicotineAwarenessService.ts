@@ -5,6 +5,8 @@ import { addCalendarDays, dateKeyInZone } from './time'
 
 const SETTINGS_KEY = 'personal-stock:nicotine-awareness-v1'
 const MICROGRAMS_PER_MG = 1000n
+const DEFAULT_DAILY_BASELINE = 13
+const DEFAULT_WEEKLY_REDUCTION = 1
 
 export type NicotineProfileId = 'neo-published-range' | 'veo-independent-range' | 'custom'
 
@@ -44,6 +46,10 @@ export interface NicotineAwarenessSettings {
   customMinMg: string
   customMaxMg: string
   notes: string
+  reductionPlanEnabled: boolean
+  dailyBaselineSticks: number
+  weeklyReductionStep: number
+  reductionPlanStartDate: string
   updatedAt: string
 }
 
@@ -53,15 +59,38 @@ export interface NicotineExposureEstimate {
   maxMg: string
 }
 
+export interface ReductionPlanSummary {
+  enabled: boolean
+  baselineDailySticks: number
+  weeklyReductionStep: number
+  startDate: string
+  weekNumber: number
+  targetToday: number
+  nextWeekTarget: number
+  consumedToday: number
+  remainingToTarget: number
+  overTargetBy: number
+  last7DaysAverage: string
+  previous7DaysAverage: string
+  trendDelta: string
+  daysOverTargetLast7: number
+  zeroTargetDate: string
+}
+
 export interface NicotineAwarenessSummary {
   today: NicotineExposureEstimate
   last7Days: NicotineExposureEstimate
   allTime: NicotineExposureEstimate
+  reductionPlan: ReductionPlanSummary
   profileLabel: string
   evidenceNote: string
   sourceTitle: string
   sourceUrl: string
   isEstimate: true
+}
+
+function todayKey(): string {
+  return dateKeyInZone(new Date(), STOCK_TIMEZONE)
 }
 
 function defaultSettings(): NicotineAwarenessSettings {
@@ -70,6 +99,10 @@ function defaultSettings(): NicotineAwarenessSettings {
     customMinMg: '0.460',
     customMaxMg: '0.680',
     notes: '',
+    reductionPlanEnabled: true,
+    dailyBaselineSticks: DEFAULT_DAILY_BASELINE,
+    weeklyReductionStep: DEFAULT_WEEKLY_REDUCTION,
+    reductionPlanStartDate: todayKey(),
     updatedAt: new Date(0).toISOString(),
   }
 }
@@ -117,6 +150,33 @@ function safeNumber(value: bigint): number {
   return Number(value)
 }
 
+function validDateKey(value: unknown): value is string {
+  if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false
+  const parsed = Date.parse(`${value}T00:00:00Z`)
+  return Number.isFinite(parsed) && new Date(parsed).toISOString().startsWith(value)
+}
+
+function positiveInteger(value: unknown, fallback: number, maximum: number): number {
+  return Number.isSafeInteger(value) && Number(value) > 0 && Number(value) <= maximum ? Number(value) : fallback
+}
+
+function dayDifference(from: string, to: string): number {
+  const start = Date.parse(`${from}T00:00:00Z`)
+  const end = Date.parse(`${to}T00:00:00Z`)
+  return Math.floor((end - start) / 86_400_000)
+}
+
+function planTargetForDate(settings: NicotineAwarenessSettings, dateKey: string): number {
+  if (!settings.reductionPlanEnabled) return settings.dailyBaselineSticks
+  const elapsedDays = Math.max(0, dayDifference(settings.reductionPlanStartDate, dateKey))
+  const weekIndex = Math.floor(elapsedDays / 7)
+  return Math.max(0, settings.dailyBaselineSticks - settings.weeklyReductionStep * (weekIndex + 1))
+}
+
+function averageString(total: bigint): string {
+  return (safeNumber(total) / 7).toFixed(1)
+}
+
 export class NicotineAwarenessService {
   constructor(private readonly db: AppDatabase) {}
 
@@ -129,11 +189,16 @@ export class NicotineAwarenessService {
       if (profileId !== 'neo-published-range' && profileId !== 'veo-independent-range' && profileId !== 'custom') {
         return defaultSettings()
       }
+      const fallbackStartDate = dateKeyInZone(new Date(record.updatedAt), STOCK_TIMEZONE)
       return {
         profileId,
         customMinMg: typeof parsed.customMinMg === 'string' ? parsed.customMinMg : '0.460',
         customMaxMg: typeof parsed.customMaxMg === 'string' ? parsed.customMaxMg : '0.680',
         notes: typeof parsed.notes === 'string' ? parsed.notes.slice(0, 4000) : '',
+        reductionPlanEnabled: typeof parsed.reductionPlanEnabled === 'boolean' ? parsed.reductionPlanEnabled : true,
+        dailyBaselineSticks: positiveInteger(parsed.dailyBaselineSticks, DEFAULT_DAILY_BASELINE, 200),
+        weeklyReductionStep: positiveInteger(parsed.weeklyReductionStep, DEFAULT_WEEKLY_REDUCTION, 50),
+        reductionPlanStartDate: validDateKey(parsed.reductionPlanStartDate) ? parsed.reductionPlanStartDate : fallbackStartDate,
         updatedAt: typeof parsed.updatedAt === 'string' ? parsed.updatedAt : record.updatedAt,
       }
     } catch {
@@ -143,6 +208,13 @@ export class NicotineAwarenessService {
 
   async saveSettings(input: Omit<NicotineAwarenessSettings, 'updatedAt'>): Promise<NicotineAwarenessSettings> {
     if (input.notes.length > 4000) throw new Error('A nota pode ter no máximo 4000 caracteres.')
+    if (!Number.isSafeInteger(input.dailyBaselineSticks) || input.dailyBaselineSticks < 1 || input.dailyBaselineSticks > 200) {
+      throw new Error('A linha de base diária deve ser um número inteiro entre 1 e 200 sticks.')
+    }
+    if (!Number.isSafeInteger(input.weeklyReductionStep) || input.weeklyReductionStep < 1 || input.weeklyReductionStep > 50) {
+      throw new Error('A redução semanal deve ser um número inteiro entre 1 e 50 sticks.')
+    }
+    if (!validDateKey(input.reductionPlanStartDate)) throw new Error('A data de início do plano não é válida.')
     if (input.profileId === 'custom') {
       const min = parseMgToMicrograms(input.customMinMg, 'Valor mínimo')
       const max = parseMgToMicrograms(input.customMaxMg, 'Valor máximo')
@@ -195,17 +267,23 @@ export class NicotineAwarenessService {
     const range = this.rangeFor(settings)
     const movements = await this.db.stockMovements.where('entityId').equals(STICKS_ENTITY_ID).toArray()
     const consumed = netConsumedSticks(movements)
-    const todayKey = dateKeyInZone(now, STOCK_TIMEZONE)
-    const sevenDayStart = addCalendarDays(todayKey, -6)
+    const todayDateKey = dateKeyInZone(now, STOCK_TIMEZONE)
+    const sevenDayStart = addCalendarDays(todayDateKey, -6)
+    const previousSevenStart = addCalendarDays(todayDateKey, -13)
+    const previousSevenEnd = addCalendarDays(todayDateKey, -7)
+    const byDay = new Map<string, bigint>()
 
     let allTime = 0n
     let today = 0n
     let last7Days = 0n
+    let previous7Days = 0n
     for (const entry of consumed) {
       const dateKey = dateKeyInZone(new Date(entry.effectiveAt), STOCK_TIMEZONE)
       allTime += entry.sticks
-      if (dateKey === todayKey) today += entry.sticks
-      if (dateKey >= sevenDayStart && dateKey <= todayKey) last7Days += entry.sticks
+      byDay.set(dateKey, (byDay.get(dateKey) ?? 0n) + entry.sticks)
+      if (dateKey === todayDateKey) today += entry.sticks
+      if (dateKey >= sevenDayStart && dateKey <= todayDateKey) last7Days += entry.sticks
+      if (dateKey >= previousSevenStart && dateKey <= previousSevenEnd) previous7Days += entry.sticks
     }
 
     const estimate = (sticks: bigint): NicotineExposureEstimate => ({
@@ -214,10 +292,46 @@ export class NicotineAwarenessService {
       maxMg: formatMicrogramsAsMg(sticks * range.max),
     })
 
+    const elapsedDays = Math.max(0, dayDifference(settings.reductionPlanStartDate, todayDateKey))
+    const weekNumber = Math.floor(elapsedDays / 7) + 1
+    const targetToday = planTargetForDate(settings, todayDateKey)
+    const nextWeekDate = addCalendarDays(todayDateKey, 7)
+    const nextWeekTarget = planTargetForDate(settings, nextWeekDate)
+    const consumedToday = safeNumber(today)
+    let daysOverTargetLast7 = 0
+    if (settings.reductionPlanEnabled) {
+      for (let offset = 0; offset < 7; offset += 1) {
+        const key = addCalendarDays(sevenDayStart, offset)
+        const used = safeNumber(byDay.get(key) ?? 0n)
+        if (used > planTargetForDate(settings, key)) daysOverTargetLast7 += 1
+      }
+    }
+    const weeksUntilZero = Math.max(1, Math.ceil(settings.dailyBaselineSticks / settings.weeklyReductionStep))
+    const zeroTargetDate = addCalendarDays(settings.reductionPlanStartDate, (weeksUntilZero - 1) * 7)
+    const last7Average = safeNumber(last7Days) / 7
+    const previous7Average = safeNumber(previous7Days) / 7
+
     return {
       today: estimate(today),
       last7Days: estimate(last7Days),
       allTime: estimate(allTime),
+      reductionPlan: {
+        enabled: settings.reductionPlanEnabled,
+        baselineDailySticks: settings.dailyBaselineSticks,
+        weeklyReductionStep: settings.weeklyReductionStep,
+        startDate: settings.reductionPlanStartDate,
+        weekNumber,
+        targetToday,
+        nextWeekTarget,
+        consumedToday,
+        remainingToTarget: Math.max(0, targetToday - consumedToday),
+        overTargetBy: Math.max(0, consumedToday - targetToday),
+        last7DaysAverage: averageString(last7Days),
+        previous7DaysAverage: averageString(previous7Days),
+        trendDelta: (last7Average - previous7Average).toFixed(1),
+        daysOverTargetLast7,
+        zeroTargetDate,
+      },
       profileLabel: range.label,
       evidenceNote: range.evidenceNote,
       sourceTitle: range.sourceTitle,
