@@ -1,4 +1,4 @@
-import { useRef, useState, type ChangeEvent } from 'react'
+import { useEffect, useRef, useState, type ChangeEvent } from 'react'
 import { useAppServices } from '../providers/AppServicesProvider'
 import { pushAppNotification } from '../store/useNotificationStore'
 
@@ -19,11 +19,42 @@ function downloadText(content: string, fileName: string) {
   URL.revokeObjectURL(url)
 }
 
+type StorageProtection = 'checking' | 'persistent' | 'best-effort' | 'unsupported'
+
 export function AppBackupPanel() {
   const { backupService, personalStockService } = useAppServices()
   const inputRef = useRef<HTMLInputElement | null>(null)
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState('')
+  const [storageProtection, setStorageProtection] = useState<StorageProtection>('checking')
+
+  useEffect(() => {
+    if (!navigator.storage?.persisted) {
+      setStorageProtection('unsupported')
+      return
+    }
+    void navigator.storage.persisted()
+      .then((persistent) => setStorageProtection(persistent ? 'persistent' : 'best-effort'))
+      .catch(() => setStorageProtection('unsupported'))
+  }, [])
+
+  async function requestPersistentStorage() {
+    if (!navigator.storage?.persist) {
+      setStorageProtection('unsupported')
+      setMessage('Este navegador não disponibiliza a API de armazenamento persistente. Mantém cópias integrais externas atualizadas.')
+      return
+    }
+    try {
+      const granted = await navigator.storage.persist()
+      setStorageProtection(granted ? 'persistent' : 'best-effort')
+      setMessage(granted
+        ? 'O navegador marcou o armazenamento local como persistente neste dispositivo.'
+        : 'O navegador não concedeu persistência permanente. Os dados continuam guardados localmente; cria também cópias integrais externas.')
+    } catch {
+      setStorageProtection('unsupported')
+      setMessage('Não foi possível pedir armazenamento persistente neste navegador. Cria também cópias integrais externas.')
+    }
+  }
 
   async function exportBackup() {
     if (busy) return
@@ -32,7 +63,7 @@ export function AppBackupPanel() {
     try {
       const content = await backupService.exportText()
       downloadText(content, backupFileName())
-      setMessage('Cópia integral criada com todos os dados locais, incluindo stock pessoal.')
+      setMessage('Cópia integral criada com todos os dados locais, incluindo stock pessoal, notas e configurações guardadas na base de dados.')
       pushAppNotification('success', 'Cópia de segurança criada', 'O ficheiro integral foi guardado no dispositivo.')
     } catch (error) {
       const detail = error instanceof Error ? error.message : 'Não foi possível criar a cópia de segurança.'
@@ -78,6 +109,14 @@ export function AppBackupPanel() {
     if (file) void restoreFile(file)
   }
 
+  const storageLabel = storageProtection === 'persistent'
+    ? 'PERSISTENTE'
+    : storageProtection === 'best-effort'
+      ? 'LOCAL'
+      : storageProtection === 'unsupported'
+        ? 'LOCAL'
+        : 'A VERIFICAR'
+
   return (
     <section className="stockPanel appBackupPanel" aria-labelledby="app-backup-title">
       <div className="stockPanelHeading">
@@ -85,12 +124,12 @@ export function AppBackupPanel() {
           <span className="stockPanelTag">DADOS · INTEGRAL</span>
           <h2 id="app-backup-title">Cópia de segurança e restauro</h2>
         </div>
-        <span className="stockStatusOk">LOCAL</span>
+        <span className="stockStatusOk">{storageLabel}</span>
       </div>
 
       <p>
-        A cópia inclui jornada, pausas, atividades, foco, café, definições e as quatro tabelas do stock pessoal:
-        entidades, movimentos, horários de medicação e eventos de toma.
+        A cópia inclui jornada, pausas, atividades, foco, café, definições, notas guardadas em metadata e as quatro tabelas do stock pessoal:
+        entidades, movimentos, horários de medicação e eventos de toma. A configuração de nicotina e respetivas notas também seguem no backup.
       </p>
 
       <div className="stockMetricGrid appBackupMetrics">
@@ -105,9 +144,9 @@ export function AppBackupPanel() {
           <small>Ou restaura o conjunto completo, ou a operação falha.</small>
         </article>
         <article className="stockMetric">
-          <span>Stock</span>
-          <strong>Incluído</strong>
-          <small>Ledger, horários e estados das tomas seguem no mesmo ficheiro.</small>
+          <span>Proteção local</span>
+          <strong>{storageProtection === 'persistent' ? 'Persistente' : 'Melhor esforço'}</strong>
+          <small>O browser continua a ser armazenamento local; uma cópia externa é a proteção adicional.</small>
         </article>
       </div>
 
@@ -118,6 +157,11 @@ export function AppBackupPanel() {
         <button type="button" disabled={busy} onClick={() => inputRef.current?.click()}>
           Restaurar cópia
         </button>
+        {storageProtection !== 'persistent' ? (
+          <button type="button" disabled={busy} onClick={() => void requestPersistentStorage()}>
+            Proteger armazenamento neste dispositivo
+          </button>
+        ) : null}
         <input
           ref={inputRef}
           className="appBackupFileInput"
@@ -129,7 +173,7 @@ export function AppBackupPanel() {
       </div>
 
       {message ? <div className="stockMessage" role="status">{message}</div> : null}
-      <p><strong>Aviso:</strong> antes de restaurar uma cópia antiga, cria primeiro uma cópia do estado atual se pretenderes preservá-lo.</p>
+      <p><strong>Aviso:</strong> nenhum armazenamento apenas no navegador permite garantir perda zero. Para proteção máxima, mantém uma cópia integral externa atualizada antes de limpar dados do browser, trocar de dispositivo ou restaurar uma cópia antiga.</p>
     </section>
   )
 }
