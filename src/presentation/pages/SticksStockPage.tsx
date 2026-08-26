@@ -1,4 +1,10 @@
 import { useCallback, useEffect, useState } from 'react'
+import {
+  NICOTINE_REFERENCE_PROFILES,
+  type NicotineAwarenessSettings,
+  type NicotineAwarenessSummary,
+  type NicotineProfileId,
+} from '../../application/personalStock/NicotineAwarenessService'
 import type { PhysicalStockCheck, StickSummary, StockMovement } from '../../domain/personalStock/models'
 import { useAppServices } from '../providers/AppServicesProvider'
 
@@ -37,30 +43,74 @@ function signed(value?: string): string {
   return `+${value}`
 }
 
+function nicotineAmount(minMg?: string, maxMg?: string): string {
+  if (minMg === undefined || maxMg === undefined) return '—'
+  const local = (value: string) => value.replace('.', ',')
+  return minMg === maxMg ? `${local(minMg)} mg` : `${local(minMg)}–${local(maxMg)} mg`
+}
+
 export function SticksStockPage() {
-  const { personalStockService, stockReconciliationService } = useAppServices()
+  const { personalStockService, stockReconciliationService, nicotineAwarenessService } = useAppServices()
   const [summary, setSummary] = useState<StickSummary | null>(null)
   const [movements, setMovements] = useState<StockMovement[]>([])
   const [physicalCheck, setPhysicalCheck] = useState<PhysicalStockCheck | null>(null)
+  const [nicotineSummary, setNicotineSummary] = useState<NicotineAwarenessSummary | null>(null)
+  const [nicotineSettings, setNicotineSettings] = useState<NicotineAwarenessSettings | null>(null)
+  const [nicotineSettingsReady, setNicotineSettingsReady] = useState(false)
+  const [nicotineSaveState, setNicotineSaveState] = useState('')
   const [quantity, setQuantity] = useState('20')
   const [physicalQuantity, setPhysicalQuantity] = useState('')
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState('')
 
   const reload = useCallback(async () => {
-    const [nextSummary, nextMovements, nextPhysicalCheck] = await Promise.all([
+    const [nextSummary, nextMovements, nextPhysicalCheck, nextNicotineSummary] = await Promise.all([
       personalStockService.getSticksSummary(),
       personalStockService.listStickMovements(30),
       stockReconciliationService.getPhysicalCheck('stock:sticks:glo'),
+      nicotineAwarenessService.getSummary(),
     ])
     setSummary(nextSummary)
     setMovements(nextMovements)
     setPhysicalCheck(nextPhysicalCheck)
-  }, [personalStockService, stockReconciliationService])
+    setNicotineSummary(nextNicotineSummary)
+  }, [nicotineAwarenessService, personalStockService, stockReconciliationService])
 
   useEffect(() => {
     void reload().catch((error: unknown) => setMessage(error instanceof Error ? error.message : 'Erro ao carregar o stock.'))
-  }, [reload])
+    void nicotineAwarenessService.getSettings()
+      .then((settings) => {
+        setNicotineSettings(settings)
+        setNicotineSettingsReady(true)
+      })
+      .catch((error: unknown) => setMessage(error instanceof Error ? error.message : 'Erro ao carregar a configuração de nicotina.'))
+  }, [nicotineAwarenessService, reload])
+
+  useEffect(() => {
+    if (!nicotineSettings || !nicotineSettingsReady) return
+    setNicotineSaveState('A guardar…')
+    const timer = window.setTimeout(() => {
+      void nicotineAwarenessService.saveSettings({
+        profileId: nicotineSettings.profileId,
+        customMinMg: nicotineSettings.customMinMg,
+        customMaxMg: nicotineSettings.customMaxMg,
+        notes: nicotineSettings.notes,
+      }).then(async () => {
+        setNicotineSaveState('Guardado automaticamente no dispositivo e incluído no backup.')
+        setNicotineSummary(await nicotineAwarenessService.getSummary())
+      }).catch((error: unknown) => {
+        setNicotineSaveState(error instanceof Error ? error.message : 'Não foi possível guardar esta configuração.')
+      })
+    }, 650)
+    return () => window.clearTimeout(timer)
+  }, [
+    nicotineAwarenessService,
+    nicotineSettings?.profileId,
+    nicotineSettings?.customMinMg,
+    nicotineSettings?.customMaxMg,
+    nicotineSettings?.notes,
+    nicotineSettingsReady,
+  ])
 
   async function run(action: () => Promise<unknown>, success: string) {
     if (busy) return
@@ -81,6 +131,13 @@ export function SticksStockPage() {
   const canSubmitQuantity = Number.isSafeInteger(parsedQuantity) && parsedQuantity > 0
   const canSubmitPhysical = /^\d+$/.test(physicalQuantity.trim())
     && BigInt(physicalQuantity.trim() || '0') <= BigInt(Number.MAX_SAFE_INTEGER)
+
+  const updateNicotineSetting = <K extends keyof NicotineAwarenessSettings>(
+    key: K,
+    value: NicotineAwarenessSettings[K],
+  ) => {
+    setNicotineSettings((current) => current ? { ...current, [key]: value } : current)
+  }
 
   return (
     <section className="personalStockPage sticksStockPage" aria-labelledby="sticks-title">
@@ -114,6 +171,109 @@ export function SticksStockPage() {
           <small>{formatPhysicalCheckTime(physicalCheck?.checkedAt)}</small>
         </article>
       </div>
+
+      <section className="stockPanel nicotineAwarenessPanel" aria-labelledby="nicotine-awareness-title">
+        <div className="nicotineAwarenessHeading">
+          <div>
+            <span className="stockPanelTag">CONSCIÊNCIA DE NICOTINA</span>
+            <h2 id="nicotine-awareness-title">Nicotina estimada associada às utilizações</h2>
+          </div>
+          <span className="nicotineAwarenessBadge">ESTIMATIVA</span>
+        </div>
+        <p>
+          A contagem de sticks é exata porque vem do ledger. A nicotina é apresentada como estimativa de emissão no aerossol,
+          multiplicando apenas utilizações válidas pelo valor laboratorial por stick do perfil selecionado.
+        </p>
+
+        <div className="nicotineMetricGrid">
+          <article className="nicotineMetric">
+            <span>Hoje</span>
+            <strong>{nicotineAmount(nicotineSummary?.today.minMg, nicotineSummary?.today.maxMg)}</strong>
+            <small>{nicotineSummary?.today.sticks ?? 0} sticks registados</small>
+          </article>
+          <article className="nicotineMetric">
+            <span>Últimos 7 dias</span>
+            <strong>{nicotineAmount(nicotineSummary?.last7Days.minMg, nicotineSummary?.last7Days.maxMg)}</strong>
+            <small>{nicotineSummary?.last7Days.sticks ?? 0} sticks registados</small>
+          </article>
+          <article className="nicotineMetric">
+            <span>Total registado</span>
+            <strong>{nicotineAmount(nicotineSummary?.allTime.minMg, nicotineSummary?.allTime.maxMg)}</strong>
+            <small>{nicotineSummary?.allTime.sticks ?? 0} sticks líquidos após correções</small>
+          </article>
+        </div>
+
+        {nicotineSettings ? (
+          <div className="nicotineSettingsGrid">
+            <label>
+              Perfil do stick
+              <select
+                value={nicotineSettings.profileId}
+                onChange={(event) => updateNicotineSetting('profileId', event.target.value as NicotineProfileId)}
+              >
+                {NICOTINE_REFERENCE_PROFILES.map((profile) => (
+                  <option value={profile.id} key={profile.id}>{profile.label}</option>
+                ))}
+                <option value="custom">Personalizado — usar valor confirmado</option>
+              </select>
+            </label>
+
+            <div className="nicotineSourceBox">
+              <strong>{nicotineSummary?.profileLabel ?? 'A carregar referência…'}</strong>
+              <p>{nicotineSummary?.evidenceNote}</p>
+              {nicotineSummary?.sourceUrl ? (
+                <a href={nicotineSummary.sourceUrl} target="_blank" rel="noreferrer">Abrir fonte científica</a>
+              ) : null}
+            </div>
+
+            {nicotineSettings.profileId === 'custom' ? (
+              <div className="nicotineCustomRange">
+                <label>
+                  Nicotina mínima por stick (mg)
+                  <input
+                    inputMode="decimal"
+                    value={nicotineSettings.customMinMg}
+                    onChange={(event) => updateNicotineSetting('customMinMg', event.target.value)}
+                  />
+                </label>
+                <label>
+                  Nicotina máxima por stick (mg)
+                  <input
+                    inputMode="decimal"
+                    value={nicotineSettings.customMaxMg}
+                    onChange={(event) => updateNicotineSetting('customMaxMg', event.target.value)}
+                  />
+                </label>
+              </div>
+            ) : null}
+          </div>
+        ) : null}
+
+        {nicotineSettings ? (
+          <label className="nicotineNotesLabel">
+            Notas sobre o produto / referência utilizada
+            <textarea
+              maxLength={4000}
+              placeholder="Ex.: Neo variante X; confirmar valor da embalagem ou laboratório."
+              value={nicotineSettings.notes}
+              onChange={(event) => updateNicotineSetting('notes', event.target.value)}
+            />
+          </label>
+        ) : null}
+
+        <div className="nicotineSaveRow">
+          <span className="nicotineSaveState" role="status">{nicotineSaveState || 'As alterações ficam guardadas automaticamente.'}</span>
+        </div>
+
+        <p className="nicotineWarning">
+          <strong>Importante:</strong> mg por stick medidos numa máquina não são a mesma coisa que a dose absorvida pelo organismo.
+          A absorção depende do dispositivo, modo, produto e padrão de utilização; por isso a aplicação não apresenta este valor como dose corporal exata.
+        </p>
+        <p className="nicotineWhoNote">
+          A OMS classifica os produtos de tabaco aquecido como produtos que geram aerossóis com nicotina e substâncias tóxicas e salienta que a nicotina é altamente aditiva.{' '}
+          <a href="https://www.who.int/europe/news-room/fact-sheets/item/effects-of-tobacco-on-health" target="_blank" rel="noreferrer">Consultar OMS</a>.
+        </p>
+      </section>
 
       {!summary?.initialized ? (
         <section className="stockPanel">
@@ -150,7 +310,7 @@ export function SticksStockPage() {
               disabled={busy || (summary.stock ?? 0) <= 0}
               onClick={() => void run(
                 () => personalStockService.consumeStick(operationId()),
-                '1 stick utilizado. Stock atualizado.',
+                '1 stick utilizado. Stock e estimativa de nicotina atualizados.',
               )}
             >
               + 1 stick utilizado
