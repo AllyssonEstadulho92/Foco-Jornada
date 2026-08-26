@@ -168,7 +168,8 @@ function dayDifference(from: string, to: string): number {
 
 function planTargetForDate(settings: NicotineAwarenessSettings, dateKey: string): number {
   if (!settings.reductionPlanEnabled) return settings.dailyBaselineSticks
-  const elapsedDays = Math.max(0, dayDifference(settings.reductionPlanStartDate, dateKey))
+  const elapsedDays = dayDifference(settings.reductionPlanStartDate, dateKey)
+  if (elapsedDays < 0) return settings.dailyBaselineSticks
   const weekIndex = Math.floor(elapsedDays / 7)
   return Math.max(0, settings.dailyBaselineSticks - settings.weeklyReductionStep * (weekIndex + 1))
 }
@@ -292,8 +293,8 @@ export class NicotineAwarenessService {
       maxMg: formatMicrogramsAsMg(sticks * range.max),
     })
 
-    const elapsedDays = Math.max(0, dayDifference(settings.reductionPlanStartDate, todayDateKey))
-    const weekNumber = Math.floor(elapsedDays / 7) + 1
+    const elapsedPlanDays = dayDifference(settings.reductionPlanStartDate, todayDateKey)
+    const weekNumber = elapsedPlanDays < 0 ? 0 : Math.floor(elapsedPlanDays / 7) + 1
     const targetToday = planTargetForDate(settings, todayDateKey)
     const nextWeekDate = addCalendarDays(todayDateKey, 7)
     const nextWeekTarget = planTargetForDate(settings, nextWeekDate)
@@ -303,7 +304,7 @@ export class NicotineAwarenessService {
       for (let offset = 0; offset < 7; offset += 1) {
         const key = addCalendarDays(sevenDayStart, offset)
         const used = safeNumber(byDay.get(key) ?? 0n)
-        if (used > planTargetForDate(settings, key)) daysOverTargetLast7 += 1
+        if (key >= settings.reductionPlanStartDate && used > planTargetForDate(settings, key)) daysOverTargetLast7 += 1
       }
     }
     const weeksUntilZero = Math.max(1, Math.ceil(settings.dailyBaselineSticks / settings.weeklyReductionStep))
