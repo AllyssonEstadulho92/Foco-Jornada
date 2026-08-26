@@ -60,6 +60,7 @@ import './styles/personal-stock-hub-prototype.css'
 import './styles/nicotine-awareness.css'
 import './styles/stock-integrity-console.css'
 import './styles/medication-protection.css'
+import './styles/medication-prototype-complete.css'
 
 const root = document.getElementById('root')
 if (!root) throw new Error('Elemento #root não encontrado.')
