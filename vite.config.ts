@@ -8,9 +8,10 @@ const packageJson = JSON.parse(
 ) as { version: string }
 const buildDate = new Date().toISOString()
 const buildId = process.env.GITHUB_SHA?.slice(0, 7) ?? `local-${Date.now().toString(36)}`
+const githubPagesBase = '/Foco-Jornada/'
 
 export default defineConfig({
-  base: './',
+  base: githubPagesBase,
   define: {
     __APP_VERSION__: JSON.stringify(packageJson.version),
     __APP_BUILD_DATE__: JSON.stringify(buildDate),
@@ -37,11 +38,11 @@ export default defineConfig({
         theme_color: '#f6f7f5',
         background_color: '#f6f7f5',
         display: 'standalone',
-        start_url: './',
-        scope: './',
+        start_url: githubPagesBase,
+        scope: githubPagesBase,
         icons: [
           {
-            src: 'icon.svg',
+            src: `${githubPagesBase}icon.svg`,
             sizes: 'any',
             type: 'image/svg+xml',
             purpose: 'any maskable',
