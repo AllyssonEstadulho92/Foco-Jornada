@@ -400,8 +400,6 @@ export class AppBackupService {
     const localMedicationIds = new Set(
       localEntities.filter((entity) => entity.kind === 'medication').map((entity) => entity.id),
     )
-    const localMedicationEntities = localEntities.filter((entity) => localMedicationIds.has(entity.id))
-    const localMedicationMovements = localMovements.filter((movement) => localMedicationIds.has(movement.entityId))
     const localMedicationSchedules = localSchedules.filter((schedule) => localMedicationIds.has(schedule.medicationId))
     const localMedicationDoseEvents = localDoseEvents.filter((event) => localMedicationIds.has(event.medicationId))
     const localProtectedMetadata = localMetadata.filter((record) =>
@@ -418,15 +416,15 @@ export class AppBackupService {
         metadata: mergeProtectedMetadata(incomingPayload.tables.metadata, localProtectedMetadata),
         stockEntities: mergeAppendOnlyById(
           incomingPayload.tables.stockEntities,
-          localMedicationEntities,
+          localEntities,
           (item) => item.id,
-          'medicamento',
+          'entidade de stock',
         ),
         stockMovements: mergeAppendOnlyById(
           incomingPayload.tables.stockMovements,
-          localMedicationMovements,
+          localMovements,
           (item) => item.id,
-          'movimento de medicação',
+          'movimento de stock',
         ),
         medicationSchedules: mergeAppendOnlyById(
           incomingPayload.tables.medicationSchedules,
