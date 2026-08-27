@@ -6,6 +6,7 @@ import { MedicationDoseStatusService } from './application/personalStock/Medicat
 import { NicotineAwarenessService } from './application/personalStock/NicotineAwarenessService'
 import { OperationalPersonalStockService } from './application/personalStock/OperationalPersonalStockService'
 import { StickPackPlannerService } from './application/personalStock/StickPackPlannerService'
+import { StickUsageAnalyticsService } from './application/personalStock/StickUsageAnalyticsService'
 import { StockReconciliationService } from './application/personalStock/StockReconciliationService'
 import { db } from './infrastructure/database/appDatabase'
 import { DexieActivityRepository } from './infrastructure/repositories/DexieActivityRepository'
@@ -115,6 +116,7 @@ const services = {
   stockReconciliationService: new StockReconciliationService(db),
   nicotineAwarenessService: new NicotineAwarenessService(db),
   stickPackPlannerService: new StickPackPlannerService(db),
+  stickUsageAnalyticsService: new StickUsageAnalyticsService(db),
   backupService: new AppBackupService(db),
 }
 
