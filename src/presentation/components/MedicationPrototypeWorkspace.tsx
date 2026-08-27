@@ -1,10 +1,9 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import type {
   MedicationDashboardSummary,
   MedicationLifecycleStatus,
   MedicationProtectedProfile,
   MedicationProtectionSummary,
-  MedicationSnapshotStatus,
   MedicationTimelineItem,
 } from '../../application/personalStock/MedicationDataProtectionService'
 import { minorToDecimal } from '../../application/personalStock/decimal'
@@ -29,15 +28,6 @@ const EMPTY_DASHBOARD: MedicationDashboardSummary = {
   takenDoseCount: 0,
   pendingDoseCount: 0,
   notTakenDoseCount: 0,
-}
-
-const EMPTY_SNAPSHOT: MedicationSnapshotStatus = {
-  available: false,
-  valid: false,
-  medicationCount: 0,
-  recordCount: 0,
-  sizeBytes: 0,
-  source: 'none',
 }
 
 function statusLabel(status: MedicationLifecycleStatus): string {
@@ -75,11 +65,6 @@ function formatDate(value?: string): string {
   }).format(parsed)
 }
 
-function bytesLabel(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
-}
 
 function timelineIcon(kind: MedicationTimelineItem['kind']): string {
   if (kind === 'dose') return '✓'
@@ -115,10 +100,8 @@ export function MedicationPrototypeWorkspace({
     personalStockService,
     medicationDataProtectionService,
   } = useAppServices()
-  const restoreInputRef = useRef<HTMLInputElement>(null)
   const [profiles, setProfiles] = useState<Record<string, MedicationProtectedProfile>>({})
   const [dashboard, setDashboard] = useState<MedicationDashboardSummary>(EMPTY_DASHBOARD)
-  const [snapshot, setSnapshot] = useState<MedicationSnapshotStatus>(EMPTY_SNAPSHOT)
   const [protection, setProtection] = useState<MedicationProtectionSummary | null>(null)
   const [timeline, setTimeline] = useState<MedicationTimelineItem[]>([])
   const [schedules, setSchedules] = useState<MedicationSchedule[]>([])
@@ -137,9 +120,8 @@ export function MedicationPrototypeWorkspace({
   const selected = medications.find((item) => item.medication.id === selectedId) ?? null
 
   const loadWorkspace = useCallback(async () => {
-    const [nextDashboard, nextSnapshot, profileEntries] = await Promise.all([
+    const [nextDashboard, profileEntries] = await Promise.all([
       medicationDataProtectionService.getTodayDashboard(today),
-      medicationDataProtectionService.getRedundantSnapshotStatus(),
       Promise.all(medications.map(async (item) => [
         item.medication.id,
         await medicationDataProtectionService.getProfile(item.medication.id),
@@ -147,7 +129,6 @@ export function MedicationPrototypeWorkspace({
     ])
     const profileMap = Object.fromEntries(profileEntries) as Record<string, MedicationProtectedProfile>
     setDashboard(nextDashboard)
-    setSnapshot(nextSnapshot)
     setProfiles(profileMap)
 
     if (!selectedId || !medications.some((item) => item.medication.id === selectedId)) {
@@ -244,38 +225,6 @@ export function MedicationPrototypeWorkspace({
     await medicationDataProtectionService.recordCheckpoint(selectedId, 'informação protegida atualizada')
   }
 
-  async function verifySelected() {
-    if (!selectedId) return
-    await medicationDataProtectionService.recordCheckpoint(selectedId, 'verificação manual no centro de medicação')
-    await medicationDataProtectionService.syncRedundantSnapshot()
-  }
-
-  async function downloadMedicationBackup() {
-    const text = await medicationDataProtectionService.exportMedicationSnapshotText()
-    const blob = new Blob([text], { type: 'application/json;charset=utf-8' })
-    const url = URL.createObjectURL(blob)
-    try {
-      const link = document.createElement('a')
-      link.href = url
-      link.download = `foco-jornada-medicacao-${today}.json`
-      document.body.appendChild(link)
-      link.click()
-      link.remove()
-    } finally {
-      URL.revokeObjectURL(url)
-    }
-    await medicationDataProtectionService.syncRedundantSnapshot()
-  }
-
-  async function restoreMedicationBackup(file: File) {
-    const text = await file.text()
-    const result = await medicationDataProtectionService.mergeMedicationSnapshotText(text)
-    setMessage(
-      `Restauro protegido concluído: ${result.addedRecords} registo(s) acrescentado(s), sem apagar os dados locais existentes.`,
-    )
-    await onDataChanged()
-    await loadWorkspace()
-  }
 
   function scrollTo(id: string) {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -283,19 +232,6 @@ export function MedicationPrototypeWorkspace({
 
   return (
     <section className="medProtoWorkspace" aria-labelledby="med-proto-title">
-      <div className={`medProtoProtectionBanner ${protection?.status === 'OK' ? 'isOk' : 'needsCheck'}`}>
-        <div className="medProtoShield" aria-hidden="true">✓</div>
-        <div>
-          <strong>{protection?.status === 'OK' ? 'PROTEÇÃO ATIVA' : 'PROTEÇÃO A VERIFICAR'}</strong>
-          <span>
-            Guardado em IndexedDB, histórico append-only e cópia redundante local. Nenhuma correção apaga o registo anterior.
-          </span>
-        </div>
-        <button type="button" disabled={busy || !selectedId} onClick={() => void execute(verifySelected, 'Proteção verificada e ponto de proteção atualizado.')}>
-          Verificar
-        </button>
-      </div>
-
       <header className="medProtoHeader">
         <div>
           <span className="stockPanelTag">GESTOR DE MEDICAÇÃO · COMPLETO</span>
@@ -400,7 +336,6 @@ export function MedicationPrototypeWorkspace({
             <section className="medProtoToday">
               <div className="medProtoSectionHeading">
                 <div><span>HOJE</span><h4>Tomas programadas</h4></div>
-                <button type="button" onClick={() => scrollTo('medication-today-doses')}>Abrir ações completas</button>
               </div>
               {todayDoseRows.length ? todayDoseRows.map(({ schedule, event }) => (
                 <div className="medProtoDoseRow" key={schedule.id}>
@@ -418,7 +353,7 @@ export function MedicationPrototypeWorkspace({
                 </div>
               )) : <p className="medProtoEmptyInline">Sem horários válidos para hoje.</p>}
               <button type="button" className="stockPrimaryAction medProtoRegisterButton" onClick={() => scrollTo('medication-today-doses')}>
-                + Registar toma
+                Gerir tomas de hoje
               </button>
             </section>
 
@@ -520,69 +455,20 @@ export function MedicationPrototypeWorkspace({
         )}
       </div>
 
-      <section className="medProtoProtectionGrid">
-        <article>
-          <span>PROTEÇÃO INTEGRADA</span>
-          <strong>{protection?.status === 'OK' ? 'Protegido' : 'Verificar'}</strong>
-          <small>Identidade estável, checkpoints e revisões append-only.</small>
-          <button type="button" onClick={() => scrollTo('medication-protection-integrated')}>Abrir proteção</button>
-        </article>
-        <article>
-          <span>INTEGRIDADE DOS DADOS</span>
-          <strong>{protection?.status ?? 'A VERIFICAR'}</strong>
-          <small>{protection ? `${protection.movementCount + protection.scheduleCount + protection.doseEventCount} registos verificados` : 'Seleciona um medicamento'}</small>
-          <button type="button" disabled={busy || !selectedId} onClick={() => void execute(verifySelected, 'Integridade verificada sem apagar ou reescrever registos.')}>
-            Verificar agora
-          </button>
-        </article>
-        <article>
-          <span>LEDGER</span>
-          <strong>{protection?.movementCount ?? 0} movimentos</strong>
-          <small>{protection?.checkpointCount ?? 0} ponto(s) de proteção · {protection?.noteRevisionCount ?? 0} revisão(ões) de nota.</small>
-          <button type="button" onClick={() => setTab('history')}>Ver histórico</button>
-        </article>
-        <article>
-          <span>BACKUP E RESTAURO</span>
-          <strong>{snapshot.valid ? 'Cópia local válida' : 'Criar cópia'}</strong>
-          <small>
-            {snapshot.valid
-              ? `${snapshot.medicationCount} medicamento(s) · ${snapshot.recordCount} registos · ${bytesLabel(snapshot.sizeBytes)}`
-              : 'A cópia externa permite recuperar dados mesmo fora deste navegador.'}
-          </small>
-          <div className="medProtoBackupActions">
-            <button
-              type="button"
-              className="stockPrimaryAction"
-              disabled={busy}
-              onClick={() => void execute(downloadMedicationBackup, 'Cópia protegida criada e descarregada.')}
-            >
-              Fazer backup agora
-            </button>
-            <button type="button" disabled={busy} onClick={() => restoreInputRef.current?.click()}>
-              Restaurar sem apagar
-            </button>
-            <input
-              ref={restoreInputRef}
-              className="medProtoHiddenInput"
-              type="file"
-              accept="application/json,.json"
-              onChange={(event) => {
-                const file = event.target.files?.[0]
-                event.currentTarget.value = ''
-                if (file) void execute(() => restoreMedicationBackup(file), 'Restauro protegido concluído.')
-              }}
-            />
-          </div>
-        </article>
-      </section>
+      <div className="medProtoPassiveProtection" role="status">
+        <strong>{protection?.status === 'OK' ? 'Dados protegidos automaticamente' : 'Proteção a verificar'}</strong>
+        <span>
+          IndexedDB + histórico append-only + cópia redundante local. Correções acrescentam registos; não apagam o anterior.
+          {protection ? ` ${protection.movementCount + protection.scheduleCount + protection.doseEventCount} registo(s) operacionais verificados.` : ''}
+        </span>
+      </div>
 
       {message ? <div className="medProtoMessage" role="status">{message}</div> : null}
 
       <p className="medProtoSafety">
-        <strong>Regra principal:</strong> o fluxo de medicação não tem botão de eliminação. Correções acrescentam eventos,
-        as notas mantêm revisões e o restauro desta área é feito por fusão, sem limpar os dados existentes. Atualizar a página
-        ou fechar o navegador mantém os dados locais. Limpar todos os dados do site, perder o dispositivo ou desinstalar sem
-        uma cópia externa ainda pode causar perda; por isso o backup externo continua disponível.
+        <strong>Regra principal:</strong> stock e tomas vêm dos registos guardados; não são inferidos. Correções acrescentam eventos,
+        as notas mantêm revisões e os dados permanecem após atualizar a página. A cópia externa continua disponível em “Mais”
+        para proteger contra perda do dispositivo ou limpeza total do navegador.
       </p>
     </section>
   )
