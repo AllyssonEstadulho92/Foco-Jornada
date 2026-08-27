@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
 import { AppDatabase } from '../../infrastructure/database/appDatabase'
-import { NicotineAwarenessService } from './NicotineAwarenessService'
 import { PersonalStockService } from './PersonalStockService'
 import { StickPackPlannerService } from './StickPackPlannerService'
 
@@ -12,26 +11,12 @@ function makeDatabase(): AppDatabase {
   return new AppDatabase(`foco-jornada-stick-pack-test-${operationId()}`)
 }
 
-async function configureReduction(db: AppDatabase) {
-  await new NicotineAwarenessService(db).saveSettings({
-    profileId: 'neo-published-range',
-    customMinMg: '0.460',
-    customMaxMg: '0.680',
-    notes: '',
-    reductionPlanEnabled: true,
-    dailyBaselineSticks: 13,
-    weeklyReductionStep: 1,
-    reductionPlanStartDate: '2026-08-27',
-  })
-}
-
 describe('StickPackPlannerService', () => {
-  it('represents 12 packs of 20 as exactly 240 sticks and forecasts the baseline deterministically', async () => {
+  it('represents 12 packs of 20 as exactly 240 sticks without inventing a depletion date', async () => {
     const db = makeDatabase()
     try {
       const stock = new PersonalStockService(db)
       const planner = new StickPackPlannerService(db)
-      await configureReduction(db)
       await planner.saveSettings({ packCount: 12, sticksPerPack: 20 })
       await stock.initializeSticks(240, operationId())
 
@@ -46,14 +31,10 @@ describe('StickPackPlannerService', () => {
       expect(projection.currentPackStarted).toBe(false)
       expect(projection.currentPackRemaining).toBe(0)
       expect(projection.currentPackPercentRemaining).toBe(100)
-      expect(projection.currentPackBaselineDays).toBe('1.5')
-      expect(projection.currentPackBaselineDepletionDate).toBe('2026-08-28')
       expect(projection.packEquivalent).toBe('12.0')
-      expect(projection.baselineDailySticks).toBe(13)
-      expect(projection.baselineDays).toBe('18.5')
-      expect(projection.baselineDepletionDate).toBe('2026-09-14')
-      expect(projection.reductionPlanDays).toBe(22)
-      expect(projection.reductionPlanDepletionDate).toBe('2026-09-17')
+      expect(projection.historicalReliable).toBe(false)
+      expect(projection.historicalDepletionDate).toBeNull()
+      expect(projection.currentPackHistoricalDepletionDate).toBeNull()
     } finally {
       await db.delete()
     }
@@ -64,7 +45,6 @@ describe('StickPackPlannerService', () => {
     try {
       const stock = new PersonalStockService(db)
       const planner = new StickPackPlannerService(db)
-      await configureReduction(db)
       await planner.saveSettings({ packCount: 12, sticksPerPack: 20 })
       await stock.initializeSticks(240, operationId())
       await stock.consumeStick(operationId())
@@ -86,13 +66,11 @@ describe('StickPackPlannerService', () => {
     }
   })
 
-
-  it('only enables the observed-rate forecast after three days of tracked use', async () => {
+  it('only estimates duration after at least three observed calendar days', async () => {
     const db = makeDatabase()
     try {
       const stock = new PersonalStockService(db)
       const planner = new StickPackPlannerService(db)
-      await configureReduction(db)
       await planner.saveSettings({ packCount: 2, sticksPerPack: 20 })
       await stock.initializeSticks(30, operationId())
       await stock.consumeStick(operationId())
@@ -117,7 +95,9 @@ describe('StickPackPlannerService', () => {
       expect(projection.historicalReliable).toBe(true)
       expect(projection.historicalDailyAverage).toBe('1.0')
       expect(projection.historicalDays).toBe('27.0')
+      expect(projection.historicalDepletionDate).toBe('2026-09-22')
       expect(projection.currentPackHistoricalDays).toBe('7.0')
+      expect(projection.currentPackHistoricalDepletionDate).toBe('2026-09-02')
     } finally {
       await db.delete()
     }
