@@ -5,6 +5,7 @@ import { MedicationDataProtectionService } from './application/personalStock/Med
 import { MedicationDoseStatusService } from './application/personalStock/MedicationDoseStatusService'
 import { NicotineAwarenessService } from './application/personalStock/NicotineAwarenessService'
 import { OperationalPersonalStockService } from './application/personalStock/OperationalPersonalStockService'
+import { StickDataProtectionService } from './application/personalStock/StickDataProtectionService'
 import { StickPackPlannerService } from './application/personalStock/StickPackPlannerService'
 import { StickUsageAnalyticsService } from './application/personalStock/StickUsageAnalyticsService'
 import { StockReconciliationService } from './application/personalStock/StockReconciliationService'
@@ -115,6 +116,7 @@ const services = {
   medicationDataProtectionService: new MedicationDataProtectionService(db),
   stockReconciliationService: new StockReconciliationService(db),
   nicotineAwarenessService: new NicotineAwarenessService(db),
+  stickDataProtectionService: new StickDataProtectionService(db),
   stickPackPlannerService: new StickPackPlannerService(db),
   stickUsageAnalyticsService: new StickUsageAnalyticsService(db),
   backupService: new AppBackupService(db),
