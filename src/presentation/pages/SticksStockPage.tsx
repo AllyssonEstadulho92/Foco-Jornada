@@ -9,6 +9,7 @@ import type {
   StickPackProjection,
   StickPackSettings,
 } from '../../application/personalStock/StickPackPlannerService'
+import type { StickUsageAnalytics } from '../../application/personalStock/StickUsageAnalyticsService'
 import type { PhysicalStockCheck, StickSummary, StockMovement } from '../../domain/personalStock/models'
 import { useAppServices } from '../providers/AppServicesProvider'
 
@@ -69,6 +70,32 @@ function localDecimal(value: string): string {
   return value.replace('.', ',')
 }
 
+function formatUsageTime(value?: string | null): string {
+  if (!value) return '—'
+  return new Intl.DateTimeFormat('pt-PT', {
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'Europe/Lisbon',
+  }).format(new Date(value))
+}
+
+function formatUsageDay(value: string): string {
+  const date = new Date(`${value}T12:00:00Z`)
+  return new Intl.DateTimeFormat('pt-PT', {
+    weekday: 'short',
+    day: '2-digit',
+    timeZone: 'UTC',
+  }).format(date)
+}
+
+function durationLabel(minutes?: number | null): string {
+  if (minutes === null || minutes === undefined) return '—'
+  if (minutes < 60) return `${minutes} min`
+  const hours = Math.floor(minutes / 60)
+  const rest = minutes % 60
+  return rest ? `${hours} h ${rest} min` : `${hours} h`
+}
+
 function initialPackSettings(): StickPackSettings {
   return {
     packCount: 12,
@@ -83,6 +110,7 @@ export function SticksStockPage() {
     stockReconciliationService,
     nicotineAwarenessService,
     stickPackPlannerService,
+    stickUsageAnalyticsService,
   } = useAppServices()
   const [summary, setSummary] = useState<StickSummary | null>(null)
   const [movements, setMovements] = useState<StockMovement[]>([])
@@ -95,6 +123,7 @@ export function SticksStockPage() {
   const [packSettingsReady, setPackSettingsReady] = useState(false)
   const [packSaveState, setPackSaveState] = useState('')
   const [packProjection, setPackProjection] = useState<StickPackProjection | null>(null)
+  const [usageAnalytics, setUsageAnalytics] = useState<StickUsageAnalytics | null>(null)
   const [quantity, setQuantity] = useState('20')
   const [physicalQuantity, setPhysicalQuantity] = useState('')
   const [busy, setBusy] = useState(false)
@@ -107,22 +136,26 @@ export function SticksStockPage() {
       nextPhysicalCheck,
       nextNicotineSummary,
       nextPackProjection,
+      nextUsageAnalytics,
     ] = await Promise.all([
       personalStockService.getSticksSummary(),
       personalStockService.listStickMovements(50),
       stockReconciliationService.getPhysicalCheck('stock:sticks:glo'),
       nicotineAwarenessService.getSummary(),
       stickPackPlannerService.getProjection(),
+      stickUsageAnalyticsService.getAnalytics(),
     ])
     setSummary(nextSummary)
     setMovements(nextMovements)
     setPhysicalCheck(nextPhysicalCheck)
     setNicotineSummary(nextNicotineSummary)
     setPackProjection(nextPackProjection)
+    setUsageAnalytics(nextUsageAnalytics)
   }, [
     nicotineAwarenessService,
     personalStockService,
     stickPackPlannerService,
+    stickUsageAnalyticsService,
     stockReconciliationService,
   ])
 
@@ -274,6 +307,8 @@ export function SticksStockPage() {
   const displayedPackLabel = packProjection?.currentStockSticks
     ? packProjection.currentPackStarted ? 'Maço atual' : 'Próximo maço'
     : 'Sem maço disponível'
+
+  const maxDailyUsage = Math.max(1, ...(usageAnalytics?.last7Days.map((item) => item.count) ?? [1]))
 
   async function confirmConfiguredPhysicalStock() {
     const saved = await stickPackPlannerService.saveSettings({
@@ -512,6 +547,103 @@ export function SticksStockPage() {
             Corrigir último registo
           </button>
         </div>
+      </section>
+
+      <section className="stickUsageAnalyticsPanel" aria-labelledby="stick-usage-analytics-title">
+        <div className="stickUsageAnalyticsHeading">
+          <div>
+            <span className="stockPanelTag">PADRÃO REGISTADO</span>
+            <h2 id="stick-usage-analytics-title">Utilização por hora e por dia</h2>
+            <p>Calculado apenas a partir dos movimentos efetivamente guardados no ledger.</p>
+          </div>
+          <button
+            type="button"
+            className="stockSecondaryAction"
+            disabled={busy}
+            onClick={() => void reload()}
+          >
+            Atualizar
+          </button>
+        </div>
+
+        <div className="stickUsageMetrics">
+          <article>
+            <span>Último registo</span>
+            <strong>{formatUsageTime(usageAnalytics?.lastUseAt)}</strong>
+            <small>{usageAnalytics?.lastUseAt ? `há ${durationLabel(usageAnalytics.minutesSinceLastUse)}` : 'sem utilização registada'}</small>
+          </article>
+          <article>
+            <span>Intervalo médio hoje</span>
+            <strong>{durationLabel(usageAnalytics?.averageIntervalMinutesToday)}</strong>
+            <small>{usageAnalytics?.todayCount ?? 0} utilização(ões) hoje</small>
+          </article>
+          <article>
+            <span>Menor intervalo hoje</span>
+            <strong>{durationLabel(usageAnalytics?.shortestIntervalMinutesToday)}</strong>
+            <small>entre registos válidos</small>
+          </article>
+          <article>
+            <span>Maior intervalo hoje</span>
+            <strong>{durationLabel(usageAnalytics?.longestIntervalMinutesToday)}</strong>
+            <small>entre registos válidos</small>
+          </article>
+        </div>
+
+        <div className="stickUsageChart" aria-label="Sticks registados nos últimos sete dias">
+          <div className="stickUsageChartTitle">
+            <strong>Últimos 7 dias</strong>
+            <span>{usageAnalytics?.last7Total ?? 0} sticks · anterior: {usageAnalytics?.previous7Total ?? 0}</span>
+          </div>
+          <div className="stickUsageBars">
+            {usageAnalytics?.last7Days.map((item) => (
+              <div className="stickUsageBarRow" key={item.date}>
+                <span>{formatUsageDay(item.date)}</span>
+                <div className="stickUsageBarTrack">
+                  <i style={{ width: `${Math.round((item.count / maxDailyUsage) * 100)}%` }} />
+                </div>
+                <strong>{item.count}</strong>
+              </div>
+            ))}
+          </div>
+          <div className="stickUsageTrend">
+            <span>Diferença vs. 7 dias anteriores</span>
+            <strong className={usageAnalytics?.trendDirection === 'up' ? 'isUp' : usageAnalytics?.trendDirection === 'down' ? 'isDown' : ''}>
+              {usageAnalytics && usageAnalytics.trendDifference > 0 ? '+' : ''}{usageAnalytics?.trendDifference ?? 0}
+            </strong>
+          </div>
+        </div>
+
+        <details className="stickUsageTimelineDetails">
+          <summary>Ver horários recentes</summary>
+          <div className="stickUsageTimeline">
+            {usageAnalytics?.recentEvents.length ? usageAnalytics.recentEvents.map((event, index) => {
+              const nextOlder = usageAnalytics.recentEvents[index + 1]
+              const gap = nextOlder
+                ? Math.max(0, Math.round((Date.parse(event.effectiveAt) - Date.parse(nextOlder.effectiveAt)) / 60_000))
+                : null
+              return (
+                <div className="stickUsageTimelineRow" key={event.id}>
+                  <div>
+                    <strong>{formatUsageTime(event.effectiveAt)}</strong>
+                    <span>{new Intl.DateTimeFormat('pt-PT', {
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: 'numeric',
+                      timeZone: 'Europe/Lisbon',
+                    }).format(new Date(event.effectiveAt))}</span>
+                  </div>
+                  <span>{event.count} stick{event.count === 1 ? '' : 's'}</span>
+                  <small>{gap === null ? 'primeiro registo disponível' : `${durationLabel(gap)} desde o anterior`}</small>
+                </div>
+              )
+            }) : <p className="stockEmpty">Ainda não existem utilizações registadas.</p>}
+          </div>
+        </details>
+
+        <p className="stickUsageAnalyticsNote">
+          Intervalos e gráficos são descritivos. Não indicam um intervalo seguro nem quantos sticks deves utilizar.
+          Uma correção remove o registo da análise ativa sem apagar o movimento original do histórico auditável.
+        </p>
       </section>
 
       <section className="stickForecastPanel" aria-labelledby="stick-forecast-title">
