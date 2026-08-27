@@ -18,7 +18,7 @@ export interface StickPackSettings {
 export interface StickPackUsagePeriod {
   packNumber: number
   consumedSticks: number
-  actualStartAt: string
+  actualStartAt: string | null
   actualEndAt: string | null
   status: 'completed' | 'current'
 }
@@ -152,12 +152,14 @@ function dateForRate(stock: number, dailyRate: number, today: string): { days: s
 function buildPackUsagePeriods(
   consumed: Array<{ effectiveAt: string; sticks: bigint; sequence: number }>,
   sticksPerPack: number,
+  initialStockSticks: number | null,
 ): StickPackUsagePeriod[] {
   if (!Number.isSafeInteger(sticksPerPack) || sticksPerPack <= 0) return []
 
   const periods: StickPackUsagePeriod[] = []
   let packNumber = 1
-  let consumedInPack = 0
+  const initialRemainder = initialStockSticks === null ? 0 : initialStockSticks % sticksPerPack
+  let consumedInPack = initialRemainder === 0 ? 0 : sticksPerPack - initialRemainder
   let actualStartAt: string | null = null
   let actualEndAt: string | null = null
 
@@ -173,7 +175,7 @@ function buildPackUsagePeriods(
         periods.push({
           packNumber,
           consumedSticks: consumedInPack,
-          actualStartAt: actualStartAt as string,
+          actualStartAt,
           actualEndAt,
           status: 'completed',
         })
@@ -185,7 +187,7 @@ function buildPackUsagePeriods(
     }
   }
 
-  if (consumedInPack > 0 && actualStartAt) {
+  if (consumedInPack > 0) {
     periods.push({
       packNumber,
       consumedSticks: consumedInPack,
@@ -237,7 +239,7 @@ function buildPackForecasts(input: {
     remaining -= sticks
 
     const isCurrent = sequence === 1 && input.currentPackStarted
-    const estimatedStartDate = input.historicalReliable
+    const estimatedStartDate = input.historicalReliable && !isCurrent
       ? dateForConsumptionIndex(cumulativeBefore + 1, input.historicalDailyAverage, input.today)
       : null
     const endForecast = input.historicalReliable
@@ -362,7 +364,13 @@ export class StickPackPlannerService {
         ? currentPackRemaining ?? 0
         : Math.min(settings.sticksPerPack, currentStock)
 
-    const packUsagePeriods = buildPackUsagePeriods(consumed, settings.sticksPerPack)
+    const initialStockMovement = [...movements]
+      .sort(compareMovements)
+      .find((movement) => movement.type === 'initial_stock')
+    const initialStockSticks = initialStockMovement
+      ? safeNumber(BigInt(initialStockMovement.balanceAfterMinor))
+      : null
+    const packUsagePeriods = buildPackUsagePeriods(consumed, settings.sticksPerPack, initialStockSticks)
 
     const historicalForecast = currentStock === null || !historicalReliable
       ? null
