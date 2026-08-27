@@ -111,6 +111,7 @@ export function SticksStockPage() {
     nicotineAwarenessService,
     stickPackPlannerService,
     stickUsageAnalyticsService,
+    stickDataProtectionService,
   } = useAppServices()
 
   const [summary, setSummary] = useState<StickSummary | null>(null)
@@ -162,11 +163,14 @@ export function SticksStockPage() {
   ])
 
   useEffect(() => {
-    void Promise.all([
-      reload(),
-      stickPackPlannerService.getSettings(),
-      nicotineAwarenessService.getSettings(),
-    ]).then(([, nextPackSettings, nextNicotineSettings]) => {
+    void (async () => {
+      await stickDataProtectionService.recoverIfNeeded()
+      return Promise.all([
+        reload(),
+        stickPackPlannerService.getSettings(),
+        nicotineAwarenessService.getSettings(),
+      ])
+    })().then(([, nextPackSettings, nextNicotineSettings]) => {
       setPackSettings(nextPackSettings)
       setPackSettingsReady(true)
       setNicotineSettings(nextNicotineSettings)
@@ -174,7 +178,7 @@ export function SticksStockPage() {
     }).catch((error: unknown) => {
       setMessage(error instanceof Error ? error.message : 'Não foi possível carregar o controlo de sticks.')
     })
-  }, [nicotineAwarenessService, reload, stickPackPlannerService])
+  }, [nicotineAwarenessService, reload, stickDataProtectionService, stickPackPlannerService])
 
   useEffect(() => {
     if (!packSettingsReady) return
@@ -195,6 +199,7 @@ export function SticksStockPage() {
         sticksPerPack: packSettings.sticksPerPack,
       }).then(async (saved) => {
         setPackSettings(saved)
+        await stickDataProtectionService.sync()
         setPackSaveState('Configuração guardada automaticamente.')
         setPackProjection(await stickPackPlannerService.getProjection())
       }).catch((error: unknown) => {
@@ -206,6 +211,7 @@ export function SticksStockPage() {
     packSettings.packCount,
     packSettings.sticksPerPack,
     packSettingsReady,
+    stickDataProtectionService,
     stickPackPlannerService,
   ])
 
@@ -233,6 +239,7 @@ export function SticksStockPage() {
         notes: nicotineSettings.notes,
       }).then(async (saved) => {
         setNicotineSettings(saved)
+        await stickDataProtectionService.sync()
         setNicotineSaveState('Guardado automaticamente.')
         setNicotineSummary(await nicotineAwarenessService.getSummary())
       }).catch((error: unknown) => {
@@ -248,6 +255,7 @@ export function SticksStockPage() {
     nicotineSettings.notes,
     nicotineSettings.profileId,
     nicotineSettingsReady,
+    stickDataProtectionService,
   ])
 
   async function run(action: () => Promise<unknown>, success: string) {
@@ -256,6 +264,7 @@ export function SticksStockPage() {
     setMessage('')
     try {
       await action()
+      await stickDataProtectionService.sync()
       await reload()
       setMessage(success)
     } catch (error) {
@@ -767,8 +776,8 @@ export function SticksStockPage() {
           </details>
 
           <p className="sticksPersistenceNote">
-            <strong>Dados:</strong> stock, utilizações, correções, configuração do maço, variante veo e notas ficam guardados localmente e entram na cópia integral da aplicação.
-            O histórico normal não é apagado por uma correção. Para proteção contra perda do dispositivo ou limpeza total do navegador, mantém também uma cópia externa em “Mais”.
+            <strong>Proteção automática:</strong> stock, utilizações, correções, configuração do maço, variante veo e notas ficam em IndexedDB e numa cópia redundante local atualizada após alterações.
+            O histórico normal não é apagado por uma correção. Para perda do dispositivo ou limpeza total do navegador, mantém também uma cópia externa em “Mais”.
           </p>
         </>
       )}
