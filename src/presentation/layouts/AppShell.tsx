@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { AppTopBar } from '../components/AppTopBar'
-import { StockIntegrityPanel } from '../components/StockIntegrityPanel'
 import { NavigationIcon } from '../navigation/NavigationIcon'
 import { primaryNavigation, secondaryNavigation, type NavigationItem } from '../navigation/navigationItems'
 import { useUiStore } from '../store/useUiStore'
@@ -102,6 +101,18 @@ export function AppShell() {
     syncTheme()
     media.addEventListener('change', syncTheme)
     return () => media.removeEventListener('change', syncTheme)
+  }, [])
+
+  useEffect(() => {
+    if (!navigator.storage?.persisted || !navigator.storage?.persist) return
+    void navigator.storage.persisted()
+      .then((persistent) => {
+        if (!persistent) return navigator.storage.persist()
+        return true
+      })
+      .catch(() => {
+        // A aplicação continua com IndexedDB mesmo quando o navegador não permite persistência explícita.
+      })
   }, [])
 
   useEffect(() => {
@@ -218,8 +229,6 @@ export function AppShell() {
             </section>
           ) : null}
           <Outlet />
-          {location.pathname === '/sticks' ? <StockIntegrityPanel scope="sticks" /> : null}
-          {location.pathname === '/medicamentos' ? <StockIntegrityPanel scope="medications" /> : null}
         </main>
       </div>
 

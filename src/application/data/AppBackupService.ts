@@ -321,6 +321,7 @@ function mergeProtectedMetadata(incoming: AppMetadataRecord[], local: AppMetadat
     const replaceableCurrent = item.key.startsWith('medication-protection:note-current:')
       || item.key.startsWith('medication-protection:profile-current:')
       || item.key === 'personal-stock:nicotine-awareness-v1'
+      || item.key === 'personal-stock:nicotine-awareness-v2'
       || item.key === 'personal-stock:stick-pack-planner-v1'
     if (!replaceableCurrent) {
       throw new Error(`Restauro protegido recusado: o registo ${item.key} diverge da cópia.`)
@@ -406,6 +407,7 @@ export class AppBackupService {
     const localProtectedMetadata = localMetadata.filter((record) =>
       record.key.startsWith('medication-protection:')
       || record.key === 'personal-stock:nicotine-awareness-v1'
+      || record.key === 'personal-stock:nicotine-awareness-v2'
       || record.key === 'personal-stock:stick-pack-planner-v1'
     )
 
