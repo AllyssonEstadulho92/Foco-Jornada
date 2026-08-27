@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { AppDatabase } from '../../infrastructure/database/appDatabase'
 import { MedicationDataProtectionService } from '../personalStock/MedicationDataProtectionService'
 import { MedicationDoseStatusService } from '../personalStock/MedicationDoseStatusService'
+import { NicotineAwarenessService } from '../personalStock/NicotineAwarenessService'
 import { PersonalStockService } from '../personalStock/PersonalStockService'
 import { StickPackPlannerService } from '../personalStock/StickPackPlannerService'
 import { AppBackupService, BACKUP_APP_VERSION, BACKUP_FORMAT } from './AppBackupService'
@@ -221,6 +222,33 @@ describe('AppBackupService', () => {
       expect(restored.packCount).toBe(12)
       expect(restored.sticksPerPack).toBe(20)
       expect(await db.metadata.get('personal-stock:stick-pack-planner-v1')).toBeTruthy()
+    } finally {
+      await db.delete()
+    }
+  })
+
+
+  it('preserva a configuração veo v2 ao restaurar uma cópia integral mais antiga', async () => {
+    const db = makeDatabase()
+    try {
+      const backup = new AppBackupService(db)
+      const olderBackup = await backup.exportText()
+
+      const nicotine = new NicotineAwarenessService(db)
+      await nicotine.saveSettings({
+        profileId: 'veo-purple-click-2026',
+        customContentMeanMg: '',
+        customEmissionMeanMg: '',
+        customSourceLabel: '',
+        notes: 'Purple Click confirmado.',
+      })
+
+      await backup.restoreFromText(olderBackup)
+
+      const restored = await nicotine.getSettings()
+      expect(restored.profileId).toBe('veo-purple-click-2026')
+      expect(restored.notes).toBe('Purple Click confirmado.')
+      expect(await db.metadata.get('personal-stock:nicotine-awareness-v2')).toBeTruthy()
     } finally {
       await db.delete()
     }
