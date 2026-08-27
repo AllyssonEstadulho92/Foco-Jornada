@@ -206,6 +206,47 @@ describe('StickPackPlannerService', () => {
     }
   })
 
+  it('keeps real pack start and end dates even before forecast history becomes reliable', async () => {
+    const db = makeDatabase()
+    try {
+      const stock = new PersonalStockService(db)
+      const planner = new StickPackPlannerService(db)
+      await planner.saveSettings({ packCount: 1, sticksPerPack: 20 })
+      await stock.initializeSticks(20, operationId())
+
+      for (let index = 0; index < 20; index += 1) {
+        await stock.consumeStick(operationId())
+      }
+
+      const consumptions = (await db.stockMovements.where('entityId').equals('stock:sticks:glo').toArray())
+        .filter((movement) => movement.type === 'consumption')
+        .sort((left, right) => left.sequence - right.sequence)
+
+      for (let index = 0; index < 20; index += 1) {
+        await db.stockMovements.update(consumptions[index].id, {
+          effectiveAt: `2026-08-27T${String(1 + index).padStart(2, '0')}:00:00.000Z`,
+        })
+      }
+
+      const projection = await planner.getProjection(new Date('2026-08-27T22:00:00.000Z'))
+
+      expect(projection.historicalCoverageDays).toBe(1)
+      expect(projection.historicalReliable).toBe(false)
+      expect(projection.packUsagePeriods).toEqual([
+        {
+          packNumber: 1,
+          consumedSticks: 20,
+          actualStartAt: '2026-08-27T01:00:00.000Z',
+          actualEndAt: '2026-08-27T20:00:00.000Z',
+          status: 'completed',
+        },
+      ])
+      expect(projection.packForecasts).toEqual([])
+    } finally {
+      await db.delete()
+    }
+  })
+
   it('persists pack configuration in metadata so it is included in the normal backup', async () => {
     const db = makeDatabase()
     try {
