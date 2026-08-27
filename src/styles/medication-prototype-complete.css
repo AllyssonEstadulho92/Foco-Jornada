@@ -429,3 +429,99 @@
 .medProtoPassiveProtection strong{color:var(--accent,#1d6f5f)}
 .medProtoPassiveProtection span{color:var(--text-muted,#66706a);line-height:1.4}
 [data-theme="dark"] .medProtoPassiveProtection{background:#151d19;border-color:#29352f}
+
+
+/* Linear medication workflow: overview -> today -> configuration. */
+.medicationLinearPage{display:grid;gap:16px}
+.medicationLinearCreate{display:grid;gap:12px}
+.medicationLinearCreate>p{margin:0;color:var(--text-muted,#66706a);line-height:1.45}
+
+.medicationLinearForecast{
+  display:grid;
+  gap:12px;
+  padding:16px;
+  border:1px solid var(--border-subtle,#dfe4df);
+  border-radius:18px;
+  background:var(--surface-elevated,#fff);
+}
+.medicationLinearHeading{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.medicationLinearHeading h2{margin:3px 0 0}
+.medicationLinearForecastGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.medicationLinearForecastGrid article{
+  display:grid;gap:5px;padding:13px;border:1px solid var(--border-subtle,#dfe4df);border-radius:13px;background:var(--surface-soft,#f6f8f6)
+}
+.medicationLinearForecastGrid span{font-size:.72rem;text-transform:uppercase;letter-spacing:.045em;font-weight:800;color:var(--text-muted,#66706a)}
+.medicationLinearForecastGrid strong{font-size:1.08rem;line-height:1.25}
+.medicationLinearForecastGrid small{font-size:.74rem;color:var(--text-muted,#66706a);line-height:1.35}
+.medicationLinearNoForecast,
+.medicationLinearRule,
+.medicationLinearDoseRule{
+  margin:0;padding:10px 11px;border-radius:11px;background:var(--surface-soft,#f6f8f6);color:var(--text-muted,#66706a);line-height:1.45
+}
+.medicationLinearToday{margin:0}
+
+.medicationLinearAdvanced{
+  border:1px solid var(--border-subtle,#dfe4df);
+  border-radius:16px;
+  background:var(--surface-elevated,#fff);
+  overflow:hidden;
+}
+.medicationLinearAdvanced>summary{
+  cursor:pointer;
+  padding:14px 15px;
+  list-style:none;
+  font-weight:850;
+}
+.medicationLinearAdvanced>summary::-webkit-details-marker{display:none}
+.medicationLinearAdvanced>summary::after{content:'+';float:right;color:var(--text-muted,#66706a)}
+.medicationLinearAdvanced[open]>summary::after{content:'−'}
+.medicationLinearAdvancedBody{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+  padding:13px;
+  border-top:1px solid var(--border-subtle,#dfe4df)
+}
+.medicationLinearAdvancedBody>section{
+  display:grid;
+  align-content:start;
+  gap:9px;
+  padding:12px;
+  border-radius:12px;
+  background:var(--surface-soft,#f6f8f6)
+}
+.medicationLinearAdvancedBody h3{margin:0}
+.medicationLinearAdvancedBody p{margin:0;color:var(--text-muted,#66706a);line-height:1.4}
+.medicationLinearAdvancedBody small{color:var(--text-muted,#66706a);line-height:1.35}
+.medicationLinearExact{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:center;
+  padding:12px 13px;
+  border:1px solid var(--border-subtle,#dfe4df);
+  border-radius:12px;
+  background:var(--surface-soft,#f6f8f6)
+}
+.medicationLinearExact span{color:var(--text-muted,#66706a);text-align:right}
+
+[data-theme="dark"] .medicationLinearForecast,
+[data-theme="dark"] .medicationLinearAdvanced{background:#0f1512;border-color:#29352f}
+[data-theme="dark"] .medicationLinearForecastGrid article,
+[data-theme="dark"] .medicationLinearAdvancedBody>section,
+[data-theme="dark"] .medicationLinearNoForecast,
+[data-theme="dark"] .medicationLinearRule,
+[data-theme="dark"] .medicationLinearDoseRule,
+[data-theme="dark"] .medicationLinearExact{background:#151d19;border-color:#29352f}
+[data-theme="dark"] .medicationLinearAdvancedBody{border-color:#29352f}
+
+@media(max-width:900px){
+  .medicationLinearForecastGrid,
+  .medicationLinearAdvancedBody{grid-template-columns:1fr}
+}
+@media(max-width:620px){
+  .medicationLinearForecast{padding:13px;border-radius:16px}
+  .medicationLinearHeading{display:grid;grid-template-columns:1fr}
+  .medicationLinearExact{display:grid;grid-template-columns:1fr}
+  .medicationLinearExact span{text-align:left}
+}
