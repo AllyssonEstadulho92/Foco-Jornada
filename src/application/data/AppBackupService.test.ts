@@ -254,4 +254,36 @@ describe('AppBackupService', () => {
     }
   })
 
+
+  it('preserva movimentos de sticks criados depois de uma cópia integral mais antiga', async () => {
+    const db = makeDatabase()
+    try {
+      const stock = new PersonalStockService(db)
+      const backup = new AppBackupService(db)
+
+      await stock.initializeSticks(20, operationId())
+      await stock.consumeStick(operationId())
+      const olderBackup = await backup.exportText()
+
+      await stock.consumeStick(operationId())
+      await stock.consumeStick(operationId())
+      await stock.restockSticks(20, operationId())
+
+      const beforeRestore = await stock.getSticksSummary()
+      const movementCountBefore = (await db.stockMovements.where('entityId').equals('stock:sticks:glo').toArray()).length
+
+      await backup.restoreFromText(olderBackup)
+
+      const afterRestore = await stock.getSticksSummary()
+      const movementCountAfter = (await db.stockMovements.where('entityId').equals('stock:sticks:glo').toArray()).length
+
+      expect(beforeRestore.stock).toBe(37)
+      expect(afterRestore.stock).toBe(37)
+      expect(movementCountAfter).toBe(movementCountBefore)
+      expect(afterRestore.ok).toBe(true)
+    } finally {
+      await db.delete()
+    }
+  })
+
 })
