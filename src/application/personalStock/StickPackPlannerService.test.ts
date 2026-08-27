@@ -42,6 +42,12 @@ describe('StickPackPlannerService', () => {
       expect(projection.configuredMatchesCurrent).toBe(true)
       expect(projection.fullPacksRemaining).toBe(12)
       expect(projection.looseSticksRemaining).toBe(0)
+      expect(projection.sealedPacksRemaining).toBe(12)
+      expect(projection.currentPackStarted).toBe(false)
+      expect(projection.currentPackRemaining).toBe(0)
+      expect(projection.currentPackPercentRemaining).toBe(100)
+      expect(projection.currentPackBaselineDays).toBe('1.5')
+      expect(projection.currentPackBaselineDepletionDate).toBe('2026-08-28')
       expect(projection.packEquivalent).toBe('12.0')
       expect(projection.baselineDailySticks).toBe(13)
       expect(projection.baselineDays).toBe('18.5')
@@ -68,9 +74,50 @@ describe('StickPackPlannerService', () => {
       expect(projection.currentStockSticks).toBe(239)
       expect(projection.fullPacksRemaining).toBe(11)
       expect(projection.looseSticksRemaining).toBe(19)
+      expect(projection.sealedPacksRemaining).toBe(11)
+      expect(projection.currentPackStarted).toBe(true)
+      expect(projection.currentPackRemaining).toBe(19)
+      expect(projection.currentPackPercentRemaining).toBe(95)
       expect(projection.configuredDifference).toBe(1)
       expect(projection.configuredMatchesCurrent).toBe(false)
       expect(projection.ledgerOk).toBe(true)
+    } finally {
+      await db.delete()
+    }
+  })
+
+
+  it('only enables the observed-rate forecast after three days of tracked use', async () => {
+    const db = makeDatabase()
+    try {
+      const stock = new PersonalStockService(db)
+      const planner = new StickPackPlannerService(db)
+      await configureReduction(db)
+      await planner.saveSettings({ packCount: 2, sticksPerPack: 20 })
+      await stock.initializeSticks(30, operationId())
+      await stock.consumeStick(operationId())
+      await stock.consumeStick(operationId())
+      await stock.consumeStick(operationId())
+
+      const consumptions = (await db.stockMovements.where('entityId').equals('stock:sticks:glo').toArray())
+        .filter((movement) => movement.type === 'consumption')
+        .sort((left, right) => left.sequence - right.sequence)
+
+      await db.stockMovements.update(consumptions[0].id, { effectiveAt: '2026-08-25T12:00:00.000Z' })
+      await db.stockMovements.update(consumptions[1].id, { effectiveAt: '2026-08-26T12:00:00.000Z' })
+      await db.stockMovements.update(consumptions[2].id, { effectiveAt: '2026-08-27T12:00:00.000Z' })
+
+      const projection = await planner.getProjection(new Date('2026-08-27T18:00:00Z'))
+
+      expect(projection.currentStockSticks).toBe(27)
+      expect(projection.currentPackStarted).toBe(true)
+      expect(projection.currentPackRemaining).toBe(7)
+      expect(projection.sealedPacksRemaining).toBe(1)
+      expect(projection.historicalCoverageDays).toBe(3)
+      expect(projection.historicalReliable).toBe(true)
+      expect(projection.historicalDailyAverage).toBe('1.0')
+      expect(projection.historicalDays).toBe('27.0')
+      expect(projection.currentPackHistoricalDays).toBe('7.0')
     } finally {
       await db.delete()
     }
