@@ -306,6 +306,42 @@ function mergeAppendOnlyById<T>(
   return merged
 }
 
+function mergeStockEntities(incoming: StockEntity[], local: StockEntity[]): StockEntity[] {
+  const merged = [...incoming]
+  const byId = new Map(incoming.map((item) => [item.id, item]))
+
+  for (const item of local) {
+    const existing = byId.get(item.id)
+    if (!existing) {
+      merged.push(item)
+      byId.set(item.id, item)
+      continue
+    }
+
+    const immutableFieldsMatch =
+      existing.kind === item.kind
+      && existing.name === item.name
+      && existing.unit === item.unit
+      && existing.dosage === item.dosage
+      && existing.timezone === item.timezone
+      && existing.startDate === item.startDate
+      && existing.createdAt === item.createdAt
+
+    if (!immutableFieldsMatch) {
+      throw new Error(`Restauro protegido recusado: a entidade de stock ${item.id} tem identidade diferente.`)
+    }
+
+    const incomingPhysicalAt = existing.lastPhysicalCountAt ?? ''
+    const localPhysicalAt = item.lastPhysicalCountAt ?? ''
+    const preferred = localPhysicalAt > incomingPhysicalAt ? item : existing
+    const index = merged.findIndex((candidate) => candidate.id === item.id)
+    if (index >= 0) merged[index] = preferred
+    byId.set(item.id, preferred)
+  }
+
+  return merged
+}
+
 function mergeProtectedMetadata(incoming: AppMetadataRecord[], local: AppMetadataRecord[]): AppMetadataRecord[] {
   const merged = [...incoming]
   const byKey = new Map(incoming.map((item) => [item.key, item]))
@@ -414,11 +450,9 @@ export class AppBackupService {
       tables: {
         ...incomingPayload.tables,
         metadata: mergeProtectedMetadata(incomingPayload.tables.metadata, localProtectedMetadata),
-        stockEntities: mergeAppendOnlyById(
+        stockEntities: mergeStockEntities(
           incomingPayload.tables.stockEntities,
           localEntities,
-          (item) => item.id,
-          'entidade de stock',
         ),
         stockMovements: mergeAppendOnlyById(
           incomingPayload.tables.stockMovements,
