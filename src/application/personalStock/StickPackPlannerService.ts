@@ -15,6 +15,15 @@ export interface StickPackSettings {
   updatedAt: string
 }
 
+export interface StickPackDepletionForecast {
+  sequence: number
+  kind: 'current' | 'sealed'
+  sticks: number
+  cumulativeSticks: number
+  estimatedDurationDays: string | null
+  estimatedDepletionDate: string | null
+}
+
 export interface StickPackProjection {
   settings: StickPackSettings
   configuredTotalSticks: number
@@ -35,6 +44,7 @@ export interface StickPackProjection {
   historicalDepletionDate: string | null
   currentPackHistoricalDays: string | null
   currentPackHistoricalDepletionDate: string | null
+  packForecasts: StickPackDepletionForecast[]
   usedToday: number
   last7DaysSticks: number
   ledgerOk: boolean
@@ -123,6 +133,53 @@ function dateForRate(stock: number, dailyRate: number, today: string): { days: s
     days: exactDays.toFixed(1),
     date: addCalendarDays(today, calendarDays - 1),
   }
+}
+
+function buildPackForecasts(input: {
+  currentStock: number | null
+  sticksPerPack: number
+  currentPackStarted: boolean
+  currentPackRemaining: number | null
+  historicalReliable: boolean
+  historicalDailyAverage: number
+  today: string
+}): StickPackDepletionForecast[] {
+  if (input.currentStock === null || input.currentStock <= 0) return []
+
+  const forecasts: StickPackDepletionForecast[] = []
+  let remaining = input.currentStock
+  let cumulative = 0
+  let sequence = 1
+
+  while (remaining > 0) {
+    const sticks = sequence === 1 && input.currentPackStarted
+      ? Math.min(input.currentPackRemaining ?? 0, remaining)
+      : Math.min(input.sticksPerPack, remaining)
+
+    if (sticks <= 0) break
+
+    cumulative += sticks
+    remaining -= sticks
+
+    const endForecast = input.historicalReliable
+      ? dateForRate(cumulative, input.historicalDailyAverage, input.today)
+      : null
+
+    forecasts.push({
+      sequence,
+      kind: sequence === 1 && input.currentPackStarted ? 'current' : 'sealed',
+      sticks,
+      cumulativeSticks: cumulative,
+      estimatedDurationDays: input.historicalReliable
+        ? (sticks / input.historicalDailyAverage).toFixed(1)
+        : null,
+      estimatedDepletionDate: endForecast?.date ?? null,
+    })
+
+    sequence += 1
+  }
+
+  return forecasts
 }
 
 export class StickPackPlannerService {
@@ -229,6 +286,15 @@ export class StickPackPlannerService {
     const currentPackHistoricalForecast = currentStock === null || !historicalReliable
       ? null
       : dateForRate(currentPackForProjection, historicalDailyAverageNumber, today)
+    const packForecasts = buildPackForecasts({
+      currentStock,
+      sticksPerPack: settings.sticksPerPack,
+      currentPackStarted,
+      currentPackRemaining,
+      historicalReliable,
+      historicalDailyAverage: historicalDailyAverageNumber,
+      today,
+    })
 
     return {
       settings,
@@ -254,6 +320,7 @@ export class StickPackPlannerService {
       historicalDepletionDate: historicalForecast?.date ?? null,
       currentPackHistoricalDays: currentPackHistoricalForecast?.days ?? null,
       currentPackHistoricalDepletionDate: currentPackHistoricalForecast?.date ?? null,
+      packForecasts,
       usedToday: safeNumber(usedToday),
       last7DaysSticks: last7Number,
       ledgerOk: reconstructed.ok,

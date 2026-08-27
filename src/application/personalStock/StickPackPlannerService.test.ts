@@ -35,6 +35,23 @@ describe('StickPackPlannerService', () => {
       expect(projection.historicalReliable).toBe(false)
       expect(projection.historicalDepletionDate).toBeNull()
       expect(projection.currentPackHistoricalDepletionDate).toBeNull()
+      expect(projection.packForecasts).toHaveLength(12)
+      expect(projection.packForecasts[0]).toMatchObject({
+        sequence: 1,
+        kind: 'sealed',
+        sticks: 20,
+        cumulativeSticks: 20,
+        estimatedDurationDays: null,
+        estimatedDepletionDate: null,
+      })
+      expect(projection.packForecasts[11]).toMatchObject({
+        sequence: 12,
+        kind: 'sealed',
+        sticks: 20,
+        cumulativeSticks: 240,
+        estimatedDurationDays: null,
+        estimatedDepletionDate: null,
+      })
     } finally {
       await db.delete()
     }
@@ -98,6 +115,24 @@ describe('StickPackPlannerService', () => {
       expect(projection.historicalDepletionDate).toBe('2026-09-22')
       expect(projection.currentPackHistoricalDays).toBe('7.0')
       expect(projection.currentPackHistoricalDepletionDate).toBe('2026-09-02')
+      expect(projection.packForecasts).toEqual([
+        {
+          sequence: 1,
+          kind: 'current',
+          sticks: 7,
+          cumulativeSticks: 7,
+          estimatedDurationDays: '7.0',
+          estimatedDepletionDate: '2026-09-02',
+        },
+        {
+          sequence: 2,
+          kind: 'sealed',
+          sticks: 20,
+          cumulativeSticks: 27,
+          estimatedDurationDays: '20.0',
+          estimatedDepletionDate: '2026-09-22',
+        },
+      ])
     } finally {
       await db.delete()
     }

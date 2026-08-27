@@ -623,6 +623,41 @@ export function SticksStockPage() {
                 Histórico atual: {packProjection?.historicalCoverageDays ?? 0}/3 dias.
               </p>
             )}
+
+            {packProjection?.historicalReliable && packProjection.packForecasts.length ? (
+              <div className="sticksPackForecastComparison" aria-label="Comparação da previsão de fim de cada maço">
+                <div className="sticksPackForecastHeading">
+                  <strong>Previsão por maço</strong>
+                  <span>Cada linha mostra quando esse maço deverá terminar se o ritmo observado se mantiver.</span>
+                </div>
+                <div className="sticksPackForecastTable" role="table" aria-label="Previsão de duração dos maços">
+                  <div className="sticksPackForecastHeader" role="row">
+                    <span role="columnheader">Maço</span>
+                    <span role="columnheader">Sticks</span>
+                    <span role="columnheader">Duração</span>
+                    <span role="columnheader">Previsto acabar</span>
+                  </div>
+                  {packProjection.packForecasts.map((forecast) => (
+                    <div
+                      className={`sticksPackForecastRow${forecast.kind === 'current' ? ' isCurrent' : ''}`}
+                      role="row"
+                      key={forecast.sequence}
+                    >
+                      <strong role="cell">
+                        {forecast.kind === 'current' ? 'Maço atual' : `Maço ${forecast.sequence}`}
+                      </strong>
+                      <span role="cell">{forecast.sticks}</span>
+                      <span role="cell">≈ {localDecimal(forecast.estimatedDurationDays)} dias</span>
+                      <strong role="cell">{formatDateKey(forecast.estimatedDepletionDate)}</strong>
+                    </div>
+                  ))}
+                </div>
+                <small className="sticksPackForecastNote">
+                  A data de cada linha é cumulativa: o maço seguinte começa depois do anterior. Assim consegues comparar os maços e organizar o stock sem criar uma meta de consumo.
+                </small>
+              </div>
+            ) : null}
+
             <p className="sticksEstimateRule">
               A data é uma projeção matemática do stock com base no teu ritmo observado. Não é uma recomendação de quantos sticks utilizar.
             </p>
