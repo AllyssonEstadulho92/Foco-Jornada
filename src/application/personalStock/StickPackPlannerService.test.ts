@@ -38,17 +38,23 @@ describe('StickPackPlannerService', () => {
       expect(projection.packForecasts).toHaveLength(12)
       expect(projection.packForecasts[0]).toMatchObject({
         sequence: 1,
+        packNumber: 1,
         kind: 'sealed',
         sticks: 20,
         cumulativeSticks: 20,
+        actualStartAt: null,
+        estimatedStartDate: null,
         estimatedDurationDays: null,
         estimatedDepletionDate: null,
       })
       expect(projection.packForecasts[11]).toMatchObject({
         sequence: 12,
+        packNumber: 12,
         kind: 'sealed',
         sticks: 20,
         cumulativeSticks: 240,
+        actualStartAt: null,
+        estimatedStartDate: null,
         estimatedDurationDays: null,
         estimatedDepletionDate: null,
       })
@@ -115,24 +121,86 @@ describe('StickPackPlannerService', () => {
       expect(projection.historicalDepletionDate).toBe('2026-09-22')
       expect(projection.currentPackHistoricalDays).toBe('7.0')
       expect(projection.currentPackHistoricalDepletionDate).toBe('2026-09-02')
+      expect(projection.packUsagePeriods).toEqual([
+        {
+          packNumber: 1,
+          consumedSticks: 13,
+          actualStartAt: null,
+          actualEndAt: null,
+          status: 'current',
+        },
+      ])
       expect(projection.packForecasts).toEqual([
         {
           sequence: 1,
+          packNumber: 1,
           kind: 'current',
           sticks: 7,
           cumulativeSticks: 7,
+          actualStartAt: null,
+          estimatedStartDate: null,
           estimatedDurationDays: '7.0',
           estimatedDepletionDate: '2026-09-02',
         },
         {
           sequence: 2,
+          packNumber: 2,
           kind: 'sealed',
           sticks: 20,
           cumulativeSticks: 27,
+          actualStartAt: null,
+          estimatedStartDate: '2026-09-03',
           estimatedDurationDays: '20.0',
           estimatedDepletionDate: '2026-09-22',
         },
       ])
+    } finally {
+      await db.delete()
+    }
+  })
+
+
+  it('records exact start and end timestamps when a full tracked pack is completed', async () => {
+    const db = makeDatabase()
+    try {
+      const stock = new PersonalStockService(db)
+      const planner = new StickPackPlannerService(db)
+      await planner.saveSettings({ packCount: 2, sticksPerPack: 20 })
+      await stock.initializeSticks(40, operationId())
+
+      for (let index = 0; index < 21; index += 1) {
+        await stock.consumeStick(operationId())
+      }
+
+      const consumptions = (await db.stockMovements.where('entityId').equals('stock:sticks:glo').toArray())
+        .filter((movement) => movement.type === 'consumption')
+        .sort((left, right) => left.sequence - right.sequence)
+
+      for (let index = 0; index < 20; index += 1) {
+        await db.stockMovements.update(consumptions[index].id, {
+          effectiveAt: `2026-08-${String(index < 10 ? 25 : 26).padStart(2, '0')}T${String(8 + (index % 10)).padStart(2, '0')}:00:00.000Z`,
+        })
+      }
+      await db.stockMovements.update(consumptions[20].id, { effectiveAt: '2026-08-27T09:00:00.000Z' })
+
+      const projection = await planner.getProjection(new Date('2026-08-27T12:00:00.000Z'))
+
+      expect(projection.packUsagePeriods[0]).toEqual({
+        packNumber: 1,
+        consumedSticks: 20,
+        actualStartAt: '2026-08-25T08:00:00.000Z',
+        actualEndAt: '2026-08-26T17:00:00.000Z',
+        status: 'completed',
+      })
+      expect(projection.packUsagePeriods[1]).toEqual({
+        packNumber: 2,
+        consumedSticks: 1,
+        actualStartAt: '2026-08-27T09:00:00.000Z',
+        actualEndAt: null,
+        status: 'current',
+      })
+      expect(projection.packForecasts[0].packNumber).toBe(2)
+      expect(projection.packForecasts[0].actualStartAt).toBe('2026-08-27T09:00:00.000Z')
     } finally {
       await db.delete()
     }
