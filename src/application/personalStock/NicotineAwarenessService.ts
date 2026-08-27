@@ -3,106 +3,100 @@ import type { StockMovement } from '../../domain/personalStock/models'
 import { STICKS_ENTITY_ID, STOCK_TIMEZONE } from './PersonalStockService'
 import { addCalendarDays, dateKeyInZone } from './time'
 
-const SETTINGS_KEY = 'personal-stock:nicotine-awareness-v1'
+const SETTINGS_KEY = 'personal-stock:nicotine-awareness-v2'
 const MICROGRAMS_PER_MG = 1000n
-const DEFAULT_DAILY_BASELINE = 13
-const DEFAULT_WEEKLY_REDUCTION = 1
 
-export type NicotineProfileId = 'neo-published-range' | 'veo-independent-range' | 'custom'
+export type NicotineProfileId =
+  | 'unselected'
+  | 'veo-green-click-2026'
+  | 'veo-purple-click-2026'
+  | 'custom-lab'
 
 export interface NicotineReferenceProfile {
-  id: Exclude<NicotineProfileId, 'custom'>
+  id: Exclude<NicotineProfileId, 'unselected' | 'custom-lab'>
   label: string
-  minMicrogramsPerStick: bigint
-  maxMicrogramsPerStick: bigint
+  contentMeanMicrogramsPerStick: bigint
+  contentSdMicrogramsPerStick: bigint
+  emissionMeanMicrogramsPerStick: bigint
+  emissionSdMicrogramsPerStick: bigint
   sourceTitle: string
   sourceUrl: string
+  manufacturerTitle: string
+  manufacturerUrl: string
   evidenceNote: string
 }
 
 export const NICOTINE_REFERENCE_PROFILES: NicotineReferenceProfile[] = [
   {
-    id: 'neo-published-range',
-    label: 'Neo glo — intervalo publicado',
-    minMicrogramsPerStick: 460n,
-    maxMicrogramsPerStick: 680n,
-    sourceTitle: 'Scientific Reports (2022) — glo/Neo',
-    sourceUrl: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC9424205/',
-    evidenceNote: 'Dois consumíveis Neo estudados produziram 0,46 e 0,68 mg de nicotina por stick num regime padronizado de máquina.',
+    id: 'veo-green-click-2026',
+    label: 'veo Green Click — medição laboratorial 2026',
+    contentMeanMicrogramsPerStick: 3460n,
+    contentSdMicrogramsPerStick: 310n,
+    emissionMeanMicrogramsPerStick: 980n,
+    emissionSdMicrogramsPerStick: 30n,
+    sourceTitle: 'Pauwels et al. (2026) — nicotine heat sticks without tobacco',
+    sourceUrl: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC13401252/',
+    manufacturerTitle: 'glo / BAT — informação oficial sobre veo',
+    manufacturerUrl: 'https://glo-gr.myshopify.com/en-gr/products/heated-tobacco-sticks-with-capsules-veo-demi-slim-tropical-twist',
+    evidenceNote: 'No estudo, veo Green Click apresentou 3,46 ± 0,31 mg de nicotina total no stick e 0,98 ± 0,03 mg na emissão por stick sob condições laboratoriais padronizadas.',
   },
   {
-    id: 'veo-independent-range',
-    label: 'Veo glo — medição independente',
-    minMicrogramsPerStick: 950n,
-    maxMicrogramsPerStick: 980n,
-    sourceTitle: 'Estudo químico independente (2026) — Veo',
+    id: 'veo-purple-click-2026',
+    label: 'veo Purple Click — medição laboratorial 2026',
+    contentMeanMicrogramsPerStick: 3220n,
+    contentSdMicrogramsPerStick: 80n,
+    emissionMeanMicrogramsPerStick: 950n,
+    emissionSdMicrogramsPerStick: 40n,
+    sourceTitle: 'Pauwels et al. (2026) — nicotine heat sticks without tobacco',
     sourceUrl: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC13401252/',
-    evidenceNote: 'Veo Green Click e Purple Click emitiram cerca de 0,95–0,98 mg de nicotina por stick em condições laboratoriais padronizadas.',
+    manufacturerTitle: 'glo / BAT — informação oficial sobre veo',
+    manufacturerUrl: 'https://glo-gr.myshopify.com/en-gr/products/heated-tobacco-sticks-with-capsules-veo-demi-slim-tropical-twist',
+    evidenceNote: 'No estudo, veo Purple Click apresentou 3,22 ± 0,08 mg de nicotina total no stick e 0,95 ± 0,04 mg na emissão por stick sob condições laboratoriais padronizadas.',
   },
 ]
 
 export interface NicotineAwarenessSettings {
   profileId: NicotineProfileId
-  customMinMg: string
-  customMaxMg: string
+  customContentMeanMg: string
+  customEmissionMeanMg: string
+  customSourceLabel: string
   notes: string
-  reductionPlanEnabled: boolean
-  dailyBaselineSticks: number
-  weeklyReductionStep: number
-  reductionPlanStartDate: string
   updatedAt: string
 }
 
 export interface NicotineExposureEstimate {
   sticks: number
-  minMg: string
-  maxMg: string
-}
-
-export interface ReductionPlanSummary {
-  enabled: boolean
-  baselineDailySticks: number
-  weeklyReductionStep: number
-  startDate: string
-  weekNumber: number
-  targetToday: number
-  nextWeekTarget: number
-  consumedToday: number
-  remainingToTarget: number
-  overTargetBy: number
-  last7DaysAverage: string
-  previous7DaysAverage: string
-  trendDelta: string
-  daysOverTargetLast7: number
-  zeroTargetDate: string
+  contentLabMeanMg: string | null
+  emissionLabMeanMg: string | null
 }
 
 export interface NicotineAwarenessSummary {
   today: NicotineExposureEstimate
   last7Days: NicotineExposureEstimate
   allTime: NicotineExposureEstimate
-  reductionPlan: ReductionPlanSummary
+  selected: boolean
   profileLabel: string
+  contentPerStickMeanMg: string | null
+  contentPerStickSdMg: string | null
+  emissionPerStickMeanMg: string | null
+  emissionPerStickSdMg: string | null
   evidenceNote: string
   sourceTitle: string
   sourceUrl: string
+  manufacturerTitle: string
+  manufacturerUrl: string
+  absorptionStatement: string
+  calculationStatement: string
   isEstimate: true
-}
-
-function todayKey(): string {
-  return dateKeyInZone(new Date(), STOCK_TIMEZONE)
 }
 
 function defaultSettings(): NicotineAwarenessSettings {
   return {
-    profileId: 'neo-published-range',
-    customMinMg: '0.460',
-    customMaxMg: '0.680',
+    profileId: 'unselected',
+    customContentMeanMg: '',
+    customEmissionMeanMg: '',
+    customSourceLabel: '',
     notes: '',
-    reductionPlanEnabled: true,
-    dailyBaselineSticks: DEFAULT_DAILY_BASELINE,
-    weeklyReductionStep: DEFAULT_WEEKLY_REDUCTION,
-    reductionPlanStartDate: todayKey(),
     updatedAt: new Date(0).toISOString(),
   }
 }
@@ -150,32 +144,17 @@ function safeNumber(value: bigint): number {
   return Number(value)
 }
 
-function validDateKey(value: unknown): value is string {
-  if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false
-  const parsed = Date.parse(`${value}T00:00:00Z`)
-  return Number.isFinite(parsed) && new Date(parsed).toISOString().startsWith(value)
-}
-
-function positiveInteger(value: unknown, fallback: number, maximum: number): number {
-  return Number.isSafeInteger(value) && Number(value) > 0 && Number(value) <= maximum ? Number(value) : fallback
-}
-
-function dayDifference(from: string, to: string): number {
-  const start = Date.parse(`${from}T00:00:00Z`)
-  const end = Date.parse(`${to}T00:00:00Z`)
-  return Math.floor((end - start) / 86_400_000)
-}
-
-function planTargetForDate(settings: NicotineAwarenessSettings, dateKey: string): number {
-  if (!settings.reductionPlanEnabled) return settings.dailyBaselineSticks
-  const elapsedDays = dayDifference(settings.reductionPlanStartDate, dateKey)
-  if (elapsedDays < 0) return settings.dailyBaselineSticks
-  const weekIndex = Math.floor(elapsedDays / 7)
-  return Math.max(0, settings.dailyBaselineSticks - settings.weeklyReductionStep * (weekIndex + 1))
-}
-
-function averageString(total: bigint): string {
-  return (safeNumber(total) / 7).toFixed(1)
+type ResolvedProfile = {
+  label: string
+  contentMean: bigint
+  contentSd: bigint | null
+  emissionMean: bigint
+  emissionSd: bigint | null
+  sourceTitle: string
+  sourceUrl: string
+  manufacturerTitle: string
+  manufacturerUrl: string
+  evidenceNote: string
 }
 
 export class NicotineAwarenessService {
@@ -184,22 +163,24 @@ export class NicotineAwarenessService {
   async getSettings(): Promise<NicotineAwarenessSettings> {
     const record = await this.db.metadata.get(SETTINGS_KEY)
     if (!record) return defaultSettings()
+
     try {
       const parsed = JSON.parse(record.value) as Partial<NicotineAwarenessSettings>
       const profileId = parsed.profileId
-      if (profileId !== 'neo-published-range' && profileId !== 'veo-independent-range' && profileId !== 'custom') {
+      if (
+        profileId !== 'unselected'
+        && profileId !== 'veo-green-click-2026'
+        && profileId !== 'veo-purple-click-2026'
+        && profileId !== 'custom-lab'
+      ) {
         return defaultSettings()
       }
-      const fallbackStartDate = dateKeyInZone(new Date(record.updatedAt), STOCK_TIMEZONE)
       return {
         profileId,
-        customMinMg: typeof parsed.customMinMg === 'string' ? parsed.customMinMg : '0.460',
-        customMaxMg: typeof parsed.customMaxMg === 'string' ? parsed.customMaxMg : '0.680',
+        customContentMeanMg: typeof parsed.customContentMeanMg === 'string' ? parsed.customContentMeanMg : '',
+        customEmissionMeanMg: typeof parsed.customEmissionMeanMg === 'string' ? parsed.customEmissionMeanMg : '',
+        customSourceLabel: typeof parsed.customSourceLabel === 'string' ? parsed.customSourceLabel.slice(0, 300) : '',
         notes: typeof parsed.notes === 'string' ? parsed.notes.slice(0, 4000) : '',
-        reductionPlanEnabled: typeof parsed.reductionPlanEnabled === 'boolean' ? parsed.reductionPlanEnabled : true,
-        dailyBaselineSticks: positiveInteger(parsed.dailyBaselineSticks, DEFAULT_DAILY_BASELINE, 200),
-        weeklyReductionStep: positiveInteger(parsed.weeklyReductionStep, DEFAULT_WEEKLY_REDUCTION, 50),
-        reductionPlanStartDate: validDateKey(parsed.reductionPlanStartDate) ? parsed.reductionPlanStartDate : fallbackStartDate,
         updatedAt: typeof parsed.updatedAt === 'string' ? parsed.updatedAt : record.updatedAt,
       }
     } catch {
@@ -209,134 +190,109 @@ export class NicotineAwarenessService {
 
   async saveSettings(input: Omit<NicotineAwarenessSettings, 'updatedAt'>): Promise<NicotineAwarenessSettings> {
     if (input.notes.length > 4000) throw new Error('A nota pode ter no máximo 4000 caracteres.')
-    if (!Number.isSafeInteger(input.dailyBaselineSticks) || input.dailyBaselineSticks < 1 || input.dailyBaselineSticks > 200) {
-      throw new Error('A linha de base diária deve ser um número inteiro entre 1 e 200 sticks.')
+    if (input.customSourceLabel.length > 300) throw new Error('A descrição da fonte pode ter no máximo 300 caracteres.')
+
+    if (input.profileId === 'custom-lab') {
+      parseMgToMicrograms(input.customContentMeanMg, 'Conteúdo total')
+      parseMgToMicrograms(input.customEmissionMeanMg, 'Emissão')
+      if (!input.customSourceLabel.trim()) {
+        throw new Error('Indica a fonte do valor laboratorial personalizado.')
+      }
     }
-    if (!Number.isSafeInteger(input.weeklyReductionStep) || input.weeklyReductionStep < 1 || input.weeklyReductionStep > 50) {
-      throw new Error('A redução semanal deve ser um número inteiro entre 1 e 50 sticks.')
-    }
-    if (!validDateKey(input.reductionPlanStartDate)) throw new Error('A data de início do plano não é válida.')
-    if (input.profileId === 'custom') {
-      const min = parseMgToMicrograms(input.customMinMg, 'Valor mínimo')
-      const max = parseMgToMicrograms(input.customMaxMg, 'Valor máximo')
-      if (max < min) throw new Error('O valor máximo não pode ser inferior ao mínimo.')
-    }
+
     const settings: NicotineAwarenessSettings = {
       ...input,
       notes: input.notes.trimEnd(),
+      customSourceLabel: input.customSourceLabel.trim(),
       updatedAt: new Date().toISOString(),
     }
-    await this.db.metadata.put({ key: SETTINGS_KEY, value: JSON.stringify(settings), updatedAt: settings.updatedAt })
+    await this.db.metadata.put({
+      key: SETTINGS_KEY,
+      value: JSON.stringify(settings),
+      updatedAt: settings.updatedAt,
+    })
     return settings
   }
 
-  private rangeFor(settings: NicotineAwarenessSettings): {
-    label: string
-    min: bigint
-    max: bigint
-    sourceTitle: string
-    sourceUrl: string
-    evidenceNote: string
-  } {
-    if (settings.profileId === 'custom') {
-      const min = parseMgToMicrograms(settings.customMinMg, 'Valor mínimo')
-      const max = parseMgToMicrograms(settings.customMaxMg, 'Valor máximo')
-      if (max < min) throw new Error('O valor máximo não pode ser inferior ao mínimo.')
+  private resolveProfile(settings: NicotineAwarenessSettings): ResolvedProfile | null {
+    if (settings.profileId === 'unselected') return null
+
+    if (settings.profileId === 'custom-lab') {
       return {
-        label: 'Perfil personalizado',
-        min,
-        max,
-        sourceTitle: 'Valor configurado pelo utilizador',
+        label: 'Valor laboratorial personalizado',
+        contentMean: parseMgToMicrograms(settings.customContentMeanMg, 'Conteúdo total'),
+        contentSd: null,
+        emissionMean: parseMgToMicrograms(settings.customEmissionMeanMg, 'Emissão'),
+        emissionSd: null,
+        sourceTitle: settings.customSourceLabel,
         sourceUrl: '',
-        evidenceNote: 'O cálculo usa o intervalo por stick que foi configurado manualmente.',
+        manufacturerTitle: '',
+        manufacturerUrl: '',
+        evidenceNote: 'O cálculo usa os valores laboratoriais registados manualmente e a fonte guardada pelo utilizador.',
       }
     }
+
     const profile = NICOTINE_REFERENCE_PROFILES.find((item) => item.id === settings.profileId)
     if (!profile) throw new Error('Perfil de nicotina desconhecido.')
     return {
       label: profile.label,
-      min: profile.minMicrogramsPerStick,
-      max: profile.maxMicrogramsPerStick,
+      contentMean: profile.contentMeanMicrogramsPerStick,
+      contentSd: profile.contentSdMicrogramsPerStick,
+      emissionMean: profile.emissionMeanMicrogramsPerStick,
+      emissionSd: profile.emissionSdMicrogramsPerStick,
       sourceTitle: profile.sourceTitle,
       sourceUrl: profile.sourceUrl,
+      manufacturerTitle: profile.manufacturerTitle,
+      manufacturerUrl: profile.manufacturerUrl,
       evidenceNote: profile.evidenceNote,
     }
   }
 
   async getSummary(now = new Date()): Promise<NicotineAwarenessSummary> {
     const settings = await this.getSettings()
-    const range = this.rangeFor(settings)
+    const profile = this.resolveProfile(settings)
     const movements = await this.db.stockMovements.where('entityId').equals(STICKS_ENTITY_ID).toArray()
     const consumed = netConsumedSticks(movements)
     const todayDateKey = dateKeyInZone(now, STOCK_TIMEZONE)
     const sevenDayStart = addCalendarDays(todayDateKey, -6)
-    const previousSevenStart = addCalendarDays(todayDateKey, -13)
-    const previousSevenEnd = addCalendarDays(todayDateKey, -7)
-    const byDay = new Map<string, bigint>()
 
     let allTime = 0n
     let today = 0n
     let last7Days = 0n
-    let previous7Days = 0n
     for (const entry of consumed) {
       const dateKey = dateKeyInZone(new Date(entry.effectiveAt), STOCK_TIMEZONE)
       allTime += entry.sticks
-      byDay.set(dateKey, (byDay.get(dateKey) ?? 0n) + entry.sticks)
       if (dateKey === todayDateKey) today += entry.sticks
       if (dateKey >= sevenDayStart && dateKey <= todayDateKey) last7Days += entry.sticks
-      if (dateKey >= previousSevenStart && dateKey <= previousSevenEnd) previous7Days += entry.sticks
     }
 
     const estimate = (sticks: bigint): NicotineExposureEstimate => ({
       sticks: safeNumber(sticks),
-      minMg: formatMicrogramsAsMg(sticks * range.min),
-      maxMg: formatMicrogramsAsMg(sticks * range.max),
+      contentLabMeanMg: profile ? formatMicrogramsAsMg(sticks * profile.contentMean) : null,
+      emissionLabMeanMg: profile ? formatMicrogramsAsMg(sticks * profile.emissionMean) : null,
     })
-
-    const elapsedPlanDays = dayDifference(settings.reductionPlanStartDate, todayDateKey)
-    const weekNumber = elapsedPlanDays < 0 ? 0 : Math.floor(elapsedPlanDays / 7) + 1
-    const targetToday = planTargetForDate(settings, todayDateKey)
-    const nextWeekDate = addCalendarDays(todayDateKey, 7)
-    const nextWeekTarget = planTargetForDate(settings, nextWeekDate)
-    const consumedToday = safeNumber(today)
-    let daysOverTargetLast7 = 0
-    if (settings.reductionPlanEnabled) {
-      for (let offset = 0; offset < 7; offset += 1) {
-        const key = addCalendarDays(sevenDayStart, offset)
-        const used = safeNumber(byDay.get(key) ?? 0n)
-        if (key >= settings.reductionPlanStartDate && used > planTargetForDate(settings, key)) daysOverTargetLast7 += 1
-      }
-    }
-    const weeksUntilZero = Math.max(1, Math.ceil(settings.dailyBaselineSticks / settings.weeklyReductionStep))
-    const zeroTargetDate = addCalendarDays(settings.reductionPlanStartDate, (weeksUntilZero - 1) * 7)
-    const last7Average = safeNumber(last7Days) / 7
-    const previous7Average = safeNumber(previous7Days) / 7
 
     return {
       today: estimate(today),
       last7Days: estimate(last7Days),
       allTime: estimate(allTime),
-      reductionPlan: {
-        enabled: settings.reductionPlanEnabled,
-        baselineDailySticks: settings.dailyBaselineSticks,
-        weeklyReductionStep: settings.weeklyReductionStep,
-        startDate: settings.reductionPlanStartDate,
-        weekNumber,
-        targetToday,
-        nextWeekTarget,
-        consumedToday,
-        remainingToTarget: Math.max(0, targetToday - consumedToday),
-        overTargetBy: Math.max(0, consumedToday - targetToday),
-        last7DaysAverage: averageString(last7Days),
-        previous7DaysAverage: averageString(previous7Days),
-        trendDelta: (last7Average - previous7Average).toFixed(1),
-        daysOverTargetLast7,
-        zeroTargetDate,
-      },
-      profileLabel: range.label,
-      evidenceNote: range.evidenceNote,
-      sourceTitle: range.sourceTitle,
-      sourceUrl: range.sourceUrl,
+      selected: Boolean(profile),
+      profileLabel: profile?.label ?? 'Seleciona a variante veo para calcular',
+      contentPerStickMeanMg: profile ? formatMicrogramsAsMg(profile.contentMean) : null,
+      contentPerStickSdMg: profile?.contentSd !== null && profile?.contentSd !== undefined
+        ? formatMicrogramsAsMg(profile.contentSd)
+        : null,
+      emissionPerStickMeanMg: profile ? formatMicrogramsAsMg(profile.emissionMean) : null,
+      emissionPerStickSdMg: profile?.emissionSd !== null && profile?.emissionSd !== undefined
+        ? formatMicrogramsAsMg(profile.emissionSd)
+        : null,
+      evidenceNote: profile?.evidenceNote ?? 'Nenhum valor é assumido até selecionares uma variante estudada ou registares um valor laboratorial com fonte.',
+      sourceTitle: profile?.sourceTitle ?? '',
+      sourceUrl: profile?.sourceUrl ?? '',
+      manufacturerTitle: profile?.manufacturerTitle ?? '',
+      manufacturerUrl: profile?.manufacturerUrl ?? '',
+      absorptionStatement: 'A dose absorvida pelo organismo não pode ser calculada com exatidão a partir do valor do stick ou da emissão de máquina. A aplicação não apresenta esse número como dose corporal.',
+      calculationStatement: 'Os totais apresentados são multiplicações determinísticas do número exato de sticks registados pela média laboratorial publicada para a variante selecionada.',
       isEstimate: true,
     }
   }
