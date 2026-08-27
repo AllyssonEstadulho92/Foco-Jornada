@@ -732,7 +732,7 @@ export function SticksStockPage() {
                 <small className="sticksPackForecastNote">
                   O início passa a REAL · EXATO no primeiro stick registado desse maço e o fim passa a REAL · EXATO no último stick, desde que a fronteira entre maços permaneça determinística. Datas futuras continuam sempre como PREVISÃO.
                 </small>
-                {!packProjection.packTrackingExact && packProjection.packTrackingIssue ? (
+                {packProjection && !packProjection.packTrackingExact && packProjection.packTrackingIssue ? (
                   <p className="sticksPackTrackingWarning">
                     <strong>Calendário individual não marcado como exato:</strong> {packProjection.packTrackingIssue} O stock total continua exato pelo ledger.
                   </p>
