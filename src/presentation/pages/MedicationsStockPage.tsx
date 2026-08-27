@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
 import { minorToDecimal } from '../../application/personalStock/decimal'
 import { dateKeyInZone, resolveZonedLocalDateTime } from '../../application/personalStock/time'
 import type {
@@ -380,12 +379,12 @@ export function MedicationsStockPage() {
   }
 
   return (
-    <section className="personalStockPage medicationsStockPage" aria-labelledby="medications-title">
+    <section className="personalStockPage medicationsStockPage medicationLinearPage" aria-labelledby="medications-title">
       <header className="personalStockHeader personalStockHeaderActions">
         <div>
-          <span className="eyebrow">STOCK PESSOAL · EXATO</span>
+          <span className="eyebrow">ORGANIZAÇÃO PESSOAL · MEDICAÇÃO</span>
           <h1 id="medications-title">Medicamentos</h1>
-          <p>Gestão de stock e horários prescritos. A aplicação não recomenda nem altera tratamentos.</p>
+          <p>Stock, horários e tomas baseados apenas nos registos configurados. A aplicação não altera nem inventa a prescrição.</p>
         </div>
         <button
           type="button"
@@ -400,8 +399,10 @@ export function MedicationsStockPage() {
       {message ? <div className="stockMessage" role="status">{message}</div> : null}
 
       {showCreate || medications.length === 0 ? (
-        <section className="stockPanel" id="medication-create-form" tabIndex={-1}>
-          <h2>Novo medicamento</h2>
+        <section className="stockPanel medicationLinearCreate" id="medication-create-form" tabIndex={-1}>
+          <span className="stockPanelTag">NOVO MEDICAMENTO</span>
+          <h2>Registar informação base</h2>
+          <p>Nome, dosagem, unidade e stock inicial ficam associados ao registo original protegido.</p>
           <div className="stockFormGrid">
             <label>Nome<input value={createForm.name} onChange={(event) => setCreateForm({ ...createForm, name: event.target.value })} /></label>
             <label>Dosagem<input placeholder="ex.: 400 mg" value={createForm.dosage} onChange={(event) => setCreateForm({ ...createForm, dosage: event.target.value })} /></label>
@@ -437,76 +438,54 @@ export function MedicationsStockPage() {
         />
       </div>
 
-      {medications.length > 0 ? (
-        <div className="stockMedicationSelector" role="tablist" aria-label="Medicamentos">
-          {medications.map((item) => (
-            <button
-              type="button"
-              key={item.medication.id}
-              className={item.medication.id === selectedId ? 'active' : ''}
-              onClick={() => setSelectedId(item.medication.id)}
-            >
-              <strong>{item.medication.name}</strong>
-              <small>{item.stock} {item.medication.unit}</small>
-            </button>
-          ))}
-        </div>
-      ) : null}
-
       {selected ? (
         <>
-          <section className="stockMedicationHero">
-            <div>
-              <span className="stockPanelTag">{selected.medication.dosage}</span>
-              <h2>{selected.medication.name}</h2>
-              <p>Stock atual</p>
-              <strong>{selected.stock} <small>{selected.medication.unit}</small></strong>
+          <section className="medicationLinearForecast" aria-labelledby="medication-forecast-title">
+            <div className="medicationLinearHeading">
+              <div>
+                <span className="stockPanelTag">AUTONOMIA PROGRAMADA</span>
+                <h2 id="medication-forecast-title">Até onde chega o stock configurado</h2>
+              </div>
+              <span className={forecast?.exact ? 'stockStatusOk' : 'stockStatusNeutral'}>
+                {forecast?.exact ? 'SIMULAÇÃO EXATA' : 'SEM SIMULAÇÃO'}
+              </span>
             </div>
-            <span className={selected.ok ? 'stockStatusOk' : 'stockStatusError'}>
-              {selected.ok ? 'RECONCILIADO' : 'INCONSISTÊNCIA'}
-            </span>
+            {forecast ? (
+              <div className="medicationLinearForecastGrid">
+                <article>
+                  <span>Autonomia</span>
+                  <strong>{formatDuration(forecast.autonomySeconds)}</strong>
+                  <small>simulação cronológica dos horários ativos</small>
+                </article>
+                <article>
+                  <span>Última toma possível</span>
+                  <strong>{formatDateTime(forecast.lastPossibleDose?.scheduledAt)}</strong>
+                  <small>{forecast.stockAfterLastPossible} {selected.medication.unit} restantes depois dessa toma</small>
+                </article>
+                <article>
+                  <span>Primeira toma sem stock suficiente</span>
+                  <strong>{formatDateTime(forecast.firstImpossibleDose.scheduledAt)}</strong>
+                  <small>faltariam {forecast.missingQuantity} {selected.medication.unit}</small>
+                </article>
+              </div>
+            ) : (
+              <p className="medicationLinearNoForecast">
+                {forecastMessage || 'Configura pelo menos um horário válido para calcular a autonomia sem suposições.'}
+              </p>
+            )}
+            <p className="medicationLinearRule">
+              Esta autonomia usa apenas stock real + horários e quantidades que configuraste. Não usa média inventada nem altera o tratamento.
+            </p>
           </section>
 
-          <div className="stockMetricGrid stockMedicationMetrics">
-            <article className="stockMetric">
-              <span>Próxima toma</span>
-              <strong>{formatDateTime(forecast?.nextDose.scheduledAt)}</strong>
-              <small>{forecast ? `${forecast.nextDose.quantity} ${selected.medication.unit}` : forecastMessage}</small>
-            </article>
-            <article className="stockMetric">
-              <span>Autonomia programada</span>
-              <strong>{formatDuration(forecast?.autonomySeconds)}</strong>
-              <small>Simulação cronológica</small>
-            </article>
-            <article className="stockMetric">
-              <span>Última toma possível</span>
-              <strong>{formatDateTime(forecast?.lastPossibleDose?.scheduledAt)}</strong>
-              <small>{forecast ? `${forecast.stockAfterLastPossible} ${selected.medication.unit} restantes` : '—'}</small>
-            </article>
-            <article className="stockMetric">
-              <span>Primeira toma impossível</span>
-              <strong>{formatDateTime(forecast?.firstImpossibleDose.scheduledAt)}</strong>
-              <small>{forecast ? `Em falta: ${forecast.missingQuantity} ${selected.medication.unit}` : '—'}</small>
-            </article>
-          </div>
-
-          <section className="stockPanel stockDosePanel" id="medication-today-doses">
+          <section className="stockPanel stockDosePanel medicationLinearToday" id="medication-today-doses">
             <div className="stockPanelHeading">
               <div><span className="stockPanelTag">HOJE</span><h2>Tomas programadas</h2></div>
               <span>{today}</span>
             </div>
-
-            <details className="stockDoseGuide">
-              <summary>Como funcionam as ações?</summary>
-              <div className="stockDoseGuideGrid">
-                <div><strong>Tomada / Tomada agora</strong><span>Confirma a toma e desconta exatamente a quantidade programada.</span></div>
-                <div><strong>Adiar</strong><span>Escolhe +15 min, +30 min, +1 h ou uma hora manual. Adiar não desconta stock.</span></div>
-                <div><strong>Atrasada</strong><span>Aparece automaticamente quando a hora passa sem registo. É apenas um aviso e não altera stock.</span></div>
-                <div><strong>Menu ···</strong><span>Reúne Não tomada, correções e o histórico daquela ocorrência.</span></div>
-              </div>
-              <p>Os atalhos de tempo servem apenas para agenda. Não são uma recomendação clínica nem alteram a prescrição.</p>
-              <Link className="stockDoseGuideLink" to="/guia#medicamentos">Abrir guia completo</Link>
-            </details>
+            <p className="medicationLinearDoseRule">
+              Só “Tomada” desconta stock. Adiar ou marcar “Não tomada” preserva o stock e cria um evento auditável.
+            </p>
 
             {todayDoses.length ? (
               <div className="stockDoseList">
@@ -540,7 +519,7 @@ export function MedicationsStockPage() {
                           <div className="stockPostponeEditor">
                             <div className="stockPostponeTitle">
                               <strong>{postponeEventId ? 'Alterar nova hora' : 'Adiar toma'}</strong>
-                              <span>Escolhe a hora. O stock só muda quando confirmares a toma.</span>
+                              <span>O stock não muda até a toma ser confirmada.</span>
                             </div>
                             <div className="stockPostponePresets" aria-label="Atalhos para nova hora">
                               <button type="button" disabled={busy || !quick15} onClick={() => quick15 && setPostponeTime(quick15)}>+15 min</button>
@@ -548,14 +527,10 @@ export function MedicationsStockPage() {
                               <button type="button" disabled={busy || !quick60} onClick={() => quick60 && setPostponeTime(quick60)}>+1 h</button>
                             </div>
                             <label>
-                              Escolher hora
-                              <input
-                                type="time"
-                                value={postponeTime}
-                                onChange={(changeEvent) => setPostponeTime(changeEvent.target.value)}
-                              />
+                              Nova hora
+                              <input type="time" value={postponeTime} onChange={(changeEvent) => setPostponeTime(changeEvent.target.value)} />
                             </label>
-                            <span className="stockPostponeHint">Os atalhos são apenas opções de agenda e não constituem indicação sobre quando deves tomar o medicamento.</span>
+                            <span className="stockPostponeHint">Os atalhos são ferramentas de agenda, não indicação clínica.</span>
                             <div className="stockPostponeButtons">
                               <button type="button" disabled={busy} onClick={closePostponeEditor}>Cancelar</button>
                               <button
@@ -565,8 +540,8 @@ export function MedicationsStockPage() {
                                 onClick={() => void run(
                                   async () => { await savePostpone(schedule) },
                                   postponeEventId
-                                    ? 'Nova hora guardada. O adiamento anterior ficou no histórico e o stock não foi alterado.'
-                                    : 'Toma adiada para a nova hora. O stock não foi alterado.',
+                                    ? 'Nova hora guardada. O adiamento anterior ficou no histórico.'
+                                    : 'Toma adiada. O stock não foi alterado.',
                                 )}
                               >
                                 Guardar hora
@@ -601,7 +576,7 @@ export function MedicationsStockPage() {
                                           operationId: operationId(),
                                         })
                                       },
-                                      'Toma confirmada. O stock foi descontado na transação.',
+                                      'Toma confirmada. O stock foi descontado exatamente uma vez.',
                                     )}
                                   >
                                     {isLate ? 'Tomada agora' : 'Tomada'}
@@ -618,7 +593,7 @@ export function MedicationsStockPage() {
                                       async () => {
                                         await medicationDoseStatusService.confirmPostponedMedicationDose(event.id, operationId())
                                       },
-                                      'Toma adiada confirmada. O stock foi descontado uma única vez e o reagendamento ficou auditado.',
+                                      'Toma adiada confirmada. O stock foi descontado uma única vez.',
                                     )}
                                   >
                                     Tomada agora
@@ -666,7 +641,7 @@ export function MedicationsStockPage() {
                                             setOpenMenuScheduleId(null)
                                             void run(
                                               async () => { await markNotTaken(schedule, event) },
-                                              'A toma adiada foi marcada como não tomada. O stock não foi alterado e a alteração ficou auditada.',
+                                              'A toma adiada foi marcada como não tomada. O histórico foi preservado.',
                                             )
                                           }}
                                         >
@@ -680,7 +655,7 @@ export function MedicationsStockPage() {
                                             setOpenMenuScheduleId(null)
                                             void run(
                                               async () => { await correctDoseEvent(event) },
-                                              'Adiamento corrigido. A toma voltou a ficar disponível para registo.',
+                                              'Adiamento corrigido. O evento original permanece no histórico.',
                                             )
                                           }}
                                         >
@@ -698,7 +673,7 @@ export function MedicationsStockPage() {
                                           setOpenMenuScheduleId(null)
                                           void run(
                                             async () => { await correctDoseEvent(event) },
-                                            'Toma corrigida. O stock foi reposto através de um movimento de correção.',
+                                            'Toma corrigida. O stock foi reposto por movimento de correção.',
                                           )
                                         }}
                                       >
@@ -715,7 +690,7 @@ export function MedicationsStockPage() {
                                           setOpenMenuScheduleId(null)
                                           void run(
                                             async () => { await correctDoseEvent(event) },
-                                            'Estado corrigido. A toma voltou a ficar disponível para registo.',
+                                            'Estado corrigido. O evento original permanece no histórico.',
                                           )
                                         }}
                                       >
@@ -724,7 +699,7 @@ export function MedicationsStockPage() {
                                     ) : null}
 
                                     <button type="button" role="menuitem" onClick={() => toggleDetails(schedule.id)}>
-                                      {detailsOpen ? 'Fechar detalhes' : 'Ver detalhes e histórico'}
+                                      {detailsOpen ? 'Fechar histórico' : 'Ver histórico desta toma'}
                                     </button>
                                   </div>
                                 ) : null}
@@ -761,12 +736,12 @@ export function MedicationsStockPage() {
                                       : historyEvent.status === 'taken'
                                         ? `Stock: −${minorToDecimal(historyEvent.quantityMinor)} ${selected.medication.unit}`
                                         : historyEvent.status === 'corrected'
-                                          ? 'Mantém o registo original e anula o seu estado ativo.'
+                                          ? 'O registo original foi mantido e corrigido por um novo evento.'
                                           : 'Sem alteração de stock.'}
                                   </small>
                                 </div>
                               </div>
-                            )) : <p>Ainda não existem eventos registados para esta toma.</p>}
+                            )) : <p>Ainda não existem eventos para esta toma.</p>}
                           </div>
                         </div>
                       ) : null}
@@ -774,54 +749,60 @@ export function MedicationsStockPage() {
                   )
                 })}
               </div>
-            ) : <p className="stockEmpty">Ainda não existem horários válidos para hoje.</p>}
+            ) : (
+              <p className="stockEmpty">Ainda não existem horários válidos para hoje. Configura um horário em “Configuração e stock”.</p>
+            )}
           </section>
 
-          <div className="stockTwoPanels">
-            <section className="stockPanel">
-              <h2>Adicionar horário</h2>
-              <div className="stockInlineForm stockInlineFormStack">
-                <label>Hora<input type="time" value={scheduleForm.localTime} onChange={(event) => setScheduleForm({ ...scheduleForm, localTime: event.target.value })} /></label>
-                <label>Quantidade<input inputMode="decimal" value={scheduleForm.quantity} onChange={(event) => setScheduleForm({ ...scheduleForm, quantity: event.target.value })} /></label>
-                <button
-                  type="button"
-                  disabled={busy}
-                  onClick={() => void run(
-                    async () => {
-                      await personalStockService.addMedicationSchedule({
-                        medicationId: selected.medication.id,
-                        localTime: scheduleForm.localTime,
-                        quantity: scheduleForm.quantity,
-                        effectiveFrom: today,
-                      })
-                    },
-                    'Horário adicionado. As previsões foram recalculadas.',
-                  )}
-                >
-                  Adicionar horário
-                </button>
-              </div>
-            </section>
+          <details className="medicationLinearAdvanced">
+            <summary>Configuração e stock</summary>
+            <div className="medicationLinearAdvancedBody">
+              <section>
+                <h3>Adicionar horário</h3>
+                <div className="stockInlineForm stockInlineFormStack">
+                  <label>Hora<input type="time" value={scheduleForm.localTime} onChange={(event) => setScheduleForm({ ...scheduleForm, localTime: event.target.value })} /></label>
+                  <label>Quantidade<input inputMode="decimal" value={scheduleForm.quantity} onChange={(event) => setScheduleForm({ ...scheduleForm, quantity: event.target.value })} /></label>
+                  <button
+                    type="button"
+                    disabled={busy}
+                    onClick={() => void run(
+                      async () => {
+                        await personalStockService.addMedicationSchedule({
+                          medicationId: selected.medication.id,
+                          localTime: scheduleForm.localTime,
+                          quantity: scheduleForm.quantity,
+                          effectiveFrom: today,
+                        })
+                      },
+                      'Horário adicionado. A autonomia foi recalculada apenas com a nova configuração.',
+                    )}
+                  >
+                    Adicionar horário
+                  </button>
+                </div>
+              </section>
 
-            <section className="stockPanel">
-              <h2>Repor stock</h2>
-              <div className="stockInlineForm stockInlineFormStack">
-                <label>Quantidade<input inputMode="decimal" value={restockQuantity} onChange={(event) => setRestockQuantity(event.target.value)} /></label>
-                <button
-                  type="button"
-                  disabled={busy || !restockQuantity.trim()}
-                  onClick={() => void run(
-                    async () => {
-                      await personalStockService.restockMedication(selected.medication.id, restockQuantity, operationId())
-                      setRestockQuantity('')
-                    },
-                    'Reposição adicionada ao ledger.',
-                  )}
-                >
-                  Adicionar stock
-                </button>
-              </div>
-              <div className="stockCorrectionActions">
+              <section>
+                <h3>Repor stock</h3>
+                <div className="stockInlineForm stockInlineFormStack">
+                  <label>
+                    Quantidade ({selected.medication.unit})
+                    <input inputMode="decimal" value={restockQuantity} onChange={(event) => setRestockQuantity(event.target.value)} />
+                  </label>
+                  <button
+                    type="button"
+                    disabled={busy || !restockQuantity.trim()}
+                    onClick={() => void run(
+                      async () => {
+                        await personalStockService.restockMedication(selected.medication.id, restockQuantity, operationId())
+                        setRestockQuantity('')
+                      },
+                      'Reposição adicionada ao ledger.',
+                    )}
+                  >
+                    Adicionar stock
+                  </button>
+                </div>
                 <button
                   type="button"
                   className="stockSecondaryAction"
@@ -830,68 +811,59 @@ export function MedicationsStockPage() {
                     async () => {
                       await stockReconciliationService.undoLastMedicationRestock(selected.medication.id, operationId())
                     },
-                    'Última reposição corrigida através de um novo movimento auditável.',
+                    'Última reposição corrigida por um novo movimento auditável.',
                   )}
                 >
                   Corrigir última reposição
                 </button>
-              </div>
-            </section>
-          </div>
+              </section>
 
-          <section className="stockPanel stockPhysicalPanel">
-            <span className="stockPanelTag">CONFERÊNCIA REAL</span>
-            <h2>Contagem física do medicamento</h2>
-            <p>Indica a quantidade que tens realmente. A aplicação compara com o ledger e, se necessário, cria uma correção auditável.</p>
-            <div className="stockInlineForm stockInlineFormStack stockPhysicalInline">
-              <label>
-                Quantidade contada ({selected.medication.unit})
-                <input
-                  inputMode="decimal"
-                  placeholder={`ex.: ${selected.stock}`}
-                  value={physicalQuantity}
-                  onChange={(event) => setPhysicalQuantity(event.target.value)}
-                />
-              </label>
-              <button
-                type="button"
-                className="stockPrimaryAction"
-                disabled={busy || !physicalQuantity.trim()}
-                onClick={() => void run(
-                  async () => {
-                    await stockReconciliationService.reconcileMedicationPhysicalCount(
-                      selected.medication.id,
-                      physicalQuantity,
-                      operationId(),
-                    )
-                    setPhysicalQuantity('')
-                  },
-                  'Contagem física guardada. O stock ficou reconciliado com a quantidade contada.',
-                )}
-              >
-                Reconciliar contagem
-              </button>
-            </div>
-
-            {physicalCheck ? (
-              <>
-                <div className="stockPhysicalGrid" aria-label="Última conferência física">
-                  <div className="stockPhysicalMetric"><span>Calculado antes</span><strong>{physicalCheck.expected}</strong></div>
-                  <div className="stockPhysicalMetric"><span>Contado</span><strong>{physicalCheck.counted}</strong></div>
-                  <div className="stockPhysicalMetric">
-                    <span>Ajuste aplicado</span>
-                    <strong className={adjustmentClass(physicalCheck.adjustment)}>{signed(physicalCheck.adjustment)}</strong>
-                  </div>
+              <section>
+                <h3>Contagem física</h3>
+                <p>Usa apenas se contares fisicamente o medicamento e o valor não coincidir com o ledger.</p>
+                <div className="stockInlineForm stockInlineFormStack">
+                  <label>
+                    Quantidade contada ({selected.medication.unit})
+                    <input
+                      inputMode="decimal"
+                      placeholder={`ex.: ${selected.stock}`}
+                      value={physicalQuantity}
+                      onChange={(event) => setPhysicalQuantity(event.target.value)}
+                    />
+                  </label>
+                  <button
+                    type="button"
+                    className="stockPrimaryAction"
+                    disabled={busy || !physicalQuantity.trim()}
+                    onClick={() => void run(
+                      async () => {
+                        await stockReconciliationService.reconcileMedicationPhysicalCount(
+                          selected.medication.id,
+                          physicalQuantity,
+                          operationId(),
+                        )
+                        setPhysicalQuantity('')
+                      },
+                      'Contagem física reconciliada sem apagar movimentos anteriores.',
+                    )}
+                  >
+                    Reconciliar
+                  </button>
                 </div>
-                <p className="stockPhysicalCheckTime">Verificado em {formatPhysicalCheckTime(physicalCheck.checkedAt)}.</p>
-              </>
-            ) : <p className="stockPhysicalCheckTime">Ainda não foi feita uma contagem física deste medicamento.</p>}
-          </section>
+                {physicalCheck ? (
+                  <small>
+                    Última contagem: {physicalCheck.counted} · ajuste {signed(physicalCheck.adjustment)} · {formatPhysicalCheckTime(physicalCheck.checkedAt)}
+                  </small>
+                ) : null}
+              </section>
+            </div>
+          </details>
 
-          <section className="stockProjectionPanel stockExactPanel">
-            <span>EXATO</span>
-            <strong>stock inicial + entradas − consumos ± correções = {selected.stock} {selected.medication.unit}</strong>
-            <p>{selected.movementCount} movimentos. Stock reconstruído: {minorToDecimal(selected.reconstructedMinor)} {selected.medication.unit}.</p>
+          <section className="medicationLinearExact">
+            <strong>Stock exato: {selected.stock} {selected.medication.unit}</strong>
+            <span>
+              {selected.movementCount} movimento(s) · reconstruído: {minorToDecimal(selected.reconstructedMinor)} {selected.medication.unit} · {selected.ok ? 'integridade OK' : 'verificar integridade'}
+            </span>
           </section>
         </>
       ) : null}
