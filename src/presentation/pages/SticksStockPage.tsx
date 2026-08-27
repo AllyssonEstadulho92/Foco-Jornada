@@ -19,21 +19,31 @@ function operationId(): string {
 
 function movementLabel(movement: StockMovement): string {
   if (movement.type === 'initial_stock') return 'Stock inicial'
-  if (movement.type === 'consumption') return 'Utilização'
+  if (movement.type === 'consumption') return 'Stick utilizado'
   if (movement.type === 'restock') return 'Reposição'
   if (movement.correctionReason === 'physical_count') return 'Reconciliação física'
   if (movement.correctionReason === 'undo_restock') return 'Correção de reposição'
   return 'Correção'
 }
 
-function formatPhysicalCheckTime(value?: string): string {
-  if (!value) return 'Nunca verificado'
+function formatDateTime(value?: string | null): string {
+  if (!value) return '—'
   return new Intl.DateTimeFormat('pt-PT', {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
+    timeZone: 'Europe/Lisbon',
+  }).format(new Date(value))
+}
+
+function formatTime(value?: string | null): string {
+  if (!value) return '—'
+  return new Intl.DateTimeFormat('pt-PT', {
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'Europe/Lisbon',
   }).format(new Date(value))
 }
 
@@ -47,36 +57,6 @@ function formatDateKey(value?: string | null): string {
     year: 'numeric',
     timeZone: 'UTC',
   }).format(parsed)
-}
-
-function adjustmentClass(value?: string): string {
-  if (!value || value === '0') return 'stockPhysicalAdjustmentZero'
-  return value.startsWith('-') ? 'stockPhysicalAdjustmentNegative' : 'stockPhysicalAdjustmentPositive'
-}
-
-function signed(value?: string): string {
-  if (!value) return '—'
-  if (value === '0' || value.startsWith('-')) return value
-  return `+${value}`
-}
-
-function nicotineAmount(minMg?: string, maxMg?: string): string {
-  if (minMg === undefined || maxMg === undefined) return '—'
-  const local = (value: string) => value.replace('.', ',')
-  return minMg === maxMg ? `${local(minMg)} mg` : `${local(minMg)}–${local(maxMg)} mg`
-}
-
-function localDecimal(value: string): string {
-  return value.replace('.', ',')
-}
-
-function formatUsageTime(value?: string | null): string {
-  if (!value) return '—'
-  return new Intl.DateTimeFormat('pt-PT', {
-    hour: '2-digit',
-    minute: '2-digit',
-    timeZone: 'Europe/Lisbon',
-  }).format(new Date(value))
 }
 
 function formatUsageDay(value: string): string {
@@ -96,10 +76,30 @@ function durationLabel(minutes?: number | null): string {
   return rest ? `${hours} h ${rest} min` : `${hours} h`
 }
 
+function localDecimal(value?: string | null): string {
+  return value ? value.replace('.', ',') : '—'
+}
+
+function mgLabel(mean?: string | null, sd?: string | null): string {
+  if (!mean) return '—'
+  return sd ? `${localDecimal(mean)} ± ${localDecimal(sd)} mg` : `${localDecimal(mean)} mg`
+}
+
 function initialPackSettings(): StickPackSettings {
   return {
     packCount: 12,
     sticksPerPack: 20,
+    updatedAt: new Date(0).toISOString(),
+  }
+}
+
+function initialNicotineSettings(): NicotineAwarenessSettings {
+  return {
+    profileId: 'unselected',
+    customContentMeanMg: '',
+    customEmissionMeanMg: '',
+    customSourceLabel: '',
+    notes: '',
     updatedAt: new Date(0).toISOString(),
   }
 }
@@ -112,19 +112,20 @@ export function SticksStockPage() {
     stickPackPlannerService,
     stickUsageAnalyticsService,
   } = useAppServices()
+
   const [summary, setSummary] = useState<StickSummary | null>(null)
   const [movements, setMovements] = useState<StockMovement[]>([])
   const [physicalCheck, setPhysicalCheck] = useState<PhysicalStockCheck | null>(null)
-  const [nicotineSummary, setNicotineSummary] = useState<NicotineAwarenessSummary | null>(null)
-  const [nicotineSettings, setNicotineSettings] = useState<NicotineAwarenessSettings | null>(null)
-  const [nicotineSettingsReady, setNicotineSettingsReady] = useState(false)
-  const [nicotineSaveState, setNicotineSaveState] = useState('')
   const [packSettings, setPackSettings] = useState<StickPackSettings>(initialPackSettings)
+  const [packProjection, setPackProjection] = useState<StickPackProjection | null>(null)
   const [packSettingsReady, setPackSettingsReady] = useState(false)
   const [packSaveState, setPackSaveState] = useState('')
-  const [packProjection, setPackProjection] = useState<StickPackProjection | null>(null)
+  const [nicotineSettings, setNicotineSettings] = useState<NicotineAwarenessSettings>(initialNicotineSettings)
+  const [nicotineSummary, setNicotineSummary] = useState<NicotineAwarenessSummary | null>(null)
+  const [nicotineSettingsReady, setNicotineSettingsReady] = useState(false)
+  const [nicotineSaveState, setNicotineSaveState] = useState('')
   const [usageAnalytics, setUsageAnalytics] = useState<StickUsageAnalytics | null>(null)
-  const [quantity, setQuantity] = useState('20')
+  const [restockPacks, setRestockPacks] = useState('1')
   const [physicalQuantity, setPhysicalQuantity] = useState('')
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState('')
@@ -134,22 +135,23 @@ export function SticksStockPage() {
       nextSummary,
       nextMovements,
       nextPhysicalCheck,
-      nextNicotineSummary,
       nextPackProjection,
+      nextNicotineSummary,
       nextUsageAnalytics,
     ] = await Promise.all([
       personalStockService.getSticksSummary(),
-      personalStockService.listStickMovements(50),
+      personalStockService.listStickMovements(80),
       stockReconciliationService.getPhysicalCheck('stock:sticks:glo'),
-      nicotineAwarenessService.getSummary(),
       stickPackPlannerService.getProjection(),
+      nicotineAwarenessService.getSummary(),
       stickUsageAnalyticsService.getAnalytics(),
     ])
+
     setSummary(nextSummary)
     setMovements(nextMovements)
     setPhysicalCheck(nextPhysicalCheck)
-    setNicotineSummary(nextNicotineSummary)
     setPackProjection(nextPackProjection)
+    setNicotineSummary(nextNicotineSummary)
     setUsageAnalytics(nextUsageAnalytics)
   }, [
     nicotineAwarenessService,
@@ -160,63 +162,32 @@ export function SticksStockPage() {
   ])
 
   useEffect(() => {
-    void reload().catch((error: unknown) => setMessage(error instanceof Error ? error.message : 'Erro ao carregar o stock.'))
-
     void Promise.all([
-      nicotineAwarenessService.getSettings(),
+      reload(),
       stickPackPlannerService.getSettings(),
-    ]).then(([settings, packs]) => {
-      setNicotineSettings(settings)
-      setNicotineSettingsReady(true)
-      setPackSettings(packs)
+      nicotineAwarenessService.getSettings(),
+    ]).then(([, nextPackSettings, nextNicotineSettings]) => {
+      setPackSettings(nextPackSettings)
       setPackSettingsReady(true)
+      setNicotineSettings(nextNicotineSettings)
+      setNicotineSettingsReady(true)
     }).catch((error: unknown) => {
-      setMessage(error instanceof Error ? error.message : 'Erro ao carregar a configuração.')
+      setMessage(error instanceof Error ? error.message : 'Não foi possível carregar o controlo de sticks.')
     })
   }, [nicotineAwarenessService, reload, stickPackPlannerService])
 
   useEffect(() => {
-    if (!nicotineSettings || !nicotineSettingsReady) return
-    setNicotineSaveState('A guardar…')
-    const timer = window.setTimeout(() => {
-      void nicotineAwarenessService.saveSettings({
-        profileId: nicotineSettings.profileId,
-        customMinMg: nicotineSettings.customMinMg,
-        customMaxMg: nicotineSettings.customMaxMg,
-        notes: nicotineSettings.notes,
-        reductionPlanEnabled: nicotineSettings.reductionPlanEnabled,
-        dailyBaselineSticks: nicotineSettings.dailyBaselineSticks,
-        weeklyReductionStep: nicotineSettings.weeklyReductionStep,
-        reductionPlanStartDate: nicotineSettings.reductionPlanStartDate,
-      }).then(async () => {
-        setNicotineSaveState('Guardado automaticamente e incluído no backup.')
-        const [nextNicotine, nextProjection] = await Promise.all([
-          nicotineAwarenessService.getSummary(),
-          stickPackPlannerService.getProjection(),
-        ])
-        setNicotineSummary(nextNicotine)
-        setPackProjection(nextProjection)
-      }).catch((error: unknown) => {
-        setNicotineSaveState(error instanceof Error ? error.message : 'Não foi possível guardar esta configuração.')
-      })
-    }, 650)
-    return () => window.clearTimeout(timer)
-  }, [
-    nicotineAwarenessService,
-    nicotineSettings?.profileId,
-    nicotineSettings?.customMinMg,
-    nicotineSettings?.customMaxMg,
-    nicotineSettings?.notes,
-    nicotineSettings?.reductionPlanEnabled,
-    nicotineSettings?.dailyBaselineSticks,
-    nicotineSettings?.weeklyReductionStep,
-    nicotineSettings?.reductionPlanStartDate,
-    nicotineSettingsReady,
-    stickPackPlannerService,
-  ])
-
-  useEffect(() => {
     if (!packSettingsReady) return
+    if (
+      !Number.isSafeInteger(packSettings.packCount)
+      || packSettings.packCount < 0
+      || !Number.isSafeInteger(packSettings.sticksPerPack)
+      || packSettings.sticksPerPack <= 0
+    ) {
+      setPackSaveState('Corrige a configuração dos maços.')
+      return
+    }
+
     setPackSaveState('A guardar…')
     const timer = window.setTimeout(() => {
       void stickPackPlannerService.saveSettings({
@@ -224,18 +195,59 @@ export function SticksStockPage() {
         sticksPerPack: packSettings.sticksPerPack,
       }).then(async (saved) => {
         setPackSettings(saved)
-        setPackSaveState('Configuração dos maços guardada automaticamente.')
+        setPackSaveState('Configuração guardada automaticamente.')
         setPackProjection(await stickPackPlannerService.getProjection())
       }).catch((error: unknown) => {
-        setPackSaveState(error instanceof Error ? error.message : 'Não foi possível guardar a configuração dos maços.')
+        setPackSaveState(error instanceof Error ? error.message : 'Não foi possível guardar a configuração.')
       })
-    }, 500)
+    }, 450)
     return () => window.clearTimeout(timer)
   }, [
     packSettings.packCount,
     packSettings.sticksPerPack,
     packSettingsReady,
     stickPackPlannerService,
+  ])
+
+  useEffect(() => {
+    if (!nicotineSettingsReady) return
+    if (
+      nicotineSettings.profileId === 'custom-lab'
+      && (
+        !nicotineSettings.customContentMeanMg.trim()
+        || !nicotineSettings.customEmissionMeanMg.trim()
+        || !nicotineSettings.customSourceLabel.trim()
+      )
+    ) {
+      setNicotineSaveState('Preenche os dois valores laboratoriais e a fonte.')
+      return
+    }
+
+    setNicotineSaveState('A guardar…')
+    const timer = window.setTimeout(() => {
+      void nicotineAwarenessService.saveSettings({
+        profileId: nicotineSettings.profileId,
+        customContentMeanMg: nicotineSettings.customContentMeanMg,
+        customEmissionMeanMg: nicotineSettings.customEmissionMeanMg,
+        customSourceLabel: nicotineSettings.customSourceLabel,
+        notes: nicotineSettings.notes,
+      }).then(async (saved) => {
+        setNicotineSettings(saved)
+        setNicotineSaveState('Guardado automaticamente.')
+        setNicotineSummary(await nicotineAwarenessService.getSummary())
+      }).catch((error: unknown) => {
+        setNicotineSaveState(error instanceof Error ? error.message : 'Não foi possível guardar os dados de nicotina.')
+      })
+    }, 550)
+    return () => window.clearTimeout(timer)
+  }, [
+    nicotineAwarenessService,
+    nicotineSettings.customContentMeanMg,
+    nicotineSettings.customEmissionMeanMg,
+    nicotineSettings.customSourceLabel,
+    nicotineSettings.notes,
+    nicotineSettings.profileId,
+    nicotineSettingsReady,
   ])
 
   async function run(action: () => Promise<unknown>, success: string) {
@@ -253,51 +265,23 @@ export function SticksStockPage() {
     }
   }
 
-  const parsedQuantity = Number(quantity)
-  const canSubmitQuantity = Number.isSafeInteger(parsedQuantity) && parsedQuantity > 0
-  const canSubmitPhysical = /^\d+$/.test(physicalQuantity.trim())
-    && BigInt(physicalQuantity.trim() || '0') <= BigInt(Number.MAX_SAFE_INTEGER)
-
-  const configuredPackTotal = useMemo(
+  const configuredTotal = useMemo(
     () => packSettings.packCount * packSettings.sticksPerPack,
     [packSettings.packCount, packSettings.sticksPerPack],
   )
-  const packConfigurationValid = Number.isSafeInteger(packSettings.packCount)
+  const validPackConfiguration = Number.isSafeInteger(packSettings.packCount)
     && packSettings.packCount >= 0
     && Number.isSafeInteger(packSettings.sticksPerPack)
     && packSettings.sticksPerPack > 0
-    && Number.isSafeInteger(configuredPackTotal)
-    && configuredPackTotal > 0
+    && Number.isSafeInteger(configuredTotal)
+    && configuredTotal > 0
 
-  const updateNicotineSetting = <K extends keyof NicotineAwarenessSettings>(
-    key: K,
-    value: NicotineAwarenessSettings[K],
-  ) => {
-    setNicotineSettings((current) => current ? { ...current, [key]: value } : current)
-  }
-
-  const reductionPlan = nicotineSummary?.reductionPlan
-  const reductionStatus = reductionPlan
-    ? !reductionPlan.enabled
-      ? 'Plano pausado'
-      : reductionPlan.overTargetBy > 0
-        ? `Acima da meta pessoal por ${reductionPlan.overTargetBy}`
-        : reductionPlan.consumedToday === reductionPlan.targetToday
-          ? 'Na meta pessoal'
-          : 'Abaixo da meta pessoal'
-    : 'A carregar…'
-  const trendValue = reductionPlan ? Number(reductionPlan.trendDelta) : 0
-  const trendText = reductionPlan
-    ? `${trendValue > 0 ? '+' : ''}${localDecimal(reductionPlan.trendDelta)} sticks/dia`
-    : '—'
-
-  const currentPackText = packProjection?.currentStockSticks === null || packProjection?.currentStockSticks === undefined
-    ? '—'
-    : packProjection.currentStockSticks === 0
-      ? '0 maços'
-      : packProjection.currentPackStarted
-        ? `${packProjection.sealedPacksRemaining ?? 0} fechado(s) + ${packProjection.currentPackRemaining ?? 0} no atual`
-        : `${packProjection.sealedPacksRemaining ?? 0} maço(s) fechado(s)`
+  const restockPackCount = Number(restockPacks)
+  const restockSticks = Number.isSafeInteger(restockPackCount) && restockPackCount > 0
+    ? restockPackCount * packSettings.sticksPerPack
+    : 0
+  const validPhysicalQuantity = /^\d+$/.test(physicalQuantity.trim())
+    && BigInt(physicalQuantity.trim() || '0') <= BigInt(Number.MAX_SAFE_INTEGER)
 
   const displayedPackRemaining = packProjection?.currentStockSticks
     ? packProjection.currentPackStarted
@@ -305,668 +289,472 @@ export function SticksStockPage() {
       : Math.min(packSettings.sticksPerPack, packProjection.currentStockSticks)
     : 0
   const displayedPackLabel = packProjection?.currentStockSticks
-    ? packProjection.currentPackStarted ? 'Maço atual' : 'Próximo maço'
-    : 'Sem maço disponível'
+    ? packProjection.currentPackStarted ? 'Maço atual' : 'Próximo maço fechado'
+    : 'Sem stock disponível'
 
   const maxDailyUsage = Math.max(1, ...(usageAnalytics?.last7Days.map((item) => item.count) ?? [1]))
 
-  async function confirmConfiguredPhysicalStock() {
-    const saved = await stickPackPlannerService.saveSettings({
+  function updateNicotineSetting<K extends keyof NicotineAwarenessSettings>(
+    key: K,
+    value: NicotineAwarenessSettings[K],
+  ) {
+    setNicotineSettings((current) => ({ ...current, [key]: value }))
+  }
+
+  async function confirmInitialStock() {
+    await stickPackPlannerService.saveSettings({
       packCount: packSettings.packCount,
       sticksPerPack: packSettings.sticksPerPack,
     })
-    const total = saved.packCount * saved.sticksPerPack
-    if (summary?.initialized) {
-      await stockReconciliationService.reconcileSticksPhysicalCount(String(total), operationId())
-    } else {
-      await personalStockService.initializeSticks(total, operationId())
-    }
+    await personalStockService.initializeSticks(configuredTotal, operationId())
   }
 
-  async function addOneConfiguredPack() {
-    if (!summary?.initialized) throw new Error('Confirma primeiro o stock físico inicial.')
-    await personalStockService.restockSticks(packSettings.sticksPerPack, operationId())
+  async function addConfiguredPacks() {
+    if (!summary?.initialized) throw new Error('Confirma primeiro o stock inicial.')
+    if (!Number.isSafeInteger(restockPackCount) || restockPackCount <= 0) {
+      throw new Error('Indica um número inteiro de maços a adicionar.')
+    }
+    await personalStockService.restockSticks(restockSticks, operationId())
+    setRestockPacks('1')
   }
 
   return (
-    <section className="personalStockPage sticksStockPage sticksControlV2" aria-labelledby="sticks-title">
-      <header className="personalStockHeader sticksControlHeader">
+    <section className="personalStockPage sticksStockPage sticksLinearPage" aria-labelledby="sticks-title">
+      <header className="personalStockHeader sticksLinearHeader">
         <div>
-          <span className="eyebrow">STOCK PESSOAL · EXATO</span>
-          <h1 id="sticks-title">Controlo de sticks glo</h1>
-          <p>Stock em maços e sticks, registo rápido de utilização, projeção de duração e ledger auditável.</p>
+          <span className="eyebrow">STOCK PESSOAL · VEO</span>
+          <h1 id="sticks-title">Sticks glo veo</h1>
+          <p>Contagem exata do stock e das utilizações. Nicotina separada entre conteúdo do stick, emissão laboratorial e dose corporal.</p>
         </div>
       </header>
 
       {message ? <div className="stockMessage" role="status">{message}</div> : null}
 
-      <div className="stickHeroMetrics">
-        <article className="stickHeroMetric isPrimary">
-          <span>Stock atual</span>
-          <strong>{summary?.initialized ? summary.stock : configuredPackTotal}</strong>
-          <small>{summary?.initialized ? 'sticks no ledger' : 'sticks configurados, ainda por confirmar'}</small>
-        </article>
-        <article className="stickHeroMetric">
-          <span>Equivalente em maços</span>
-          <strong>{currentPackText}</strong>
-          <small>{packSettings.sticksPerPack} sticks por maço</small>
-        </article>
-        <article className="stickHeroMetric">
-          <span>Utilizados hoje</span>
-          <strong>{summary?.initialized ? summary.usedToday : 0}</strong>
-          <small>contagem exata</small>
-        </article>
-        <article className="stickHeroMetric">
-          <span>Previsão à linha de base</span>
-          <strong>{formatDateKey(packProjection?.baselineDepletionDate)}</strong>
-          <small>
-            {packProjection?.baselineDays
-              ? `≈ ${localDecimal(packProjection.baselineDays)} dias a ${packProjection.baselineDailySticks}/dia`
-              : 'confirma primeiro o stock'}
-          </small>
-        </article>
-      </div>
-
-      <section className="stickPackSetup" aria-labelledby="stick-pack-title">
-        <div className="stickPackSetupHeading">
+      {!summary?.initialized ? (
+        <section className="sticksSetupCard" aria-labelledby="sticks-setup-title">
           <div>
-            <span className="stockPanelTag">STOCK EM MAÇOS</span>
-            <h2 id="stick-pack-title">{packSettings.packCount} maço(s) × {packSettings.sticksPerPack} sticks</h2>
-            <p>Esta configuração fica guardada. Confirmar o stock cria ou reconcilia o ledger sem apagar movimentos anteriores.</p>
+            <span className="stockPanelTag">PASSO 1 · STOCK INICIAL</span>
+            <h2 id="sticks-setup-title">Confirma o que tens fisicamente</h2>
+            <p>O stock só entra no ledger depois desta confirmação. Antes disso a aplicação não mostra maços disponíveis nem cria previsões.</p>
           </div>
-          <span className={packProjection?.configuredMatchesCurrent ? 'stickPackBadge isOk' : 'stickPackBadge'}>
-            {packProjection?.configuredMatchesCurrent ? 'CONFIRMADO' : 'POR CONFIRMAR'}
-          </span>
-        </div>
 
-        <div className="stickPackInputs">
-          <label>
-            Maços físicos
-            <input
-              type="number"
-              inputMode="numeric"
-              min="0"
-              max="10000"
-              value={packSettings.packCount}
-              onChange={(event) => setPackSettings((current) => ({
-                ...current,
-                packCount: Number(event.target.value),
-              }))}
-            />
-          </label>
-          <span aria-hidden="true">×</span>
-          <label>
-            Sticks por maço
-            <input
-              type="number"
-              inputMode="numeric"
-              min="1"
-              max="1000"
-              value={packSettings.sticksPerPack}
-              onChange={(event) => setPackSettings((current) => ({
-                ...current,
-                sticksPerPack: Number(event.target.value),
-              }))}
-            />
-          </label>
-          <span aria-hidden="true">=</span>
-          <div className="stickPackTotal">
-            <strong>{Number.isFinite(configuredPackTotal) ? configuredPackTotal : '—'}</strong>
-            <span>sticks</span>
-          </div>
-        </div>
-
-        <div className="stickPackCompare">
-          <div>
-            <span>Configurado</span>
-            <strong>{configuredPackTotal} sticks</strong>
-          </div>
-          <div>
-            <span>Ledger atual</span>
-            <strong>{summary?.initialized ? summary.stock : 'não iniciado'}</strong>
-          </div>
-          <div>
-            <span>Diferença</span>
-            <strong>
-              {packProjection?.configuredDifference === null || packProjection?.configuredDifference === undefined
-                ? '—'
-                : signed(String(packProjection.configuredDifference))}
-            </strong>
-          </div>
-        </div>
-
-        <div className="stickPackActions">
-          <button
-            type="button"
-            className="stockPrimaryAction"
-            disabled={busy || !packConfigurationValid}
-            onClick={() => void run(
-              confirmConfiguredPhysicalStock,
-              `Stock físico confirmado: ${configuredPackTotal} sticks. O ledger foi atualizado sem apagar o histórico.`,
-            )}
-          >
-            Confirmar {configuredPackTotal} sticks no stock
-          </button>
-          <button
-            type="button"
-            className="stockSecondaryAction"
-            disabled={busy || !summary?.initialized || !Number.isSafeInteger(packSettings.sticksPerPack)}
-            onClick={() => void run(
-              addOneConfiguredPack,
-              `1 maço adicionado: +${packSettings.sticksPerPack} sticks.`,
-            )}
-          >
-            + Adicionar 1 maço
-          </button>
-        </div>
-        <span className="stickPackSaveState" role="status">
-          {packSaveState || `${packSettings.packCount} maço(s) de ${packSettings.sticksPerPack} correspondem a ${configuredPackTotal} sticks.`}
-        </span>
-      </section>
-
-      <section className="stickCurrentPackPanel" aria-labelledby="stick-current-pack-title">
-        <div className="stickCurrentPackHeading">
-          <div>
-            <span className="stockPanelTag">MAÇO EM UTILIZAÇÃO</span>
-            <h2 id="stick-current-pack-title">{displayedPackLabel}</h2>
-          </div>
-          <span className="stickCurrentPackBadge">
-            {packProjection?.currentStockSticks
-              ? packProjection.currentPackStarted ? 'ABERTO' : 'FECHADO'
-              : 'SEM STOCK'}
-          </span>
-        </div>
-
-        <div className="stickCurrentPackBody">
-          <div className="stickCurrentPackCount">
-            <strong>{displayedPackRemaining}</strong>
-            <span>de {packSettings.sticksPerPack} sticks</span>
-          </div>
-          <div className="stickCurrentPackProgress" aria-label="Percentagem restante do maço apresentado">
-            <span style={{ width: `${packProjection?.currentPackPercentRemaining ?? 0}%` }} />
-          </div>
-          <div className="stickCurrentPackMeta">
-            <div>
-              <span>Maços fechados em reserva</span>
-              <strong>{packProjection?.sealedPacksRemaining ?? 0}</strong>
-            </div>
-            <div>
-              <span>Estimativa deste maço à linha de base</span>
-              <strong>{formatDateKey(packProjection?.currentPackBaselineDepletionDate)}</strong>
-              <small>
-                {packProjection?.currentPackBaselineDays
-                  ? `≈ ${localDecimal(packProjection.currentPackBaselineDays)} dias`
-                  : 'sem projeção'}
-              </small>
-            </div>
-            <div>
-              <span>Estimativa pelo ritmo observado</span>
-              <strong>{formatDateKey(packProjection?.currentPackHistoricalDepletionDate)}</strong>
-              <small>
-                {packProjection?.historicalReliable && packProjection.currentPackHistoricalDays
-                  ? `≈ ${localDecimal(packProjection.currentPackHistoricalDays)} dias`
-                  : `precisa de pelo menos 3 dias de histórico · atual: ${packProjection?.historicalCoverageDays ?? 0}`}
-              </small>
-            </div>
-          </div>
-        </div>
-
-        <p className="stickCurrentPackNote">
-          Esta previsão responde apenas a quanto tempo o stock do maço pode durar ao ritmo registado.
-          Não é uma indicação de quantos sticks utilizar.
-        </p>
-      </section>
-
-      <section className="stickQuickUse" aria-labelledby="stick-use-title">
-        <div>
-          <span className="stockPanelTag">REGISTO RÁPIDO</span>
-          <h2 id="stick-use-title">Utilização</h2>
-          <p>Cada toque confirmado grava um movimento de −1 stick. Desfazer cria uma correção; não apaga o movimento anterior.</p>
-        </div>
-        <div className="stickQuickButtons">
-          <button
-            type="button"
-            className="stockPrimaryAction stickUseMainButton"
-            disabled={busy || !summary?.initialized || (summary.stock ?? 0) <= 0}
-            onClick={() => void run(
-              () => personalStockService.consumeStick(operationId()),
-              '1 stick registado. Stock, projeções e histórico atualizados.',
-            )}
-          >
-            + 1 stick utilizado
-          </button>
-          <button
-            type="button"
-            className="stockSecondaryAction"
-            disabled={busy || !summary?.initialized}
-            onClick={() => void run(
-              () => personalStockService.undoLastStick(operationId()),
-              'Última utilização corrigida por um novo movimento auditável.',
-            )}
-          >
-            Corrigir último registo
-          </button>
-        </div>
-      </section>
-
-      <section className="stickUsageAnalyticsPanel" aria-labelledby="stick-usage-analytics-title">
-        <div className="stickUsageAnalyticsHeading">
-          <div>
-            <span className="stockPanelTag">PADRÃO REGISTADO</span>
-            <h2 id="stick-usage-analytics-title">Utilização por hora e por dia</h2>
-            <p>Calculado apenas a partir dos movimentos efetivamente guardados no ledger.</p>
-          </div>
-          <button
-            type="button"
-            className="stockSecondaryAction"
-            disabled={busy}
-            onClick={() => void reload()}
-          >
-            Atualizar
-          </button>
-        </div>
-
-        <div className="stickUsageMetrics">
-          <article>
-            <span>Último registo</span>
-            <strong>{formatUsageTime(usageAnalytics?.lastUseAt)}</strong>
-            <small>{usageAnalytics?.lastUseAt ? `há ${durationLabel(usageAnalytics.minutesSinceLastUse)}` : 'sem utilização registada'}</small>
-          </article>
-          <article>
-            <span>Intervalo médio hoje</span>
-            <strong>{durationLabel(usageAnalytics?.averageIntervalMinutesToday)}</strong>
-            <small>{usageAnalytics?.todayCount ?? 0} utilização(ões) hoje</small>
-          </article>
-          <article>
-            <span>Menor intervalo hoje</span>
-            <strong>{durationLabel(usageAnalytics?.shortestIntervalMinutesToday)}</strong>
-            <small>entre registos válidos</small>
-          </article>
-          <article>
-            <span>Maior intervalo hoje</span>
-            <strong>{durationLabel(usageAnalytics?.longestIntervalMinutesToday)}</strong>
-            <small>entre registos válidos</small>
-          </article>
-        </div>
-
-        <div className="stickUsageChart" aria-label="Sticks registados nos últimos sete dias">
-          <div className="stickUsageChartTitle">
-            <strong>Últimos 7 dias</strong>
-            <span>{usageAnalytics?.last7Total ?? 0} sticks · anterior: {usageAnalytics?.previous7Total ?? 0}</span>
-          </div>
-          <div className="stickUsageBars">
-            {usageAnalytics?.last7Days.map((item) => (
-              <div className="stickUsageBarRow" key={item.date}>
-                <span>{formatUsageDay(item.date)}</span>
-                <div className="stickUsageBarTrack">
-                  <i style={{ width: `${Math.round((item.count / maxDailyUsage) * 100)}%` }} />
-                </div>
-                <strong>{item.count}</strong>
-              </div>
-            ))}
-          </div>
-          <div className="stickUsageTrend">
-            <span>Diferença vs. 7 dias anteriores</span>
-            <strong className={usageAnalytics?.trendDirection === 'up' ? 'isUp' : usageAnalytics?.trendDirection === 'down' ? 'isDown' : ''}>
-              {usageAnalytics && usageAnalytics.trendDifference > 0 ? '+' : ''}{usageAnalytics?.trendDifference ?? 0}
-            </strong>
-          </div>
-        </div>
-
-        <details className="stickUsageTimelineDetails">
-          <summary>Ver horários recentes</summary>
-          <div className="stickUsageTimeline">
-            {usageAnalytics?.recentEvents.length ? usageAnalytics.recentEvents.map((event, index) => {
-              const nextOlder = usageAnalytics.recentEvents[index + 1]
-              const gap = nextOlder
-                ? Math.max(0, Math.round((Date.parse(event.effectiveAt) - Date.parse(nextOlder.effectiveAt)) / 60_000))
-                : null
-              return (
-                <div className="stickUsageTimelineRow" key={event.id}>
-                  <div>
-                    <strong>{formatUsageTime(event.effectiveAt)}</strong>
-                    <span>{new Intl.DateTimeFormat('pt-PT', {
-                      day: '2-digit',
-                      month: '2-digit',
-                      year: 'numeric',
-                      timeZone: 'Europe/Lisbon',
-                    }).format(new Date(event.effectiveAt))}</span>
-                  </div>
-                  <span>{event.count} stick{event.count === 1 ? '' : 's'}</span>
-                  <small>{gap === null ? 'primeiro registo disponível' : `${durationLabel(gap)} desde o anterior`}</small>
-                </div>
-              )
-            }) : <p className="stockEmpty">Ainda não existem utilizações registadas.</p>}
-          </div>
-        </details>
-
-        <p className="stickUsageAnalyticsNote">
-          Intervalos e gráficos são descritivos. Não indicam um intervalo seguro nem quantos sticks deves utilizar.
-          Uma correção remove o registo da análise ativa sem apagar o movimento original do histórico auditável.
-        </p>
-      </section>
-
-      <section className="stickForecastPanel" aria-labelledby="stick-forecast-title">
-        <div className="stickForecastHeading">
-          <div>
-            <span className="stockPanelTag">DURAÇÃO DO STOCK</span>
-            <h2 id="stick-forecast-title">Até quando pode durar</h2>
-          </div>
-          <span className="stickForecastBadge">PROJEÇÃO</span>
-        </div>
-
-        <div className="stickForecastGrid">
-          <article>
-            <span>Linha de base pessoal</span>
-            <strong>{formatDateKey(packProjection?.baselineDepletionDate)}</strong>
-            <small>
-              {packProjection?.baselineDays
-                ? `${localDecimal(packProjection.baselineDays)} dias a ${packProjection.baselineDailySticks} sticks/dia`
-                : 'Sem stock confirmado'}
-            </small>
-          </article>
-          <article>
-            <span>Ritmo observado</span>
-            <strong>{formatDateKey(packProjection?.historicalDepletionDate)}</strong>
-            <small>
-              {packProjection?.historicalReliable && packProjection.historicalDailyAverage && packProjection.historicalDays
-                ? `${localDecimal(packProjection.historicalDailyAverage)} sticks/dia · ${packProjection.historicalCoverageDays} dias observados · ≈ ${localDecimal(packProjection.historicalDays)} dias`
-                : `Ainda sem histórico suficiente (${packProjection?.historicalCoverageDays ?? 0}/3 dias mínimos)`}
-            </small>
-          </article>
-          <article>
-            <span>Trajetória de redução</span>
-            <strong>
-              {packProjection?.reductionPlanStopsBeforeDepletion
-                ? 'Stock excedente'
-                : formatDateKey(packProjection?.reductionPlanDepletionDate)}
-            </strong>
-            <small>
-              {packProjection?.reductionPlanDays !== null && packProjection?.reductionPlanDays !== undefined
-                ? `≈ ${packProjection.reductionPlanDays} dias seguindo a meta pessoal`
-                : packProjection?.reductionPlanStopsBeforeDepletion
-                  ? 'a meta matemática chega a 0 antes de o stock acabar'
-                  : 'Sem projeção disponível'}
-            </small>
-          </article>
-        </div>
-
-        <p className="stickForecastRule">
-          <strong>Regra:</strong> estas datas são projeções matemáticas do stock, não recomendações de consumo.
-          O stock exato vem do ledger; a data muda sempre que registas uma utilização, reposição ou correção.
-        </p>
-      </section>
-
-      {nicotineSettings && reductionPlan ? (
-        <section className="stickReductionCompact" aria-labelledby="stick-reduction-title">
-          <div className="stickReductionCompactHeading">
-            <div>
-              <span className="stockPanelTag">REDUÇÃO PESSOAL</span>
-              <h2 id="stick-reduction-title">Plano atual</h2>
-            </div>
-            <span className="nicotineReductionBadge">META PESSOAL</span>
-          </div>
-          <div className="stickReductionCompactGrid">
-            <article><span>Hoje</span><strong>{reductionPlan.consumedToday}</strong><small>sticks registados</small></article>
-            <article><span>Meta da semana</span><strong>{reductionPlan.targetToday}/dia</strong><small>não é limite seguro</small></article>
-            <article><span>Situação</span><strong>{reductionStatus}</strong><small>comparação com a meta</small></article>
-            <article><span>Tendência</span><strong className={trendValue > 0 ? 'nicotineTrendUp' : trendValue < 0 ? 'nicotineTrendDown' : ''}>{trendText}</strong><small>vs. 7 dias anteriores</small></article>
-          </div>
-          <div className="stickReductionSettings">
-            <label className="nicotinePlanToggle">
-              <input
-                type="checkbox"
-                checked={nicotineSettings.reductionPlanEnabled}
-                onChange={(event) => updateNicotineSetting('reductionPlanEnabled', event.target.checked)}
-              />
-              Plano automático ativo
-            </label>
+          <div className="sticksSetupEquation">
             <label>
-              Linha de base
+              Maços
+              <input
+                type="number"
+                inputMode="numeric"
+                min="0"
+                max="10000"
+                value={packSettings.packCount}
+                onChange={(event) => setPackSettings((current) => ({
+                  ...current,
+                  packCount: Number(event.target.value),
+                }))}
+              />
+            </label>
+            <span aria-hidden="true">×</span>
+            <label>
+              Sticks por maço
               <input
                 type="number"
                 inputMode="numeric"
                 min="1"
-                max="200"
-                value={nicotineSettings.dailyBaselineSticks}
-                onChange={(event) => updateNicotineSetting('dailyBaselineSticks', Number(event.target.value))}
+                max="1000"
+                value={packSettings.sticksPerPack}
+                onChange={(event) => setPackSettings((current) => ({
+                  ...current,
+                  sticksPerPack: Number(event.target.value),
+                }))}
               />
             </label>
-            <label>
-              Redução semanal
-              <input
-                type="number"
-                inputMode="numeric"
-                min="1"
-                max="50"
-                value={nicotineSettings.weeklyReductionStep}
-                onChange={(event) => updateNicotineSetting('weeklyReductionStep', Number(event.target.value))}
-              />
-            </label>
-            <label>
-              Início
-              <input
-                type="date"
-                value={nicotineSettings.reductionPlanStartDate}
-                onChange={(event) => updateNicotineSetting('reductionPlanStartDate', event.target.value)}
-              />
-            </label>
+            <span aria-hidden="true">=</span>
+            <strong>{Number.isFinite(configuredTotal) ? configuredTotal : '—'} sticks</strong>
           </div>
-          <span className="nicotineSaveState" role="status">
-            {nicotineSaveState || 'Alterações guardadas automaticamente.'}
-          </span>
+
+          <button
+            type="button"
+            className="stockPrimaryAction sticksPrimaryWide"
+            disabled={busy || !validPackConfiguration}
+            onClick={() => void run(
+              confirmInitialStock,
+              `Stock inicial confirmado: ${configuredTotal} sticks. O valor ficou registado no ledger.`,
+            )}
+          >
+            Confirmar stock inicial
+          </button>
+          <small className="sticksAutoSaveState">{packSaveState || 'A configuração dos maços é guardada automaticamente.'}</small>
         </section>
-      ) : null}
-
-      <details className="stickAdvancedDetails">
-        <summary>
-          <span>Nicotina e fontes</span>
-          <small>Estimativa separada da contagem exata de sticks</small>
-        </summary>
-        <section className="stockPanel nicotineAwarenessPanel" aria-labelledby="nicotine-awareness-title">
-          <div className="nicotineAwarenessHeading">
-            <div>
-              <span className="stockPanelTag">CONSCIÊNCIA DE NICOTINA</span>
-              <h2 id="nicotine-awareness-title">Nicotina estimada associada às utilizações</h2>
-            </div>
-            <span className="nicotineAwarenessBadge">ESTIMATIVA</span>
-          </div>
-
-          <div className="nicotineMetricGrid">
-            <article className="nicotineMetric">
+      ) : (
+        <>
+          <section className="sticksCoreSummary" aria-label="Resumo do stock de sticks">
+            <article>
+              <span>Stock exato</span>
+              <strong>{summary.stock}</strong>
+              <small>sticks reconstruídos pelo ledger</small>
+            </article>
+            <article>
+              <span>Em maços</span>
+              <strong>
+                {packProjection?.currentPackStarted
+                  ? `${packProjection.sealedPacksRemaining ?? 0} fechados + ${packProjection.currentPackRemaining ?? 0} sticks`
+                  : `${packProjection?.sealedPacksRemaining ?? 0} maços fechados`}
+              </strong>
+              <small>{packSettings.sticksPerPack} sticks por maço</small>
+            </article>
+            <article>
               <span>Hoje</span>
-              <strong>{nicotineAmount(nicotineSummary?.today.minMg, nicotineSummary?.today.maxMg)}</strong>
-              <small>{nicotineSummary?.today.sticks ?? 0} sticks registados</small>
+              <strong>{summary.usedToday ?? 0}</strong>
+              <small>utilizações líquidas após correções</small>
             </article>
-            <article className="nicotineMetric">
-              <span>Últimos 7 dias</span>
-              <strong>{nicotineAmount(nicotineSummary?.last7Days.minMg, nicotineSummary?.last7Days.maxMg)}</strong>
-              <small>{nicotineSummary?.last7Days.sticks ?? 0} sticks registados</small>
-            </article>
-            <article className="nicotineMetric">
-              <span>Total registado</span>
-              <strong>{nicotineAmount(nicotineSummary?.allTime.minMg, nicotineSummary?.allTime.maxMg)}</strong>
-              <small>{nicotineSummary?.allTime.sticks ?? 0} sticks líquidos após correções</small>
-            </article>
-          </div>
-
-          {nicotineSettings ? (
-            <>
-              <div className="nicotineSettingsGrid">
-                <label>
-                  Perfil do stick
-                  <select
-                    value={nicotineSettings.profileId}
-                    onChange={(event) => updateNicotineSetting('profileId', event.target.value as NicotineProfileId)}
-                  >
-                    {NICOTINE_REFERENCE_PROFILES.map((profile) => (
-                      <option value={profile.id} key={profile.id}>{profile.label}</option>
-                    ))}
-                    <option value="custom">Personalizado — usar valor confirmado</option>
-                  </select>
-                </label>
-
-                <div className="nicotineSourceBox">
-                  <strong>{nicotineSummary?.profileLabel ?? 'A carregar referência…'}</strong>
-                  <p>{nicotineSummary?.evidenceNote}</p>
-                  {nicotineSummary?.sourceUrl ? (
-                    <a href={nicotineSummary.sourceUrl} target="_blank" rel="noreferrer">Abrir fonte científica</a>
-                  ) : null}
-                </div>
-
-                {nicotineSettings.profileId === 'custom' ? (
-                  <div className="nicotineCustomRange">
-                    <label>
-                      Nicotina mínima por stick (mg)
-                      <input
-                        inputMode="decimal"
-                        value={nicotineSettings.customMinMg}
-                        onChange={(event) => updateNicotineSetting('customMinMg', event.target.value)}
-                      />
-                    </label>
-                    <label>
-                      Nicotina máxima por stick (mg)
-                      <input
-                        inputMode="decimal"
-                        value={nicotineSettings.customMaxMg}
-                        onChange={(event) => updateNicotineSetting('customMaxMg', event.target.value)}
-                      />
-                    </label>
-                  </div>
-                ) : null}
-              </div>
-
-              <label className="nicotineNotesLabel">
-                Notas sobre o produto / referência utilizada
-                <textarea
-                  maxLength={4000}
-                  placeholder="Ex.: variante do produto; confirmar valor da embalagem ou laboratório."
-                  value={nicotineSettings.notes}
-                  onChange={(event) => updateNicotineSetting('notes', event.target.value)}
-                />
-              </label>
-            </>
-          ) : null}
-
-          <p className="nicotineWarning">
-            <strong>Importante:</strong> mg por stick medidos em máquina não equivalem à dose absorvida pelo organismo.
-            A aplicação mantém esta informação como estimativa de emissão, nunca como dose corporal exata.
-          </p>
-          <p className="nicotineWhoNote">
-            A OMS refere que todas as formas de tabaco são nocivas, que não existe nível seguro de exposição ao tabaco e que a nicotina é altamente aditiva.{' '}
-            <a href="https://www.who.int/en/news-room/fact-sheets/detail/tobacco" target="_blank" rel="noreferrer">Consultar OMS</a>.
-          </p>
-        </section>
-      </details>
-
-      <details className="stickAdvancedDetails">
-        <summary>
-          <span>Stock, reposições e contagem física</span>
-          <small>Ferramentas de correção e conferência</small>
-        </summary>
-        <div className="stockTwoPanels stickAdvancedPanelGrid">
-          <section className="stockPanel">
-            <span className="stockPanelTag">REPOSIÇÃO MANUAL</span>
-            <h2>Adicionar sticks avulsos</h2>
-            <div className="stockInlineForm stockInlineFormStack">
-              <label>
-                Sticks a adicionar
-                <input inputMode="numeric" value={quantity} onChange={(event) => setQuantity(event.target.value)} />
-              </label>
-              <button
-                type="button"
-                disabled={busy || !summary?.initialized || !canSubmitQuantity}
-                onClick={() => void run(
-                  () => personalStockService.restockSticks(parsedQuantity, operationId()),
-                  'Reposição adicionada ao ledger.',
-                )}
-              >
-                Adicionar
-              </button>
-            </div>
-            <div className="stockCorrectionActions">
-              <button
-                type="button"
-                className="stockSecondaryAction"
-                disabled={busy || !summary?.initialized}
-                onClick={() => void run(
-                  () => stockReconciliationService.undoLastStickRestock(operationId()),
-                  'Última reposição corrigida através de um novo movimento auditável.',
-                )}
-              >
-                Corrigir última reposição
-              </button>
-            </div>
           </section>
 
-          <section className="stockPanel stockPhysicalPanel">
-            <span className="stockPanelTag">CONFERÊNCIA REAL</span>
-            <h2>Contagem física</h2>
-            <p>Se a quantidade física for diferente do ledger, é criado um movimento corretivo. O histórico anterior permanece.</p>
-            <div className="stockInlineForm stockInlineFormStack stockPhysicalInline">
-              <label>
-                Quantidade contada
-                <input
-                  inputMode="numeric"
-                  placeholder="ex.: 240"
-                  value={physicalQuantity}
-                  onChange={(event) => setPhysicalQuantity(event.target.value)}
-                />
-              </label>
+          <section className="sticksRegisterCard" aria-labelledby="sticks-register-title">
+            <div>
+              <span className="stockPanelTag">PASSO 2 · REGISTAR</span>
+              <h2 id="sticks-register-title">Utilização</h2>
+              <p>Cada registo retira exatamente 1 stick. Corrigir cria um novo movimento e preserva o original.</p>
+            </div>
+            <div className="sticksRegisterActions">
               <button
                 type="button"
                 className="stockPrimaryAction"
-                disabled={busy || !summary?.initialized || !canSubmitPhysical}
+                disabled={busy || (summary.stock ?? 0) <= 0}
                 onClick={() => void run(
-                  async () => {
-                    await stockReconciliationService.reconcileSticksPhysicalCount(physicalQuantity, operationId())
-                    setPhysicalQuantity('')
-                  },
-                  'Contagem física guardada e ledger reconciliado.',
+                  () => personalStockService.consumeStick(operationId()),
+                  '1 stick registado. Stock e cálculos atualizados.',
                 )}
               >
-                Reconciliar contagem
+                Registar 1 stick
               </button>
+              {usageAnalytics?.recentEvents.length ? (
+                <button
+                  type="button"
+                  className="stockSecondaryAction"
+                  disabled={busy}
+                  onClick={() => void run(
+                    () => personalStockService.undoLastStick(operationId()),
+                    'Último registo corrigido. O movimento original permanece no histórico.',
+                  )}
+                >
+                  Corrigir último registo
+                </button>
+              ) : null}
             </div>
-
-            {physicalCheck ? (
-              <>
-                <div className="stockPhysicalGrid" aria-label="Última conferência física">
-                  <div className="stockPhysicalMetric"><span>Calculado antes</span><strong>{physicalCheck.expected}</strong></div>
-                  <div className="stockPhysicalMetric"><span>Contado</span><strong>{physicalCheck.counted}</strong></div>
-                  <div className="stockPhysicalMetric">
-                    <span>Ajuste aplicado</span>
-                    <strong className={adjustmentClass(physicalCheck.adjustment)}>{signed(physicalCheck.adjustment)}</strong>
-                  </div>
-                </div>
-                <p className="stockPhysicalCheckTime">Verificado em {formatPhysicalCheckTime(physicalCheck.checkedAt)}.</p>
-              </>
-            ) : null}
           </section>
-        </div>
-      </details>
 
-      <details className="stickAdvancedDetails">
-        <summary>
-          <span>Histórico auditável</span>
-          <small>{summary?.movementCount ?? 0} movimentos · {summary?.ok ? 'integridade OK' : 'verificar integridade'}</small>
-        </summary>
-        <section className="stockPanel">
-          <div className="stockPanelHeading">
-            <div>
-              <span className="stockPanelTag">LEDGER</span>
-              <h2>Histórico de movimentos</h2>
+          <section className="sticksCurrentPackCard" aria-labelledby="current-pack-title">
+            <div className="sticksSectionHeading">
+              <div>
+                <span className="stockPanelTag">MAÇO</span>
+                <h2 id="current-pack-title">{displayedPackLabel}</h2>
+              </div>
+              <strong>{displayedPackRemaining}/{packSettings.sticksPerPack}</strong>
             </div>
-            <span className={summary?.ok ? 'stockStatusOk' : 'stockStatusError'}>{summary?.ok ? 'OK' : 'VERIFICAR'}</span>
-          </div>
+            <div className="sticksProgressTrack" aria-label="Proporção restante no maço apresentado">
+              <span style={{ width: `${packProjection?.currentPackPercentRemaining ?? 0}%` }} />
+            </div>
+            <div className="sticksInlineFacts">
+              <span>Maços fechados: <strong>{packProjection?.sealedPacksRemaining ?? 0}</strong></span>
+              <span>Stock total: <strong>{summary.stock} sticks</strong></span>
+            </div>
+          </section>
 
-          {movements.length ? (
+          <section className="sticksNicotineCard" aria-labelledby="nicotine-title">
+            <div className="sticksSectionHeading">
+              <div>
+                <span className="stockPanelTag">PASSO 3 · NICOTINA</span>
+                <h2 id="nicotine-title">Quanto está associado a cada stick</h2>
+              </div>
+              <span className="sticksEstimateBadge">MEDIÇÃO LABORATORIAL</span>
+            </div>
+
+            <label className="sticksProductSelect">
+              Variante veo
+              <select
+                value={nicotineSettings.profileId}
+                onChange={(event) => updateNicotineSetting('profileId', event.target.value as NicotineProfileId)}
+              >
+                <option value="unselected">Selecionar variante — não assumir valor</option>
+                {NICOTINE_REFERENCE_PROFILES.map((profile) => (
+                  <option value={profile.id} key={profile.id}>{profile.label}</option>
+                ))}
+                <option value="custom-lab">Outro veo — valor laboratorial documentado</option>
+              </select>
+            </label>
+
+            {nicotineSettings.profileId === 'custom-lab' ? (
+              <div className="sticksCustomNicotineGrid">
+                <label>
+                  Conteúdo total médio por stick (mg)
+                  <input
+                    inputMode="decimal"
+                    value={nicotineSettings.customContentMeanMg}
+                    onChange={(event) => updateNicotineSetting('customContentMeanMg', event.target.value)}
+                  />
+                </label>
+                <label>
+                  Emissão média por stick (mg)
+                  <input
+                    inputMode="decimal"
+                    value={nicotineSettings.customEmissionMeanMg}
+                    onChange={(event) => updateNicotineSetting('customEmissionMeanMg', event.target.value)}
+                  />
+                </label>
+                <label className="sticksCustomSource">
+                  Fonte laboratorial
+                  <input
+                    value={nicotineSettings.customSourceLabel}
+                    onChange={(event) => updateNicotineSetting('customSourceLabel', event.target.value)}
+                    placeholder="Laboratório, relatório ou referência"
+                  />
+                </label>
+              </div>
+            ) : null}
+
+            <div className="sticksNicotinePerStick">
+              <article>
+                <span>Conteúdo total no stick</span>
+                <strong>{mgLabel(nicotineSummary?.contentPerStickMeanMg, nicotineSummary?.contentPerStickSdMg)}</strong>
+                <small>média laboratorial ± desvio-padrão, quando publicado</small>
+              </article>
+              <article>
+                <span>Emissão por stick no ensaio</span>
+                <strong>{mgLabel(nicotineSummary?.emissionPerStickMeanMg, nicotineSummary?.emissionPerStickSdMg)}</strong>
+                <small>valor de máquina; não é dose absorvida</small>
+              </article>
+              <article className="sticksNoBodyDose">
+                <span>Dose absorvida pelo organismo</span>
+                <strong>Não calculável com exatidão</strong>
+                <small>depende do padrão real de utilização e não pode ser inferida destes números</small>
+              </article>
+            </div>
+
+            {nicotineSummary?.selected ? (
+              <div className="sticksNicotineTotals">
+                <article>
+                  <span>Hoje · {nicotineSummary.today.sticks} sticks</span>
+                  <strong>{localDecimal(nicotineSummary.today.emissionLabMeanMg)} mg</strong>
+                  <small>equivalente da média de emissão laboratorial</small>
+                </article>
+                <article>
+                  <span>Últimos 7 dias · {nicotineSummary.last7Days.sticks} sticks</span>
+                  <strong>{localDecimal(nicotineSummary.last7Days.emissionLabMeanMg)} mg</strong>
+                  <small>equivalente da média de emissão laboratorial</small>
+                </article>
+                <article>
+                  <span>Total registado · {nicotineSummary.allTime.sticks} sticks</span>
+                  <strong>{localDecimal(nicotineSummary.allTime.emissionLabMeanMg)} mg</strong>
+                  <small>equivalente da média de emissão laboratorial</small>
+                </article>
+              </div>
+            ) : (
+              <p className="sticksNoAssumption">
+                Seleciona a variante estudada que corresponde ao teu produto. Até lá, a aplicação conta sticks mas não calcula nicotina.
+              </p>
+            )}
+
+            <div className="sticksEvidenceBox">
+              <strong>{nicotineSummary?.profileLabel}</strong>
+              <p>{nicotineSummary?.evidenceNote}</p>
+              <p>{nicotineSummary?.calculationStatement}</p>
+              <p><strong>Absorção:</strong> {nicotineSummary?.absorptionStatement}</p>
+              <div className="sticksEvidenceLinks">
+                {nicotineSummary?.sourceUrl ? (
+                  <a href={nicotineSummary.sourceUrl} target="_blank" rel="noreferrer">Estudo científico</a>
+                ) : null}
+                {nicotineSummary?.manufacturerUrl ? (
+                  <a href={nicotineSummary.manufacturerUrl} target="_blank" rel="noreferrer">Informação oficial glo/BAT</a>
+                ) : null}
+              </div>
+            </div>
+
+            <label className="sticksNicotineNotes">
+              Nota do produto
+              <textarea
+                maxLength={4000}
+                value={nicotineSettings.notes}
+                onChange={(event) => updateNicotineSetting('notes', event.target.value)}
+                placeholder="Ex.: sabor, lote ou informação da embalagem"
+              />
+            </label>
+            <small className="sticksAutoSaveState">{nicotineSaveState || 'Configuração e notas guardadas automaticamente.'}</small>
+          </section>
+
+          <section className="sticksDurationCard" aria-labelledby="duration-title">
+            <div className="sticksSectionHeading">
+              <div>
+                <span className="stockPanelTag">PASSO 4 · DURAÇÃO</span>
+                <h2 id="duration-title">Até quando o stock pode durar</h2>
+              </div>
+              <span className="sticksEstimateBadge">ESTIMATIVA</span>
+            </div>
+
+            {packProjection?.historicalReliable ? (
+              <div className="sticksDurationGrid">
+                <article>
+                  <span>Ritmo observado</span>
+                  <strong>{localDecimal(packProjection.historicalDailyAverage)} sticks/dia</strong>
+                  <small>{packProjection.historicalCoverageDays} dias de histórico usados</small>
+                </article>
+                <article>
+                  <span>Maço atual / próximo</span>
+                  <strong>{formatDateKey(packProjection.currentPackHistoricalDepletionDate)}</strong>
+                  <small>≈ {localDecimal(packProjection.currentPackHistoricalDays)} dias</small>
+                </article>
+                <article>
+                  <span>Stock total</span>
+                  <strong>{formatDateKey(packProjection.historicalDepletionDate)}</strong>
+                  <small>≈ {localDecimal(packProjection.historicalDays)} dias</small>
+                </article>
+              </div>
+            ) : (
+              <p className="sticksNoAssumption">
+                A aplicação não inventa uma média. A previsão só aparece depois de pelo menos 3 dias de utilizações registadas.
+                Histórico atual: {packProjection?.historicalCoverageDays ?? 0}/3 dias.
+              </p>
+            )}
+            <p className="sticksEstimateRule">
+              A data é uma projeção matemática do stock com base no teu ritmo observado. Não é uma recomendação de quantos sticks utilizar.
+            </p>
+          </section>
+
+          <section className="sticksPatternCard" aria-labelledby="pattern-title">
+            <div>
+              <span className="stockPanelTag">HISTÓRICO ÚTIL</span>
+              <h2 id="pattern-title">Padrão registado</h2>
+              <p>Horários e intervalos vêm diretamente dos movimentos guardados.</p>
+            </div>
+
+            <div className="sticksPatternMetrics">
+              <article>
+                <span>Último registo</span>
+                <strong>{formatTime(usageAnalytics?.lastUseAt)}</strong>
+                <small>{usageAnalytics?.lastUseAt ? `há ${durationLabel(usageAnalytics.minutesSinceLastUse)}` : 'sem registos'}</small>
+              </article>
+              <article>
+                <span>Intervalo médio hoje</span>
+                <strong>{durationLabel(usageAnalytics?.averageIntervalMinutesToday)}</strong>
+                <small>{usageAnalytics?.todayCount ?? 0} utilização(ões)</small>
+              </article>
+              <article>
+                <span>Últimos 7 dias</span>
+                <strong>{usageAnalytics?.last7Total ?? 0}</strong>
+                <small>anterior: {usageAnalytics?.previous7Total ?? 0}</small>
+              </article>
+            </div>
+
+            <div className="sticksWeekBars">
+              {usageAnalytics?.last7Days.map((item) => (
+                <div className="sticksWeekBarRow" key={item.date}>
+                  <span>{formatUsageDay(item.date)}</span>
+                  <div><i style={{ width: `${Math.round((item.count / maxDailyUsage) * 100)}%` }} /></div>
+                  <strong>{item.count}</strong>
+                </div>
+              ))}
+            </div>
+
+            <details className="sticksSimpleDetails">
+              <summary>Ver horários recentes</summary>
+              <div className="sticksRecentList">
+                {usageAnalytics?.recentEvents.length ? usageAnalytics.recentEvents.map((event) => (
+                  <article key={event.id}>
+                    <strong>{formatTime(event.effectiveAt)}</strong>
+                    <span>{formatDateTime(event.effectiveAt)}</span>
+                    <small>{event.count} stick{event.count === 1 ? '' : 's'}</small>
+                  </article>
+                )) : <p className="stockEmpty">Ainda não existem utilizações registadas.</p>}
+              </div>
+            </details>
+          </section>
+
+          <details className="sticksSimpleDetails sticksAdjustments">
+            <summary>Stock e correções</summary>
+            <div className="sticksAdjustmentsBody">
+              <section>
+                <h3>Adicionar maços</h3>
+                <div className="sticksInlineForm">
+                  <label>
+                    Quantidade de maços
+                    <input
+                      inputMode="numeric"
+                      value={restockPacks}
+                      onChange={(event) => setRestockPacks(event.target.value)}
+                    />
+                  </label>
+                  <span>= {restockSticks || 0} sticks</span>
+                  <button
+                    type="button"
+                    disabled={busy || restockSticks <= 0}
+                    onClick={() => void run(addConfiguredPacks, `${restockPackCount} maço(s) adicionados ao stock.`)}
+                  >
+                    Adicionar ao stock
+                  </button>
+                </div>
+              </section>
+
+              <section>
+                <h3>Contagem física</h3>
+                <p>Usa apenas quando contares fisicamente o stock e encontrares uma diferença.</p>
+                <div className="sticksInlineForm">
+                  <label>
+                    Sticks contados
+                    <input
+                      inputMode="numeric"
+                      value={physicalQuantity}
+                      onChange={(event) => setPhysicalQuantity(event.target.value)}
+                    />
+                  </label>
+                  <button
+                    type="button"
+                    disabled={busy || !validPhysicalQuantity}
+                    onClick={() => void run(
+                      async () => {
+                        await stockReconciliationService.reconcileSticksPhysicalCount(physicalQuantity, operationId())
+                        setPhysicalQuantity('')
+                      },
+                      'Contagem física reconciliada sem apagar movimentos anteriores.',
+                    )}
+                  >
+                    Reconciliar
+                  </button>
+                </div>
+                {physicalCheck ? (
+                  <small>Última contagem: {physicalCheck.counted} sticks em {formatDateTime(physicalCheck.checkedAt)}.</small>
+                ) : null}
+              </section>
+
+              <section>
+                <h3>Configuração do maço</h3>
+                <div className="sticksInlineForm">
+                  <label>
+                    Sticks por maço
+                    <input
+                      type="number"
+                      inputMode="numeric"
+                      min="1"
+                      max="1000"
+                      value={packSettings.sticksPerPack}
+                      onChange={(event) => setPackSettings((current) => ({
+                        ...current,
+                        sticksPerPack: Number(event.target.value),
+                      }))}
+                    />
+                  </label>
+                </div>
+                <small>{packSaveState || 'Guardado automaticamente.'}</small>
+              </section>
+            </div>
+          </details>
+
+          <details className="sticksSimpleDetails">
+            <summary>Histórico auditável · {summary.movementCount} movimentos</summary>
             <div className="stockLedgerList">
               {movements.map((movement) => (
                 <article className="stockLedgerRow" key={movement.id}>
                   <div>
                     <strong>{movementLabel(movement)}</strong>
-                    <small>{new Date(movement.effectiveAt).toLocaleString('pt-PT')}</small>
+                    <small>{formatDateTime(movement.effectiveAt)}</small>
                   </div>
                   <div className="stockLedgerMath">
                     <span>{movement.balanceBeforeMinor}</span>
@@ -976,9 +764,14 @@ export function SticksStockPage() {
                 </article>
               ))}
             </div>
-          ) : <p className="stockEmpty">Ainda não existem movimentos.</p>}
-        </section>
-      </details>
+          </details>
+
+          <p className="sticksPersistenceNote">
+            <strong>Dados:</strong> stock, utilizações, correções, configuração do maço, variante veo e notas ficam guardados localmente e entram na cópia integral da aplicação.
+            O histórico normal não é apagado por uma correção. Para proteção contra perda do dispositivo ou limpeza total do navegador, mantém também uma cópia externa em “Mais”.
+          </p>
+        </>
+      )}
     </section>
   )
 }
