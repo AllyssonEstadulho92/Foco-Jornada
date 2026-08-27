@@ -10,6 +10,7 @@ import type { MedicationDataProtectionService } from '../../application/personal
 import type { MedicationDoseStatusService } from '../../application/personalStock/MedicationDoseStatusService'
 import type { NicotineAwarenessService } from '../../application/personalStock/NicotineAwarenessService'
 import type { PersonalStockService } from '../../application/personalStock/PersonalStockService'
+import type { StickPackPlannerService } from '../../application/personalStock/StickPackPlannerService'
 import type { StockReconciliationService } from '../../application/personalStock/StockReconciliationService'
 import type { SettingsRepository } from '../../application/settings/SettingsRepository'
 
@@ -25,6 +26,7 @@ export interface AppServices {
   medicationDataProtectionService?: MedicationDataProtectionService
   stockReconciliationService?: StockReconciliationService
   nicotineAwarenessService?: NicotineAwarenessService
+  stickPackPlannerService?: StickPackPlannerService
   backupService?: AppBackupService
 }
 
@@ -34,6 +36,7 @@ type RuntimeAppServices = AppServices & {
   medicationDataProtectionService: MedicationDataProtectionService
   stockReconciliationService: StockReconciliationService
   nicotineAwarenessService: NicotineAwarenessService
+  stickPackPlannerService: StickPackPlannerService
   backupService: AppBackupService
 }
 
