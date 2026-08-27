@@ -427,3 +427,89 @@
   .sticksRecentList article{grid-template-columns:60px minmax(0,1fr)}
   .sticksRecentList small{grid-column:2}
 }
+
+
+.sticksPackForecastComparison{
+  display:grid;
+  gap:10px;
+  padding-top:2px;
+}
+.sticksPackForecastHeading{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:baseline;
+}
+.sticksPackForecastHeading span{
+  color:var(--text-muted,#66706a);
+  font-size:.78rem;
+  text-align:right;
+}
+.sticksPackForecastTable{
+  display:grid;
+  border:1px solid var(--border-subtle,#dfe4df);
+  border-radius:13px;
+  overflow:hidden;
+}
+.sticksPackForecastHeader,
+.sticksPackForecastRow{
+  display:grid;
+  grid-template-columns:minmax(120px,1.1fr) minmax(64px,.55fr) minmax(100px,.85fr) minmax(130px,1fr);
+  gap:10px;
+  align-items:center;
+  padding:10px 12px;
+}
+.sticksPackForecastHeader{
+  background:var(--surface-soft,#f6f8f6);
+  color:var(--text-muted,#66706a);
+  font-size:.7rem;
+  font-weight:850;
+  text-transform:uppercase;
+  letter-spacing:.045em;
+}
+.sticksPackForecastRow{
+  border-top:1px solid var(--border-subtle,#e8ece8);
+  font-size:.84rem;
+}
+.sticksPackForecastRow.isCurrent{
+  background:#f1fbf4;
+}
+.sticksPackForecastRow>span:nth-child(2),
+.sticksPackForecastRow>span:nth-child(3){
+  color:var(--text-muted,#66706a);
+}
+.sticksPackForecastNote{
+  color:var(--text-muted,#66706a);
+  line-height:1.4;
+}
+[data-theme="dark"] .sticksPackForecastTable{
+  border-color:#29352f;
+}
+[data-theme="dark"] .sticksPackForecastHeader{
+  background:#151d19;
+}
+[data-theme="dark"] .sticksPackForecastRow{
+  border-color:#222e28;
+}
+[data-theme="dark"] .sticksPackForecastRow.isCurrent{
+  background:#12261a;
+}
+@media(max-width:620px){
+  .sticksPackForecastHeading{
+    display:grid;
+    grid-template-columns:1fr;
+  }
+  .sticksPackForecastHeading span{
+    text-align:left;
+  }
+  .sticksPackForecastHeader,
+  .sticksPackForecastRow{
+    grid-template-columns:minmax(92px,1fr) 50px 82px minmax(105px,1fr);
+    gap:7px;
+    padding:9px 10px;
+    font-size:.76rem;
+  }
+  .sticksPackForecastHeader{
+    font-size:.62rem;
+  }
+}
