@@ -1,0 +1,104 @@
+import { describe, expect, it } from 'vitest'
+import { AppDatabase } from '../../infrastructure/database/appDatabase'
+import { NicotineAwarenessService } from './NicotineAwarenessService'
+import { PersonalStockService } from './PersonalStockService'
+import { StickPackPlannerService } from './StickPackPlannerService'
+
+function operationId(): string {
+  return globalThis.crypto.randomUUID()
+}
+
+function makeDatabase(): AppDatabase {
+  return new AppDatabase(`foco-jornada-stick-pack-test-${operationId()}`)
+}
+
+async function configureReduction(db: AppDatabase) {
+  await new NicotineAwarenessService(db).saveSettings({
+    profileId: 'neo-published-range',
+    customMinMg: '0.460',
+    customMaxMg: '0.680',
+    notes: '',
+    reductionPlanEnabled: true,
+    dailyBaselineSticks: 13,
+    weeklyReductionStep: 1,
+    reductionPlanStartDate: '2026-08-27',
+  })
+}
+
+describe('StickPackPlannerService', () => {
+  it('represents 12 packs of 20 as exactly 240 sticks and forecasts the baseline deterministically', async () => {
+    const db = makeDatabase()
+    try {
+      const stock = new PersonalStockService(db)
+      const planner = new StickPackPlannerService(db)
+      await configureReduction(db)
+      await planner.saveSettings({ packCount: 12, sticksPerPack: 20 })
+      await stock.initializeSticks(240, operationId())
+
+      const projection = await planner.getProjection(new Date('2026-08-27T12:00:00Z'))
+
+      expect(projection.configuredTotalSticks).toBe(240)
+      expect(projection.currentStockSticks).toBe(240)
+      expect(projection.configuredMatchesCurrent).toBe(true)
+      expect(projection.fullPacksRemaining).toBe(12)
+      expect(projection.looseSticksRemaining).toBe(0)
+      expect(projection.packEquivalent).toBe('12.0')
+      expect(projection.baselineDailySticks).toBe(13)
+      expect(projection.baselineDays).toBe('18.5')
+      expect(projection.baselineDepletionDate).toBe('2026-09-14')
+      expect(projection.reductionPlanDays).toBe(22)
+      expect(projection.reductionPlanDepletionDate).toBe('2026-09-17')
+    } finally {
+      await db.delete()
+    }
+  })
+
+  it('keeps the exact pack equivalent synchronized with ledger consumption', async () => {
+    const db = makeDatabase()
+    try {
+      const stock = new PersonalStockService(db)
+      const planner = new StickPackPlannerService(db)
+      await configureReduction(db)
+      await planner.saveSettings({ packCount: 12, sticksPerPack: 20 })
+      await stock.initializeSticks(240, operationId())
+      await stock.consumeStick(operationId())
+
+      const projection = await planner.getProjection(new Date())
+
+      expect(projection.currentStockSticks).toBe(239)
+      expect(projection.fullPacksRemaining).toBe(11)
+      expect(projection.looseSticksRemaining).toBe(19)
+      expect(projection.configuredDifference).toBe(1)
+      expect(projection.configuredMatchesCurrent).toBe(false)
+      expect(projection.ledgerOk).toBe(true)
+    } finally {
+      await db.delete()
+    }
+  })
+
+  it('persists pack configuration in metadata so it is included in the normal backup', async () => {
+    const db = makeDatabase()
+    try {
+      const planner = new StickPackPlannerService(db)
+      await planner.saveSettings({ packCount: 12, sticksPerPack: 20 })
+
+      const restored = await planner.getSettings()
+      expect(restored.packCount).toBe(12)
+      expect(restored.sticksPerPack).toBe(20)
+      expect(await db.metadata.get('personal-stock:stick-pack-planner-v1')).toBeTruthy()
+    } finally {
+      await db.delete()
+    }
+  })
+
+  it('rejects impossible pack configurations instead of rounding them silently', async () => {
+    const db = makeDatabase()
+    try {
+      const planner = new StickPackPlannerService(db)
+      await expect(planner.saveSettings({ packCount: 12.5, sticksPerPack: 20 })).rejects.toThrow('maços')
+      await expect(planner.saveSettings({ packCount: 12, sticksPerPack: 0 })).rejects.toThrow('sticks por maço')
+    } finally {
+      await db.delete()
+    }
+  })
+})

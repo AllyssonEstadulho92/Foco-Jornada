@@ -3,6 +3,7 @@ import { AppDatabase } from '../../infrastructure/database/appDatabase'
 import { MedicationDataProtectionService } from '../personalStock/MedicationDataProtectionService'
 import { MedicationDoseStatusService } from '../personalStock/MedicationDoseStatusService'
 import { PersonalStockService } from '../personalStock/PersonalStockService'
+import { StickPackPlannerService } from '../personalStock/StickPackPlannerService'
 import { AppBackupService, BACKUP_APP_VERSION, BACKUP_FORMAT } from './AppBackupService'
 
 function operationId(): string {
@@ -199,6 +200,27 @@ describe('AppBackupService', () => {
       expect((await db.medicationDoseEvents.where('medicationId').equals(medicationId).toArray())).toHaveLength(1)
       expect(await protection.getProtectedNote(medicationId)).toBe('Nota criada depois da cópia antiga.')
       expect((await stock.getMedicationSummary(medicationId)).stock).toBe('11')
+    } finally {
+      await db.delete()
+    }
+  })
+
+
+  it('preserva a configuração atual de maços ao restaurar uma cópia integral mais antiga', async () => {
+    const db = makeDatabase()
+    try {
+      const backup = new AppBackupService(db)
+      const olderBackup = await backup.exportText()
+
+      const planner = new StickPackPlannerService(db)
+      await planner.saveSettings({ packCount: 12, sticksPerPack: 20 })
+
+      await backup.restoreFromText(olderBackup)
+
+      const restored = await planner.getSettings()
+      expect(restored.packCount).toBe(12)
+      expect(restored.sticksPerPack).toBe(20)
+      expect(await db.metadata.get('personal-stock:stick-pack-planner-v1')).toBeTruthy()
     } finally {
       await db.delete()
     }

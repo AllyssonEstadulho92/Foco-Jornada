@@ -5,6 +5,7 @@ import { MedicationDataProtectionService } from './application/personalStock/Med
 import { MedicationDoseStatusService } from './application/personalStock/MedicationDoseStatusService'
 import { NicotineAwarenessService } from './application/personalStock/NicotineAwarenessService'
 import { OperationalPersonalStockService } from './application/personalStock/OperationalPersonalStockService'
+import { StickPackPlannerService } from './application/personalStock/StickPackPlannerService'
 import { StockReconciliationService } from './application/personalStock/StockReconciliationService'
 import { db } from './infrastructure/database/appDatabase'
 import { DexieActivityRepository } from './infrastructure/repositories/DexieActivityRepository'
@@ -61,6 +62,7 @@ import './styles/nicotine-awareness.css'
 import './styles/stock-integrity-console.css'
 import './styles/medication-protection.css'
 import './styles/medication-prototype-complete.css'
+import './styles/sticks-control-v2.css'
 
 const root = document.getElementById('root')
 if (!root) throw new Error('Elemento #root não encontrado.')
@@ -112,6 +114,7 @@ const services = {
   medicationDataProtectionService: new MedicationDataProtectionService(db),
   stockReconciliationService: new StockReconciliationService(db),
   nicotineAwarenessService: new NicotineAwarenessService(db),
+  stickPackPlannerService: new StickPackPlannerService(db),
   backupService: new AppBackupService(db),
 }
 
