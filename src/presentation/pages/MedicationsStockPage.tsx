@@ -423,10 +423,6 @@ export function MedicationsStockPage() {
           selectedId={selectedId}
           today={today}
           onSelect={setSelectedId}
-          onAddMedication={() => {
-            setShowCreate(true)
-            scrollToMedicationSection('medication-create-form')
-          }}
           onDataChanged={async () => {
             await loadList(selectedId ?? undefined)
             if (selectedId) await loadSelected(selectedId)
