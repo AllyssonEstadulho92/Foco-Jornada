@@ -416,3 +416,16 @@
   .medProtoInformationTab{grid-template-columns:1fr}
   .medProtoProtectionGrid{grid-template-columns:1fr}
 }
+
+
+.medProtoPassiveProtection{
+  display:grid;
+  gap:4px;
+  padding:12px 13px;
+  border:1px solid var(--border-subtle,#dfe4df);
+  border-radius:12px;
+  background:var(--surface-soft,#f6f8f6);
+}
+.medProtoPassiveProtection strong{color:var(--accent,#1d6f5f)}
+.medProtoPassiveProtection span{color:var(--text-muted,#66706a);line-height:1.4}
+[data-theme="dark"] .medProtoPassiveProtection{background:#151d19;border-color:#29352f}
