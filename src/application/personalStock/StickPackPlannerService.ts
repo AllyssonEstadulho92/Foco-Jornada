@@ -1,7 +1,6 @@
 import type { AppDatabase } from '../../infrastructure/database/appDatabase'
 import type { StockMovement } from '../../domain/personalStock/models'
 import { STICKS_ENTITY_ID, STOCK_TIMEZONE } from './PersonalStockService'
-import { NicotineAwarenessService, type NicotineAwarenessSettings } from './NicotineAwarenessService'
 import { addCalendarDays, dateKeyInZone } from './time'
 
 const SETTINGS_KEY = 'personal-stock:stick-pack-planner-v1'
@@ -28,22 +27,14 @@ export interface StickPackProjection {
   currentPackRemaining: number | null
   currentPackStarted: boolean
   currentPackPercentRemaining: number | null
-  currentPackBaselineDays: string | null
-  currentPackBaselineDepletionDate: string | null
-  currentPackHistoricalDays: string | null
-  currentPackHistoricalDepletionDate: string | null
   packEquivalent: string | null
-  baselineDailySticks: number
-  baselineDays: string | null
-  baselineDepletionDate: string | null
   historicalDailyAverage: string | null
   historicalCoverageDays: number
   historicalReliable: boolean
   historicalDays: string | null
   historicalDepletionDate: string | null
-  reductionPlanDays: number | null
-  reductionPlanDepletionDate: string | null
-  reductionPlanStopsBeforeDepletion: boolean
+  currentPackHistoricalDays: string | null
+  currentPackHistoricalDepletionDate: string | null
   usedToday: number
   last7DaysSticks: number
   ledgerOk: boolean
@@ -123,14 +114,6 @@ function dayDifference(from: string, to: string): number {
   return Math.floor((end - start) / 86_400_000)
 }
 
-function reductionTargetForDate(settings: NicotineAwarenessSettings, dateKey: string): number {
-  if (!settings.reductionPlanEnabled) return settings.dailyBaselineSticks
-  const elapsedDays = dayDifference(settings.reductionPlanStartDate, dateKey)
-  if (elapsedDays < 0) return settings.dailyBaselineSticks
-  const weekIndex = Math.floor(elapsedDays / 7)
-  return Math.max(0, settings.dailyBaselineSticks - settings.weeklyReductionStep * (weekIndex + 1))
-}
-
 function dateForRate(stock: number, dailyRate: number, today: string): { days: string; date: string } | null {
   if (stock <= 0) return { days: '0.0', date: today }
   if (!Number.isFinite(dailyRate) || dailyRate <= 0) return null
@@ -140,40 +123,6 @@ function dateForRate(stock: number, dailyRate: number, today: string): { days: s
     days: exactDays.toFixed(1),
     date: addCalendarDays(today, calendarDays - 1),
   }
-}
-
-function reductionForecast(
-  stock: number,
-  today: string,
-  consumedToday: number,
-  settings: NicotineAwarenessSettings,
-): { days: number | null; date: string | null; stopsBeforeDepletion: boolean } {
-  if (stock <= 0) return { days: 0, date: today, stopsBeforeDepletion: false }
-
-  let remaining = stock
-  for (let offset = 0; offset < 3_650; offset += 1) {
-    const dateKey = addCalendarDays(today, offset)
-    const target = reductionTargetForDate(settings, dateKey)
-    const projectedUse = offset === 0 ? Math.max(0, target - consumedToday) : target
-
-    if (projectedUse <= 0) {
-      if (settings.reductionPlanEnabled && target === 0) {
-        return { days: null, date: null, stopsBeforeDepletion: true }
-      }
-      continue
-    }
-
-    remaining -= projectedUse
-    if (remaining <= 0) {
-      return {
-        days: offset + 1,
-        date: dateKey,
-        stopsBeforeDepletion: false,
-      }
-    }
-  }
-
-  return { days: null, date: null, stopsBeforeDepletion: true }
 }
 
 export class StickPackPlannerService {
@@ -219,14 +168,17 @@ export class StickPackPlannerService {
   }
 
   async getProjection(now = new Date()): Promise<StickPackProjection> {
-    const [settings, movements, nicotineSettings] = await Promise.all([
+    const [settings, movements] = await Promise.all([
       this.getSettings(),
       this.db.stockMovements.where('entityId').equals(STICKS_ENTITY_ID).toArray(),
-      new NicotineAwarenessService(this.db).getSettings(),
     ])
 
     const reconstructed = reconstruct(movements)
-    const currentStockSticks = movements.length && reconstructed.ok ? safeNumber(reconstructed.balance) : movements.length ? null : null
+    const currentStockSticks = movements.length && reconstructed.ok
+      ? safeNumber(reconstructed.balance)
+      : movements.length
+        ? null
+        : null
     const consumed = netConsumed(movements)
     const today = dateKeyInZone(now, STOCK_TIMEZONE)
     const sevenDayStart = addCalendarDays(today, -6)
@@ -245,7 +197,6 @@ export class StickPackPlannerService {
 
     const currentStock = currentStockSticks
     const configuredTotalSticks = settings.packCount * settings.sticksPerPack
-    const usedTodayNumber = safeNumber(usedToday)
     const last7Number = safeNumber(last7)
     const historicalCoverageDays = firstObservedDay
       ? Math.min(7, Math.max(1, dayDifference(firstObservedDay, today) + 1))
@@ -265,32 +216,19 @@ export class StickPackPlannerService {
         : currentPackStarted
           ? looseSticksRemaining
           : 0
-    const sealedPacksRemaining = currentStock === null
-      ? null
-      : currentPackStarted
-        ? fullPacksRemaining
-        : fullPacksRemaining
+    const sealedPacksRemaining = currentStock === null ? null : fullPacksRemaining
     const currentPackForProjection = currentStock === null || currentStock <= 0
       ? 0
       : currentPackStarted
         ? currentPackRemaining ?? 0
         : Math.min(settings.sticksPerPack, currentStock)
 
-    const baselineForecast = currentStock === null
-      ? null
-      : dateForRate(currentStock, nicotineSettings.dailyBaselineSticks, today)
     const historicalForecast = currentStock === null || !historicalReliable
       ? null
       : dateForRate(currentStock, historicalDailyAverageNumber, today)
-    const currentPackBaselineForecast = currentStock === null
-      ? null
-      : dateForRate(currentPackForProjection, nicotineSettings.dailyBaselineSticks, today)
     const currentPackHistoricalForecast = currentStock === null || !historicalReliable
       ? null
       : dateForRate(currentPackForProjection, historicalDailyAverageNumber, today)
-    const reduction = currentStock === null
-      ? { days: null, date: null, stopsBeforeDepletion: false }
-      : reductionForecast(currentStock, today, usedTodayNumber, nicotineSettings)
 
     return {
       settings,
@@ -308,23 +246,15 @@ export class StickPackPlannerService {
         : currentPackForProjection <= 0
           ? 0
           : Math.round((currentPackForProjection / settings.sticksPerPack) * 100),
-      currentPackBaselineDays: currentPackBaselineForecast?.days ?? null,
-      currentPackBaselineDepletionDate: currentPackBaselineForecast?.date ?? null,
-      currentPackHistoricalDays: currentPackHistoricalForecast?.days ?? null,
-      currentPackHistoricalDepletionDate: currentPackHistoricalForecast?.date ?? null,
       packEquivalent: currentStock === null ? null : (currentStock / settings.sticksPerPack).toFixed(1),
-      baselineDailySticks: nicotineSettings.dailyBaselineSticks,
-      baselineDays: baselineForecast?.days ?? null,
-      baselineDepletionDate: baselineForecast?.date ?? null,
       historicalDailyAverage: historicalDailyAverageNumber > 0 ? historicalDailyAverageNumber.toFixed(1) : null,
       historicalCoverageDays,
       historicalReliable,
       historicalDays: historicalForecast?.days ?? null,
       historicalDepletionDate: historicalForecast?.date ?? null,
-      reductionPlanDays: reduction.days,
-      reductionPlanDepletionDate: reduction.date,
-      reductionPlanStopsBeforeDepletion: reduction.stopsBeforeDepletion,
-      usedToday: usedTodayNumber,
+      currentPackHistoricalDays: currentPackHistoricalForecast?.days ?? null,
+      currentPackHistoricalDepletionDate: currentPackHistoricalForecast?.date ?? null,
+      usedToday: safeNumber(usedToday),
       last7DaysSticks: last7Number,
       ledgerOk: reconstructed.ok,
     }
