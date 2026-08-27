@@ -453,3 +453,69 @@
     transition: none;
   }
 }
+
+
+.stockHubLinear{display:grid;gap:16px}
+.stockHubLinearGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.stockHubLinearCard{
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr) auto;
+  align-items:center;
+  gap:14px;
+  padding:16px;
+  border:1px solid var(--border-subtle,#dfe4df);
+  border-radius:18px;
+  background:var(--surface-elevated,#fff);
+  color:inherit;
+  text-decoration:none;
+}
+.stockHubLinearCard:hover{border-color:var(--accent,#1d6f5f)}
+.stockHubLinearIcon{
+  display:grid;
+  place-items:center;
+  width:50px;
+  height:50px;
+  border-radius:14px;
+  background:var(--surface-soft,#f0f6f1);
+  color:var(--accent,#1d6f5f)
+}
+.stockHubLinearIcon svg{width:28px;height:28px;fill:none;stroke:currentColor;stroke-width:1.8}
+.stockHubLinearCard>div{display:grid;gap:5px}
+.stockHubLinearCard>div>strong{font-size:1.12rem}
+.stockHubLinearCard p{margin:0;color:var(--text-muted,#66706a);line-height:1.4}
+.stockHubLinearCard small{color:var(--text-muted,#66706a)}
+.stockHubLinearCard>span:last-child{font-size:1.35rem;color:var(--text-muted,#66706a)}
+.stockHubLinearIntegrity{
+  display:grid;
+  grid-template-columns:auto 1fr;
+  gap:12px;
+  padding:14px;
+  border:1px solid var(--border-subtle,#dfe4df);
+  border-radius:15px;
+  background:var(--surface-soft,#f6f8f6)
+}
+.stockHubLinearShield{
+  display:grid;
+  place-items:center;
+  width:40px;
+  height:40px;
+  border-radius:12px;
+  background:#e2f5ea;
+  color:#16603a
+}
+.stockHubLinearShield svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8}
+.stockHubLinearIntegrity>div{display:grid;gap:4px}
+.stockHubLinearIntegrity p{margin:0;color:var(--text-muted,#66706a);line-height:1.4}
+.stockHubLinearIntegrity small{color:var(--text-muted,#66706a)}
+.stockHubLinearBackup{margin:0;color:var(--text-muted,#66706a)}
+.stockHubLinearBackup a{font-weight:750;color:var(--accent,#1d6f5f)}
+
+[data-theme="dark"] .stockHubLinearCard{background:#0f1512;border-color:#29352f}
+[data-theme="dark"] .stockHubLinearIcon{background:#151d19}
+[data-theme="dark"] .stockHubLinearIntegrity{background:#151d19;border-color:#29352f}
+[data-theme="dark"] .stockHubLinearShield{background:#173c2a;color:#9fe0b7}
+
+@media(max-width:700px){
+  .stockHubLinearGrid{grid-template-columns:1fr}
+  .stockHubLinearCard{padding:14px}
+}
