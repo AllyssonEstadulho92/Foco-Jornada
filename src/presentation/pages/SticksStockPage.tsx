@@ -303,6 +303,34 @@ export function SticksStockPage() {
 
   const maxDailyUsage = Math.max(1, ...(usageAnalytics?.last7Days.map((item) => item.count) ?? [1]))
 
+  const packTimelineRows = useMemo(() => {
+    if (!packProjection) return []
+
+    const completed = packProjection.packUsagePeriods
+      .filter((period) => period.status === 'completed')
+      .map((period) => ({
+        packNumber: period.packNumber,
+        status: 'completed' as const,
+        sticks: period.consumedSticks,
+        startValue: period.actualStartAt,
+        startExact: Boolean(period.actualStartAt),
+        endValue: period.actualEndAt,
+        endExact: Boolean(period.actualEndAt),
+      }))
+
+    const remaining = packProjection.packForecasts.map((forecast) => ({
+      packNumber: forecast.packNumber,
+      status: forecast.kind === 'current' ? 'current' as const : 'future' as const,
+      sticks: forecast.sticks,
+      startValue: forecast.actualStartAt ?? forecast.estimatedStartDate,
+      startExact: Boolean(forecast.actualStartAt),
+      endValue: forecast.estimatedDepletionDate,
+      endExact: false,
+    }))
+
+    return [...completed, ...remaining].sort((left, right) => left.packNumber - right.packNumber)
+  }, [packProjection])
+
   function updateNicotineSetting<K extends keyof NicotineAwarenessSettings>(
     key: K,
     value: NicotineAwarenessSettings[K],
@@ -624,65 +652,65 @@ export function SticksStockPage() {
               </p>
             )}
 
-            {packProjection?.packUsagePeriods.some((period) => period.status === 'completed') ? (
-              <div className="sticksPackActualHistory" aria-label="Datas reais dos maços concluídos">
+            {packProjection?.historicalReliable && packTimelineRows.length ? (
+              <div className="sticksPackForecastComparison" aria-label="Datas de início e fim de cada maço">
                 <div className="sticksPackForecastHeading">
-                  <strong>Datas reais registadas</strong>
-                  <span>Estas datas vêm das utilizações guardadas no ledger.</span>
+                  <strong>Calendário de cada maço</strong>
+                  <span>Datas já ocorridas são reais; datas futuras permanecem previsão até acontecerem.</span>
                 </div>
-                <div className="sticksPackActualList">
-                  {packProjection.packUsagePeriods
-                    .filter((period) => period.status === 'completed')
-                    .slice(-3)
-                    .reverse()
-                    .map((period) => (
-                      <article key={period.packNumber}>
-                        <strong>Maço {period.packNumber}</strong>
-                        <span>Começou: <b>{period.actualStartAt ? formatDateTime(period.actualStartAt) : 'não registado'}</b></span>
-                        <span>Acabou: <b>{formatDateTime(period.actualEndAt)}</b></span>
-                        <small>{period.actualStartAt ? 'INÍCIO E FIM REAIS' : 'FIM REAL · INÍCIO DESCONHECIDO'} · {period.consumedSticks} sticks</small>
-                      </article>
-                    ))}
-                </div>
-              </div>
-            ) : null}
-
-            {packProjection?.historicalReliable && packProjection.packForecasts.length ? (
-              <div className="sticksPackForecastComparison" aria-label="Comparação das datas de cada maço">
-                <div className="sticksPackForecastHeading">
-                  <strong>Início e fim de cada maço</strong>
-                  <span>Data real quando já aconteceu; previsão enquanto ainda é futura.</span>
-                </div>
-                <div className="sticksPackForecastTable" role="table" aria-label="Datas de início e fim dos maços">
+                <div className="sticksPackForecastTable" role="table" aria-label="Início e fim de cada maço">
                   <div className="sticksPackForecastHeader" role="row">
                     <span role="columnheader">Maço</span>
                     <span role="columnheader">Sticks</span>
-                    <span role="columnheader">Começa</span>
-                    <span role="columnheader">Acaba</span>
+                    <span role="columnheader">Início</span>
+                    <span role="columnheader">Fim</span>
                   </div>
-                  {packProjection.packForecasts.map((forecast) => (
+                  {packTimelineRows.map((row) => (
                     <div
-                      className={`sticksPackForecastRow${forecast.kind === 'current' ? ' isCurrent' : ''}`}
+                      className={`sticksPackForecastRow${row.status === 'current' ? ' isCurrent' : row.status === 'completed' ? ' isCompleted' : ''}`}
                       role="row"
-                      key={forecast.sequence}
+                      key={row.packNumber}
                     >
                       <strong role="cell">
-                        {forecast.kind === 'current' ? `Maço ${forecast.packNumber} · atual` : `Maço ${forecast.packNumber}`}
+                        Maço {row.packNumber}
+                        <small>
+                          {row.status === 'completed'
+                            ? 'CONCLUÍDO'
+                            : row.status === 'current'
+                              ? 'ATUAL'
+                              : 'FUTURO'}
+                        </small>
                       </strong>
-                      <span role="cell">{forecast.sticks}</span>
+                      <span role="cell">{row.sticks}</span>
                       <span role="cell">
-                        <b>{forecast.actualStartAt ? formatDateTime(forecast.actualStartAt) : formatDateKey(forecast.estimatedStartDate)}</b>
-                        <small>{forecast.actualStartAt ? 'REAL' : forecast.estimatedStartDate ? 'PREVISÃO' : 'NÃO REGISTADO'}</small>
+                        <b>
+                          {row.startExact
+                            ? formatDateTime(row.startValue)
+                            : row.startValue
+                              ? formatDateKey(row.startValue)
+                              : '—'}
+                        </b>
+                        <small>
+                          {row.startExact ? 'REAL · EXATO' : row.startValue ? 'PREVISÃO' : 'AINDA NÃO REGISTADO'}
+                        </small>
                       </span>
                       <span role="cell">
-                        <b>{formatDateKey(forecast.estimatedDepletionDate)}</b>
-                        <small>PREVISÃO</small>
+                        <b>
+                          {row.endExact
+                            ? formatDateTime(row.endValue)
+                            : row.endValue
+                              ? formatDateKey(row.endValue)
+                              : '—'}
+                        </b>
+                        <small>
+                          {row.endExact ? 'REAL · EXATO' : row.endValue ? 'PREVISÃO' : 'AINDA NÃO REGISTADO'}
+                        </small>
                       </span>
                     </div>
                   ))}
                 </div>
                 <small className="sticksPackForecastNote">
-                  O início e o fim tornam-se exatos quando acontecem e ficam comprovados pelos registos do ledger. Datas futuras continuam necessariamente como previsão e são recalculadas com o ritmo observado.
+                  Quando registas o primeiro stick de um maço, a data de início passa a REAL · EXATO. Quando registas o último stick desse maço, a data de fim também passa a REAL · EXATO e fica preservada no histórico. Uma data futura não pode ser exata sem acontecer; por isso continua marcada como PREVISÃO e é recalculada com o ritmo observado.
                 </small>
               </div>
             ) : null}

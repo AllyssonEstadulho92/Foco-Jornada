@@ -568,3 +568,21 @@
     grid-template-columns:1fr;
   }
 }
+
+
+.sticksPackForecastRow.isCompleted{
+  background:var(--surface-soft,#f6f8f6);
+}
+.sticksPackForecastRow>strong[role="cell"]{
+  display:grid;
+  gap:2px;
+}
+.sticksPackForecastRow>strong[role="cell"] small{
+  font-size:.62rem;
+  font-weight:850;
+  letter-spacing:.045em;
+  color:var(--text-muted,#66706a);
+}
+[data-theme="dark"] .sticksPackForecastRow.isCompleted{
+  background:#151d19;
+}
