@@ -260,7 +260,20 @@ export function SticksStockPage() {
 
   const currentPackText = packProjection?.currentStockSticks === null || packProjection?.currentStockSticks === undefined
     ? '—'
-    : `${packProjection.fullPacksRemaining ?? 0} maço(s) + ${packProjection.looseSticksRemaining ?? 0} stick(s)`
+    : packProjection.currentStockSticks === 0
+      ? '0 maços'
+      : packProjection.currentPackStarted
+        ? `${packProjection.sealedPacksRemaining ?? 0} fechado(s) + ${packProjection.currentPackRemaining ?? 0} no atual`
+        : `${packProjection.sealedPacksRemaining ?? 0} maço(s) fechado(s)`
+
+  const displayedPackRemaining = packProjection?.currentStockSticks
+    ? packProjection.currentPackStarted
+      ? packProjection.currentPackRemaining ?? 0
+      : Math.min(packSettings.sticksPerPack, packProjection.currentStockSticks)
+    : 0
+  const displayedPackLabel = packProjection?.currentStockSticks
+    ? packProjection.currentPackStarted ? 'Maço atual' : 'Próximo maço'
+    : 'Sem maço disponível'
 
   async function confirmConfiguredPhysicalStock() {
     const saved = await stickPackPlannerService.saveSettings({
@@ -416,6 +429,59 @@ export function SticksStockPage() {
         </span>
       </section>
 
+      <section className="stickCurrentPackPanel" aria-labelledby="stick-current-pack-title">
+        <div className="stickCurrentPackHeading">
+          <div>
+            <span className="stockPanelTag">MAÇO EM UTILIZAÇÃO</span>
+            <h2 id="stick-current-pack-title">{displayedPackLabel}</h2>
+          </div>
+          <span className="stickCurrentPackBadge">
+            {packProjection?.currentStockSticks
+              ? packProjection.currentPackStarted ? 'ABERTO' : 'FECHADO'
+              : 'SEM STOCK'}
+          </span>
+        </div>
+
+        <div className="stickCurrentPackBody">
+          <div className="stickCurrentPackCount">
+            <strong>{displayedPackRemaining}</strong>
+            <span>de {packSettings.sticksPerPack} sticks</span>
+          </div>
+          <div className="stickCurrentPackProgress" aria-label="Percentagem restante do maço apresentado">
+            <span style={{ width: `${packProjection?.currentPackPercentRemaining ?? 0}%` }} />
+          </div>
+          <div className="stickCurrentPackMeta">
+            <div>
+              <span>Maços fechados em reserva</span>
+              <strong>{packProjection?.sealedPacksRemaining ?? 0}</strong>
+            </div>
+            <div>
+              <span>Estimativa deste maço à linha de base</span>
+              <strong>{formatDateKey(packProjection?.currentPackBaselineDepletionDate)}</strong>
+              <small>
+                {packProjection?.currentPackBaselineDays
+                  ? `≈ ${localDecimal(packProjection.currentPackBaselineDays)} dias`
+                  : 'sem projeção'}
+              </small>
+            </div>
+            <div>
+              <span>Estimativa pelo ritmo observado</span>
+              <strong>{formatDateKey(packProjection?.currentPackHistoricalDepletionDate)}</strong>
+              <small>
+                {packProjection?.historicalReliable && packProjection.currentPackHistoricalDays
+                  ? `≈ ${localDecimal(packProjection.currentPackHistoricalDays)} dias`
+                  : `precisa de pelo menos 3 dias de histórico · atual: ${packProjection?.historicalCoverageDays ?? 0}`}
+              </small>
+            </div>
+          </div>
+        </div>
+
+        <p className="stickCurrentPackNote">
+          Esta previsão responde apenas a quanto tempo o stock do maço pode durar ao ritmo registado.
+          Não é uma indicação de quantos sticks utilizar.
+        </p>
+      </section>
+
       <section className="stickQuickUse" aria-labelledby="stick-use-title">
         <div>
           <span className="stockPanelTag">REGISTO RÁPIDO</span>
@@ -468,12 +534,12 @@ export function SticksStockPage() {
             </small>
           </article>
           <article>
-            <span>Média dos últimos 7 dias</span>
+            <span>Ritmo observado</span>
             <strong>{formatDateKey(packProjection?.historicalDepletionDate)}</strong>
             <small>
-              {packProjection?.historicalDailyAverage && packProjection?.historicalDays
-                ? `${localDecimal(packProjection.historicalDailyAverage)} sticks/dia · ≈ ${localDecimal(packProjection.historicalDays)} dias`
-                : 'Ainda sem histórico suficiente'}
+              {packProjection?.historicalReliable && packProjection.historicalDailyAverage && packProjection.historicalDays
+                ? `${localDecimal(packProjection.historicalDailyAverage)} sticks/dia · ${packProjection.historicalCoverageDays} dias observados · ≈ ${localDecimal(packProjection.historicalDays)} dias`
+                : `Ainda sem histórico suficiente (${packProjection?.historicalCoverageDays ?? 0}/3 dias mínimos)`}
             </small>
           </article>
           <article>
