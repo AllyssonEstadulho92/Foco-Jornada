@@ -15,11 +15,22 @@ export interface StickPackSettings {
   updatedAt: string
 }
 
+export interface StickPackUsagePeriod {
+  packNumber: number
+  consumedSticks: number
+  actualStartAt: string
+  actualEndAt: string | null
+  status: 'completed' | 'current'
+}
+
 export interface StickPackDepletionForecast {
   sequence: number
+  packNumber: number
   kind: 'current' | 'sealed'
   sticks: number
   cumulativeSticks: number
+  actualStartAt: string | null
+  estimatedStartDate: string | null
   estimatedDurationDays: string | null
   estimatedDepletionDate: string | null
 }
@@ -44,6 +55,7 @@ export interface StickPackProjection {
   historicalDepletionDate: string | null
   currentPackHistoricalDays: string | null
   currentPackHistoricalDepletionDate: string | null
+  packUsagePeriods: StickPackUsagePeriod[]
   packForecasts: StickPackDepletionForecast[]
   usedToday: number
   last7DaysSticks: number
@@ -94,7 +106,7 @@ function reconstruct(movements: StockMovement[]): { ok: boolean; balance: bigint
   return { ok: true, balance }
 }
 
-function netConsumed(movements: StockMovement[]): Array<{ effectiveAt: string; sticks: bigint }> {
+function netConsumed(movements: StockMovement[]): Array<{ effectiveAt: string; sticks: bigint; sequence: number }> {
   const corrections = new Map<string, bigint>()
   for (const movement of movements) {
     if (!movement.correctionOf) continue
@@ -104,11 +116,13 @@ function netConsumed(movements: StockMovement[]): Array<{ effectiveAt: string; s
     )
   }
 
-  return movements
+  return [...movements]
+    .sort(compareMovements)
     .filter((movement) => movement.type === 'consumption')
     .map((movement) => ({
       effectiveAt: movement.effectiveAt,
       sticks: -(BigInt(movement.quantityMinor) + (corrections.get(movement.id) ?? 0n)),
+      sequence: movement.sequence,
     }))
     .filter((entry) => entry.sticks > 0n)
 }
@@ -135,6 +149,62 @@ function dateForRate(stock: number, dailyRate: number, today: string): { days: s
   }
 }
 
+function buildPackUsagePeriods(
+  consumed: Array<{ effectiveAt: string; sticks: bigint; sequence: number }>,
+  sticksPerPack: number,
+): StickPackUsagePeriod[] {
+  if (!Number.isSafeInteger(sticksPerPack) || sticksPerPack <= 0) return []
+
+  const periods: StickPackUsagePeriod[] = []
+  let packNumber = 1
+  let consumedInPack = 0
+  let actualStartAt: string | null = null
+  let actualEndAt: string | null = null
+
+  for (const entry of consumed) {
+    let remaining = safeNumber(entry.sticks)
+    while (remaining > 0) {
+      if (consumedInPack === 0) actualStartAt = entry.effectiveAt
+      consumedInPack += 1
+      actualEndAt = entry.effectiveAt
+      remaining -= 1
+
+      if (consumedInPack === sticksPerPack) {
+        periods.push({
+          packNumber,
+          consumedSticks: consumedInPack,
+          actualStartAt: actualStartAt as string,
+          actualEndAt,
+          status: 'completed',
+        })
+        packNumber += 1
+        consumedInPack = 0
+        actualStartAt = null
+        actualEndAt = null
+      }
+    }
+  }
+
+  if (consumedInPack > 0 && actualStartAt) {
+    periods.push({
+      packNumber,
+      consumedSticks: consumedInPack,
+      actualStartAt,
+      actualEndAt: null,
+      status: 'current',
+    })
+  }
+
+  return periods
+}
+
+function dateForConsumptionIndex(index: number, dailyRate: number, today: string): string | null {
+  if (!Number.isSafeInteger(index) || index <= 0) return null
+  if (!Number.isFinite(dailyRate) || dailyRate <= 0) return null
+  const calendarDays = Math.max(1, Math.ceil(index / dailyRate))
+  return addCalendarDays(today, calendarDays - 1)
+}
+
 function buildPackForecasts(input: {
   currentStock: number | null
   sticksPerPack: number
@@ -143,6 +213,7 @@ function buildPackForecasts(input: {
   historicalReliable: boolean
   historicalDailyAverage: number
   today: string
+  packUsagePeriods: StickPackUsagePeriod[]
 }): StickPackDepletionForecast[] {
   if (input.currentStock === null || input.currentStock <= 0) return []
 
@@ -150,6 +221,9 @@ function buildPackForecasts(input: {
   let remaining = input.currentStock
   let cumulative = 0
   let sequence = 1
+  const currentUsagePeriod = input.packUsagePeriods.find((period) => period.status === 'current') ?? null
+  const completedPackCount = input.packUsagePeriods.filter((period) => period.status === 'completed').length
+  const firstPackNumber = currentUsagePeriod?.packNumber ?? completedPackCount + 1
 
   while (remaining > 0) {
     const sticks = sequence === 1 && input.currentPackStarted
@@ -158,18 +232,26 @@ function buildPackForecasts(input: {
 
     if (sticks <= 0) break
 
+    const cumulativeBefore = cumulative
     cumulative += sticks
     remaining -= sticks
 
+    const isCurrent = sequence === 1 && input.currentPackStarted
+    const estimatedStartDate = input.historicalReliable
+      ? dateForConsumptionIndex(cumulativeBefore + 1, input.historicalDailyAverage, input.today)
+      : null
     const endForecast = input.historicalReliable
       ? dateForRate(cumulative, input.historicalDailyAverage, input.today)
       : null
 
     forecasts.push({
       sequence,
-      kind: sequence === 1 && input.currentPackStarted ? 'current' : 'sealed',
+      packNumber: firstPackNumber + sequence - 1,
+      kind: isCurrent ? 'current' : 'sealed',
       sticks,
       cumulativeSticks: cumulative,
+      actualStartAt: isCurrent ? currentUsagePeriod?.actualStartAt ?? null : null,
+      estimatedStartDate,
       estimatedDurationDays: input.historicalReliable
         ? (sticks / input.historicalDailyAverage).toFixed(1)
         : null,
@@ -280,6 +362,8 @@ export class StickPackPlannerService {
         ? currentPackRemaining ?? 0
         : Math.min(settings.sticksPerPack, currentStock)
 
+    const packUsagePeriods = buildPackUsagePeriods(consumed, settings.sticksPerPack)
+
     const historicalForecast = currentStock === null || !historicalReliable
       ? null
       : dateForRate(currentStock, historicalDailyAverageNumber, today)
@@ -294,6 +378,7 @@ export class StickPackPlannerService {
       historicalReliable,
       historicalDailyAverage: historicalDailyAverageNumber,
       today,
+      packUsagePeriods,
     })
 
     return {
@@ -320,6 +405,7 @@ export class StickPackPlannerService {
       historicalDepletionDate: historicalForecast?.date ?? null,
       currentPackHistoricalDays: currentPackHistoricalForecast?.days ?? null,
       currentPackHistoricalDepletionDate: currentPackHistoricalForecast?.date ?? null,
+      packUsagePeriods,
       packForecasts,
       usedToday: safeNumber(usedToday),
       last7DaysSticks: last7Number,
