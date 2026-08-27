@@ -323,7 +323,7 @@ export function SticksStockPage() {
         <div className="stickPackSetupHeading">
           <div>
             <span className="stockPanelTag">STOCK EM MAÇOS</span>
-            <h2 id="stick-pack-title">12 maços × 20 sticks</h2>
+            <h2 id="stick-pack-title">{packSettings.packCount} maço(s) × {packSettings.sticksPerPack} sticks</h2>
             <p>Esta configuração fica guardada. Confirmar o stock cria ou reconcilia o ledger sem apagar movimentos anteriores.</p>
           </div>
           <span className={packProjection?.configuredMatchesCurrent ? 'stickPackBadge isOk' : 'stickPackBadge'}>
@@ -412,7 +412,7 @@ export function SticksStockPage() {
           </button>
         </div>
         <span className="stickPackSaveState" role="status">
-          {packSaveState || '12 maços de 20 correspondem exatamente a 240 sticks.'}
+          {packSaveState || `${packSettings.packCount} maço(s) de ${packSettings.sticksPerPack} correspondem a ${configuredPackTotal} sticks.`}
         </span>
       </section>
 
