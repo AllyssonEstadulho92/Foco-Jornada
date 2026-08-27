@@ -212,7 +212,7 @@ export function MedicationPrototypeWorkspace({
 
 
   return (
-    <section className="medProtoWorkspace" aria-labelledby="med-proto-title">
+    <section className="medProtoWorkspace" aria-label="Resumo e detalhes dos medicamentos">
       <div className="medProtoSummary">
         <article><strong>{dashboard.medicationCount}</strong><span>Medicamentos em uso</span></article>
         <article>
