@@ -202,3 +202,228 @@
   .stickUsageChartTitle{display:grid;grid-template-columns:1fr}
   .stickUsageTimelineRow{grid-template-columns:80px 58px minmax(0,1fr)}
 }
+
+
+/* Linear Veo control: primary workflow only. */
+.sticksLinearPage{display:grid;gap:16px}
+.sticksLinearHeader p{max-width:760px}
+.sticksSetupCard,
+.sticksRegisterCard,
+.sticksCurrentPackCard,
+.sticksNicotineCard,
+.sticksDurationCard,
+.sticksPatternCard{
+  display:grid;
+  gap:14px;
+  padding:16px;
+  border:1px solid var(--border-subtle,#dfe4df);
+  border-radius:18px;
+  background:var(--surface-elevated,#fff);
+}
+.sticksSetupCard h2,
+.sticksRegisterCard h2,
+.sticksCurrentPackCard h2,
+.sticksNicotineCard h2,
+.sticksDurationCard h2,
+.sticksPatternCard h2{margin:3px 0 5px}
+.sticksSetupCard p,
+.sticksRegisterCard p,
+.sticksPatternCard p{margin:0;color:var(--text-muted,#66706a);line-height:1.45}
+
+.sticksSetupEquation{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto minmax(0,1fr) auto minmax(140px,.8fr);
+  gap:10px;
+  align-items:end;
+}
+.sticksSetupEquation label,
+.sticksProductSelect,
+.sticksCustomNicotineGrid label,
+.sticksNicotineNotes,
+.sticksInlineForm label{
+  display:grid;
+  gap:6px;
+  font-size:.78rem;
+  font-weight:750;
+  color:var(--text-muted,#66706a);
+}
+.sticksSetupEquation input,
+.sticksProductSelect select,
+.sticksCustomNicotineGrid input,
+.sticksNicotineNotes textarea,
+.sticksInlineForm input{
+  width:100%;
+  box-sizing:border-box;
+  border:1px solid var(--border-subtle,#d8ded8);
+  border-radius:11px;
+  background:var(--surface,#fff);
+  color:inherit;
+  padding:10px 11px;
+  font:inherit;
+}
+.sticksSetupEquation>span{align-self:center;font-weight:850;color:var(--text-muted,#66706a)}
+.sticksSetupEquation>strong{
+  align-self:end;
+  padding:10px 12px;
+  border-radius:12px;
+  background:var(--surface-soft,#f6f8f6);
+}
+.sticksPrimaryWide{width:100%;min-height:48px}
+.sticksAutoSaveState{color:var(--text-muted,#66706a)}
+
+.sticksCoreSummary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.sticksCoreSummary article{
+  display:grid;gap:5px;padding:14px;border:1px solid var(--border-subtle,#dfe4df);border-radius:15px;background:var(--surface-soft,#f6f8f6)
+}
+.sticksCoreSummary span{font-size:.72rem;text-transform:uppercase;letter-spacing:.055em;font-weight:850;color:var(--text-muted,#66706a)}
+.sticksCoreSummary strong{font-size:1.35rem;line-height:1.18}
+.sticksCoreSummary small{color:var(--text-muted,#66706a);line-height:1.35}
+
+.sticksRegisterCard{grid-template-columns:minmax(0,1fr) minmax(240px,.8fr);align-items:center}
+.sticksRegisterActions{display:grid;gap:8px}
+.sticksRegisterActions button{min-height:48px}
+
+.sticksSectionHeading{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.sticksSectionHeading>strong{font-size:1.25rem}
+.sticksProgressTrack{height:12px;border-radius:999px;background:var(--surface-soft,#edf1ee);overflow:hidden}
+.sticksProgressTrack>span{display:block;height:100%;border-radius:inherit;background:#35a45e}
+.sticksInlineFacts{display:flex;gap:16px;flex-wrap:wrap;color:var(--text-muted,#66706a)}
+.sticksInlineFacts strong{color:var(--text-primary,inherit)}
+
+.sticksEstimateBadge{
+  display:inline-flex;align-items:center;border-radius:999px;padding:6px 9px;font-size:.68rem;font-weight:850;letter-spacing:.055em;
+  background:#eaf2ff;color:#2f5f91;white-space:nowrap
+}
+.sticksProductSelect select{min-height:44px}
+.sticksCustomNicotineGrid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.sticksCustomSource{grid-column:1/-1}
+.sticksNicotinePerStick,
+.sticksNicotineTotals,
+.sticksDurationGrid,
+.sticksPatternMetrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.sticksNicotinePerStick article,
+.sticksNicotineTotals article,
+.sticksDurationGrid article,
+.sticksPatternMetrics article{
+  display:grid;gap:5px;padding:13px;border:1px solid var(--border-subtle,#dfe4df);border-radius:13px;background:var(--surface-soft,#f6f8f6)
+}
+.sticksNicotinePerStick span,
+.sticksNicotineTotals span,
+.sticksDurationGrid span,
+.sticksPatternMetrics span{
+  font-size:.72rem;text-transform:uppercase;letter-spacing:.045em;font-weight:800;color:var(--text-muted,#66706a)
+}
+.sticksNicotinePerStick strong,
+.sticksNicotineTotals strong,
+.sticksDurationGrid strong,
+.sticksPatternMetrics strong{font-size:1.08rem;line-height:1.25}
+.sticksNicotinePerStick small,
+.sticksNicotineTotals small,
+.sticksDurationGrid small,
+.sticksPatternMetrics small{font-size:.72rem;line-height:1.35;color:var(--text-muted,#66706a)}
+.sticksNoBodyDose{border-style:dashed!important}
+.sticksNoAssumption{
+  margin:0;padding:11px 12px;border:1px solid #e4d8a7;border-radius:12px;background:#fffaf0;color:#5f542d;line-height:1.45
+}
+.sticksEvidenceBox{
+  display:grid;gap:6px;padding:13px;border:1px solid var(--border-subtle,#dfe4df);border-radius:13px
+}
+.sticksEvidenceBox p{margin:0;color:var(--text-muted,#66706a);line-height:1.45}
+.sticksEvidenceLinks{display:flex;gap:10px;flex-wrap:wrap}
+.sticksEvidenceLinks a{font-weight:750;color:var(--accent,#1d6f5f)}
+.sticksNicotineNotes textarea{min-height:86px;resize:vertical}
+.sticksEstimateRule{
+  margin:0;padding:10px 11px;border-radius:11px;background:var(--surface-soft,#f6f8f6);color:var(--text-muted,#66706a);line-height:1.45
+}
+
+.sticksWeekBars{display:grid;gap:7px}
+.sticksWeekBarRow{display:grid;grid-template-columns:62px minmax(0,1fr) 28px;gap:9px;align-items:center}
+.sticksWeekBarRow>span{font-size:.74rem;text-transform:capitalize;color:var(--text-muted,#66706a)}
+.sticksWeekBarRow>div{height:10px;border-radius:999px;background:var(--surface-soft,#edf1ee);overflow:hidden}
+.sticksWeekBarRow i{display:block;height:100%;border-radius:inherit;background:#35a45e}
+.sticksWeekBarRow strong{text-align:right;font-variant-numeric:tabular-nums}
+
+.sticksSimpleDetails{
+  border:1px solid var(--border-subtle,#dfe4df);
+  border-radius:15px;
+  background:var(--surface-elevated,#fff);
+  overflow:hidden;
+}
+.sticksSimpleDetails>summary{
+  cursor:pointer;
+  padding:13px 14px;
+  font-weight:800;
+  list-style:none;
+}
+.sticksSimpleDetails>summary::-webkit-details-marker{display:none}
+.sticksSimpleDetails>summary::after{content:'+';float:right;color:var(--text-muted,#66706a)}
+.sticksSimpleDetails[open]>summary::after{content:'−'}
+.sticksRecentList{display:grid;border-top:1px solid var(--border-subtle,#dfe4df)}
+.sticksRecentList article{
+  display:grid;grid-template-columns:70px minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 12px;border-top:1px solid var(--border-subtle,#edf0ed)
+}
+.sticksRecentList article:first-child{border-top:0}
+.sticksRecentList span,
+.sticksRecentList small{color:var(--text-muted,#66706a);font-size:.76rem}
+.sticksAdjustmentsBody{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:13px;border-top:1px solid var(--border-subtle,#dfe4df)}
+.sticksAdjustmentsBody section{display:grid;align-content:start;gap:9px;padding:12px;border-radius:12px;background:var(--surface-soft,#f6f8f6)}
+.sticksAdjustmentsBody h3{margin:0}
+.sticksAdjustmentsBody p{margin:0;color:var(--text-muted,#66706a);line-height:1.4}
+.sticksInlineForm{display:grid;gap:8px}
+.sticksInlineForm>span{color:var(--text-muted,#66706a);font-size:.8rem}
+.sticksPersistenceNote{
+  margin:0;padding:12px 13px;border:1px solid var(--border-subtle,#dfe4df);border-radius:12px;background:var(--surface-soft,#f6f8f6);color:var(--text-muted,#66706a);line-height:1.45
+}
+
+[data-theme="dark"] .sticksSetupCard,
+[data-theme="dark"] .sticksRegisterCard,
+[data-theme="dark"] .sticksCurrentPackCard,
+[data-theme="dark"] .sticksNicotineCard,
+[data-theme="dark"] .sticksDurationCard,
+[data-theme="dark"] .sticksPatternCard,
+[data-theme="dark"] .sticksSimpleDetails{background:#0f1512;border-color:#29352f}
+[data-theme="dark"] .sticksSetupEquation input,
+[data-theme="dark"] .sticksProductSelect select,
+[data-theme="dark"] .sticksCustomNicotineGrid input,
+[data-theme="dark"] .sticksNicotineNotes textarea,
+[data-theme="dark"] .sticksInlineForm input{background:#111915;border-color:#304039}
+[data-theme="dark"] .sticksCoreSummary article,
+[data-theme="dark"] .sticksSetupEquation>strong,
+[data-theme="dark"] .sticksNicotinePerStick article,
+[data-theme="dark"] .sticksNicotineTotals article,
+[data-theme="dark"] .sticksDurationGrid article,
+[data-theme="dark"] .sticksPatternMetrics article,
+[data-theme="dark"] .sticksAdjustmentsBody section,
+[data-theme="dark"] .sticksEstimateRule,
+[data-theme="dark"] .sticksPersistenceNote{background:#151d19;border-color:#29352f}
+[data-theme="dark"] .sticksProgressTrack,
+[data-theme="dark"] .sticksWeekBarRow>div{background:#1b2720}
+[data-theme="dark"] .sticksNoAssumption{background:#221f14;border-color:#51471f;color:#e5d9a6}
+[data-theme="dark"] .sticksEstimateBadge{background:#17263a;color:#b8d8ff}
+
+@media(max-width:900px){
+  .sticksNicotinePerStick,
+  .sticksNicotineTotals,
+  .sticksDurationGrid,
+  .sticksPatternMetrics{grid-template-columns:1fr}
+  .sticksAdjustmentsBody{grid-template-columns:1fr}
+}
+@media(max-width:620px){
+  .sticksSetupCard,
+  .sticksRegisterCard,
+  .sticksCurrentPackCard,
+  .sticksNicotineCard,
+  .sticksDurationCard,
+  .sticksPatternCard{padding:13px;border-radius:16px}
+  .sticksSetupEquation{grid-template-columns:1fr auto 1fr}
+  .sticksSetupEquation>strong{grid-column:1/-1}
+  .sticksSetupEquation>span:nth-of-type(2){display:none}
+  .sticksCoreSummary{grid-template-columns:1fr}
+  .sticksRegisterCard{grid-template-columns:1fr}
+  .sticksSectionHeading{display:grid;grid-template-columns:1fr}
+  .sticksEstimateBadge{justify-self:start}
+  .sticksCustomNicotineGrid{grid-template-columns:1fr}
+  .sticksCustomSource{grid-column:auto}
+  .sticksRecentList article{grid-template-columns:60px minmax(0,1fr)}
+  .sticksRecentList small{grid-column:2}
+}
