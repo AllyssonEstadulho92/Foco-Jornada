@@ -24,11 +24,21 @@ export interface StickPackProjection {
   configuredMatchesCurrent: boolean
   fullPacksRemaining: number | null
   looseSticksRemaining: number | null
+  sealedPacksRemaining: number | null
+  currentPackRemaining: number | null
+  currentPackStarted: boolean
+  currentPackPercentRemaining: number | null
+  currentPackBaselineDays: string | null
+  currentPackBaselineDepletionDate: string | null
+  currentPackHistoricalDays: string | null
+  currentPackHistoricalDepletionDate: string | null
   packEquivalent: string | null
   baselineDailySticks: number
   baselineDays: string | null
   baselineDepletionDate: string | null
   historicalDailyAverage: string | null
+  historicalCoverageDays: number
+  historicalReliable: boolean
   historicalDays: string | null
   historicalDepletionDate: string | null
   reductionPlanDays: number | null
@@ -222,24 +232,62 @@ export class StickPackPlannerService {
     const sevenDayStart = addCalendarDays(today, -6)
     let usedToday = 0n
     let last7 = 0n
+    let firstObservedDay: string | null = null
 
     for (const item of consumed) {
       const day = dateKeyInZone(new Date(item.effectiveAt), STOCK_TIMEZONE)
       if (day === today) usedToday += item.sticks
-      if (day >= sevenDayStart && day <= today) last7 += item.sticks
+      if (day >= sevenDayStart && day <= today) {
+        last7 += item.sticks
+        if (!firstObservedDay || day < firstObservedDay) firstObservedDay = day
+      }
     }
 
     const currentStock = currentStockSticks
     const configuredTotalSticks = settings.packCount * settings.sticksPerPack
     const usedTodayNumber = safeNumber(usedToday)
     const last7Number = safeNumber(last7)
-    const historicalDailyAverageNumber = last7Number > 0 ? last7Number / 7 : 0
+    const historicalCoverageDays = firstObservedDay
+      ? Math.min(7, Math.max(1, dayDifference(firstObservedDay, today) + 1))
+      : 0
+    const historicalDailyAverageNumber = historicalCoverageDays > 0
+      ? last7Number / historicalCoverageDays
+      : 0
+    const historicalReliable = historicalCoverageDays >= 3 && last7Number > 0
+
+    const looseSticksRemaining = currentStock === null ? null : currentStock % settings.sticksPerPack
+    const fullPacksRemaining = currentStock === null ? null : Math.floor(currentStock / settings.sticksPerPack)
+    const currentPackStarted = currentStock !== null && currentStock > 0 && looseSticksRemaining !== 0
+    const currentPackRemaining = currentStock === null
+      ? null
+      : currentStock <= 0
+        ? 0
+        : currentPackStarted
+          ? looseSticksRemaining
+          : 0
+    const sealedPacksRemaining = currentStock === null
+      ? null
+      : currentPackStarted
+        ? fullPacksRemaining
+        : fullPacksRemaining
+    const currentPackForProjection = currentStock === null || currentStock <= 0
+      ? 0
+      : currentPackStarted
+        ? currentPackRemaining ?? 0
+        : Math.min(settings.sticksPerPack, currentStock)
+
     const baselineForecast = currentStock === null
       ? null
       : dateForRate(currentStock, nicotineSettings.dailyBaselineSticks, today)
-    const historicalForecast = currentStock === null
+    const historicalForecast = currentStock === null || !historicalReliable
       ? null
       : dateForRate(currentStock, historicalDailyAverageNumber, today)
+    const currentPackBaselineForecast = currentStock === null
+      ? null
+      : dateForRate(currentPackForProjection, nicotineSettings.dailyBaselineSticks, today)
+    const currentPackHistoricalForecast = currentStock === null || !historicalReliable
+      ? null
+      : dateForRate(currentPackForProjection, historicalDailyAverageNumber, today)
     const reduction = currentStock === null
       ? { days: null, date: null, stopsBeforeDepletion: false }
       : reductionForecast(currentStock, today, usedTodayNumber, nicotineSettings)
@@ -250,13 +298,27 @@ export class StickPackPlannerService {
       currentStockSticks: currentStock,
       configuredDifference: currentStock === null ? null : configuredTotalSticks - currentStock,
       configuredMatchesCurrent: currentStock !== null && configuredTotalSticks === currentStock,
-      fullPacksRemaining: currentStock === null ? null : Math.floor(currentStock / settings.sticksPerPack),
-      looseSticksRemaining: currentStock === null ? null : currentStock % settings.sticksPerPack,
+      fullPacksRemaining,
+      looseSticksRemaining,
+      sealedPacksRemaining,
+      currentPackRemaining,
+      currentPackStarted,
+      currentPackPercentRemaining: currentStock === null
+        ? null
+        : currentPackForProjection <= 0
+          ? 0
+          : Math.round((currentPackForProjection / settings.sticksPerPack) * 100),
+      currentPackBaselineDays: currentPackBaselineForecast?.days ?? null,
+      currentPackBaselineDepletionDate: currentPackBaselineForecast?.date ?? null,
+      currentPackHistoricalDays: currentPackHistoricalForecast?.days ?? null,
+      currentPackHistoricalDepletionDate: currentPackHistoricalForecast?.date ?? null,
       packEquivalent: currentStock === null ? null : (currentStock / settings.sticksPerPack).toFixed(1),
       baselineDailySticks: nicotineSettings.dailyBaselineSticks,
       baselineDays: baselineForecast?.days ?? null,
       baselineDepletionDate: baselineForecast?.date ?? null,
       historicalDailyAverage: historicalDailyAverageNumber > 0 ? historicalDailyAverageNumber.toFixed(1) : null,
+      historicalCoverageDays,
+      historicalReliable,
       historicalDays: historicalForecast?.days ?? null,
       historicalDepletionDate: historicalForecast?.date ?? null,
       reductionPlanDays: reduction.days,
