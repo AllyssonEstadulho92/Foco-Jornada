@@ -313,9 +313,11 @@ export function SticksStockPage() {
         status: 'completed' as const,
         sticks: period.consumedSticks,
         startValue: period.actualStartAt,
-        startExact: Boolean(period.actualStartAt),
+        startActual: Boolean(period.actualStartAt),
+        startExact: Boolean(period.actualStartAt) && packProjection.packTrackingExact,
         endValue: period.actualEndAt,
-        endExact: Boolean(period.actualEndAt),
+        endActual: Boolean(period.actualEndAt),
+        endExact: Boolean(period.actualEndAt) && packProjection.packTrackingExact,
       }))
 
     const remaining = packProjection.packForecasts.map((forecast) => ({
@@ -323,8 +325,10 @@ export function SticksStockPage() {
       status: forecast.kind === 'current' ? 'current' as const : 'future' as const,
       sticks: forecast.sticks,
       startValue: forecast.actualStartAt ?? forecast.estimatedStartDate,
-      startExact: Boolean(forecast.actualStartAt),
+      startActual: Boolean(forecast.actualStartAt),
+      startExact: Boolean(forecast.actualStartAt) && packProjection.packTrackingExact,
       endValue: forecast.estimatedDepletionDate,
+      endActual: false,
       endExact: false,
     }))
 
@@ -693,11 +697,13 @@ export function SticksStockPage() {
                         <small>
                           {row.startExact
                             ? 'REAL · EXATO'
-                            : row.startValue
-                              ? 'PREVISÃO'
-                              : row.status === 'future'
-                                ? 'SEM PREVISÃO'
-                                : 'INÍCIO NÃO REGISTADO'}
+                            : row.startActual
+                              ? 'REAL · SEQUÊNCIA INCERTA'
+                              : row.startValue
+                                ? 'PREVISÃO'
+                                : row.status === 'future'
+                                  ? 'SEM PREVISÃO'
+                                  : 'INÍCIO NÃO REGISTADO'}
                         </small>
                       </span>
                       <span role="cell">
@@ -711,19 +717,26 @@ export function SticksStockPage() {
                         <small>
                           {row.endExact
                             ? 'REAL · EXATO'
-                            : row.endValue
-                              ? 'PREVISÃO'
-                              : row.status === 'completed'
-                                ? 'FIM NÃO REGISTADO'
-                                : 'SEM PREVISÃO'}
+                            : row.endActual
+                              ? 'REAL · SEQUÊNCIA INCERTA'
+                              : row.endValue
+                                ? 'PREVISÃO'
+                                : row.status === 'completed'
+                                  ? 'FIM NÃO REGISTADO'
+                                  : 'SEM PREVISÃO'}
                         </small>
                       </span>
                     </div>
                   ))}
                 </div>
                 <small className="sticksPackForecastNote">
-                  O dia inicial passa a REAL · EXATO quando o primeiro stick desse maço fica registado no ledger. O dia do término passa a REAL · EXATO quando o último stick desse maço é registado. As datas reais aparecem mesmo antes de existirem 3 dias de histórico; apenas as datas futuras dependem da previsão pelo ritmo observado.
+                  O início passa a REAL · EXATO no primeiro stick registado desse maço e o fim passa a REAL · EXATO no último stick, desde que a fronteira entre maços permaneça determinística. Datas futuras continuam sempre como PREVISÃO.
                 </small>
+                {packProjection && !packProjection.packTrackingExact && packProjection.packTrackingIssue ? (
+                  <p className="sticksPackTrackingWarning">
+                    <strong>Calendário individual não marcado como exato:</strong> {packProjection.packTrackingIssue} O stock total continua exato pelo ledger.
+                  </p>
+                ) : null}
               </div>
             ) : null}
 

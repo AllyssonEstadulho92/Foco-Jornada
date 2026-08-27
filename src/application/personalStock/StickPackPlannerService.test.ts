@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { AppDatabase } from '../../infrastructure/database/appDatabase'
 import { PersonalStockService } from './PersonalStockService'
 import { StickPackPlannerService } from './StickPackPlannerService'
+import { StockReconciliationService } from './StockReconciliationService'
 
 function operationId(): string {
   return globalThis.crypto.randomUUID()
@@ -32,6 +33,8 @@ describe('StickPackPlannerService', () => {
       expect(projection.currentPackRemaining).toBe(0)
       expect(projection.currentPackPercentRemaining).toBe(100)
       expect(projection.packEquivalent).toBe('12.0')
+      expect(projection.packTrackingExact).toBe(true)
+      expect(projection.packTrackingIssue).toBeNull()
       expect(projection.historicalReliable).toBe(false)
       expect(projection.historicalDepletionDate).toBeNull()
       expect(projection.currentPackHistoricalDepletionDate).toBeNull()
@@ -242,6 +245,30 @@ describe('StickPackPlannerService', () => {
         },
       ])
       expect(projection.packForecasts).toEqual([])
+    } finally {
+      await db.delete()
+    }
+  })
+
+
+  it('stops calling pack dates exact after a physical-count correction changes pack boundaries', async () => {
+    const db = makeDatabase()
+    try {
+      const stock = new PersonalStockService(db)
+      const planner = new StickPackPlannerService(db)
+      const reconciliation = new StockReconciliationService(db)
+
+      await planner.saveSettings({ packCount: 2, sticksPerPack: 20 })
+      await stock.initializeSticks(40, operationId())
+      await stock.consumeStick(operationId())
+      await reconciliation.reconcileSticksPhysicalCount('38', operationId())
+
+      const projection = await planner.getProjection(new Date())
+
+      expect(projection.currentStockSticks).toBe(38)
+      expect(projection.packTrackingExact).toBe(false)
+      expect(projection.packTrackingIssue).toContain('contagem física')
+      expect(projection.ledgerOk).toBe(true)
     } finally {
       await db.delete()
     }

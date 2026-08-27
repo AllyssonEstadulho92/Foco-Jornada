@@ -5,6 +5,7 @@ import { MedicationDoseStatusService } from '../personalStock/MedicationDoseStat
 import { NicotineAwarenessService } from '../personalStock/NicotineAwarenessService'
 import { PersonalStockService } from '../personalStock/PersonalStockService'
 import { StickPackPlannerService } from '../personalStock/StickPackPlannerService'
+import { StockReconciliationService } from '../personalStock/StockReconciliationService'
 import { AppBackupService, BACKUP_APP_VERSION, BACKUP_FORMAT } from './AppBackupService'
 
 function operationId(): string {
@@ -249,6 +250,65 @@ describe('AppBackupService', () => {
       expect(restored.profileId).toBe('veo-purple-click-2026')
       expect(restored.notes).toBe('Purple Click confirmado.')
       expect(await db.metadata.get('personal-stock:nicotine-awareness-v2')).toBeTruthy()
+    } finally {
+      await db.delete()
+    }
+  })
+
+
+  it('preserva movimentos de sticks criados depois de uma cópia integral mais antiga', async () => {
+    const db = makeDatabase()
+    try {
+      const stock = new PersonalStockService(db)
+      const backup = new AppBackupService(db)
+
+      await stock.initializeSticks(20, operationId())
+      await stock.consumeStick(operationId())
+      const olderBackup = await backup.exportText()
+
+      await stock.consumeStick(operationId())
+      await stock.consumeStick(operationId())
+      await stock.restockSticks(20, operationId())
+
+      const beforeRestore = await stock.getSticksSummary()
+      const movementCountBefore = (await db.stockMovements.where('entityId').equals('stock:sticks:glo').toArray()).length
+
+      await backup.restoreFromText(olderBackup)
+
+      const afterRestore = await stock.getSticksSummary()
+      const movementCountAfter = (await db.stockMovements.where('entityId').equals('stock:sticks:glo').toArray()).length
+
+      expect(beforeRestore.stock).toBe(37)
+      expect(afterRestore.stock).toBe(37)
+      expect(movementCountAfter).toBe(movementCountBefore)
+      expect(afterRestore.ok).toBe(true)
+    } finally {
+      await db.delete()
+    }
+  })
+
+
+  it('preserva a conferência física mais recente de sticks ao restaurar uma cópia antiga', async () => {
+    const db = makeDatabase()
+    try {
+      const stock = new PersonalStockService(db)
+      const backup = new AppBackupService(db)
+      const reconciliation = new StockReconciliationService(db)
+
+      await stock.initializeSticks(20, operationId())
+      const olderBackup = await backup.exportText()
+
+      await reconciliation.reconcileSticksPhysicalCount('18', operationId())
+      const before = await db.stockEntities.get('stock:sticks:glo')
+      expect(before?.lastPhysicalCountMinor).toBe('18')
+
+      await backup.restoreFromText(olderBackup)
+
+      const after = await db.stockEntities.get('stock:sticks:glo')
+      expect(after?.lastPhysicalCountMinor).toBe('18')
+      expect(after?.lastPhysicalCountAt).toBe(before?.lastPhysicalCountAt)
+      expect((await stock.getSticksSummary()).stock).toBe(18)
+      expect((await stock.diagnostic()).integrity).toBe('OK')
     } finally {
       await db.delete()
     }

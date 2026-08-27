@@ -36,8 +36,8 @@ export const NICOTINE_REFERENCE_PROFILES: NicotineReferenceProfile[] = [
     emissionSdMicrogramsPerStick: 30n,
     sourceTitle: 'Pauwels et al. (2026) — nicotine heat sticks without tobacco',
     sourceUrl: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC13401252/',
-    manufacturerTitle: 'glo / BAT — informação oficial sobre veo',
-    manufacturerUrl: 'https://glo-gr.myshopify.com/en-gr/products/heated-tobacco-sticks-with-capsules-veo-demi-slim-tropical-twist',
+    manufacturerTitle: 'glo Portugal — informação oficial sobre sticks veo',
+    manufacturerUrl: 'https://www.myglo.com/pt-pt/nossos-produtos/sticks-veo',
     evidenceNote: 'No estudo, veo Green Click apresentou 3,46 ± 0,31 mg de nicotina total no stick e 0,98 ± 0,03 mg na emissão por stick sob condições laboratoriais padronizadas.',
   },
   {
@@ -49,8 +49,8 @@ export const NICOTINE_REFERENCE_PROFILES: NicotineReferenceProfile[] = [
     emissionSdMicrogramsPerStick: 40n,
     sourceTitle: 'Pauwels et al. (2026) — nicotine heat sticks without tobacco',
     sourceUrl: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC13401252/',
-    manufacturerTitle: 'glo / BAT — informação oficial sobre veo',
-    manufacturerUrl: 'https://glo-gr.myshopify.com/en-gr/products/heated-tobacco-sticks-with-capsules-veo-demi-slim-tropical-twist',
+    manufacturerTitle: 'glo Portugal — informação oficial sobre sticks veo',
+    manufacturerUrl: 'https://www.myglo.com/pt-pt/nossos-produtos/sticks-veo',
     evidenceNote: 'No estudo, veo Purple Click apresentou 3,22 ± 0,08 mg de nicotina total no stick e 0,95 ± 0,04 mg na emissão por stick sob condições laboratoriais padronizadas.',
   },
 ]

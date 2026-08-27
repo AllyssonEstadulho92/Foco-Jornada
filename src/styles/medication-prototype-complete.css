@@ -102,6 +102,24 @@
   font:inherit;
 }
 .medProtoFilters{display:flex;gap:8px;flex-wrap:wrap}
+.medProtoFilterSelect{
+  display:grid;
+  grid-template-columns:auto minmax(120px,180px);
+  align-items:center;
+  gap:8px;
+  color:var(--text-muted,#66706a);
+  font-size:.78rem;
+  font-weight:750;
+}
+.medProtoFilterSelect select{
+  width:100%;
+  border:1px solid var(--border-subtle,#d8ded8);
+  border-radius:10px;
+  background:var(--surface,#fff);
+  color:inherit;
+  padding:9px 10px;
+  font:inherit;
+}
 .medProtoFilters button.active{
   background:var(--accent,#1d6f5f);
   border-color:var(--accent,#1d6f5f);
@@ -524,4 +542,9 @@
   .medicationLinearHeading{display:grid;grid-template-columns:1fr}
   .medicationLinearExact{display:grid;grid-template-columns:1fr}
   .medicationLinearExact span{text-align:left}
+}
+
+[data-theme="dark"] .medProtoFilterSelect select{background:#111915;border-color:#304039}
+@media(max-width:620px){
+  .medProtoFilterSelect{grid-template-columns:1fr}
 }

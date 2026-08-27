@@ -18,7 +18,6 @@ interface MedicationPrototypeWorkspaceProps {
   selectedId: string | null
   today: string
   onSelect: (medicationId: string) => void
-  onAddMedication: () => void
   onDataChanged: () => Promise<void>
 }
 
@@ -76,24 +75,11 @@ function timelineIcon(kind: MedicationTimelineItem['kind']): string {
   return '+'
 }
 
-function activeEvent(events: MedicationDoseEvent[], occurrenceKey: string): MedicationDoseEvent | undefined {
-  const occurrenceEvents = events.filter((event) => event.occurrenceKey === occurrenceKey)
-  const correctedIds = new Set(
-    occurrenceEvents
-      .filter((event) => event.status === 'corrected' && event.correctionOf)
-      .map((event) => event.correctionOf as string),
-  )
-  return occurrenceEvents
-    .filter((event) => event.status !== 'corrected' && !correctedIds.has(event.id))
-    .sort((left, right) => right.createdAt.localeCompare(left.createdAt) || right.id.localeCompare(left.id))[0]
-}
-
 export function MedicationPrototypeWorkspace({
   medications,
   selectedId,
   today,
   onSelect,
-  onAddMedication,
   onDataChanged,
 }: MedicationPrototypeWorkspaceProps) {
   const {
@@ -186,10 +172,7 @@ export function MedicationPrototypeWorkspace({
     ? `${minorToDecimal(schedules[0].quantityMinor)} ${selected.medication.unit}`
     : '—'
 
-  const todayDoseRows = useMemo(() => schedules.map((schedule) => ({
-    schedule,
-    event: activeEvent(doseEvents, `${schedule.id}:${today}`),
-  })), [doseEvents, schedules, today])
+
 
   const lastSevenDays = useMemo(() => {
     const now = new Date()
@@ -226,21 +209,10 @@ export function MedicationPrototypeWorkspace({
   }
 
 
-  function scrollTo(id: string) {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  }
+
 
   return (
-    <section className="medProtoWorkspace" aria-labelledby="med-proto-title">
-      <header className="medProtoHeader">
-        <div>
-          <span className="stockPanelTag">GESTOR DE MEDICAÇÃO · COMPLETO</span>
-          <h2 id="med-proto-title">Medicação</h2>
-          <p>Registos persistentes, ações auditáveis e informação protegida. O sistema não altera nem recomenda tratamentos.</p>
-        </div>
-        <button type="button" className="medProtoAddButton" onClick={onAddMedication}>+ Medicamento</button>
-      </header>
-
+    <section className="medProtoWorkspace" aria-label="Resumo e detalhes dos medicamentos">
       <div className="medProtoSummary">
         <article><strong>{dashboard.medicationCount}</strong><span>Medicamentos em uso</span></article>
         <article>
@@ -261,24 +233,15 @@ export function MedicationPrototypeWorkspace({
             placeholder="Pesquisar medicamento, dosagem, prescritor ou observação"
           />
         </label>
-        <div className="medProtoFilters" role="group" aria-label="Filtrar medicamentos">
-          {([
-            ['all', 'Todos'],
-            ['active', 'Em uso'],
-            ['paused', 'Pausados'],
-            ['finished', 'Finalizados'],
-          ] as Array<[StatusFilter, string]>).map(([value, label]) => (
-            <button
-              type="button"
-              key={value}
-              className={filter === value ? 'active' : ''}
-              aria-pressed={filter === value}
-              onClick={() => setFilter(value)}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
+        <label className="medProtoFilterSelect">
+          Estado
+          <select value={filter} onChange={(event) => setFilter(event.target.value as StatusFilter)}>
+            <option value="all">Todos</option>
+            <option value="active">Em uso</option>
+            <option value="paused">Pausados</option>
+            <option value="finished">Finalizados</option>
+          </select>
+        </label>
       </div>
 
       <div className="medProtoBody">
@@ -332,30 +295,6 @@ export function MedicationPrototypeWorkspace({
               <div><span>Prescrito por</span><strong>{selectedProfile?.prescribedBy || 'Não registado'}</strong></div>
               <div><span>Observação</span><strong>{selectedProfile?.observation || 'Sem observação protegida'}</strong></div>
             </div>
-
-            <section className="medProtoToday">
-              <div className="medProtoSectionHeading">
-                <div><span>HOJE</span><h4>Tomas programadas</h4></div>
-              </div>
-              {todayDoseRows.length ? todayDoseRows.map(({ schedule, event }) => (
-                <div className="medProtoDoseRow" key={schedule.id}>
-                  <strong>{schedule.localTime}</strong>
-                  <span>{minorToDecimal(schedule.quantityMinor)} {selected.medication.unit}</span>
-                  <span className={event?.status === 'taken' ? 'medProtoDoseTaken' : event?.status === 'not_taken' ? 'medProtoDoseNotTaken' : 'medProtoDosePending'}>
-                    {event?.status === 'taken'
-                      ? 'Tomada'
-                      : event?.status === 'not_taken'
-                        ? 'Não tomada'
-                        : event?.status === 'postponed'
-                          ? 'Adiada'
-                          : 'Pendente'}
-                  </span>
-                </div>
-              )) : <p className="medProtoEmptyInline">Sem horários válidos para hoje.</p>}
-              <button type="button" className="stockPrimaryAction medProtoRegisterButton" onClick={() => scrollTo('medication-today-doses')}>
-                Gerir tomas de hoje
-              </button>
-            </section>
 
             <nav className="medProtoTabs" aria-label="Detalhes do medicamento">
               <button type="button" className={tab === 'history' ? 'active' : ''} onClick={() => setTab('history')}>Histórico</button>

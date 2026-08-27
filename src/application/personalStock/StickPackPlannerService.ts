@@ -57,6 +57,8 @@ export interface StickPackProjection {
   currentPackHistoricalDepletionDate: string | null
   packUsagePeriods: StickPackUsagePeriod[]
   packForecasts: StickPackDepletionForecast[]
+  packTrackingExact: boolean
+  packTrackingIssue: string | null
   usedToday: number
   last7DaysSticks: number
   ledgerOk: boolean
@@ -372,6 +374,23 @@ export class StickPackPlannerService {
       : null
     const packUsagePeriods = buildPackUsagePeriods(consumed, settings.sticksPerPack, initialStockSticks)
 
+    const hasPartialInitialStock = initialStockSticks !== null && initialStockSticks % settings.sticksPerPack !== 0
+    const hasLooseRestock = movements.some((movement) =>
+      movement.type === 'restock'
+      && BigInt(movement.quantityMinor) % BigInt(settings.sticksPerPack) !== 0n
+    )
+    const hasPhysicalCountCorrection = movements.some((movement) =>
+      movement.type === 'correction' && movement.correctionReason === 'physical_count'
+    )
+    const packTrackingExact = !hasPartialInitialStock && !hasLooseRestock && !hasPhysicalCountCorrection
+    const packTrackingIssue = hasPhysicalCountCorrection
+      ? 'Houve uma correção por contagem física; a associação exata entre movimentos e maços físicos pode ter mudado.'
+      : hasLooseRestock
+        ? 'Existe uma reposição de sticks avulsos; a fronteira entre maços físicos deixou de ser determinística.'
+        : hasPartialInitialStock
+          ? 'O stock inicial continha um maço parcial; o início do primeiro maço não foi observado pela aplicação.'
+          : null
+
     const historicalForecast = currentStock === null || !historicalReliable
       ? null
       : dateForRate(currentStock, historicalDailyAverageNumber, today)
@@ -415,6 +434,8 @@ export class StickPackPlannerService {
       currentPackHistoricalDepletionDate: currentPackHistoricalForecast?.date ?? null,
       packUsagePeriods,
       packForecasts,
+      packTrackingExact,
+      packTrackingIssue,
       usedToday: safeNumber(usedToday),
       last7DaysSticks: last7Number,
       ledgerOk: reconstructed.ok,

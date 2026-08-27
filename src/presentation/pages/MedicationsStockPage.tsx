@@ -423,10 +423,6 @@ export function MedicationsStockPage() {
           selectedId={selectedId}
           today={today}
           onSelect={setSelectedId}
-          onAddMedication={() => {
-            setShowCreate(true)
-            scrollToMedicationSection('medication-create-form')
-          }}
           onDataChanged={async () => {
             await loadList(selectedId ?? undefined)
             if (selectedId) await loadSelected(selectedId)
@@ -439,11 +435,11 @@ export function MedicationsStockPage() {
           <section className="medicationLinearForecast" aria-labelledby="medication-forecast-title">
             <div className="medicationLinearHeading">
               <div>
-                <span className="stockPanelTag">AUTONOMIA PROGRAMADA</span>
-                <h2 id="medication-forecast-title">Até onde chega o stock configurado</h2>
+                <span className="stockPanelTag">PROJEÇÃO PROGRAMADA</span>
+                <h2 id="medication-forecast-title">Até onde pode chegar o stock configurado</h2>
               </div>
               <span className={forecast?.exact ? 'stockStatusOk' : 'stockStatusNeutral'}>
-                {forecast?.exact ? 'SIMULAÇÃO EXATA' : 'SEM SIMULAÇÃO'}
+                {forecast?.exact ? 'CÁLCULO DETERMINÍSTICO' : 'SEM PROJEÇÃO'}
               </span>
             </div>
             {forecast ? (
@@ -451,7 +447,7 @@ export function MedicationsStockPage() {
                 <article>
                   <span>Autonomia</span>
                   <strong>{formatDuration(forecast.autonomySeconds)}</strong>
-                  <small>simulação cronológica dos horários ativos</small>
+                  <small>stock real aplicado cronologicamente aos horários configurados</small>
                 </article>
                 <article>
                   <span>Última toma possível</span>
@@ -470,7 +466,7 @@ export function MedicationsStockPage() {
               </p>
             )}
             <p className="medicationLinearRule">
-              Esta autonomia usa apenas stock real + horários e quantidades que configuraste. Não usa média inventada nem altera o tratamento.
+              Esta projeção usa apenas stock real + horários e quantidades configuradas. O cálculo é determinístico, mas a data futura depende de as tomas ocorrerem conforme essa configuração.
             </p>
           </section>
 

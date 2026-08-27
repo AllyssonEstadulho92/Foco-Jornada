@@ -586,3 +586,19 @@
 [data-theme="dark"] .sticksPackForecastRow.isCompleted{
   background:#151d19;
 }
+
+
+.sticksPackTrackingWarning{
+  margin:0;
+  padding:10px 11px;
+  border:1px solid #e2d39b;
+  border-radius:11px;
+  background:#fffaf0;
+  color:#5d512f;
+  line-height:1.45;
+}
+[data-theme="dark"] .sticksPackTrackingWarning{
+  background:#221f14;
+  border-color:#51471f;
+  color:#e5d9a6;
+}
