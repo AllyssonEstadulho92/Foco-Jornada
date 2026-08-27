@@ -638,9 +638,9 @@ export function SticksStockPage() {
                     .map((period) => (
                       <article key={period.packNumber}>
                         <strong>Maço {period.packNumber}</strong>
-                        <span>Começou: <b>{formatDateTime(period.actualStartAt)}</b></span>
+                        <span>Começou: <b>{period.actualStartAt ? formatDateTime(period.actualStartAt) : 'não registado'}</b></span>
                         <span>Acabou: <b>{formatDateTime(period.actualEndAt)}</b></span>
-                        <small>REAL · {period.consumedSticks} sticks registados</small>
+                        <small>{period.actualStartAt ? 'INÍCIO E FIM REAIS' : 'FIM REAL · INÍCIO DESCONHECIDO'} · {period.consumedSticks} sticks</small>
                       </article>
                     ))}
                 </div>
@@ -672,7 +672,7 @@ export function SticksStockPage() {
                       <span role="cell">{forecast.sticks}</span>
                       <span role="cell">
                         <b>{forecast.actualStartAt ? formatDateTime(forecast.actualStartAt) : formatDateKey(forecast.estimatedStartDate)}</b>
-                        <small>{forecast.actualStartAt ? 'REAL' : 'PREVISÃO'}</small>
+                        <small>{forecast.actualStartAt ? 'REAL' : forecast.estimatedStartDate ? 'PREVISÃO' : 'NÃO REGISTADO'}</small>
                       </span>
                       <span role="cell">
                         <b>{formatDateKey(forecast.estimatedDepletionDate)}</b>
