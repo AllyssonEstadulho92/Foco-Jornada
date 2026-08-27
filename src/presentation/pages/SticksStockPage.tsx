@@ -652,7 +652,7 @@ export function SticksStockPage() {
               </p>
             )}
 
-            {packProjection?.historicalReliable && packTimelineRows.length ? (
+            {packTimelineRows.length ? (
               <div className="sticksPackForecastComparison" aria-label="Datas de início e fim de cada maço">
                 <div className="sticksPackForecastHeading">
                   <strong>Calendário de cada maço</strong>
@@ -662,8 +662,8 @@ export function SticksStockPage() {
                   <div className="sticksPackForecastHeader" role="row">
                     <span role="columnheader">Maço</span>
                     <span role="columnheader">Sticks</span>
-                    <span role="columnheader">Início</span>
-                    <span role="columnheader">Fim</span>
+                    <span role="columnheader">Dia inicial</span>
+                    <span role="columnheader">Dia do término</span>
                   </div>
                   {packTimelineRows.map((row) => (
                     <div
@@ -691,7 +691,13 @@ export function SticksStockPage() {
                               : '—'}
                         </b>
                         <small>
-                          {row.startExact ? 'REAL · EXATO' : row.startValue ? 'PREVISÃO' : 'AINDA NÃO REGISTADO'}
+                          {row.startExact
+                            ? 'REAL · EXATO'
+                            : row.startValue
+                              ? 'PREVISÃO'
+                              : row.status === 'future'
+                                ? 'SEM PREVISÃO'
+                                : 'INÍCIO NÃO REGISTADO'}
                         </small>
                       </span>
                       <span role="cell">
@@ -703,14 +709,20 @@ export function SticksStockPage() {
                               : '—'}
                         </b>
                         <small>
-                          {row.endExact ? 'REAL · EXATO' : row.endValue ? 'PREVISÃO' : 'AINDA NÃO REGISTADO'}
+                          {row.endExact
+                            ? 'REAL · EXATO'
+                            : row.endValue
+                              ? 'PREVISÃO'
+                              : row.status === 'completed'
+                                ? 'FIM NÃO REGISTADO'
+                                : 'SEM PREVISÃO'}
                         </small>
                       </span>
                     </div>
                   ))}
                 </div>
                 <small className="sticksPackForecastNote">
-                  Quando registas o primeiro stick de um maço, a data de início passa a REAL · EXATO. Quando registas o último stick desse maço, a data de fim também passa a REAL · EXATO e fica preservada no histórico. Uma data futura não pode ser exata sem acontecer; por isso continua marcada como PREVISÃO e é recalculada com o ritmo observado.
+                  O dia inicial passa a REAL · EXATO quando o primeiro stick desse maço fica registado no ledger. O dia do término passa a REAL · EXATO quando o último stick desse maço é registado. As datas reais aparecem mesmo antes de existirem 3 dias de histórico; apenas as datas futuras dependem da previsão pelo ritmo observado.
                 </small>
               </div>
             ) : null}
