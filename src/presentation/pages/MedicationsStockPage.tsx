@@ -87,10 +87,6 @@ function doseStatusClass(status: MedicationDoseEvent['status']): string {
   return 'stockStatusNeutral'
 }
 
-function adjustmentClass(value?: string): string {
-  if (!value || value === '0') return 'stockPhysicalAdjustmentZero'
-  return value.startsWith('-') ? 'stockPhysicalAdjustmentNegative' : 'stockPhysicalAdjustmentPositive'
-}
 
 function signed(value?: string): string {
   if (!value) return '—'
