@@ -141,3 +141,64 @@
   .stickCurrentPackBadge{justify-self:start}
   .stickCurrentPackCount strong{font-size:1.9rem}
 }
+
+
+.stickUsageAnalyticsPanel{
+  display:grid;gap:14px;padding:16px;border:1px solid var(--border-subtle,#dfe4df);border-radius:18px;background:var(--surface-elevated,#fff)
+}
+.stickUsageAnalyticsHeading{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.stickUsageAnalyticsHeading h2{margin:3px 0 5px}
+.stickUsageAnalyticsHeading p{margin:0;color:var(--text-muted,#66706a);line-height:1.4}
+.stickUsageMetrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.stickUsageMetrics article{display:grid;gap:4px;padding:11px;border-radius:12px;background:var(--surface-soft,#f6f8f6)}
+.stickUsageMetrics span{font-size:.72rem;color:var(--text-muted,#66706a);text-transform:uppercase;letter-spacing:.045em;font-weight:800}
+.stickUsageMetrics strong{font-size:1.12rem}
+.stickUsageMetrics small{font-size:.72rem;color:var(--text-muted,#66706a);line-height:1.3}
+
+.stickUsageChart{display:grid;gap:10px;padding:13px;border:1px solid var(--border-subtle,#dfe4df);border-radius:14px}
+.stickUsageChartTitle{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.stickUsageChartTitle span{font-size:.78rem;color:var(--text-muted,#66706a)}
+.stickUsageBars{display:grid;gap:7px}
+.stickUsageBarRow{display:grid;grid-template-columns:62px minmax(0,1fr) 28px;gap:9px;align-items:center}
+.stickUsageBarRow>span{font-size:.74rem;color:var(--text-muted,#66706a);text-transform:capitalize}
+.stickUsageBarTrack{height:10px;border-radius:999px;background:var(--surface-soft,#edf1ee);overflow:hidden}
+.stickUsageBarTrack i{display:block;height:100%;border-radius:inherit;background:#35a45e;min-width:0}
+.stickUsageBarRow strong{font-variant-numeric:tabular-nums;text-align:right}
+.stickUsageTrend{display:flex;justify-content:space-between;gap:10px;padding-top:8px;border-top:1px solid var(--border-subtle,#e1e6e1)}
+.stickUsageTrend span{color:var(--text-muted,#66706a)}
+.stickUsageTrend strong.isUp{color:#9a6c00}
+.stickUsageTrend strong.isDown{color:#18713d}
+
+.stickUsageTimelineDetails{border:1px solid var(--border-subtle,#dfe4df);border-radius:12px;overflow:hidden}
+.stickUsageTimelineDetails>summary{cursor:pointer;padding:11px 12px;font-weight:800;list-style:none}
+.stickUsageTimelineDetails>summary::-webkit-details-marker{display:none}
+.stickUsageTimelineDetails>summary::after{content:'+';float:right;color:var(--text-muted,#66706a)}
+.stickUsageTimelineDetails[open]>summary::after{content:'−'}
+.stickUsageTimeline{display:grid;border-top:1px solid var(--border-subtle,#dfe4df)}
+.stickUsageTimelineRow{display:grid;grid-template-columns:110px 70px minmax(0,1fr);gap:10px;align-items:center;padding:10px 12px;border-top:1px solid var(--border-subtle,#edf0ed)}
+.stickUsageTimelineRow:first-child{border-top:0}
+.stickUsageTimelineRow>div{display:grid;gap:2px}
+.stickUsageTimelineRow>div span,.stickUsageTimelineRow small{font-size:.72rem;color:var(--text-muted,#66706a)}
+.stickUsageTimelineRow>span{font-weight:800}
+.stickUsageAnalyticsNote{margin:0;padding:10px 11px;border-radius:11px;background:var(--surface-soft,#f6f8f6);color:var(--text-muted,#66706a);line-height:1.45}
+
+[data-theme="dark"] .stickUsageAnalyticsPanel{background:#0f1512;border-color:#29352f}
+[data-theme="dark"] .stickUsageMetrics article,
+[data-theme="dark"] .stickUsageAnalyticsNote{background:#151d19}
+[data-theme="dark"] .stickUsageChart,
+[data-theme="dark"] .stickUsageTimelineDetails,
+[data-theme="dark"] .stickUsageTimeline{border-color:#29352f}
+[data-theme="dark"] .stickUsageBarTrack{background:#1b2720}
+[data-theme="dark"] .stickUsageTimelineRow{border-color:#222e28}
+
+@media(max-width:900px){
+  .stickUsageMetrics{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:620px){
+  .stickUsageAnalyticsPanel{padding:13px;border-radius:16px}
+  .stickUsageAnalyticsHeading{display:grid;grid-template-columns:1fr}
+  .stickUsageAnalyticsHeading button{width:100%}
+  .stickUsageMetrics{grid-template-columns:1fr 1fr}
+  .stickUsageChartTitle{display:grid;grid-template-columns:1fr}
+  .stickUsageTimelineRow{grid-template-columns:80px 58px minmax(0,1fr)}
+}
