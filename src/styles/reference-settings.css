@@ -3,3 +3,534 @@
 .referenceAboutRow>summary{min-height:88px;padding-block:16px}.referenceAboutInfoIcon{display:grid;width:48px;height:48px;place-items:center;border-radius:999px;background:var(--primary-soft);color:var(--primary);font-family:Georgia,serif;font-size:27px;line-height:1}.referenceAboutLogo{width:48px;height:48px}.referenceAboutRow>summary strong{font-size:18px;letter-spacing:-.015em}.referenceAboutRow>summary small{font-size:13px;line-height:1.35}.referenceAboutRow .referenceChevron{transition:transform .18s ease}.referenceAboutRow[open]>summary .referenceChevron{transform:rotate(90deg)}.referenceAboutExpanded{gap:18px;padding:20px 22px 24px 82px}.referenceVersionHero{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}.referenceVersionHero>div{display:grid;gap:4px}.referenceVersionHero>div>span,.referenceBrandHero>div>span{color:var(--primary);font-size:10px;font-weight:800;letter-spacing:.13em}.referenceVersionHero>div>strong{font-size:20px;letter-spacing:-.02em}.referenceVersionHero>div>small{color:var(--muted);font-size:11px}.referenceVersionBadge{padding:6px 9px;border:1px solid var(--line);border-radius:999px;background:var(--surface);color:var(--text);font-size:11px;font-weight:750;white-space:nowrap}.referenceVersionFacts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.referenceVersionFacts article{display:grid;gap:4px;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}.referenceVersionFacts article span{color:var(--muted);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em}.referenceVersionFacts article strong{font-size:12px}.referenceVersionCheckButton{justify-self:start;min-height:42px;padding:9px 14px;border:0;border-radius:12px;background:var(--primary);color:#fff;font:inherit;font-size:12px;font-weight:800;cursor:pointer}.referenceVersionCheckButton:disabled{cursor:wait;opacity:.62}.referenceVersionStatus{padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface);line-height:1.45}.referenceVersionStatus.is-current{border-color:color-mix(in srgb,var(--primary) 35%,var(--line));color:var(--text)}.referenceVersionStatus.is-update{border-color:#c99835;background:#fff9e9;color:#6d4e0c}.referenceVersionStatus.is-error{border-color:#d7a2a2;background:#fff5f5;color:#7c3030}.referenceBrandHero{display:grid;grid-template-columns:74px minmax(0,1fr);align-items:center;gap:16px}.referenceBrandHero>img{width:74px;height:74px;padding:8px;border:1px solid var(--line);border-radius:20px;background:var(--surface);object-fit:contain}.referenceBrandHero>div{display:grid;gap:5px}.referenceBrandHero>div>strong{font-size:20px;letter-spacing:-.025em}.referenceBrandHero>div>p{font-size:12px;line-height:1.55}.referenceBrandMeaningGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.referenceBrandMeaningGrid article{display:grid;grid-template-columns:auto 1fr;align-items:start;gap:9px;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}.referenceBrandMeaningIcon{display:grid;width:28px;height:28px;place-items:center;border-radius:9px;background:var(--primary-soft);color:var(--primary);font-size:14px;font-weight:800}.referenceBrandMeaningGrid article div{display:grid;gap:4px}.referenceBrandMeaningGrid article strong{font-size:12px}.referenceBrandMeaningGrid article p{font-size:11px;line-height:1.45}.referenceBrandPurpose{display:grid;gap:5px;padding:13px 14px;border-left:3px solid var(--primary);border-radius:0 12px 12px 0;background:var(--surface)}.referenceBrandPurpose strong{font-size:12px}.referenceBrandPurpose p{font-size:11px;line-height:1.5}
 
 @media(max-width:620px){.referenceSettingsExpanded{padding-left:18px}.referenceSettingsGrid,.referenceWeekendGrid{grid-template-columns:1fr 1fr}.referenceThemeRow{grid-template-columns:auto 1fr}.referenceThemeSwitch{grid-column:2;justify-self:stretch}.referenceSettingsSave{align-items:stretch;flex-direction:column}.referenceAboutExpanded{padding:18px}.referenceVersionFacts,.referenceBrandMeaningGrid{grid-template-columns:1fr}.referenceBrandHero{grid-template-columns:62px minmax(0,1fr)}.referenceBrandHero>img{width:62px;height:62px;border-radius:17px}}@media(max-width:420px){.referenceSettingsStaticRow,.referenceSettingsLinkRow,.referenceSettingsRow>summary{padding-inline:13px}.referenceSettingsGrid,.referenceWeekendGrid{grid-template-columns:1fr}.referenceAboutRow>summary{min-height:82px}.referenceAboutInfoIcon,.referenceAboutLogo{width:44px;height:44px}.referenceVersionHero{align-items:stretch;flex-direction:column}.referenceVersionBadge{justify-self:start}}:root[data-theme='dark'] .referenceSettingsCard{box-shadow:0 14px 42px rgba(0,0,0,.25)}:root[data-theme='dark'] .referenceThemeSwitch button.active{box-shadow:0 2px 10px rgba(0,0,0,.28)}:root[data-theme='dark'] .referenceVersionStatus.is-update{background:#312919;color:#f2d79d}:root[data-theme='dark'] .referenceVersionStatus.is-error{background:#321f1f;color:#efc4c4}
+
+
+/* Consolidação visual da página Definições.
+ * Apenas apresentação: não altera preferências, horários, tema, exportação ou persistência.
+ */
+.referenceSettingsPage{
+  width:min(100%,920px);
+  min-width:0;
+  max-width:920px;
+  margin:0 auto;
+}
+.referenceSettingsPage>*{min-width:0}
+.referenceSettingsPage .referencePageTitle{
+  min-width:0;
+  padding:20px 2px var(--space-4);
+}
+.referenceSettingsPage .referencePageTitle h1{
+  margin:0;
+  color:var(--text);
+  font-size:clamp(var(--text-2xl),5vw,var(--text-3xl));
+  font-weight:var(--weight-heavy);
+  line-height:var(--line-height-tight);
+  letter-spacing:-.035em;
+  overflow-wrap:anywhere;
+}
+.referenceSettingsPage .referencePageTitle p{
+  max-width:680px;
+  margin:var(--space-2) 0 0;
+  color:var(--muted);
+  font-size:var(--text-md);
+  line-height:var(--line-height-normal);
+}
+.referenceSettingsPage .referenceSettingsGroups{
+  min-width:0;
+  gap:var(--space-3);
+}
+
+/* Cartões e linhas */
+.referenceSettingsPage .referenceSettingsCard{
+  min-width:0;
+  border:1px solid var(--line);
+  border-radius:var(--radius-lg);
+  background:var(--surface);
+  box-shadow:0 10px 28px rgba(28,38,32,.045);
+  overflow:hidden;
+}
+.referenceSettingsPage :is(
+  .referenceSettingsStaticRow,
+  .referenceSettingsLinkRow,
+  .referenceSettingsRow>summary
+){
+  min-width:0;
+  grid-template-columns:44px minmax(0,1fr) auto;
+  gap:var(--space-3);
+  min-height:72px;
+  padding:var(--space-3) var(--space-4);
+  border-color:var(--line);
+  color:var(--text);
+}
+.referenceSettingsPage .referenceSettingsLinkRow:hover,
+.referenceSettingsPage .referenceSettingsLinkRow:focus-visible,
+.referenceSettingsPage .referenceSettingsRow>summary:hover,
+.referenceSettingsPage .referenceSettingsRow>summary:focus-visible{
+  background:var(--surface-2);
+}
+.referenceSettingsPage .referenceSettingsLinkRow:focus-visible,
+.referenceSettingsPage .referenceSettingsRow>summary:focus-visible{
+  outline:2px solid var(--primary);
+  outline-offset:-2px;
+}
+.referenceSettingsPage :is(
+  .referenceSettingsStaticRow>span:nth-child(2),
+  .referenceSettingsLinkRow>span:nth-child(2),
+  .referenceSettingsRow>summary>span:nth-child(2)
+){
+  min-width:0;
+  gap:var(--space-1);
+}
+.referenceSettingsPage :is(
+  .referenceSettingsStaticRow strong,
+  .referenceSettingsLinkRow strong,
+  .referenceSettingsRow strong
+){
+  color:var(--text);
+  font-size:var(--text-sm);
+  font-weight:var(--weight-bold);
+  line-height:var(--line-height-control);
+  overflow-wrap:anywhere;
+}
+.referenceSettingsPage :is(
+  .referenceSettingsStaticRow small,
+  .referenceSettingsLinkRow small,
+  .referenceSettingsRow small
+){
+  color:var(--muted);
+  font-size:var(--text-xs);
+  font-weight:var(--weight-medium);
+  line-height:var(--line-height-normal);
+  overflow-wrap:anywhere;
+}
+.referenceSettingsPage .referenceSettingsIcon{
+  width:44px;
+  height:44px;
+  border-radius:var(--control-radius);
+  background:var(--primary-soft);
+  color:var(--primary);
+  font-size:var(--text-lg);
+}
+.referenceSettingsPage .referenceSettingsLogo{
+  width:44px;
+  height:44px;
+}
+.referenceSettingsPage .referenceChevron{
+  color:var(--muted);
+  font-size:var(--text-xl);
+  font-weight:var(--weight-normal);
+  line-height:1;
+}
+
+/* Áreas expandidas */
+.referenceSettingsPage .referenceSettingsExpanded{
+  min-width:0;
+  gap:var(--space-3);
+  padding:var(--space-4) var(--space-4) var(--space-4) 72px;
+  border-color:var(--line);
+  background:var(--surface-2);
+}
+.referenceSettingsPage .referenceSettingsExpanded p{
+  margin:0;
+  color:var(--muted);
+  font-size:var(--text-xs);
+  line-height:var(--line-height-normal);
+  overflow-wrap:anywhere;
+}
+.referenceSettingsPage .referenceSettingsGrid{
+  min-width:0;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:var(--space-3);
+}
+.referenceSettingsPage :is(
+  .referenceSettingsGrid label,
+  .referenceMonthField,
+  .referenceSettingsSave>label,
+  .referenceSettingsExpanded>label
+){
+  min-width:0;
+  gap:var(--space-2);
+  color:var(--muted);
+  font-size:var(--text-sm);
+  font-weight:var(--weight-semibold);
+  line-height:var(--line-height-control);
+}
+.referenceSettingsPage :is(
+  .referenceSettingsGrid input,
+  .referenceSettingsGrid select,
+  .referenceMonthField input,
+  .referenceSettingsSave input,
+  .referenceSettingsExpanded input,
+  .referenceSettingsExpanded select
+){
+  min-width:0;
+  min-height:var(--control-height-compact);
+  padding:9px var(--field-padding-inline);
+  border:1px solid var(--line-strong);
+  border-radius:var(--control-radius);
+  background:var(--surface);
+  color:var(--text);
+  font-size:var(--text-base);
+  line-height:var(--line-height-control);
+}
+.referenceSettingsPage :is(
+  .referenceSettingsGrid input,
+  .referenceSettingsGrid select,
+  .referenceMonthField input,
+  .referenceSettingsSave input,
+  .referenceSettingsExpanded input,
+  .referenceSettingsExpanded select
+):focus-visible{
+  border-color:var(--primary);
+  outline:2px solid color-mix(in srgb,var(--primary) 30%,transparent);
+  outline-offset:1px;
+}
+.referenceSettingsPage .referenceWeekendGrid{
+  min-width:0;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:var(--space-2);
+}
+.referenceSettingsPage .referenceWeekendGrid label{
+  min-width:0;
+  min-height:56px;
+  gap:var(--space-2);
+  padding:var(--space-3);
+  border:1px solid var(--line);
+  border-radius:var(--control-radius);
+  background:var(--surface);
+}
+.referenceSettingsPage .referenceWeekendGrid label>span{
+  min-width:0;
+  gap:var(--space-1);
+}
+.referenceSettingsPage .referenceToggleLine{
+  min-height:44px;
+  gap:var(--space-2);
+  color:var(--text)!important;
+  font-size:var(--text-sm);
+  font-weight:var(--weight-bold);
+}
+.referenceSettingsPage :is(
+  .referenceToggleLine input[type=checkbox],
+  .referenceWeekendGrid input[type=checkbox]
+){
+  width:18px;
+  height:18px;
+  flex:0 0 auto;
+  accent-color:var(--primary);
+}
+.referenceSettingsPage .referenceBreakEditor{
+  min-width:0;
+  gap:var(--space-2);
+  padding:var(--space-3);
+  border:1px solid var(--line);
+  border-radius:var(--radius-md);
+  background:var(--surface);
+}
+.referenceSettingsPage .referenceInputSuffix{
+  min-width:0;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:var(--space-2);
+}
+
+/* Tema */
+.referenceSettingsPage .referenceThemeRow{
+  grid-template-columns:44px minmax(0,1fr) auto;
+}
+.referenceSettingsPage .referenceThemeSwitch{
+  min-width:190px;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:4px;
+  padding:4px;
+  border:1px solid var(--line);
+  border-radius:var(--control-radius);
+  background:var(--surface-2);
+}
+.referenceSettingsPage .referenceThemeSwitch button{
+  min-height:var(--control-height-compact);
+  padding:8px var(--control-padding-inline);
+  border:0;
+  border-radius:9px;
+  background:transparent;
+  color:var(--muted);
+  font-size:var(--text-sm);
+  font-weight:var(--weight-bold);
+  line-height:var(--line-height-control);
+}
+.referenceSettingsPage .referenceThemeSwitch button.active{
+  background:var(--surface);
+  color:var(--primary);
+  box-shadow:0 1px 4px rgba(28,38,32,.08);
+}
+
+/* Guardar */
+.referenceSettingsPage .referenceSettingsSave{
+  min-width:0;
+  align-items:end;
+  gap:var(--space-3);
+  margin-top:var(--space-3);
+  padding:var(--space-4);
+  border:1px solid var(--line);
+  border-radius:var(--radius-lg);
+  background:var(--surface);
+}
+.referenceSettingsPage .referenceSettingsSave>label{
+  min-width:0;
+  flex:1;
+}
+.referenceSettingsPage .referenceSettingsSave button{
+  min-height:var(--control-height);
+  padding:10px var(--control-padding-inline);
+  border:1px solid transparent;
+  border-radius:var(--control-radius);
+  background:var(--primary);
+  color:#fff;
+  font-size:var(--text-sm);
+  font-weight:var(--weight-bold);
+  line-height:var(--line-height-control);
+}
+
+/* Sobre, versão e marca */
+.referenceSettingsPage .referenceAboutRow>summary{
+  min-height:84px;
+  padding-block:var(--space-3);
+}
+.referenceSettingsPage .referenceAboutInfoIcon,
+.referenceSettingsPage .referenceAboutLogo{
+  width:44px;
+  height:44px;
+}
+.referenceSettingsPage .referenceAboutRow>summary strong{
+  font-size:var(--text-base);
+  font-weight:var(--weight-bold);
+  line-height:var(--line-height-control);
+}
+.referenceSettingsPage .referenceAboutRow>summary small{
+  font-size:var(--text-xs);
+  line-height:var(--line-height-normal);
+}
+.referenceSettingsPage .referenceAboutExpanded{
+  min-width:0;
+  gap:var(--space-4);
+  padding:var(--space-4) var(--space-4) var(--space-4) 72px;
+}
+.referenceSettingsPage .referenceVersionHero,
+.referenceSettingsPage .referenceBrandHero,
+.referenceSettingsPage .referenceVersionFacts,
+.referenceSettingsPage .referenceBrandMeaningGrid{
+  min-width:0;
+}
+.referenceSettingsPage .referenceVersionHero>div,
+.referenceSettingsPage .referenceBrandHero>div{
+  min-width:0;
+}
+.referenceSettingsPage .referenceVersionHero>div>span,
+.referenceSettingsPage .referenceBrandHero>div>span{
+  color:var(--primary);
+  font-size:10px;
+  font-weight:var(--weight-heavy);
+  letter-spacing:.08em;
+}
+.referenceSettingsPage .referenceVersionHero>div>strong,
+.referenceSettingsPage .referenceBrandHero>div>strong{
+  color:var(--text);
+  font-size:var(--text-lg);
+  font-weight:var(--weight-heavy);
+  line-height:var(--line-height-tight);
+  overflow-wrap:anywhere;
+}
+.referenceSettingsPage .referenceVersionHero>div>small,
+.referenceSettingsPage .referenceBrandHero>div>p{
+  color:var(--muted);
+  font-size:var(--text-xs);
+  line-height:var(--line-height-normal);
+  overflow-wrap:anywhere;
+}
+.referenceSettingsPage .referenceVersionBadge{
+  min-height:32px;
+  display:inline-flex;
+  align-items:center;
+  padding:5px 9px;
+  border:1px solid var(--line);
+  background:var(--surface);
+  color:var(--text);
+  font-size:var(--text-xs);
+  font-weight:var(--weight-bold);
+}
+.referenceSettingsPage .referenceVersionFacts,
+.referenceSettingsPage .referenceBrandMeaningGrid{
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:var(--space-2);
+}
+.referenceSettingsPage .referenceVersionFacts article,
+.referenceSettingsPage .referenceBrandMeaningGrid article{
+  min-width:0;
+  padding:var(--space-3);
+  border:1px solid var(--line);
+  border-radius:var(--radius-md);
+  background:var(--surface);
+}
+.referenceSettingsPage .referenceVersionFacts article strong,
+.referenceSettingsPage .referenceBrandMeaningGrid article strong{
+  color:var(--text);
+  font-size:var(--text-xs);
+  font-weight:var(--weight-bold);
+  overflow-wrap:anywhere;
+}
+.referenceSettingsPage .referenceVersionCheckButton{
+  min-height:var(--control-height-compact);
+  padding:9px var(--control-padding-inline);
+  border-radius:var(--control-radius);
+  background:var(--primary);
+  color:#fff;
+  font-size:var(--text-sm);
+  font-weight:var(--weight-bold);
+}
+.referenceSettingsPage .referenceVersionStatus,
+.referenceSettingsPage .referenceBrandPurpose{
+  min-width:0;
+  padding:var(--space-3);
+  border-radius:var(--control-radius);
+  font-size:var(--text-xs);
+  line-height:var(--line-height-normal);
+  overflow-wrap:anywhere;
+}
+.referenceSettingsPage .referenceBrandHero{
+  grid-template-columns:68px minmax(0,1fr);
+  gap:var(--space-3);
+}
+.referenceSettingsPage .referenceBrandHero>img{
+  width:68px;
+  height:68px;
+  padding:8px;
+  border:1px solid var(--line);
+  border-radius:var(--radius-md);
+  background:var(--surface);
+}
+
+/* Tema escuro */
+:root[data-theme='dark'] .referenceSettingsPage .referenceSettingsCard{
+  border-color:var(--line);
+  background:var(--surface);
+  box-shadow:0 12px 30px rgba(0,0,0,.18);
+}
+:root[data-theme='dark'] .referenceSettingsPage :is(
+  .referenceSettingsExpanded,
+  .referenceThemeSwitch
+){
+  border-color:var(--line);
+  background:var(--surface-2);
+}
+:root[data-theme='dark'] .referenceSettingsPage :is(
+  .referenceWeekendGrid label,
+  .referenceBreakEditor,
+  .referenceVersionFacts article,
+  .referenceBrandMeaningGrid article,
+  .referenceBrandHero>img
+){
+  border-color:var(--line);
+  background:var(--surface);
+}
+
+/* Mobile */
+@media(max-width:620px){
+  .referenceSettingsPage{
+    width:100%;
+    max-width:100%;
+  }
+  .referenceSettingsPage .referencePageTitle{
+    padding:16px 0 var(--space-3);
+  }
+  .referenceSettingsPage .referencePageTitle h1{
+    font-size:clamp(26px,8vw,32px);
+  }
+  .referenceSettingsPage .referencePageTitle p{
+    font-size:var(--text-sm);
+  }
+  .referenceSettingsPage :is(
+    .referenceSettingsStaticRow,
+    .referenceSettingsLinkRow,
+    .referenceSettingsRow>summary
+  ){
+    grid-template-columns:40px minmax(0,1fr) auto;
+    gap:var(--space-2);
+    padding:var(--space-3);
+  }
+  .referenceSettingsPage .referenceSettingsIcon,
+  .referenceSettingsPage .referenceSettingsLogo{
+    width:40px;
+    height:40px;
+  }
+  .referenceSettingsPage .referenceSettingsExpanded,
+  .referenceSettingsPage .referenceAboutExpanded{
+    padding:var(--space-3);
+  }
+  .referenceSettingsPage .referenceSettingsGrid,
+  .referenceSettingsPage .referenceWeekendGrid,
+  .referenceSettingsPage .referenceVersionFacts,
+  .referenceSettingsPage .referenceBrandMeaningGrid{
+    grid-template-columns:minmax(0,1fr);
+  }
+  .referenceSettingsPage .referenceThemeRow{
+    grid-template-columns:40px minmax(0,1fr);
+  }
+  .referenceSettingsPage .referenceThemeSwitch{
+    grid-column:2;
+    width:100%;
+    min-width:0;
+  }
+  .referenceSettingsPage .referenceSettingsSave{
+    align-items:stretch;
+    flex-direction:column;
+    padding:var(--space-3);
+    border-radius:var(--radius-md);
+  }
+  .referenceSettingsPage .referenceSettingsSave button{
+    width:100%;
+  }
+  .referenceSettingsPage .referenceVersionHero{
+    align-items:stretch;
+    flex-direction:column;
+  }
+  .referenceSettingsPage .referenceBrandHero{
+    grid-template-columns:60px minmax(0,1fr);
+  }
+  .referenceSettingsPage .referenceBrandHero>img{
+    width:60px;
+    height:60px;
+  }
+}
+@media(max-width:420px){
+  .referenceSettingsPage .referencePageTitle h1{font-size:26px}
+  .referenceSettingsPage :is(
+    .referenceSettingsStaticRow,
+    .referenceSettingsLinkRow,
+    .referenceSettingsRow>summary
+  ){
+    grid-template-columns:36px minmax(0,1fr) auto;
+    padding-inline:12px;
+  }
+  .referenceSettingsPage .referenceSettingsIcon,
+  .referenceSettingsPage .referenceSettingsLogo{
+    width:36px;
+    height:36px;
+  }
+  .referenceSettingsPage .referenceThemeRow{
+    grid-template-columns:36px minmax(0,1fr);
+  }
+  .referenceSettingsPage .referenceThemeSwitch{
+    grid-template-columns:minmax(0,1fr);
+  }
+  .referenceSettingsPage .referenceBrandHero{
+    grid-template-columns:minmax(0,1fr);
+  }
+  .referenceSettingsPage .referenceBrandHero>img{
+    width:56px;
+    height:56px;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .referenceSettingsPage .referenceAboutRow .referenceChevron{
+    transition:none;
+  }
+}
