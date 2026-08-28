@@ -416,3 +416,461 @@
     height: 32px;
   }
 }
+
+
+/* Consolidação visual da página Histórico.
+ * Apenas apresentação: não altera relatórios, eventos, eliminação ou persistência.
+ */
+.historyPage.referenceHistoryPage{
+  width:min(100%,920px);
+  min-width:0;
+  max-width:920px;
+  margin:0 auto;
+}
+.historyPage.referenceHistoryPage>*{min-width:0}
+.historyPage.referenceHistoryPage .historyHeader{
+  min-width:0;
+  align-items:flex-end;
+  gap:var(--space-4);
+  margin-bottom:var(--space-3);
+  padding:8px 2px var(--space-2);
+}
+.historyPage.referenceHistoryPage .historyHeaderCopy{min-width:0}
+.historyPage.referenceHistoryPage .historyHeaderCopy h1{
+  margin:0 0 var(--space-1);
+  color:var(--text);
+  font-size:clamp(var(--text-2xl),5vw,var(--text-3xl));
+  font-weight:var(--weight-heavy);
+  line-height:var(--line-height-tight);
+  letter-spacing:-.035em;
+  overflow-wrap:anywhere;
+}
+.historyPage.referenceHistoryPage .historyHeaderCopy p{
+  max-width:680px;
+  margin:0;
+  color:var(--muted);
+  font-size:var(--text-md);
+  line-height:var(--line-height-normal);
+}
+.historyPage.referenceHistoryPage .historyDateControl{
+  min-width:0;
+  min-height:var(--control-height-compact);
+  gap:var(--space-2);
+  padding:6px 8px 6px var(--field-padding-inline);
+  border:1px solid var(--line-strong);
+  border-radius:var(--control-radius);
+  background:var(--surface);
+  color:var(--muted);
+}
+.historyPage.referenceHistoryPage .historyDateControl svg{
+  width:18px;
+  height:18px;
+  flex:0 0 auto;
+  color:var(--primary);
+}
+.historyPage.referenceHistoryPage .historyDateControl input{
+  min-width:0;
+  min-height:32px;
+  padding:0 6px;
+  border:0;
+  background:transparent;
+  color:var(--text);
+  font-size:var(--text-sm);
+  font-weight:var(--weight-bold);
+  line-height:var(--line-height-control);
+}
+
+/* Período */
+.historyPage.referenceHistoryPage .referenceHistoryTabs{
+  min-width:0;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:4px;
+  margin:0 0 var(--space-3);
+  padding:4px;
+  border:1px solid var(--line);
+  border-radius:var(--control-radius);
+  background:var(--surface-2);
+}
+.historyPage.referenceHistoryPage .referenceHistoryTabs span,
+.historyPage.referenceHistoryPage .referenceHistoryTabs a{
+  min-width:0;
+  min-height:var(--control-height-compact);
+  display:grid;
+  place-items:center;
+  padding:7px var(--control-padding-inline);
+  border-radius:9px;
+  color:var(--muted);
+  text-decoration:none;
+  font-size:var(--text-sm);
+  font-weight:var(--weight-bold);
+  line-height:var(--line-height-control);
+}
+.historyPage.referenceHistoryPage .referenceHistoryTabs span[aria-current=page]{
+  background:var(--surface);
+  color:var(--primary);
+  box-shadow:0 1px 4px rgba(28,38,32,.08);
+}
+
+/* Resumo */
+.historyPage.referenceHistoryPage .historySummaryCard{
+  min-width:0;
+  margin-bottom:var(--space-3);
+  border:1px solid var(--line);
+  border-radius:var(--radius-lg);
+  background:var(--surface);
+  overflow:hidden;
+}
+.historyPage.referenceHistoryPage .referenceHistorySummary{
+  padding-top:var(--space-4);
+}
+.historyPage.referenceHistoryPage .referenceHistorySummaryHeader{
+  min-width:0;
+  gap:var(--space-3);
+  margin-bottom:var(--space-3);
+  padding:0 var(--space-4);
+}
+.historyPage.referenceHistoryPage .referenceHistorySummaryHeader>div{
+  min-width:0;
+  gap:var(--space-1);
+}
+.historyPage.referenceHistoryPage .referenceHistorySummaryHeader strong{
+  color:var(--text);
+  font-size:var(--text-base);
+  font-weight:var(--weight-bold);
+  line-height:var(--line-height-control);
+}
+.historyPage.referenceHistoryPage .referenceHistorySummaryHeader small{
+  color:var(--muted);
+  font-size:var(--text-xs);
+  line-height:var(--line-height-normal);
+}
+.historyPage.referenceHistoryPage .referenceHistorySummaryHeader a{
+  min-height:var(--control-height-compact);
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:8px var(--control-padding-inline);
+  border-radius:var(--control-radius);
+  background:var(--primary-soft);
+  color:var(--primary);
+  text-decoration:none;
+  font-size:var(--text-xs);
+  font-weight:var(--weight-bold);
+  line-height:var(--line-height-control);
+  text-align:center;
+}
+.historyPage.referenceHistoryPage .historySummaryPrimary{
+  min-width:0;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  padding:var(--space-4);
+}
+.historyPage.referenceHistoryPage .historySummaryMetric{
+  min-width:0;
+  padding:var(--space-1) var(--space-4);
+  border-color:var(--line);
+}
+.historyPage.referenceHistoryPage .historySummaryMetric:first-child{padding-left:0}
+.historyPage.referenceHistoryPage .historySummaryMetric:last-child{padding-right:0}
+.historyPage.referenceHistoryPage .historySummaryMetric span,
+.historyPage.referenceHistoryPage .historySummarySecondary span{
+  margin-bottom:var(--space-1);
+  color:var(--muted);
+  font-size:var(--text-xs);
+  font-weight:var(--weight-semibold);
+  line-height:var(--line-height-normal);
+}
+.historyPage.referenceHistoryPage .historySummaryMetric strong{
+  display:block;
+  min-width:0;
+  color:var(--text);
+  font-size:clamp(var(--text-lg),3vw,var(--text-xl));
+  font-weight:var(--weight-heavy);
+  line-height:var(--line-height-tight);
+  font-variant-numeric:tabular-nums;
+  overflow-wrap:anywhere;
+  white-space:normal;
+}
+.historyPage.referenceHistoryPage .historySummaryMetricEffective strong{color:var(--primary)}
+.historyPage.referenceHistoryPage .historySummarySecondary{
+  min-width:0;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  border-top:1px solid var(--line);
+  background:var(--surface-2);
+}
+.historyPage.referenceHistoryPage .historySummarySecondary div{
+  min-width:0;
+  padding:var(--space-3);
+  border-color:var(--line);
+}
+.historyPage.referenceHistoryPage .historySummarySecondary strong{
+  display:block;
+  min-width:0;
+  color:var(--text);
+  font-size:var(--text-sm);
+  font-weight:var(--weight-bold);
+  line-height:var(--line-height-normal);
+  font-variant-numeric:tabular-nums;
+  overflow-wrap:anywhere;
+  white-space:normal;
+}
+
+/* Timeline */
+.historyPage.referenceHistoryPage .historyTimelinePanel{
+  min-width:0;
+  padding:var(--space-4);
+  border:1px solid var(--line)!important;
+  border-radius:var(--radius-lg);
+  background:var(--surface)!important;
+  box-shadow:none!important;
+}
+.historyPage.referenceHistoryPage .historyTimelineHeader{
+  min-width:0;
+  gap:var(--space-3);
+  margin-bottom:var(--space-3);
+  padding-inline:0;
+}
+.historyPage.referenceHistoryPage .historyTimelineTitle{
+  min-width:0;
+  gap:var(--space-2);
+}
+.historyPage.referenceHistoryPage .historyTimelineTitle>div{min-width:0}
+.historyPage.referenceHistoryPage .historyTimelineIcon{
+  width:36px;
+  height:36px;
+  flex:0 0 36px;
+  border-radius:var(--control-radius);
+  background:var(--primary-soft);
+  color:var(--primary);
+}
+.historyPage.referenceHistoryPage .historyTimelineTitle h2{
+  margin:0;
+  color:var(--text);
+  font-size:var(--text-lg);
+  font-weight:var(--weight-heavy);
+  line-height:var(--line-height-tight);
+  letter-spacing:-.02em;
+}
+.historyPage.referenceHistoryPage .historyTimelineTitle span{
+  margin-top:var(--space-1);
+  color:var(--muted);
+  font-size:var(--text-xs);
+  line-height:var(--line-height-normal);
+}
+.historyPage.referenceHistoryPage .historyEventCount{
+  min-width:32px;
+  height:32px;
+  padding-inline:8px;
+  border:1px solid var(--line);
+  background:var(--surface-2);
+  color:var(--muted);
+  font-size:var(--text-xs);
+  font-weight:var(--weight-bold);
+}
+.historyPage.referenceHistoryPage .historyTimelineList{
+  min-width:0;
+  gap:var(--space-2);
+}
+.historyPage.referenceHistoryPage .historyTimelineItem{
+  min-width:0;
+  grid-template-columns:48px 12px minmax(0,1fr) auto;
+  gap:var(--space-2);
+  min-height:64px;
+  padding:var(--space-3);
+  border:1px solid var(--line);
+  border-radius:var(--radius-md);
+  background:var(--surface-2);
+}
+.historyPage.referenceHistoryPage .historyTimelineItem:last-child{border-bottom:1px solid var(--line)}
+.historyPage.referenceHistoryPage .historyTimelineItem time{
+  color:var(--muted);
+  font-size:var(--text-xs);
+  font-weight:var(--weight-bold);
+  line-height:var(--line-height-control);
+  font-variant-numeric:tabular-nums;
+}
+.historyPage.referenceHistoryPage .historyTimelineDot{
+  width:9px;
+  height:9px;
+  border:2px solid var(--surface-2);
+  background:var(--primary);
+  box-shadow:0 0 0 2px color-mix(in srgb,var(--primary) 22%,transparent);
+}
+.historyPage.referenceHistoryPage .historyTimelineItem:not(:last-child) .historyTimelineDot::after{
+  display:none;
+}
+.historyPage.referenceHistoryPage .historyTimelineCopy{
+  min-width:0;
+  gap:var(--space-1);
+}
+.historyPage.referenceHistoryPage .historyTimelineCopy strong{
+  min-width:0;
+  color:var(--text);
+  font-size:var(--text-sm);
+  font-weight:var(--weight-bold);
+  line-height:var(--line-height-control);
+  overflow-wrap:anywhere;
+  white-space:normal;
+}
+.historyPage.referenceHistoryPage .historyTimelineCopy span{
+  min-width:0;
+  color:var(--muted);
+  font-size:var(--text-xs);
+  line-height:var(--line-height-normal);
+  overflow-wrap:anywhere;
+  white-space:normal;
+}
+.historyPage.referenceHistoryPage .historyDeleteIconButton{
+  width:var(--control-height-compact);
+  height:var(--control-height-compact);
+  min-width:var(--control-height-compact);
+  min-height:var(--control-height-compact);
+  border:1px solid color-mix(in srgb,var(--danger) 32%,var(--line));
+  border-radius:var(--control-radius);
+  background:color-mix(in srgb,var(--danger) 7%,var(--surface));
+  color:var(--danger);
+}
+.historyPage.referenceHistoryPage .historyDeleteIconButton:hover:not(:disabled),
+.historyPage.referenceHistoryPage .historyDeleteIconButton:focus-visible:not(:disabled){
+  border-color:color-mix(in srgb,var(--danger) 48%,var(--line));
+  background:color-mix(in srgb,var(--danger) 10%,var(--surface));
+}
+.historyPage.referenceHistoryPage .historyActivePill{
+  min-height:32px;
+  display:inline-flex;
+  align-items:center;
+  padding:5px 9px;
+  border:1px solid color-mix(in srgb,var(--success) 30%,var(--line));
+  background:color-mix(in srgb,var(--success) 7%,var(--surface));
+  color:var(--success);
+  font-size:10px;
+  font-weight:var(--weight-heavy);
+  line-height:var(--line-height-control);
+}
+.historyPage.referenceHistoryPage .historyEmptyCompact,
+.historyPage.referenceHistoryPage :is(.mutedText,.errorBanner){
+  min-width:0;
+  font-size:var(--text-sm);
+  line-height:var(--line-height-normal);
+  overflow-wrap:anywhere;
+}
+.historyPage.referenceHistoryPage .historyEmptyCompact{
+  padding:var(--space-5) var(--space-4);
+  border:1px dashed var(--line-strong);
+  border-radius:var(--radius-md);
+  color:var(--muted);
+  text-align:center;
+}
+
+/* Tema escuro preserva a mesma geometria. */
+[data-theme="dark"] .historyPage.referenceHistoryPage :is(
+  .historySummaryCard,
+  .historyTimelinePanel,
+  .historyDateControl
+){
+  border-color:var(--line);
+  background:var(--surface)!important;
+}
+[data-theme="dark"] .historyPage.referenceHistoryPage :is(
+  .referenceHistoryTabs,
+  .historySummarySecondary,
+  .historyTimelineItem,
+  .historyEventCount
+){
+  border-color:var(--line);
+  background:var(--surface-2);
+}
+[data-theme="dark"] .historyPage.referenceHistoryPage .referenceHistoryTabs span[aria-current=page]{
+  background:var(--surface);
+}
+
+@media(max-width:700px){
+  .historyPage.referenceHistoryPage{
+    width:100%;
+    max-width:100%;
+    padding-bottom:34px;
+  }
+  .historyPage.referenceHistoryPage .historyHeader{
+    align-items:stretch;
+    flex-direction:column;
+    gap:var(--space-3);
+    margin-bottom:var(--space-3);
+    padding-inline:0;
+  }
+  .historyPage.referenceHistoryPage .historyHeaderCopy h1{
+    font-size:clamp(26px,8vw,32px);
+  }
+  .historyPage.referenceHistoryPage .historyHeaderCopy p{
+    display:block;
+    font-size:var(--text-sm);
+  }
+  .historyPage.referenceHistoryPage .historyDateControl{
+    width:100%;
+  }
+  .historyPage.referenceHistoryPage .historyDateControl input{
+    flex:1;
+    text-align:right;
+  }
+  .historyPage.referenceHistoryPage .referenceHistorySummaryHeader{
+    align-items:stretch;
+    flex-direction:column;
+    padding-inline:var(--space-3);
+  }
+  .historyPage.referenceHistoryPage .referenceHistorySummaryHeader a{
+    align-self:flex-start;
+  }
+  .historyPage.referenceHistoryPage .historySummaryPrimary{
+    padding:var(--space-3);
+  }
+  .historyPage.referenceHistoryPage .historySummaryMetric{
+    padding-inline:var(--space-2);
+  }
+  .historyPage.referenceHistoryPage .historySummarySecondary{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  .historyPage.referenceHistoryPage .historyTimelinePanel{
+    padding:var(--space-3);
+    border-radius:var(--radius-md);
+  }
+}
+@media(max-width:420px){
+  .historyPage.referenceHistoryPage .historyHeaderCopy h1{font-size:26px}
+  .historyPage.referenceHistoryPage .referenceHistoryTabs{
+    grid-template-columns:minmax(0,1fr);
+  }
+  .historyPage.referenceHistoryPage .historySummaryPrimary{
+    grid-template-columns:minmax(0,1fr);
+    gap:var(--space-2);
+  }
+  .historyPage.referenceHistoryPage .historySummaryMetric{
+    padding:var(--space-2) 0;
+    border-right:0;
+    border-bottom:1px solid var(--line);
+  }
+  .historyPage.referenceHistoryPage .historySummaryMetric:last-child{
+    border-bottom:0;
+  }
+  .historyPage.referenceHistoryPage .historySummaryMetric strong{
+    font-size:var(--text-lg);
+  }
+  .historyPage.referenceHistoryPage .historySummarySecondary{
+    grid-template-columns:minmax(0,1fr);
+  }
+  .historyPage.referenceHistoryPage .historySummarySecondary div{
+    border-right:0;
+    border-bottom:1px solid var(--line);
+  }
+  .historyPage.referenceHistoryPage .historySummarySecondary div:last-child{
+    border-bottom:0;
+  }
+  .historyPage.referenceHistoryPage .historyTimelineHeader{
+    align-items:flex-start;
+  }
+  .historyPage.referenceHistoryPage .historyTimelineItem{
+    grid-template-columns:42px 10px minmax(0,1fr);
+  }
+  .historyPage.referenceHistoryPage .historyDeleteIconButton,
+  .historyPage.referenceHistoryPage .historyActivePill{
+    grid-column:3;
+    justify-self:start;
+  }
+}
