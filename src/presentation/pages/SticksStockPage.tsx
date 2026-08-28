@@ -659,95 +659,106 @@ export function SticksStockPage() {
             )}
 
             {packTimelineRows.length ? (
-              <div className="sticksPackForecastComparison" aria-label="Datas de início e fim de cada maço">
+              <div className="sticksPackForecastComparison" aria-label="Datas reais e previstas de cada maço">
                 <div className="sticksPackForecastHeading">
-                  <strong>Calendário de cada maço</strong>
-                  <span>Datas já ocorridas são reais; datas futuras permanecem previsão até acontecerem.</span>
-                </div>
-                <div className="sticksPackForecastTable" role="table" aria-label="Início e fim de cada maço">
-                  <div className="sticksPackForecastHeader" role="row">
-                    <span role="columnheader">Maço</span>
-                    <span role="columnheader">Sticks</span>
-                    <span role="columnheader">Dia de início</span>
-                    <span role="columnheader">Término previsto / real</span>
+                  <div>
+                    <strong>Calendário por maço</strong>
+                    <span>Início real = primeiro stick registado. Fim real = último stick registado.</span>
                   </div>
-                  {packTimelineRows.map((row) => (
-                    <div
-                      className={`sticksPackForecastRow${row.status === 'current' ? ' isCurrent' : row.status === 'completed' ? ' isCompleted' : ''}`}
-                      role="row"
-                      key={row.packNumber}
-                    >
-                      <strong role="cell">
-                        Maço {row.packNumber}
-                        <small>
-                          {row.status === 'completed'
-                            ? 'CONCLUÍDO'
-                            : row.status === 'current'
-                              ? 'ATUAL'
-                              : 'FUTURO'}
-                        </small>
-                      </strong>
-                      <span role="cell">{row.sticks}</span>
-                      <span role="cell">
-                        <b>
-                          {row.startExact
-                            ? formatDateTime(row.startValue)
-                            : row.startValue
-                              ? formatDateKey(row.startValue)
-                              : '—'}
-                        </b>
-                        <small>
-                          {row.startExact
-                            ? 'REAL · EXATO'
-                            : row.startActual
-                              ? 'REAL · SEQUÊNCIA INCERTA'
-                              : row.startValue
-                                ? packProjection?.historicalReliable
-                                  ? 'PREVISÃO'
-                                  : 'PREVISÃO PROVISÓRIA'
-                                : row.status === 'future'
-                                  ? 'SEM DADOS'
-                                  : 'INÍCIO NÃO REGISTADO'}
-                        </small>
-                      </span>
-                      <span role="cell">
-                        <b>
-                          {row.endExact
-                            ? formatDateTime(row.endValue)
-                            : row.endValue
-                              ? formatDateKey(row.endValue)
-                              : '—'}
-                        </b>
-                        <small>
-                          {row.endExact
-                            ? 'REAL · EXATO'
-                            : row.endActual
-                              ? 'REAL · SEQUÊNCIA INCERTA'
-                              : row.endValue
-                                ? packProjection?.historicalReliable
-                                  ? 'PREVISÃO DE TÉRMINO'
-                                  : 'TÉRMINO PROVISÓRIO'
-                                : row.status === 'completed'
-                                  ? 'FIM NÃO REGISTADO'
-                                  : 'SEM DADOS'}
-                        </small>
-                      </span>
-                    </div>
-                  ))}
+                  <div className="sticksPackDateLegend" aria-label="Legenda das datas">
+                    <span className="isExact">REAL · EXATO</span>
+                    <span className="isForecast">PREVISÃO</span>
+                  </div>
                 </div>
+
+                <div className="sticksPackDateList">
+                  {packTimelineRows.map((row) => {
+                    const startLabel = row.startExact
+                      ? 'REAL · EXATO'
+                      : row.startActual
+                        ? 'REAL · SEQUÊNCIA INCERTA'
+                        : row.startValue
+                          ? packProjection?.historicalReliable
+                            ? 'PREVISTO'
+                            : 'PREVISTO · PROVISÓRIO'
+                          : 'SEM DATA'
+
+                    const endLabel = row.endExact
+                      ? 'REAL · EXATO'
+                      : row.endActual
+                        ? 'REAL · SEQUÊNCIA INCERTA'
+                        : row.endValue
+                          ? packProjection?.historicalReliable
+                            ? 'PREVISTO'
+                            : 'PREVISTO · PROVISÓRIO'
+                          : 'SEM DATA'
+
+                    return (
+                      <article
+                        className={`sticksPackDateCard${row.status === 'current' ? ' isCurrent' : row.status === 'completed' ? ' isCompleted' : ''}`}
+                        key={row.packNumber}
+                      >
+                        <header>
+                          <div>
+                            <strong>Maço {row.packNumber}</strong>
+                            <small>
+                              {row.status === 'completed'
+                                ? 'CONCLUÍDO'
+                                : row.status === 'current'
+                                  ? 'ATUAL'
+                                  : 'FUTURO'}
+                            </small>
+                          </div>
+                          <span>{row.sticks} sticks</span>
+                        </header>
+
+                        <div className="sticksPackDatePair">
+                          <div>
+                            <span>Começa</span>
+                            <strong>
+                              {row.startActual
+                                ? formatDateTime(row.startValue)
+                                : row.startValue
+                                  ? formatDateKey(row.startValue)
+                                  : '—'}
+                            </strong>
+                            <small className={row.startExact ? 'isExact' : row.startValue ? 'isForecast' : ''}>
+                              {startLabel}
+                            </small>
+                          </div>
+
+                          <div>
+                            <span>Acaba</span>
+                            <strong>
+                              {row.endActual
+                                ? formatDateTime(row.endValue)
+                                : row.endValue
+                                  ? formatDateKey(row.endValue)
+                                  : '—'}
+                            </strong>
+                            <small className={row.endExact ? 'isExact' : row.endValue ? 'isForecast' : ''}>
+                              {endLabel}
+                            </small>
+                          </div>
+                        </div>
+                      </article>
+                    )
+                  })}
+                </div>
+
                 <small className="sticksPackForecastNote">
-                  O início passa a REAL · EXATO no primeiro stick registado desse maço. Enquanto o maço não terminou, a coluna de término mostra a melhor data prevista calculada pelo ritmo realmente observado; no último stick, essa data é substituída pela data/hora REAL · EXATA. Com menos de 3 dias de histórico, a previsão é marcada como provisória e recalculada após cada utilização.
+                  Para um maço já iniciado, a aplicação mantém a data/hora real do primeiro stick. Quando o último stick desse maço for registado, guarda a data/hora real do fim e deixa de mostrar a previsão. Para maços futuros, início e fim são necessariamente previsões e são recalculados com o histórico real de utilização.
                 </small>
                 {packProjection && !packProjection.packTrackingExact && packProjection.packTrackingIssue ? (
                   <p className="sticksPackTrackingWarning">
-                    <strong>Calendário individual não marcado como exato:</strong> {packProjection.packTrackingIssue} O stock total continua exato pelo ledger.
+                    <strong>Sequência física dos maços não pode ser marcada como exata:</strong> {packProjection.packTrackingIssue} O stock total continua exato pelo ledger.
                   </p>
                 ) : null}
               </div>
             ) : null}
 
             <p className="sticksEstimateRule">
-              A data futura é uma previsão matemática baseada apenas no ritmo que já ficou registado. A data exata do término só existe quando o último stick do maço é efetivamente registado; nessa altura a aplicação substitui a previsão pelo valor real.
+              <strong>Exatidão:</strong> datas que já aconteceram são guardadas com data e hora reais. Datas que ainda não aconteceram não podem ser exatas; ficam identificadas como previsão até o primeiro ou último stick confirmar o valor real.
             </p>
           </section>
 
