@@ -92,6 +92,32 @@ export function TodayReferencePage() {
   const resolvedSchedule = resolveWorkScheduleForDate(schedule, now)
   const scheduleSummary = getScheduleSummary(schedule, now)
   const nextScheduleEvent = getNextScheduleEvent(schedule, now)
+  const plannedBreak = schedule.break1.enabled
+    ? schedule.break1
+    : schedule.break2.enabled
+      ? schedule.break2
+      : null
+  const plannedBreakStartMinutes = plannedBreak ? parseClockMinutes(plannedBreak.startTime) : null
+  const plannedBreakEndMinutes = plannedBreak ? parseClockMinutes(plannedBreak.endTime) : null
+  const plannedBreakDurationMinutes =
+    plannedBreakStartMinutes !== null &&
+    plannedBreakEndMinutes !== null &&
+    plannedBreakEndMinutes > plannedBreakStartMinutes
+      ? plannedBreakEndMinutes - plannedBreakStartMinutes
+      : null
+  const plannedBreakWindow =
+    plannedBreak && plannedBreakDurationMinutes
+      ? `${plannedBreak.startTime}–${plannedBreak.endTime}`
+      : null
+  const currentClockMinutes = now.getHours() * 60 + now.getMinutes()
+  const isPlannedBreakNow = Boolean(
+    resolvedSchedule.isWorkingDay &&
+      plannedBreakDurationMinutes &&
+      plannedBreakStartMinutes !== null &&
+      plannedBreakEndMinutes !== null &&
+      currentClockMinutes >= plannedBreakStartMinutes &&
+      currentClockMinutes < plannedBreakEndMinutes,
+  )
 
   const dayJourneys = useMemo(
     () => report?.journeys ?? (activeJourney ? [activeJourney] : []),
@@ -179,7 +205,7 @@ export function TodayReferencePage() {
       : activeActivity
         ? formatDuration(activeActivityDurationMs)
         : activeJourney
-          ? formatDuration(effectiveDurationMs)
+          ? plannedBreakWindow ?? nextScheduleEvent.time ?? '—'
           : nextScheduleEvent.time ?? '—'
   const mainTimeLabel = activeBreak
     ? 'Tempo da pausa'
@@ -188,7 +214,9 @@ export function TodayReferencePage() {
       : activeActivity
         ? 'Tempo da atividade'
         : activeJourney
-          ? 'Tempo efetivo'
+          ? plannedBreakDurationMinutes
+            ? `Pausa planeada · ${plannedBreakDurationMinutes} min`
+            : nextScheduleEvent.label
           : nextScheduleEvent.label
   const primaryActionLabel = activeBreak
     ? 'Terminar pausa'
@@ -199,7 +227,9 @@ export function TodayReferencePage() {
         : activeActivity
           ? 'Concluir atividade'
           : activeJourney
-            ? 'Iniciar foco'
+            ? isPlannedBreakNow
+              ? 'Iniciar pausa'
+              : 'Iniciar foco'
             : 'Iniciar jornada'
   const primaryActionGlyph = activeBreak
     ? '▶'
@@ -293,6 +323,10 @@ export function TodayReferencePage() {
       return
     }
     if (activeJourney) {
+      if (isPlannedBreakNow) {
+        await handleStartBreak()
+        return
+      }
       await startPomodoro()
       await refreshReport()
       return
@@ -383,7 +417,7 @@ export function TodayReferencePage() {
 
         <div className="referenceFocusBody">
           <div>
-            <strong>{mainTime}</strong>
+            <strong className={activeJourney && plannedBreakWindow && !activeBreak && !activeFocus && !activeActivity ? 'referenceFocusTimeWindow' : undefined}>{mainTime}</strong>
             <span>{mainTimeLabel}</span>
           </div>
           <div className="referenceProgressControl">
@@ -415,7 +449,11 @@ export function TodayReferencePage() {
                 : activeActivity
                   ? 'Atividade em curso. Conclui-a quando terminares.'
                   : activeJourney
-                    ? 'A jornada está a contar em tempo real.'
+                    ? plannedBreakWindow && plannedBreakDurationMinutes
+                      ? isPlannedBreakNow
+                        ? `Pausa planeada agora · ${plannedBreakWindow} · ${plannedBreakDurationMinutes} min.`
+                        : `Pausa planeada ${plannedBreakWindow} · ${plannedBreakDurationMinutes} min.`
+                      : 'A jornada está a contar em tempo real.'
                     : 'Começa a jornada quando estiveres pronto.'}
           </p>
         </div>
