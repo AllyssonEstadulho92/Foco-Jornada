@@ -1034,3 +1034,161 @@
     transform:none!important;
   }
 }
+
+
+/* Refinamento final da barra inferior móvel.
+ * Corrige o rótulo "Fechar" sobredimensionado e mantém todos os cinco itens
+ * com a mesma hierarquia visual e alinhamento vertical.
+ */
+@media(max-width:899px){
+  .bottomNav.mobileBottomBar{
+    min-height:74px;
+    align-items:center;
+    padding:7px 8px max(7px,env(safe-area-inset-bottom));
+    border-radius:20px;
+  }
+
+  .mobileBottomBar .navLink,
+  .mobileQuickButton,
+  .mobileQuickButtonActive{
+    min-width:0;
+    min-height:58px;
+    height:58px;
+    align-self:stretch;
+    justify-self:stretch;
+    gap:4px;
+    padding:3px 2px;
+    border-radius:14px;
+  }
+
+  .mobileBottomBar .navLink{
+    justify-content:center;
+  }
+
+  .mobileBottomBar .navMark,
+  .mobileBottomBar .navLinkActive .navMark{
+    width:34px!important;
+    height:34px!important;
+    flex:0 0 34px!important;
+    border-radius:11px!important;
+  }
+
+  .mobileBottomBar .navMark svg{
+    width:21px!important;
+    height:21px!important;
+  }
+
+  .mobileBottomBar .navLabel,
+  .mobileQuickButton > .mobileQuickButtonLabel{
+    display:block;
+    width:100%;
+    margin:0!important;
+    color:inherit;
+    font-size:10px!important;
+    font-weight:var(--weight-semibold)!important;
+    line-height:1.05!important;
+    text-align:center;
+    white-space:nowrap;
+  }
+
+  .mobileQuickButton,
+  .mobileQuickButtonActive{
+    position:relative;
+    top:0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    border:0;
+    background:transparent!important;
+    color:var(--muted);
+    box-shadow:none;
+    transform:none;
+  }
+
+  .mobileQuickButton:hover,
+  .mobileQuickButton:focus-visible{
+    background:transparent!important;
+  }
+
+  .mobileQuickButton > .mobileQuickButtonIcon{
+    display:grid;
+    width:42px;
+    height:42px;
+    flex:0 0 42px;
+    place-items:center;
+    margin:0!important;
+    border:1px solid color-mix(in srgb,var(--primary) 34%,transparent);
+    border-radius:999px;
+    background:var(--primary);
+    color:#fff;
+    box-shadow:0 7px 18px rgba(31,157,99,.20);
+    font-size:28px!important;
+    font-weight:var(--weight-medium);
+    line-height:1!important;
+  }
+
+  .mobileQuickButtonActive{
+    color:var(--primary);
+  }
+
+  .mobileQuickButtonActive > .mobileQuickButtonIcon{
+    transform:rotate(45deg);
+  }
+
+  .mobileBottomBar .navLinkActive{
+    background:transparent!important;
+    color:var(--primary)!important;
+  }
+
+  .mobileBottomBar .navLinkActive .navMark{
+    background:var(--primary-soft)!important;
+  }
+
+  .mobileQuickButton:focus-visible,
+  .mobileBottomBar .navLink:focus-visible{
+    outline:2px solid var(--primary);
+    outline-offset:2px;
+  }
+}
+
+@media(max-width:420px){
+  .bottomNav.mobileBottomBar{
+    min-height:70px;
+    padding-inline:6px;
+  }
+
+  .mobileBottomBar .navLink,
+  .mobileQuickButton,
+  .mobileQuickButtonActive{
+    min-height:54px;
+    height:54px;
+    gap:3px;
+  }
+
+  .mobileBottomBar .navMark,
+  .mobileBottomBar .navLinkActive .navMark{
+    width:31px!important;
+    height:31px!important;
+    flex-basis:31px!important;
+  }
+
+  .mobileQuickButton > .mobileQuickButtonIcon{
+    width:38px;
+    height:38px;
+    flex-basis:38px;
+    font-size:26px!important;
+  }
+
+  .mobileBottomBar .navLabel,
+  .mobileQuickButton > .mobileQuickButtonLabel{
+    font-size:9px!important;
+  }
+}
+
+@media(max-width:360px){
+  .mobileBottomBar .navLabel,
+  .mobileQuickButton > .mobileQuickButtonLabel{
+    font-size:8.5px!important;
+  }
+}
