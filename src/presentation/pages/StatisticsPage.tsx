@@ -7,7 +7,7 @@ export function StatisticsPage() {
   const { reports, totals, isLoading, error } = useStatisticsController(period)
 
   return (
-    <section className="reportPage" aria-labelledby="statistics-title">
+    <section className="reportPage statisticsPage" aria-labelledby="statistics-title">
       <header className="reportHeader">
         <div>
           <span className="eyebrow">RELATÓRIOS</span>
