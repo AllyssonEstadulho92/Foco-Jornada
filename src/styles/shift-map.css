@@ -585,3 +585,421 @@
     font-size: 36px;
   }
 }
+
+
+/* Consolidação visual do Mapa de turnos.
+ * Apenas apresentação: não altera cálculo, plano mensal, localStorage ou vencimento.
+ */
+.shiftMapPage{
+  min-width:0;
+  gap:var(--space-4);
+}
+.shiftMapPage>*{min-width:0}
+.shiftMapHeader{
+  min-width:0;
+  gap:var(--space-4);
+}
+.shiftMapHeader>div{min-width:0}
+.shiftMapHeader .eyebrow{
+  color:var(--muted);
+  font-size:var(--text-xs);
+  font-weight:var(--weight-heavy);
+  line-height:var(--line-height-control);
+  letter-spacing:.08em;
+}
+.shiftMapHeader h1{
+  margin:var(--space-1) 0 var(--space-2);
+  color:var(--text);
+  font-size:clamp(var(--text-2xl),4vw,42px);
+  font-weight:var(--weight-heavy);
+  line-height:var(--line-height-tight);
+  letter-spacing:-.035em;
+  overflow-wrap:anywhere;
+}
+.shiftMapHeader p{
+  color:var(--muted);
+  font-size:var(--text-md);
+  line-height:var(--line-height-normal);
+}
+.shiftMapMonthPicker{
+  min-width:190px;
+  gap:var(--space-2);
+}
+.shiftMapMonthPicker span,
+.shiftMapEditorGrid label>span{
+  color:var(--muted);
+  font-size:var(--text-sm);
+  font-weight:var(--weight-semibold);
+  line-height:var(--line-height-control);
+}
+.shiftMapMonthPicker input,
+.shiftMapEditorGrid input,
+.shiftMapEditorGrid select{
+  min-width:0;
+  min-height:var(--control-height-compact);
+  padding:9px var(--field-padding-inline);
+  border:1px solid var(--line-strong);
+  border-radius:var(--control-radius);
+  background:var(--surface);
+  color:var(--text);
+  font-size:var(--text-base);
+  line-height:var(--line-height-control);
+}
+
+/* Superfícies */
+.shiftMapCommand,
+.shiftMapPanel,
+.shiftMapEditor,
+.shiftMapSalaryPanel,
+.shiftMapAccountingNote{
+  min-width:0;
+  border:1px solid var(--line);
+  border-radius:var(--radius-lg);
+  background:var(--surface);
+  box-shadow:0 10px 28px rgba(28,38,32,.055);
+}
+.shiftMapCommand{
+  gap:var(--space-4);
+  padding:var(--space-4);
+}
+.shiftMapCommand>div:first-child{
+  min-width:0;
+  gap:var(--space-1);
+}
+.shiftMapCommand>div:first-child>span,
+.shiftMapSectionHeader>div>span,
+.shiftMapSalaryHero>span{
+  color:var(--muted);
+  font-size:11px;
+  font-weight:var(--weight-heavy);
+  line-height:var(--line-height-control);
+  letter-spacing:.08em;
+}
+.shiftMapCommand>div:first-child strong{
+  color:var(--text);
+  font-size:var(--text-lg);
+  font-weight:var(--weight-heavy);
+  line-height:var(--line-height-tight);
+}
+.shiftMapCommand>div:first-child small,
+.shiftMapSectionHeader>small{
+  color:var(--muted);
+  font-size:var(--text-xs);
+  line-height:var(--line-height-normal);
+  overflow-wrap:anywhere;
+}
+.shiftMapCommandActions,
+.shiftMapEditorActions{
+  gap:var(--space-2);
+}
+.shiftMapCommandActions button,
+.shiftMapEditorActions button,
+.shiftMapPayrollLink{
+  min-height:var(--control-height-compact);
+  padding:9px var(--control-padding-inline);
+  border:1px solid var(--line-strong);
+  border-radius:var(--control-radius);
+  background:var(--surface-2);
+  color:var(--text);
+  font-size:var(--text-sm);
+  font-weight:var(--weight-bold);
+  line-height:var(--line-height-control);
+}
+.shiftMapCommandActions .shiftMapSaveButton{
+  border-color:transparent;
+  background:var(--primary);
+  color:#fff;
+}
+
+/* Resumo */
+.shiftMapOverview{
+  min-width:0;
+  gap:var(--space-2);
+}
+.shiftMapOverview article{
+  min-width:0;
+  min-height:92px;
+  gap:var(--space-1);
+  padding:var(--space-3);
+  border:1px solid var(--line);
+  border-radius:var(--radius-md);
+  background:var(--surface-2);
+}
+.shiftMapOverview article span{
+  color:var(--muted);
+  font-size:var(--text-xs);
+  font-weight:var(--weight-semibold);
+  line-height:var(--line-height-normal);
+}
+.shiftMapOverview article strong{
+  color:var(--text);
+  font-size:var(--text-xl);
+  font-weight:var(--weight-heavy);
+  line-height:var(--line-height-tight);
+  font-variant-numeric:tabular-nums;
+  overflow-wrap:anywhere;
+}
+.shiftMapOverview .shiftMapOverviewPrimary{
+  background:var(--primary-soft);
+}
+.shiftMapOverview .shiftMapOverviewPrimary strong{color:var(--primary)}
+
+/* Secções e calendário */
+.shiftMapPanel,
+.shiftMapEditor,
+.shiftMapSalaryPanel{
+  padding:var(--space-4);
+}
+.shiftMapSectionHeader{
+  min-width:0;
+  gap:var(--space-3);
+  margin-bottom:var(--space-4);
+}
+.shiftMapSectionHeader>div{min-width:0}
+.shiftMapSectionHeader h2{
+  color:var(--text);
+  font-size:var(--text-lg);
+  font-weight:var(--weight-heavy);
+  line-height:var(--line-height-tight);
+}
+.shiftMapCalendarScroll{
+  border-radius:var(--control-radius);
+}
+.shiftMapCalendar{
+  gap:var(--space-2);
+}
+.shiftMapWeekday{
+  padding:8px;
+  color:var(--muted);
+  font-size:var(--text-xs);
+  font-weight:var(--weight-heavy);
+}
+.shiftMapBlank{
+  border-radius:var(--radius-md);
+  background:var(--surface-2);
+}
+.shiftMapDay{
+  min-width:0;
+  padding:var(--space-3);
+  border:1px solid var(--line);
+  border-radius:var(--radius-md);
+  background:var(--surface);
+  color:var(--text);
+}
+.shiftMapDay:hover{
+  border-color:color-mix(in srgb,var(--primary) 35%,var(--line));
+}
+.shiftMapDaySelected{
+  border-color:color-mix(in srgb,var(--primary) 60%,var(--line));
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--primary) 25%,transparent);
+}
+.shiftMapDayNumber{
+  color:var(--muted);
+  font-size:var(--text-xs);
+  font-weight:var(--weight-heavy);
+}
+.shiftMapDay>strong{
+  min-width:30px;
+  border-radius:8px;
+  background:var(--primary-soft);
+  color:var(--primary);
+  font-size:11px;
+  font-weight:var(--weight-heavy);
+}
+.shiftMapDay>small{
+  color:var(--text);
+  font-size:var(--text-xs);
+  font-weight:var(--weight-semibold);
+  line-height:var(--line-height-normal);
+  overflow-wrap:anywhere;
+}
+.shiftMapDay>em,
+.shiftMapDay>b{
+  color:var(--muted);
+  font-size:10px;
+  font-weight:var(--weight-semibold);
+  line-height:var(--line-height-normal);
+}
+.shiftMapLegend{
+  gap:var(--space-2) var(--space-3);
+  color:var(--muted);
+  font-size:var(--text-xs);
+  line-height:var(--line-height-normal);
+}
+
+/* Editor */
+.shiftMapEffectiveBadge{
+  max-width:100%;
+  padding:6px 9px;
+  background:var(--primary-soft);
+  color:var(--primary);
+  font-size:var(--text-xs);
+  font-weight:var(--weight-bold);
+  line-height:var(--line-height-control);
+}
+.shiftMapEditorGrid{
+  min-width:0;
+  gap:var(--space-3);
+}
+.shiftMapEditorGrid label{
+  min-width:0;
+  gap:var(--space-2);
+}
+.shiftMapEditorActions{
+  margin-top:var(--space-4);
+}
+
+/* Resumo RH e vencimento */
+.shiftMapLowerGrid{
+  min-width:0;
+  gap:var(--space-4);
+}
+.shiftMapRhPanel dl{
+  min-width:0;
+  gap:var(--space-2);
+}
+.shiftMapRhPanel dl>div{
+  min-width:0;
+  gap:var(--space-3);
+  padding:var(--space-3);
+  border:1px solid var(--line);
+  border-radius:var(--control-radius);
+  background:var(--surface-2);
+}
+.shiftMapRhPanel dt{
+  color:var(--muted);
+  font-size:var(--text-xs);
+  line-height:var(--line-height-normal);
+}
+.shiftMapRhPanel dd{
+  color:var(--text);
+  font-size:var(--text-lg);
+  font-weight:var(--weight-heavy);
+  font-variant-numeric:tabular-nums;
+}
+.shiftMapSalaryPanel{
+  gap:var(--space-4);
+  background:linear-gradient(145deg,var(--primary-soft),var(--surface) 48%);
+}
+.shiftMapSalaryHero{
+  min-width:0;
+  gap:var(--space-1);
+}
+.shiftMapSalaryHero>strong{
+  color:var(--primary);
+  font-size:clamp(32px,5vw,48px);
+  font-weight:var(--weight-heavy);
+  line-height:var(--line-height-tight);
+  font-variant-numeric:tabular-nums;
+  overflow-wrap:anywhere;
+}
+.shiftMapSalaryHero>small,
+.shiftMapSalaryPanel>p{
+  color:var(--muted);
+  font-size:var(--text-xs);
+  line-height:var(--line-height-normal);
+}
+.shiftMapSalaryBreakdown{
+  min-width:0;
+  gap:var(--space-2);
+}
+.shiftMapSalaryBreakdown>div{
+  min-width:0;
+  gap:var(--space-1);
+  padding:var(--space-3);
+  border:1px solid var(--line);
+  border-radius:var(--control-radius);
+  background:color-mix(in srgb,var(--surface) 86%,transparent);
+}
+.shiftMapSalaryBreakdown span{
+  color:var(--muted);
+  font-size:11px;
+}
+.shiftMapSalaryBreakdown strong{
+  color:var(--text);
+  font-size:var(--text-sm);
+  font-weight:var(--weight-bold);
+  font-variant-numeric:tabular-nums;
+  overflow-wrap:anywhere;
+}
+.shiftMapPayrollLink{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+}
+.shiftMapAccountingNote{
+  padding:var(--space-4);
+  border-left:4px solid var(--primary);
+}
+.shiftMapAccountingNote strong{
+  color:var(--text);
+  font-size:var(--text-sm);
+  font-weight:var(--weight-bold);
+}
+.shiftMapAccountingNote p{
+  color:var(--muted);
+  font-size:var(--text-xs);
+  line-height:var(--line-height-normal);
+}
+
+/* Tema escuro: mesma geometria, superfícies do tema. */
+[data-theme="dark"] :is(
+  .shiftMapCommand,
+  .shiftMapPanel,
+  .shiftMapEditor,
+  .shiftMapSalaryPanel,
+  .shiftMapAccountingNote,
+  .shiftMapDay
+){
+  border-color:var(--line);
+  background:var(--surface);
+}
+[data-theme="dark"] :is(
+  .shiftMapOverview article,
+  .shiftMapBlank,
+  .shiftMapRhPanel dl>div,
+  .shiftMapSalaryBreakdown>div
+){
+  border-color:var(--line);
+  background:var(--surface-2);
+}
+[data-theme="dark"] .shiftMapSalaryPanel{
+  background:linear-gradient(145deg,var(--primary-soft),var(--surface) 48%);
+}
+
+/* O calendário mensal mantém scroll horizontal intencional em ecrãs estreitos. */
+@media(max-width:899px){
+  .shiftMapPage{gap:var(--space-3)}
+  .shiftMapHeader,
+  .shiftMapCommand{gap:var(--space-3)}
+  .shiftMapHeader h1{font-size:clamp(26px,8vw,32px)}
+  .shiftMapCommand{padding:var(--space-3)}
+  .shiftMapCommandActions{grid-template-columns:minmax(0,1fr) minmax(0,1.2fr)}
+  .shiftMapOverview{gap:var(--space-2)}
+  .shiftMapPanel,
+  .shiftMapEditor,
+  .shiftMapSalaryPanel{padding:var(--space-3);border-radius:var(--radius-md)}
+  .shiftMapSectionHeader{gap:var(--space-2)}
+  .shiftMapEditorGrid{gap:var(--space-2)}
+  .shiftMapLowerGrid{gap:var(--space-3)}
+}
+@media(max-width:620px){
+  .shiftMapHeader p{font-size:var(--text-sm)}
+  .shiftMapOverview{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .shiftMapOverview .shiftMapOverviewPrimary{grid-column:1/-1}
+  .shiftMapCommandActions,
+  .shiftMapEditorActions{grid-template-columns:minmax(0,1fr)}
+  .shiftMapEditorGrid{grid-template-columns:minmax(0,1fr)}
+  .shiftMapEditorWide{grid-column:1}
+  .shiftMapSalaryBreakdown,
+  .shiftMapRhPanel dl{grid-template-columns:minmax(0,1fr)}
+  .shiftMapPayrollLink{width:100%}
+}
+@media(max-width:420px){
+  .shiftMapHeader h1{font-size:26px}
+  .shiftMapOverview{grid-template-columns:minmax(0,1fr)}
+  .shiftMapOverview .shiftMapOverviewPrimary{grid-column:1}
+  .shiftMapSectionHeader{align-items:flex-start}
+  .shiftMapSalaryHero>strong{font-size:32px}
+}
