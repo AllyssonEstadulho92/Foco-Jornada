@@ -362,3 +362,25 @@
     grid-column: auto;
   }
 }
+
+
+/* Jornada ativa: o destaque principal mostra a pausa planeada,
+ * evitando duplicar o contador de tempo efetivo do resumo diário.
+ */
+.referenceHome .referenceFocusTimeWindow{
+  max-width:100%;
+  font-size:clamp(30px,5vw,46px)!important;
+  line-height:1;
+  letter-spacing:-.035em;
+  white-space:nowrap;
+}
+@media(max-width:620px){
+  .referenceHome .referenceFocusTimeWindow{
+    font-size:clamp(26px,8vw,36px)!important;
+  }
+}
+@media(max-width:420px){
+  .referenceHome .referenceFocusTimeWindow{
+    font-size:28px!important;
+  }
+}
