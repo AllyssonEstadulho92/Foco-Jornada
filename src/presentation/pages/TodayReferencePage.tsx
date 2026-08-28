@@ -8,6 +8,7 @@ import { getJourneyDurationMs } from '../../domain/journey/Journey'
 import {
   formatPlannedMinutes,
   getNextScheduleEvent,
+  getResolvedScheduledBreaks,
   getScheduleSummary,
   parseClockMinutes,
   resolveWorkScheduleForDate,
@@ -92,31 +93,16 @@ export function TodayReferencePage() {
   const resolvedSchedule = resolveWorkScheduleForDate(schedule, now)
   const scheduleSummary = getScheduleSummary(schedule, now)
   const nextScheduleEvent = getNextScheduleEvent(schedule, now)
-  const plannedBreak = schedule.break1.enabled
-    ? schedule.break1
-    : schedule.break2.enabled
-      ? schedule.break2
-      : null
-  const plannedBreakStartMinutes = plannedBreak ? parseClockMinutes(plannedBreak.startTime) : null
-  const plannedBreakEndMinutes = plannedBreak ? parseClockMinutes(plannedBreak.endTime) : null
-  const plannedBreakDurationMinutes =
-    plannedBreakStartMinutes !== null &&
-    plannedBreakEndMinutes !== null &&
-    plannedBreakEndMinutes > plannedBreakStartMinutes
-      ? plannedBreakEndMinutes - plannedBreakStartMinutes
-      : null
-  const plannedBreakWindow =
-    plannedBreak && plannedBreakDurationMinutes
-      ? `${plannedBreak.startTime}–${plannedBreak.endTime}`
-      : null
+  const plannedBreak = getResolvedScheduledBreaks(schedule, now)[0] ?? null
+  const plannedBreakDurationMinutes = plannedBreak?.durationMinutes ?? null
+  const plannedBreakWindow = plannedBreak
+    ? `${plannedBreak.startTime}–${plannedBreak.endTime}`
+    : null
   const currentClockMinutes = now.getHours() * 60 + now.getMinutes()
   const isPlannedBreakNow = Boolean(
-    resolvedSchedule.isWorkingDay &&
-      plannedBreakDurationMinutes &&
-      plannedBreakStartMinutes !== null &&
-      plannedBreakEndMinutes !== null &&
-      currentClockMinutes >= plannedBreakStartMinutes &&
-      currentClockMinutes < plannedBreakEndMinutes,
+    plannedBreak &&
+      currentClockMinutes >= plannedBreak.startMinutes &&
+      currentClockMinutes < plannedBreak.endMinutes,
   )
 
   const dayJourneys = useMemo(
@@ -466,9 +452,15 @@ export function TodayReferencePage() {
         </header>
         <div className="referenceSummaryGrid">
           <article>
-            <strong>{formatDuration(journeyDurationMs)}</strong>
-            <span>Jornada</span>
-            <small>{activeJourney ? 'Em curso' : journeyDurationMs > 0 ? 'Acumulado hoje' : 'Sem registo'}</small>
+            <strong>{resolvedSchedule.isWorkingDay ? resolvedSchedule.endTime : '—'}</strong>
+            <span>Saída prevista</span>
+            <small>
+              {resolvedSchedule.isWorkingDay
+                ? activeJourney
+                  ? `Entrada real ${formatClockTime(activeJourney.startedAt)}`
+                  : `Turno ${resolvedSchedule.startTime}–${resolvedSchedule.endTime}`
+                : 'Folga planeada'}
+            </small>
           </article>
           <article>
             <strong>{formatDuration(breakDurationMs)}</strong>
