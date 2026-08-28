@@ -93,7 +93,10 @@ export function TodayReferencePage() {
   const scheduleSummary = getScheduleSummary(schedule, now)
   const nextScheduleEvent = getNextScheduleEvent(schedule, now)
 
-  const dayJourneys = report?.journeys ?? (activeJourney ? [activeJourney] : [])
+  const dayJourneys = useMemo(
+    () => report?.journeys ?? (activeJourney ? [activeJourney] : []),
+    [activeJourney, report?.journeys],
+  )
   const dayBreaks = report?.breaks ?? breaks
   const dayFocusSessions = report?.focusSessions ?? focusSessions
 
