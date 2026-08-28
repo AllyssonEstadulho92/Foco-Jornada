@@ -70,6 +70,8 @@ const mobileDataNavigation: NavigationItem[] = [
   { label: 'Cópia de segurança', path: '/mais', icon: 'more' },
 ]
 
+const appVersion = typeof __APP_VERSION__ === 'string' ? __APP_VERSION__ : '0.1.0'
+
 const mobileBottomNavigation: NavigationItem[] = [
   { label: 'Início', path: '/', icon: 'home', end: true },
   { label: 'Foco', path: '/foco', icon: 'focus' },
@@ -311,7 +313,7 @@ export function AppShell() {
                 : theme === 'light' ? 'Claro' : 'Escuro'}
             </strong>
           </button>
-          <span>Versão <strong>{__APP_VERSION__}</strong></span>
+          <span>Versão <strong>{appVersion}</strong></span>
         </footer>
       </aside>
 
