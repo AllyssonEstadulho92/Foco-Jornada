@@ -69,19 +69,19 @@ describe('WorkSchedule', () => {
     })
     expect(getScheduleMilestones(schedule, sunday).map((item) => [item.label, item.time])).toEqual([
       ['Entrada', '09:00'],
-      ['Pausa', '12:00'],
-      ['Regresso', '12:15'],
+      ['Pausa', '11:00'],
+      ['Regresso', '11:15'],
       ['Saída', '18:00'],
     ])
   })
 
-  it('desloca a pausa com o início do turno, mantendo 15 minutos', () => {
+  it('mantém a pausa fixa 11:00-11:15 mesmo no turno 09:00-18:00', () => {
     const sunday = '2026-08-23'
     const schedule = { ...DEFAULT_WORK_SCHEDULE, weekendWorkDates: [sunday] }
 
     expect(getResolvedScheduledBreaks(schedule, sunday)[0]).toMatchObject({
-      startTime: '12:00',
-      endTime: '12:15',
+      startTime: '11:00',
+      endTime: '11:15',
       durationMinutes: 15,
     })
   })
