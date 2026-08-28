@@ -13,6 +13,17 @@ function makeDatabase(): AppDatabase {
 }
 
 describe('StickPackPlannerService', () => {
+  it('starts a new control with zero packs instead of assuming previous stock', async () => {
+    const db = makeDatabase()
+    try {
+      const settings = await new StickPackPlannerService(db).getSettings()
+      expect(settings.packCount).toBe(0)
+      expect(settings.sticksPerPack).toBe(20)
+    } finally {
+      await db.delete()
+    }
+  })
+
   it('represents 12 packs of 20 as exactly 240 sticks without inventing a depletion date', async () => {
     const db = makeDatabase()
     try {
