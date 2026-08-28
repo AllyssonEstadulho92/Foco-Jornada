@@ -279,9 +279,43 @@
 .sticksCoreSummary strong{font-size:1.35rem;line-height:1.18}
 .sticksCoreSummary small{color:var(--text-muted,#66706a);line-height:1.35}
 
-.sticksRegisterCard{grid-template-columns:minmax(0,1fr) minmax(240px,.8fr);align-items:center}
-.sticksRegisterActions{display:grid;gap:8px}
-.sticksRegisterActions button{min-height:48px}
+.sticksRegisterCard{grid-template-columns:minmax(0,1fr) minmax(300px,.95fr);align-items:center}
+.sticksRegisterActions{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:8px;
+}
+.sticksRegisterActions button{
+  appearance:none;
+  -webkit-appearance:none;
+  width:100%;
+  min-height:48px;
+  border-radius:12px;
+  padding:11px 14px;
+  font:inherit;
+  font-weight:850;
+  line-height:1.2;
+  text-align:center;
+  cursor:pointer;
+  transition:transform .08s ease,border-color .15s ease,background .15s ease,opacity .15s ease;
+}
+.sticksRegisterActions button:active:not(:disabled){transform:translateY(1px)}
+.sticksRegisterActions button:disabled{opacity:.45;cursor:not-allowed}
+.sticksRegisterPrimary{
+  background:var(--accent,#1d6f5f)!important;
+  color:#fff!important;
+  border:1px solid transparent!important;
+}
+.sticksRegisterSecondary{
+  background:var(--surface-elevated,#fff)!important;
+  color:var(--text-primary,#151815)!important;
+  border:1px solid var(--border-strong,#b8c1bb)!important;
+}
+.sticksClearAction{
+  background:#fff7f7;
+  color:#9a3434;
+  border:1px solid #c78383;
+}
 
 .sticksSectionHeading{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
 .sticksSectionHeading>strong{font-size:1.25rem}
@@ -400,6 +434,16 @@
 [data-theme="dark"] .sticksWeekBarRow>div{background:#1b2720}
 [data-theme="dark"] .sticksNoAssumption{background:#221f14;border-color:#51471f;color:#e5d9a6}
 [data-theme="dark"] .sticksEstimateBadge{background:#17263a;color:#b8d8ff}
+[data-theme="dark"] .sticksRegisterSecondary{
+  background:#151d19!important;
+  color:#f3f6f4!important;
+  border-color:#405047!important;
+}
+[data-theme="dark"] .sticksClearAction{
+  background:#231515;
+  color:#f0aaaa;
+  border-color:#7a4646;
+}
 
 @media(max-width:900px){
   .sticksNicotinePerStick,
@@ -420,6 +464,7 @@
   .sticksSetupEquation>span:nth-of-type(2){display:none}
   .sticksCoreSummary{grid-template-columns:1fr}
   .sticksRegisterCard{grid-template-columns:1fr}
+  .sticksRegisterActions{grid-template-columns:1fr}
   .sticksSectionHeading{display:grid;grid-template-columns:1fr}
   .sticksEstimateBadge{justify-self:start}
   .sticksCustomNicotineGrid{grid-template-columns:1fr}
@@ -601,40 +646,3 @@
 }
 
 
-.sticksResetSection{
-  grid-column:1/-1;
-  border:1px solid #d7b4b4;
-  background:#fff7f7!important;
-}
-.sticksResetSection p{
-  max-width:760px;
-}
-.sticksResetButton{
-  width:max-content;
-  min-height:44px;
-  border:1px solid #b75858;
-  border-radius:11px;
-  background:transparent;
-  color:#9a3434;
-  padding:10px 13px;
-  font:inherit;
-  font-weight:800;
-  cursor:pointer;
-}
-.sticksResetButton:disabled{
-  opacity:.5;
-  cursor:not-allowed;
-}
-[data-theme="dark"] .sticksResetSection{
-  background:#231515!important;
-  border-color:#633a3a!important;
-}
-[data-theme="dark"] .sticksResetButton{
-  border-color:#a65c5c;
-  color:#f0aaaa;
-}
-@media(max-width:620px){
-  .sticksResetButton{
-    width:100%;
-  }
-}

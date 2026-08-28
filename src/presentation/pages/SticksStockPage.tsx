@@ -499,7 +499,7 @@ export function SticksStockPage() {
             <div className="sticksRegisterActions">
               <button
                 type="button"
-                className="stockPrimaryAction"
+                className="stockPrimaryAction sticksRegisterPrimary"
                 disabled={busy || (summary.stock ?? 0) <= 0}
                 onClick={() => void run(
                   () => personalStockService.consumeStick(operationId()),
@@ -508,19 +508,25 @@ export function SticksStockPage() {
               >
                 Registar 1 stick
               </button>
-              {usageAnalytics?.recentEvents.length ? (
-                <button
-                  type="button"
-                  className="stockSecondaryAction"
-                  disabled={busy}
-                  onClick={() => void run(
-                    () => personalStockService.undoLastStick(operationId()),
-                    'Último registo corrigido. O movimento original permanece no histórico.',
-                  )}
-                >
-                  Corrigir último registo
-                </button>
-              ) : null}
+              <button
+                type="button"
+                className="stockSecondaryAction sticksRegisterSecondary"
+                disabled={busy || !usageAnalytics?.recentEvents.length}
+                onClick={() => void run(
+                  () => personalStockService.undoLastStick(operationId()),
+                  'Último registo corrigido. O movimento original permanece no histórico.',
+                )}
+              >
+                Corrigir último registo
+              </button>
+              <button
+                type="button"
+                className="sticksClearAction"
+                disabled={busy}
+                onClick={() => void resetSticksControl()}
+              >
+                Limpar controlo
+              </button>
             </div>
           </section>
 
@@ -928,21 +934,6 @@ export function SticksStockPage() {
                 <small>{packSaveState || 'Guardado automaticamente.'}</small>
               </section>
 
-              <section className="sticksResetSection">
-                <h3>Começar de novo</h3>
-                <p>
-                  Limpa apenas o controlo ativo dos sticks. Antes disso, a aplicação cria um arquivo interno de segurança.
-                  Os medicamentos não são alterados.
-                </p>
-                <button
-                  type="button"
-                  className="sticksResetButton"
-                  disabled={busy}
-                  onClick={() => void resetSticksControl()}
-                >
-                  Limpar controlo de sticks
-                </button>
-              </section>
             </div>
           </details>
 
