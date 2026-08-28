@@ -730,7 +730,7 @@ export function SticksStockPage() {
                   ))}
                 </div>
                 <small className="sticksPackForecastNote">
-                  O início passa a REAL · EXATO no primeiro stick registado desse maço e o fim passa a REAL · EXATO no último stick, desde que a fronteira entre maços permaneça determinística. Datas futuras continuam sempre como PREVISÃO.
+                  O início passa a REAL · EXATO no primeiro stick registado desse maço e o fim passa a REAL · EXATO no último stick, desde que a fronteira entre maços permaneça determinística. Datas futuras continuam como PREVISÃO e são calculadas a partir do stock restante, descontando as utilizações já registadas hoje.
                 </small>
                 {packProjection && !packProjection.packTrackingExact && packProjection.packTrackingIssue ? (
                   <p className="sticksPackTrackingWarning">
