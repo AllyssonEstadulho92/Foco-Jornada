@@ -46,12 +46,12 @@ function BrandLockup({ compact = false }: { compact?: boolean }) {
   )
 }
 
-const mobileQuickNavigation: NavigationItem[] = [
-  { label: 'Mapa de turnos', path: '/turnos', icon: 'activities' },
-  { label: 'Stock pessoal', path: '/stock', icon: 'more' },
-  { label: 'Horas', path: '/horas', icon: 'hours' },
-  { label: 'Vencimento', path: '/vencimento', icon: 'payroll' },
-  { label: 'Foco', path: '/foco', icon: 'focus' },
+const mobileQuickNavigation = [
+  { label: 'Mapa de turnos', path: '/turnos', icon: 'activities' as const, description: 'Ver e editar turnos' },
+  { label: 'Stock pessoal', path: '/stock', icon: 'more' as const, description: 'Gerir stock' },
+  { label: 'Horas', path: '/horas', icon: 'hours' as const, description: 'Registar e consultar' },
+  { label: 'Vencimento', path: '/vencimento', icon: 'payroll' as const, description: 'Simular e consultar' },
+  { label: 'Foco', path: '/foco', icon: 'focus' as const, description: 'Focar e ser produtivo' },
 ]
 
 const mobileMainNavigation: NavigationItem[] = [
@@ -327,10 +327,23 @@ export function AppShell() {
           />
           <nav id="mobile-quick-panel" className="mobileQuickPanel" aria-labelledby="mobile-quick-panel-title">
             <header className="mobileQuickPanelHeader">
-              <div>
-                <strong id="mobile-quick-panel-title">Acesso rápido</strong>
-                <span>Atalhos principais</span>
+              <div className="mobileQuickPanelHeading">
+                <span className="mobileQuickPanelHeadingIcon" aria-hidden="true">
+                  <NavigationIcon name="more" />
+                </span>
+                <span className="mobileQuickPanelHeadingCopy">
+                  <strong id="mobile-quick-panel-title">Acesso rápido</strong>
+                  <span>Atalhos principais</span>
+                </span>
               </div>
+              <button
+                className="mobileQuickPanelClose"
+                type="button"
+                onClick={() => setMobileQuickOpen(false)}
+                aria-label="Fechar menu Mais"
+              >
+                ×
+              </button>
             </header>
             {mobileQuickNavigation.map((item) => (
               <NavLink
@@ -339,9 +352,19 @@ export function AppShell() {
                 className={({ isActive }) => `mobileQuickLink${isActive ? ' mobileQuickLinkActive' : ''}`}
               >
                 <NavigationIcon name={item.icon} />
-                <span>{item.label}</span>
+                <span className="mobileQuickLinkCopy">
+                  <strong>{item.label}</strong>
+                  <small>{item.description}</small>
+                </span>
               </NavLink>
             ))}
+            <div className="mobileQuickPanelCallout">
+              <span className="mobileQuickPanelCalloutIcon" aria-hidden="true">↯</span>
+              <span>
+                <strong>Tudo o que precisas, num só lugar.</strong>
+                <small>Acede rapidamente às tuas ferramentas principais.</small>
+              </span>
+            </div>
           </nav>
         </>
       ) : null}
