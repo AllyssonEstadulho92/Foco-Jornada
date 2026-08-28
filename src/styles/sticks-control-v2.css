@@ -431,162 +431,159 @@
 
 .sticksPackForecastComparison{
   display:grid;
-  gap:10px;
+  gap:12px;
   padding-top:2px;
 }
 .sticksPackForecastHeading{
   display:flex;
   justify-content:space-between;
-  gap:12px;
-  align-items:baseline;
+  gap:14px;
+  align-items:flex-start;
 }
-.sticksPackForecastHeading span{
-  color:var(--text-muted,#66706a);
-  font-size:.78rem;
-  text-align:right;
-}
-.sticksPackForecastTable{
+.sticksPackForecastHeading>div:first-child{
   display:grid;
+  gap:4px;
+}
+.sticksPackForecastHeading>div:first-child span{
+  color:var(--text-muted,#66706a);
+  font-size:.8rem;
+  line-height:1.4;
+}
+.sticksPackDateLegend{
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+}
+.sticksPackDateLegend span,
+.sticksPackDatePair small{
+  display:inline-flex;
+  width:max-content;
+  border-radius:999px;
+  padding:4px 7px;
+  font-size:.62rem;
+  font-weight:850;
+  letter-spacing:.045em;
+}
+.sticksPackDateLegend .isExact,
+.sticksPackDatePair small.isExact{
+  background:#e2f5ea;
+  color:#16603a;
+}
+.sticksPackDateLegend .isForecast,
+.sticksPackDatePair small.isForecast{
+  background:#eaf2ff;
+  color:#2f5f91;
+}
+.sticksPackDateList{
+  display:grid;
+  gap:8px;
+}
+.sticksPackDateCard{
+  display:grid;
+  gap:10px;
+  padding:12px;
   border:1px solid var(--border-subtle,#dfe4df);
   border-radius:13px;
-  overflow:hidden;
+  background:var(--surface-elevated,#fff);
 }
-.sticksPackForecastHeader,
-.sticksPackForecastRow{
-  display:grid;
-  grid-template-columns:minmax(120px,1.1fr) minmax(64px,.55fr) minmax(100px,.85fr) minmax(130px,1fr);
-  gap:10px;
-  align-items:center;
-  padding:10px 12px;
+.sticksPackDateCard.isCurrent{
+  border-color:#8fcda5;
+  background:#f1fbf4;
 }
-.sticksPackForecastHeader{
+.sticksPackDateCard.isCompleted{
   background:var(--surface-soft,#f6f8f6);
+}
+.sticksPackDateCard>header{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:flex-start;
+}
+.sticksPackDateCard>header>div{
+  display:grid;
+  gap:2px;
+}
+.sticksPackDateCard>header>div small{
+  color:var(--text-muted,#66706a);
+  font-size:.64rem;
+  font-weight:850;
+  letter-spacing:.05em;
+}
+.sticksPackDateCard>header>span{
+  color:var(--text-muted,#66706a);
+  font-size:.78rem;
+}
+.sticksPackDatePair{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+}
+.sticksPackDatePair>div{
+  display:grid;
+  gap:5px;
+  min-width:0;
+  padding:10px 11px;
+  border-radius:11px;
+  background:var(--surface-soft,#f6f8f6);
+}
+.sticksPackDatePair>div>span{
   color:var(--text-muted,#66706a);
   font-size:.7rem;
-  font-weight:850;
+  font-weight:800;
   text-transform:uppercase;
   letter-spacing:.045em;
 }
-.sticksPackForecastRow{
-  border-top:1px solid var(--border-subtle,#e8ece8);
-  font-size:.84rem;
+.sticksPackDatePair>div>strong{
+  font-size:.92rem;
+  line-height:1.35;
+  overflow-wrap:anywhere;
 }
-.sticksPackForecastRow.isCurrent{
-  background:#f1fbf4;
-}
-.sticksPackForecastRow>span:nth-child(2),
-.sticksPackForecastRow>span:nth-child(3){
+.sticksPackDatePair small:not(.isExact):not(.isForecast){
+  background:var(--surface-elevated,#fff);
   color:var(--text-muted,#66706a);
+  border:1px solid var(--border-subtle,#dfe4df);
 }
 .sticksPackForecastNote{
   color:var(--text-muted,#66706a);
-  line-height:1.4;
+  line-height:1.45;
 }
-[data-theme="dark"] .sticksPackForecastTable{
+
+[data-theme="dark"] .sticksPackDateCard{
+  background:#0f1512;
   border-color:#29352f;
 }
-[data-theme="dark"] .sticksPackForecastHeader{
+[data-theme="dark"] .sticksPackDateCard.isCurrent{
+  background:#12261a;
+  border-color:#2f6543;
+}
+[data-theme="dark"] .sticksPackDateCard.isCompleted,
+[data-theme="dark"] .sticksPackDatePair>div{
   background:#151d19;
 }
-[data-theme="dark"] .sticksPackForecastRow{
-  border-color:#222e28;
+[data-theme="dark"] .sticksPackDateLegend .isExact,
+[data-theme="dark"] .sticksPackDatePair small.isExact{
+  background:#173c2a;
+  color:#9fe0b7;
 }
-[data-theme="dark"] .sticksPackForecastRow.isCurrent{
-  background:#12261a;
+[data-theme="dark"] .sticksPackDateLegend .isForecast,
+[data-theme="dark"] .sticksPackDatePair small.isForecast{
+  background:#17263a;
+  color:#b8d8ff;
 }
+
 @media(max-width:620px){
   .sticksPackForecastHeading{
     display:grid;
     grid-template-columns:1fr;
   }
-  .sticksPackForecastHeading span{
-    text-align:left;
+  .sticksPackDateLegend{
+    justify-content:flex-start;
   }
-  .sticksPackForecastHeader,
-  .sticksPackForecastRow{
-    grid-template-columns:minmax(92px,1fr) 50px 82px minmax(105px,1fr);
-    gap:7px;
-    padding:9px 10px;
-    font-size:.76rem;
-  }
-  .sticksPackForecastHeader{
-    font-size:.62rem;
-  }
-}
-
-
-.sticksPackActualHistory{
-  display:grid;
-  gap:10px;
-  padding-top:2px;
-}
-.sticksPackActualList{
-  display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:8px;
-}
-.sticksPackActualList article{
-  display:grid;
-  gap:5px;
-  padding:11px;
-  border:1px solid var(--border-subtle,#dfe4df);
-  border-radius:12px;
-  background:var(--surface-soft,#f6f8f6);
-}
-.sticksPackActualList article>span{
-  font-size:.78rem;
-  color:var(--text-muted,#66706a);
-}
-.sticksPackActualList article>span b{
-  color:var(--text-primary,inherit);
-}
-.sticksPackActualList article>small{
-  font-size:.68rem;
-  font-weight:850;
-  letter-spacing:.04em;
-  color:#18713d;
-}
-.sticksPackForecastRow>span[role="cell"]{
-  display:grid;
-  gap:2px;
-}
-.sticksPackForecastRow>span[role="cell"] small{
-  font-size:.62rem;
-  font-weight:850;
-  letter-spacing:.045em;
-  color:var(--text-muted,#66706a);
-}
-[data-theme="dark"] .sticksPackActualList article{
-  background:#151d19;
-  border-color:#29352f;
-}
-[data-theme="dark"] .sticksPackActualList article>small{
-  color:#9fe0b7;
-}
-@media(max-width:900px){
-  .sticksPackActualList{
+  .sticksPackDatePair{
     grid-template-columns:1fr;
   }
 }
-
-
-.sticksPackForecastRow.isCompleted{
-  background:var(--surface-soft,#f6f8f6);
-}
-.sticksPackForecastRow>strong[role="cell"]{
-  display:grid;
-  gap:2px;
-}
-.sticksPackForecastRow>strong[role="cell"] small{
-  font-size:.62rem;
-  font-weight:850;
-  letter-spacing:.045em;
-  color:var(--text-muted,#66706a);
-}
-[data-theme="dark"] .sticksPackForecastRow.isCompleted{
-  background:#151d19;
-}
-
 
 .sticksPackTrackingWarning{
   margin:0;
