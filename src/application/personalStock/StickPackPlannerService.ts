@@ -50,6 +50,8 @@ export interface StickPackProjection {
   packEquivalent: string | null
   historicalDailyAverage: string | null
   historicalCoverageDays: number
+  forecastAvailable: boolean
+  forecastConfidence: 'none' | 'provisional' | 'established'
   historicalReliable: boolean
   historicalDays: string | null
   historicalDepletionDate: string | null
@@ -242,7 +244,7 @@ function buildPackForecasts(input: {
   sticksPerPack: number
   currentPackStarted: boolean
   currentPackRemaining: number | null
-  historicalReliable: boolean
+  forecastAvailable: boolean
   historicalDailyAverage: number
   usedToday: number
   today: string
@@ -270,7 +272,7 @@ function buildPackForecasts(input: {
     remaining -= sticks
 
     const isCurrent = sequence === 1 && input.currentPackStarted
-    const estimatedStartDate = input.historicalReliable && !isCurrent
+    const estimatedStartDate = input.forecastAvailable && !isCurrent
       ? dateForFutureConsumptionIndex(
           cumulativeBefore + 1,
           input.historicalDailyAverage,
@@ -278,7 +280,7 @@ function buildPackForecasts(input: {
           input.today,
         )
       : null
-    const endForecast = input.historicalReliable
+    const endForecast = input.forecastAvailable
       ? forecastFromCurrentDay(
           cumulative,
           input.historicalDailyAverage,
@@ -295,7 +297,7 @@ function buildPackForecasts(input: {
       cumulativeSticks: cumulative,
       actualStartAt: isCurrent ? currentUsagePeriod?.actualStartAt ?? null : null,
       estimatedStartDate,
-      estimatedDurationDays: input.historicalReliable
+      estimatedDurationDays: input.forecastAvailable
         ? (sticks / input.historicalDailyAverage).toFixed(1)
         : null,
       estimatedDepletionDate: endForecast?.date ?? null,
@@ -386,7 +388,13 @@ export class StickPackPlannerService {
     const historicalDailyAverageNumber = historicalCoverageDays > 0
       ? last7Number / historicalCoverageDays
       : 0
+    const forecastAvailable = historicalCoverageDays >= 1 && last7Number > 0
     const historicalReliable = historicalCoverageDays >= 3 && last7Number > 0
+    const forecastConfidence: StickPackProjection['forecastConfidence'] = !forecastAvailable
+      ? 'none'
+      : historicalReliable
+        ? 'established'
+        : 'provisional'
 
     const looseSticksRemaining = currentStock === null ? null : currentStock % settings.sticksPerPack
     const fullPacksRemaining = currentStock === null ? null : Math.floor(currentStock / settings.sticksPerPack)
@@ -431,10 +439,10 @@ export class StickPackPlannerService {
           : null
 
     const usedTodayNumber = safeNumber(usedToday)
-    const historicalForecast = currentStock === null || !historicalReliable
+    const historicalForecast = currentStock === null || !forecastAvailable
       ? null
       : forecastFromCurrentDay(currentStock, historicalDailyAverageNumber, usedTodayNumber, today)
-    const currentPackHistoricalForecast = currentStock === null || !historicalReliable
+    const currentPackHistoricalForecast = currentStock === null || !forecastAvailable
       ? null
       : forecastFromCurrentDay(currentPackForProjection, historicalDailyAverageNumber, usedTodayNumber, today)
     const packForecasts = buildPackForecasts({
@@ -442,7 +450,7 @@ export class StickPackPlannerService {
       sticksPerPack: settings.sticksPerPack,
       currentPackStarted,
       currentPackRemaining,
-      historicalReliable,
+      forecastAvailable,
       historicalDailyAverage: historicalDailyAverageNumber,
       usedToday: usedTodayNumber,
       today,
@@ -468,6 +476,8 @@ export class StickPackPlannerService {
       packEquivalent: currentStock === null ? null : (currentStock / settings.sticksPerPack).toFixed(1),
       historicalDailyAverage: historicalDailyAverageNumber > 0 ? historicalDailyAverageNumber.toFixed(1) : null,
       historicalCoverageDays,
+      forecastAvailable,
+      forecastConfidence,
       historicalReliable,
       historicalDays: historicalForecast?.days ?? null,
       historicalDepletionDate: historicalForecast?.date ?? null,
