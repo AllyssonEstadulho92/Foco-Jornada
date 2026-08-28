@@ -325,7 +325,13 @@ export function AppShell() {
             aria-label="Fechar acessos rápidos"
             onClick={() => setMobileQuickOpen(false)}
           />
-          <nav id="mobile-quick-panel" className="mobileQuickPanel" aria-label="Acesso rápido">
+          <nav id="mobile-quick-panel" className="mobileQuickPanel" aria-labelledby="mobile-quick-panel-title">
+            <header className="mobileQuickPanelHeader">
+              <div>
+                <strong id="mobile-quick-panel-title">Acesso rápido</strong>
+                <span>Atalhos principais</span>
+              </div>
+            </header>
             {mobileQuickNavigation.map((item) => (
               <NavLink
                 key={`panel-${item.path}-${item.label}`}
@@ -347,11 +353,12 @@ export function AppShell() {
           className={`mobileQuickButton${mobileQuickOpen ? ' mobileQuickButtonActive' : ''}`}
           type="button"
           onClick={toggleMobileQuickMenu}
-          aria-label={mobileQuickOpen ? 'Fechar acessos rápidos' : 'Abrir acessos rápidos'}
+          aria-label={mobileQuickOpen ? 'Fechar menu Mais' : 'Abrir menu Mais'}
           aria-expanded={mobileQuickOpen}
           aria-controls="mobile-quick-panel"
         >
-          <span aria-hidden="true">+</span>
+          <span className="mobileQuickButtonIcon" aria-hidden="true">+</span>
+          <span className="mobileQuickButtonLabel">{mobileQuickOpen ? 'Fechar' : 'Mais'}</span>
         </button>
         <NavigationLink item={mobileBottomNavigation[2]} />
         <NavigationLink item={mobileBottomNavigation[3]} />
