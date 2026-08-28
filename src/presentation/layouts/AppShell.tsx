@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { AppTopBar } from '../components/AppTopBar'
 import { NavigationIcon } from '../navigation/NavigationIcon'
@@ -70,6 +70,8 @@ const mobileDataNavigation: NavigationItem[] = [
   { label: 'Cópia de segurança', path: '/mais', icon: 'more' },
 ]
 
+const appVersion = typeof __APP_VERSION__ === 'string' ? __APP_VERSION__ : '0.1.0'
+
 const mobileBottomNavigation: NavigationItem[] = [
   { label: 'Início', path: '/', icon: 'home', end: true },
   { label: 'Foco', path: '/foco', icon: 'focus' },
@@ -87,6 +89,9 @@ export function AppShell() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [mobileQuickOpen, setMobileQuickOpen] = useState(false)
   const [deviceTheme, setDeviceTheme] = useState<ResolvedTheme>(systemTheme)
+  const mobileMenuButtonRef = useRef<HTMLButtonElement | null>(null)
+  const mobileDrawerCloseRef = useRef<HTMLButtonElement | null>(null)
+  const wasMobileMenuOpenRef = useRef(false)
   const resolvedTheme: ResolvedTheme = theme === 'system' ? deviceTheme : theme
 
   useEffect(() => {
@@ -147,6 +152,19 @@ export function AppShell() {
     }
   }, [mobileMenuOpen])
 
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      wasMobileMenuOpenRef.current = true
+      window.requestAnimationFrame(() => mobileDrawerCloseRef.current?.focus())
+      return
+    }
+
+    if (wasMobileMenuOpenRef.current) {
+      wasMobileMenuOpenRef.current = false
+      window.requestAnimationFrame(() => mobileMenuButtonRef.current?.focus())
+    }
+  }, [mobileMenuOpen])
+
   const openMobileMenu = () => {
     setMobileQuickOpen(false)
     setMobileMenuOpen(true)
@@ -191,7 +209,7 @@ export function AppShell() {
       </aside>
 
       <div className="appMainArea">
-        <AppTopBar onOpenMenu={openMobileMenu} />
+        <AppTopBar onOpenMenu={openMobileMenu} menuButtonRef={mobileMenuButtonRef} />
         <main className="appContent" id="main-content" tabIndex={-1}>
           {location.pathname === '/definicoes' ? (
             <section className="prototypeThemeCard" aria-label="Tema da aplicação">
@@ -240,10 +258,10 @@ export function AppShell() {
         onClick={() => setMobileMenuOpen(false)}
       />
 
-      <aside className={`mobileDrawer${mobileMenuOpen ? ' mobileDrawerOpen' : ''}`} aria-label="Menu móvel" aria-hidden={!mobileMenuOpen}>
+      <aside id="mobile-main-drawer" className={`mobileDrawer${mobileMenuOpen ? ' mobileDrawerOpen' : ''}`} aria-label="Menu móvel" aria-hidden={!mobileMenuOpen} inert={!mobileMenuOpen}>
         <header className="mobileDrawerHeader">
           <BrandLockup />
-          <button type="button" onClick={() => setMobileMenuOpen(false)} aria-label="Fechar menu">×</button>
+          <button ref={mobileDrawerCloseRef} type="button" onClick={() => setMobileMenuOpen(false)} aria-label="Fechar menu">×</button>
         </header>
         <p className="mobileDrawerTagline">Organiza o teu tempo, os turnos e o vencimento.</p>
 
@@ -295,7 +313,7 @@ export function AppShell() {
                 : theme === 'light' ? 'Claro' : 'Escuro'}
             </strong>
           </button>
-          <span>Versão <strong>V1</strong></span>
+          <span>Versão <strong>{appVersion}</strong></span>
         </footer>
       </aside>
 

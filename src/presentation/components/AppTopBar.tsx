@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } from 'react'
 import { emitAppFeedback } from '../../shared/notifications/appFeedback'
 import { useNow } from '../hooks/useNow'
 import { useAppServices } from '../providers/AppServicesProvider'
@@ -63,7 +63,7 @@ function formatNotificationTime(value: string) {
   }).format(new Date(value))
 }
 
-export function AppTopBar({ onOpenMenu }: { onOpenMenu?: () => void }) {
+export function AppTopBar({ onOpenMenu, menuButtonRef }: { onOpenMenu?: () => void; menuButtonRef?: RefObject<HTMLButtonElement | null> }) {
   const { journeyRepository, focusRepository } = useAppServices()
   const now = useNow(1000)
   const [isOpen, setIsOpen] = useState(false)
@@ -214,7 +214,7 @@ export function AppTopBar({ onOpenMenu }: { onOpenMenu?: () => void }) {
   return (
     <div className="appTopBar" aria-label="Estado da aplicação">
       <div className="mobileAppIdentity">
-        <button className="mobileMenuButton" type="button" onClick={onOpenMenu} aria-label="Abrir menu principal">
+        <button ref={menuButtonRef} className="mobileMenuButton" type="button" onClick={onOpenMenu} aria-label="Abrir menu principal" aria-controls="mobile-main-drawer">
           <MenuIcon />
         </button>
         <strong>Foco Jornada</strong>
