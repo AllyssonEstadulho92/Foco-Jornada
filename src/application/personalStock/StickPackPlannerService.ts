@@ -140,14 +140,31 @@ function dayDifference(from: string, to: string): number {
   return Math.floor((end - start) / 86_400_000)
 }
 
-function dateForRate(stock: number, dailyRate: number, today: string): { days: string; date: string } | null {
-  if (stock <= 0) return { days: '0.0', date: today }
+function forecastFromCurrentDay(
+  sticksRemaining: number,
+  dailyRate: number,
+  usedToday: number,
+  today: string,
+): { days: string; date: string } | null {
+  if (sticksRemaining <= 0) return { days: '0.0', date: today }
   if (!Number.isFinite(dailyRate) || dailyRate <= 0) return null
-  const exactDays = stock / dailyRate
-  const calendarDays = Math.max(1, Math.ceil(exactDays))
+
+  const consumedShareToday = Math.min(Math.max(usedToday, 0), dailyRate)
+  const remainingCapacityToday = Math.max(0, dailyRate - consumedShareToday)
+  const inclusiveEquivalentDays = (sticksRemaining + consumedShareToday) / dailyRate
+
+  if (sticksRemaining <= remainingCapacityToday) {
+    return {
+      days: inclusiveEquivalentDays.toFixed(1),
+      date: today,
+    }
+  }
+
+  const sticksAfterToday = sticksRemaining - remainingCapacityToday
+  const futureCalendarDays = Math.max(1, Math.ceil(sticksAfterToday / dailyRate))
   return {
-    days: exactDays.toFixed(1),
-    date: addCalendarDays(today, calendarDays - 1),
+    days: inclusiveEquivalentDays.toFixed(1),
+    date: addCalendarDays(today, futureCalendarDays),
   }
 }
 
@@ -202,11 +219,22 @@ function buildPackUsagePeriods(
   return periods
 }
 
-function dateForConsumptionIndex(index: number, dailyRate: number, today: string): string | null {
+function dateForFutureConsumptionIndex(
+  index: number,
+  dailyRate: number,
+  usedToday: number,
+  today: string,
+): string | null {
   if (!Number.isSafeInteger(index) || index <= 0) return null
   if (!Number.isFinite(dailyRate) || dailyRate <= 0) return null
-  const calendarDays = Math.max(1, Math.ceil(index / dailyRate))
-  return addCalendarDays(today, calendarDays - 1)
+
+  const consumedShareToday = Math.min(Math.max(usedToday, 0), dailyRate)
+  const remainingCapacityToday = Math.max(0, dailyRate - consumedShareToday)
+  if (index <= remainingCapacityToday) return today
+
+  const indexAfterToday = index - remainingCapacityToday
+  const futureCalendarDays = Math.max(1, Math.ceil(indexAfterToday / dailyRate))
+  return addCalendarDays(today, futureCalendarDays)
 }
 
 function buildPackForecasts(input: {
@@ -216,6 +244,7 @@ function buildPackForecasts(input: {
   currentPackRemaining: number | null
   historicalReliable: boolean
   historicalDailyAverage: number
+  usedToday: number
   today: string
   packUsagePeriods: StickPackUsagePeriod[]
 }): StickPackDepletionForecast[] {
@@ -242,10 +271,20 @@ function buildPackForecasts(input: {
 
     const isCurrent = sequence === 1 && input.currentPackStarted
     const estimatedStartDate = input.historicalReliable && !isCurrent
-      ? dateForConsumptionIndex(cumulativeBefore + 1, input.historicalDailyAverage, input.today)
+      ? dateForFutureConsumptionIndex(
+          cumulativeBefore + 1,
+          input.historicalDailyAverage,
+          input.usedToday,
+          input.today,
+        )
       : null
     const endForecast = input.historicalReliable
-      ? dateForRate(cumulative, input.historicalDailyAverage, input.today)
+      ? forecastFromCurrentDay(
+          cumulative,
+          input.historicalDailyAverage,
+          input.usedToday,
+          input.today,
+        )
       : null
 
     forecasts.push({
@@ -391,12 +430,13 @@ export class StickPackPlannerService {
           ? 'O stock inicial continha um maço parcial; o início do primeiro maço não foi observado pela aplicação.'
           : null
 
+    const usedTodayNumber = safeNumber(usedToday)
     const historicalForecast = currentStock === null || !historicalReliable
       ? null
-      : dateForRate(currentStock, historicalDailyAverageNumber, today)
+      : forecastFromCurrentDay(currentStock, historicalDailyAverageNumber, usedTodayNumber, today)
     const currentPackHistoricalForecast = currentStock === null || !historicalReliable
       ? null
-      : dateForRate(currentPackForProjection, historicalDailyAverageNumber, today)
+      : forecastFromCurrentDay(currentPackForProjection, historicalDailyAverageNumber, usedTodayNumber, today)
     const packForecasts = buildPackForecasts({
       currentStock,
       sticksPerPack: settings.sticksPerPack,
@@ -404,6 +444,7 @@ export class StickPackPlannerService {
       currentPackRemaining,
       historicalReliable,
       historicalDailyAverage: historicalDailyAverageNumber,
+      usedToday: usedTodayNumber,
       today,
       packUsagePeriods,
     })
@@ -436,7 +477,7 @@ export class StickPackPlannerService {
       packForecasts,
       packTrackingExact,
       packTrackingIssue,
-      usedToday: safeNumber(usedToday),
+      usedToday: usedTodayNumber,
       last7DaysSticks: last7Number,
       ledgerOk: reconstructed.ok,
     }
