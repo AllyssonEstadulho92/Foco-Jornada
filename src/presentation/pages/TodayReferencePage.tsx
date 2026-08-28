@@ -373,12 +373,16 @@ export function TodayReferencePage() {
           <h2>{greeting}, foco! <i aria-hidden="true">✦</i></h2>
           <p>Que tal manter o ritmo e fazer mais acontecer hoje?</p>
         </div>
-        <div className="referencePlant" aria-hidden="true">
-          <span className="referencePlantGlow" />
-          <span className="referenceLeaf referenceLeafLeft" />
-          <span className="referenceLeaf referenceLeafRight" />
-          <span className="referenceStem" />
-        </div>
+        <img
+          className="referenceHeroIllustration"
+          src={`${import.meta.env.BASE_URL}foco-jornada-hero.webp`}
+          width="320"
+          height="320"
+          alt=""
+          aria-hidden="true"
+          decoding="async"
+          fetchPriority="high"
+        />
       </header>
 
       {pageError ? <div className="errorBanner" role="alert">{pageError}</div> : null}
