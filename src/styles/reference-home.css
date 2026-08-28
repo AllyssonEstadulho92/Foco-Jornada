@@ -384,3 +384,42 @@
     font-size:28px!important;
   }
 }
+
+
+/* Hero Hoje: ilustração própria de relógio + foco.
+ * Substitui o ornamento vegetal sem alterar a geometria do conteúdo.
+ */
+.referenceHeroIllustration{
+  display:block;
+  width:170px;
+  height:170px;
+  flex:0 0 170px;
+  align-self:center;
+  object-fit:contain;
+  object-position:center;
+  filter:saturate(.88) contrast(.98);
+}
+:root[data-theme='dark'] .referenceHeroIllustration{
+  filter:saturate(.82) brightness(.92) contrast(1.04);
+}
+@media(max-width:899px){
+  .referenceHeroIllustration{
+    width:140px;
+    height:140px;
+    flex-basis:140px;
+  }
+}
+@media(max-width:620px){
+  .referenceHeroIllustration{
+    width:112px;
+    height:112px;
+    flex-basis:112px;
+  }
+}
+@media(max-width:420px){
+  .referenceHeroIllustration{
+    width:94px;
+    height:94px;
+    flex-basis:94px;
+  }
+}
