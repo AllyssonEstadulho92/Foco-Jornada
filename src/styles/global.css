@@ -24,6 +24,9 @@ body {
   overscroll-behavior-x: none;
   background: var(--bg);
   color: var(--text);
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: var(--line-height-normal);
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
 }
@@ -49,6 +52,27 @@ textarea,
 select {
   max-width: 100%;
   font: inherit;
+  line-height: var(--line-height-control);
+}
+
+button {
+  font-weight: var(--weight-semibold);
+}
+
+button[type='button']:not([aria-label]),
+button[type='submit'],
+button[type='reset'] {
+  min-height: var(--control-height-compact);
+}
+
+input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='color']):not([type='hidden']),
+select {
+  min-height: var(--control-height-compact);
+}
+
+textarea {
+  min-height: 96px;
+  line-height: var(--line-height-normal);
 }
 
 button,
@@ -87,8 +111,8 @@ select:disabled {
   border-radius: var(--radius-sm);
   background: var(--surface);
   color: var(--text);
-  font-size: 13px;
-  font-weight: 800;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-heavy);
   text-decoration: none;
   transform: translateY(calc(-100% - 20px));
   transition: transform 140ms ease;
@@ -153,8 +177,8 @@ select:disabled {
   border-radius: 12px;
   background: var(--primary-soft);
   color: var(--primary);
-  font-size: 12px;
-  font-weight: 900;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-heavy);
   letter-spacing: -0.02em;
 }
 
@@ -168,7 +192,7 @@ select:disabled {
 }
 
 .brandCopy strong {
-  font-size: 14px;
+  font-size: var(--text-md);
 }
 
 .brandCopy span {
@@ -192,7 +216,7 @@ select:disabled {
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  min-height: 44px;
+  min-height: var(--control-height-compact);
   padding: 8px 10px;
   border: 1px solid transparent;
   border-radius: var(--radius-sm);
@@ -228,7 +252,7 @@ select:disabled {
   background: var(--surface-2);
   color: var(--muted);
   font-size: 11px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
 }
 
 .navLinkActive .navMark {
@@ -240,8 +264,8 @@ select:disabled {
 .navLabel {
   min-width: 0;
   overflow: hidden;
-  font-size: 14px;
-  font-weight: 650;
+  font-size: var(--text-md);
+  font-weight: var(--weight-semibold);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -289,7 +313,7 @@ select:disabled {
   display: inline-block;
   color: var(--primary);
   font-size: 11px;
-  font-weight: 800;
+  font-weight: var(--weight-heavy);
   letter-spacing: 0.12em;
 }
 
@@ -304,8 +328,8 @@ select:disabled {
   max-width: 680px;
   margin: 0;
   color: var(--muted);
-  font-size: clamp(16px, 2vw, 19px);
-  line-height: 1.65;
+  font-size: clamp(var(--text-base), 2vw, 19px);
+  line-height: var(--line-height-relaxed);
 }
 
 .emptyState {
@@ -343,8 +367,9 @@ select:disabled {
   border-radius: var(--radius-sm);
   background: var(--surface);
   color: var(--text);
-  font-size: 14px;
-  font-weight: 700;
+  min-height: var(--control-height-compact);
+  font-size: var(--text-md);
+  font-weight: var(--weight-bold);
   text-decoration: none;
 }
 
