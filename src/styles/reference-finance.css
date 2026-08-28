@@ -1,1 +1,333 @@
 .referencePayrollPage{width:min(100%,920px);margin:0 auto}.referencePayrollHeader{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:14px;padding:28px 2px 18px}.referencePayrollHeader h1{margin:0;color:var(--text);font-size:clamp(28px,5vw,38px);font-weight:850;letter-spacing:-.045em}.referencePayrollHeader p{margin:8px 0 0;color:var(--muted);font-size:14px}.referencePayrollTitleIcon,.referencePayrollIcon{display:grid;place-items:center;background:var(--primary-soft);color:var(--primary)}.referencePayrollTitleIcon{width:52px;height:52px;border-radius:16px;font-size:22px}.referencePayrollMonth input{min-height:42px;padding:8px 10px;border:1px solid var(--line);border-radius:13px;background:var(--surface);color:var(--text)}.referencePayrollToolbar{display:flex;align-items:center;gap:8px;margin-bottom:14px}.referencePayrollToolbar>span{margin-right:auto;color:var(--muted);font-size:13px;text-transform:capitalize}.referencePayrollToolbar button,.referencePayrollToolbar a{padding:8px 11px;border:1px solid var(--line);border-radius:11px;background:var(--surface);color:var(--text);text-decoration:none;font:inherit;font-size:12px;cursor:pointer}.referencePayrollDetails,.referencePayrollNotice{border:1px solid var(--line);background:var(--surface);box-shadow:var(--shadow-lg)}.referencePayrollDetails{padding:20px;border-radius:22px}.referencePayrollDetails>h2{margin:0 0 12px;color:var(--text);font-size:18px}.referencePayrollRows{overflow:hidden;border:1px solid var(--line);border-radius:16px}.referencePayrollRow{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;min-height:58px;padding:8px 12px;border-bottom:1px solid var(--line)}.referencePayrollRow:last-child{border-bottom:0}.referencePayrollIcon{width:34px;height:34px;border-radius:10px;font-size:15px}.referencePayrollRow>span:nth-child(2){display:flex;min-width:0;flex-direction:column;gap:2px}.referencePayrollRow strong{color:var(--text);font-size:14px}.referencePayrollRow small{color:var(--muted);font-size:11px}.referencePayrollRow b{color:var(--text);font-size:14px;font-variant-numeric:tabular-nums}.positive{color:var(--primary)!important}.negative{color:#d95757!important}.referencePayrollTotals{display:grid;grid-template-columns:repeat(3,1fr);margin-top:14px;padding:14px 0 4px;border-top:1px solid var(--line)}.referencePayrollTotals span{display:flex;flex-direction:column;gap:4px;padding:0 16px;border-right:1px solid var(--line);text-align:center}.referencePayrollTotals span:last-child{border-right:0}.referencePayrollTotals small{color:var(--muted);font-size:12px}.referencePayrollTotals strong{color:var(--text);font-size:21px}.referencePayrollNotice{display:flex;align-items:center;gap:11px;margin-top:14px;padding:13px 16px;border-radius:16px;color:var(--muted)}.referencePayrollNotice>span{color:var(--primary);font-size:20px}.referencePayrollNotice p{margin:0;font-size:12px;line-height:1.45}.referencePayrollActions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}.referencePayrollActions button,.referencePayrollActions a{display:grid;min-height:48px;place-items:center;padding:10px 14px;border:1px solid var(--primary);border-radius:14px;background:var(--surface);color:var(--primary);text-decoration:none;font:inherit;font-weight:750;cursor:pointer}.referencePayrollActions button{background:var(--primary);color:white}.referenceHistoryHeader{align-items:end}.referenceHistoryTabs{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin:4px 0 16px;padding:4px;border:1px solid var(--line);border-radius:17px;background:var(--surface)}.referenceHistoryTabs span,.referenceHistoryTabs a{display:grid;min-height:42px;place-items:center;border-radius:13px;color:var(--muted);text-decoration:none;font-size:14px;font-weight:650}.referenceHistoryTabs span[aria-current=page]{background:var(--primary-soft);color:var(--primary);box-shadow:inset 0 -2px 0 color-mix(in srgb,var(--primary) 55%,transparent)}.referenceHistorySummary{padding-top:16px}.referenceHistorySummaryHeader{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}.referenceHistorySummaryHeader>div{display:flex;flex-direction:column;gap:3px}.referenceHistorySummaryHeader strong{color:var(--text);font-size:16px}.referenceHistorySummaryHeader small{color:var(--primary);font-size:12px}.referenceHistorySummaryHeader a{padding:8px 11px;border-radius:999px;background:var(--primary-soft);color:var(--primary);text-decoration:none;font-size:12px;font-weight:700}.referenceHistoryTimeline{background:transparent!important;border:0!important;box-shadow:none!important;padding-inline:0!important}.referenceHistoryTimeline .historyTimelineHeader{padding-inline:2px}.referenceHistoryTimeline .historyTimelineItem{padding-inline:16px}@media(max-width:899px){.historyPage,.shiftMapPage,.payrollPage,.reportPage,.workHoursPage,.focusPage,.activitiesPage{width:100%;max-width:920px;margin-inline:auto}.historyHeader,.shiftMapHeader,.payrollHeader,.reportHeader{padding-top:26px}.historyHeader .eyebrow,.shiftMapHeader .eyebrow,.payrollHeader .eyebrow{display:none}.historyHeader h1,.shiftMapHeader h1,.payrollHeader h1,.reportHeader h1{font-size:30px;letter-spacing:-.04em}.historySummaryCard,.historyTimelinePanel,.shiftMapCommand,.shiftMapPanel,.shiftMapDayEditor,.shiftMapPayrollCard,.payrollHero,.payrollPanel,.settingsPanel{border-color:var(--line)!important;background:var(--surface)!important;box-shadow:var(--shadow-lg)!important}.referenceHistoryTimeline{background:transparent!important;box-shadow:none!important}.historyTimelineItem{min-height:76px;border:1px solid var(--line);border-radius:18px;background:var(--surface);box-shadow:0 8px 24px rgba(28,38,32,.055)}.historyTimelineList{gap:10px}.shiftMapOverview{grid-template-columns:repeat(5,minmax(118px,1fr));overflow-x:auto;padding-bottom:4px;scrollbar-width:none}.shiftMapOverview::-webkit-scrollbar{display:none}.shiftMapOverview article{min-width:118px;border-radius:16px}.shiftMapCalendarScroll{overflow-x:auto;border:1px solid var(--line);border-radius:20px;background:var(--surface)}.shiftMapCalendar{min-width:650px}.shiftMapDay{min-height:76px}.payrollManualIntro{border-radius:20px!important}.payrollHero{border-radius:22px!important}}@media(max-width:620px){.referencePayrollHeader{grid-template-columns:auto 1fr}.referencePayrollMonth{grid-column:2;justify-self:start}.referencePayrollTotals strong{font-size:17px}.referencePayrollActions{grid-template-columns:1fr}}@media(max-width:420px){.referencePayrollDetails{padding:15px}.referencePayrollRow{grid-template-columns:auto 1fr}.referencePayrollRow b{grid-column:2;justify-self:end}.referencePayrollTotals{grid-template-columns:1fr;gap:8px}.referencePayrollTotals span{padding:8px 0;border-right:0;border-bottom:1px solid var(--line)}.referencePayrollTotals span:last-child{border-bottom:0}.referenceHistoryTabs span,.referenceHistoryTabs a{font-size:13px}}:root[data-theme='dark'] .referencePayrollDetails,:root[data-theme='dark'] .referencePayrollNotice,:root[data-theme='dark'] .historyTimelineItem{box-shadow:0 14px 42px rgba(0,0,0,.25)}
+
+/* Consolidação visual da página Vencimento.
+ * Apenas apresentação: não altera cálculo salarial, turnos, plano mensal ou persistência.
+ */
+.referencePayrollPage{
+  width:min(100%,920px);
+  min-width:0;
+  max-width:920px;
+  margin:0 auto;
+}
+.referencePayrollPage>*{min-width:0}
+.referencePayrollHeader{
+  min-width:0;
+  grid-template-columns:auto minmax(0,1fr) auto;
+  align-items:center;
+  gap:var(--space-3);
+  padding:20px 2px var(--space-4);
+}
+.referencePayrollHeader>div:nth-child(2){min-width:0}
+.referencePayrollTitleIcon{
+  width:48px;
+  height:48px;
+  border-radius:var(--control-radius);
+  background:var(--primary-soft);
+  color:var(--primary);
+  font-size:var(--text-xl);
+}
+.referencePayrollHeader h1{
+  margin:0;
+  color:var(--text);
+  font-size:clamp(var(--text-2xl),5vw,var(--text-3xl));
+  font-weight:var(--weight-heavy);
+  line-height:var(--line-height-tight);
+  letter-spacing:-.035em;
+  overflow-wrap:anywhere;
+}
+.referencePayrollHeader p{
+  max-width:680px;
+  margin:var(--space-1) 0 0;
+  color:var(--muted);
+  font-size:var(--text-md);
+  line-height:var(--line-height-normal);
+}
+.referencePayrollMonth{
+  min-width:0;
+}
+.referencePayrollMonth input{
+  min-width:160px;
+  min-height:var(--control-height-compact);
+  padding:9px var(--field-padding-inline);
+  border:1px solid var(--line-strong);
+  border-radius:var(--control-radius);
+  background:var(--surface);
+  color:var(--text);
+  font-size:var(--text-sm);
+  line-height:var(--line-height-control);
+}
+
+/* Barra de contexto */
+.referencePayrollToolbar{
+  min-width:0;
+  gap:var(--space-2);
+  margin-bottom:var(--space-3);
+}
+.referencePayrollToolbar>span{
+  min-width:0;
+  margin-right:auto;
+  color:var(--muted);
+  font-size:var(--text-sm);
+  font-weight:var(--weight-semibold);
+  line-height:var(--line-height-control);
+  text-transform:capitalize;
+  overflow-wrap:anywhere;
+}
+.referencePayrollToolbar button,
+.referencePayrollToolbar a{
+  display:inline-flex;
+  min-height:var(--control-height-compact);
+  align-items:center;
+  justify-content:center;
+  padding:9px var(--control-padding-inline);
+  border:1px solid var(--line-strong);
+  border-radius:var(--control-radius);
+  background:var(--surface);
+  color:var(--text);
+  text-decoration:none;
+  font-size:var(--text-sm);
+  font-weight:var(--weight-bold);
+  line-height:var(--line-height-control);
+  text-align:center;
+}
+.referencePayrollToolbar button:hover,
+.referencePayrollToolbar button:focus-visible,
+.referencePayrollToolbar a:hover,
+.referencePayrollToolbar a:focus-visible{
+  border-color:color-mix(in srgb,var(--primary) 35%,var(--line));
+  background:var(--primary-soft);
+  color:var(--primary);
+}
+
+/* Resumo */
+.referencePayrollDetails{
+  min-width:0;
+  padding:var(--space-4);
+  border:1px solid var(--line);
+  border-radius:var(--radius-lg);
+  background:var(--surface);
+  box-shadow:0 10px 28px rgba(28,38,32,.055);
+}
+.referencePayrollDetails>h2{
+  margin:0 0 var(--space-3);
+  color:var(--text);
+  font-size:var(--text-lg);
+  font-weight:var(--weight-heavy);
+  line-height:var(--line-height-tight);
+}
+.referencePayrollRows{
+  min-width:0;
+  border:1px solid var(--line);
+  border-radius:var(--radius-md);
+  overflow:hidden;
+}
+.referencePayrollRow{
+  min-width:0;
+  grid-template-columns:auto minmax(0,1fr) auto;
+  gap:var(--space-3);
+  min-height:64px;
+  padding:10px var(--space-3);
+  border-bottom:1px solid var(--line);
+}
+.referencePayrollIcon{
+  width:36px;
+  height:36px;
+  border-radius:var(--control-radius);
+  background:var(--primary-soft);
+  color:var(--primary);
+  font-size:var(--text-base);
+}
+.referencePayrollRow>span:nth-child(2){
+  min-width:0;
+  gap:var(--space-1);
+}
+.referencePayrollRow strong{
+  color:var(--text);
+  font-size:var(--text-sm);
+  font-weight:var(--weight-bold);
+  line-height:var(--line-height-control);
+  overflow-wrap:anywhere;
+}
+.referencePayrollRow small{
+  color:var(--muted);
+  font-size:var(--text-xs);
+  line-height:var(--line-height-normal);
+  overflow-wrap:anywhere;
+}
+.referencePayrollRow b{
+  min-width:0;
+  color:var(--text);
+  font-size:var(--text-sm);
+  font-weight:var(--weight-heavy);
+  line-height:var(--line-height-control);
+  font-variant-numeric:tabular-nums;
+  text-align:right;
+  overflow-wrap:anywhere;
+}
+.referencePayrollPage .positive{color:var(--primary)!important}
+.referencePayrollPage .negative{color:var(--danger)!important}
+
+/* Totais */
+.referencePayrollTotals{
+  min-width:0;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:0;
+  margin-top:var(--space-3);
+  padding:var(--space-3) 0 0;
+  border-top:1px solid var(--line);
+}
+.referencePayrollTotals span{
+  min-width:0;
+  gap:var(--space-1);
+  padding:0 var(--space-3);
+  border-right:1px solid var(--line);
+}
+.referencePayrollTotals small{
+  color:var(--muted);
+  font-size:var(--text-xs);
+  font-weight:var(--weight-semibold);
+  line-height:var(--line-height-normal);
+}
+.referencePayrollTotals strong{
+  color:var(--text);
+  font-size:var(--text-lg);
+  font-weight:var(--weight-heavy);
+  line-height:var(--line-height-tight);
+  font-variant-numeric:tabular-nums;
+  overflow-wrap:anywhere;
+}
+
+/* Nota e ações */
+.referencePayrollNotice{
+  min-width:0;
+  gap:var(--space-3);
+  margin-top:var(--space-3);
+  padding:var(--space-3) var(--space-4);
+  border:1px solid var(--line);
+  border-radius:var(--radius-md);
+  background:var(--surface-2);
+  color:var(--muted);
+  box-shadow:none;
+}
+.referencePayrollNotice>span{
+  color:var(--primary);
+  font-size:var(--text-lg);
+}
+.referencePayrollNotice p{
+  margin:0;
+  color:var(--muted);
+  font-size:var(--text-xs);
+  line-height:var(--line-height-normal);
+  overflow-wrap:anywhere;
+}
+.referencePayrollActions{
+  min-width:0;
+  gap:var(--space-2);
+  margin-top:var(--space-3);
+}
+.referencePayrollActions button,
+.referencePayrollActions a{
+  display:inline-flex;
+  min-width:0;
+  min-height:var(--control-height);
+  align-items:center;
+  justify-content:center;
+  padding:10px var(--control-padding-inline);
+  border-radius:var(--control-radius);
+  font-size:var(--text-sm);
+  font-weight:var(--weight-bold);
+  line-height:var(--line-height-control);
+  text-align:center;
+}
+.referencePayrollActions button{
+  border:1px solid transparent;
+  background:var(--primary);
+  color:#fff;
+}
+.referencePayrollActions a{
+  border:1px solid var(--line-strong);
+  background:var(--surface);
+  color:var(--text);
+}
+.referencePayrollActions a:hover,
+.referencePayrollActions a:focus-visible{
+  border-color:color-mix(in srgb,var(--primary) 35%,var(--line));
+  background:var(--primary-soft);
+  color:var(--primary);
+}
+
+/* Tema escuro mantém volumes e contraste do tema. */
+:root[data-theme='dark'] .referencePayrollDetails{
+  border-color:var(--line);
+  background:var(--surface);
+  box-shadow:0 12px 30px rgba(0,0,0,.18);
+}
+:root[data-theme='dark'] .referencePayrollNotice{
+  border-color:var(--line);
+  background:var(--surface-2);
+  box-shadow:none;
+}
+
+/* Mobile */
+@media(max-width:700px){
+  .referencePayrollPage{width:100%;max-width:100%}
+  .referencePayrollHeader{
+    grid-template-columns:auto minmax(0,1fr);
+    align-items:start;
+    padding:16px 0 var(--space-3);
+  }
+  .referencePayrollHeader h1{font-size:clamp(26px,8vw,32px)}
+  .referencePayrollHeader p{font-size:var(--text-sm)}
+  .referencePayrollMonth{
+    grid-column:2;
+    justify-self:stretch;
+  }
+  .referencePayrollMonth input{
+    width:100%;
+    min-width:0;
+  }
+  .referencePayrollToolbar{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  .referencePayrollToolbar>span{
+    grid-column:1/-1;
+    margin-right:0;
+  }
+  .referencePayrollToolbar button,
+  .referencePayrollToolbar a{width:100%}
+  .referencePayrollDetails{padding:var(--space-3);border-radius:var(--radius-md)}
+  .referencePayrollRow{gap:var(--space-2)}
+  .referencePayrollTotals strong{font-size:var(--text-base)}
+  .referencePayrollActions{grid-template-columns:minmax(0,1fr)}
+}
+@media(max-width:420px){
+  .referencePayrollHeader{
+    grid-template-columns:minmax(0,1fr);
+  }
+  .referencePayrollTitleIcon{display:none}
+  .referencePayrollHeader>div:nth-child(2),
+  .referencePayrollMonth{grid-column:1}
+  .referencePayrollHeader h1{font-size:26px}
+  .referencePayrollToolbar{
+    grid-template-columns:minmax(0,1fr);
+  }
+  .referencePayrollRow{
+    grid-template-columns:auto minmax(0,1fr);
+  }
+  .referencePayrollRow b{
+    grid-column:2;
+    justify-self:start;
+    text-align:left;
+  }
+  .referencePayrollTotals{
+    grid-template-columns:minmax(0,1fr);
+    gap:var(--space-2);
+  }
+  .referencePayrollTotals span{
+    padding:var(--space-2) 0;
+    border-right:0;
+    border-bottom:1px solid var(--line);
+  }
+  .referencePayrollTotals span:last-child{border-bottom:0}
+}
