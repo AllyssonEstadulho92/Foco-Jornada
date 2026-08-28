@@ -336,6 +336,7 @@ export function ShiftMapPage() {
                   key={day.date}
                   className={`shiftMapDay shiftMapDay-${day.kind}${selectedDate === day.date ? ' shiftMapDaySelected' : ''}`}
                   onClick={() => setSelectedDate(day.date)}
+                  aria-pressed={selectedDate === day.date}
                   aria-label={`${dateLabel(day.date)}: ${meta.label}, ${shiftTimeLabel(day)}`}
                 >
                   <span className="shiftMapDayNumber">{Number(day.date.slice(-2))}</span>
