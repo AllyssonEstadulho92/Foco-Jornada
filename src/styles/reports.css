@@ -364,3 +364,263 @@
     display: none;
   }
 }
+
+
+/* Consolidação visual da página Estatísticas.
+ * Escopo isolado por .statisticsPage para não afetar Definições nem outros relatórios.
+ */
+.reportPage.statisticsPage{
+  width:min(100%,920px);
+  min-width:0;
+  max-width:920px;
+  margin:0 auto;
+}
+.reportPage.statisticsPage>*{min-width:0}
+.reportPage.statisticsPage .reportHeader{
+  min-width:0;
+  align-items:flex-end;
+  gap:var(--space-4);
+  margin-bottom:var(--space-4);
+  padding:8px 2px var(--space-2);
+}
+.reportPage.statisticsPage .reportHeader>div:first-child{min-width:0}
+.reportPage.statisticsPage .reportHeader .eyebrow{
+  color:var(--muted);
+  font-size:var(--text-xs);
+  font-weight:var(--weight-heavy);
+  line-height:var(--line-height-control);
+  letter-spacing:.08em;
+}
+.reportPage.statisticsPage .reportHeader h1{
+  margin:var(--space-1) 0 var(--space-2);
+  color:var(--text);
+  font-size:clamp(var(--text-2xl),5vw,var(--text-3xl));
+  font-weight:var(--weight-heavy);
+  line-height:var(--line-height-tight);
+  letter-spacing:-.035em;
+  overflow-wrap:anywhere;
+}
+.reportPage.statisticsPage .reportHeader p{
+  max-width:680px;
+  margin:0;
+  color:var(--muted);
+  font-size:var(--text-md);
+  line-height:var(--line-height-normal);
+}
+
+/* Período */
+.reportPage.statisticsPage .periodTabs{
+  flex:0 0 auto;
+  min-width:0;
+  gap:4px;
+  padding:4px;
+  border:1px solid var(--line);
+  border-radius:var(--control-radius);
+  background:var(--surface-2);
+}
+.reportPage.statisticsPage .periodTab{
+  min-width:0;
+  min-height:var(--control-height-compact);
+  padding:8px var(--control-padding-inline);
+  border:0;
+  border-radius:9px;
+  background:transparent;
+  color:var(--muted);
+  font-size:var(--text-sm);
+  font-weight:var(--weight-bold);
+  line-height:var(--line-height-control);
+}
+.reportPage.statisticsPage .periodTab:hover,
+.reportPage.statisticsPage .periodTab:focus-visible{
+  background:color-mix(in srgb,var(--surface) 68%,transparent);
+  color:var(--text);
+}
+.reportPage.statisticsPage .periodTabActive{
+  background:var(--surface);
+  color:var(--primary);
+  box-shadow:0 1px 4px rgba(28,38,32,.08);
+}
+
+/* Métricas */
+.reportPage.statisticsPage .summaryGrid{
+  min-width:0;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:var(--space-2);
+  margin-bottom:var(--space-4);
+}
+.reportPage.statisticsPage .summaryGrid article{
+  min-width:0;
+  min-height:104px;
+  gap:var(--space-2);
+  padding:var(--space-3);
+  border:1px solid var(--line);
+  border-radius:var(--radius-md);
+  background:var(--surface);
+  box-shadow:0 8px 22px rgba(28,38,32,.035);
+}
+.reportPage.statisticsPage .summaryGrid span{
+  color:var(--muted);
+  font-size:var(--text-xs);
+  font-weight:var(--weight-semibold);
+  line-height:var(--line-height-normal);
+}
+.reportPage.statisticsPage .summaryGrid strong{
+  min-width:0;
+  color:var(--text);
+  font-size:var(--text-xl);
+  font-weight:var(--weight-heavy);
+  line-height:var(--line-height-tight);
+  font-variant-numeric:tabular-nums;
+  overflow-wrap:anywhere;
+}
+.reportPage.statisticsPage .summaryGrid article:nth-child(2) strong,
+.reportPage.statisticsPage .summaryGrid article:nth-child(4) strong{
+  color:var(--primary);
+}
+
+/* Resumo diário */
+.reportPage.statisticsPage .timelinePanel{
+  min-width:0;
+  padding:var(--space-4);
+  border:1px solid var(--line);
+  border-radius:var(--radius-lg);
+  background:var(--surface);
+}
+.reportPage.statisticsPage .timelinePanel .sectionHeadingRow{
+  min-width:0;
+  gap:var(--space-3);
+  margin-bottom:var(--space-3);
+}
+.reportPage.statisticsPage .timelinePanel .sectionHeadingRow>div{min-width:0}
+.reportPage.statisticsPage .timelinePanel .sectionKicker{
+  color:var(--muted);
+  font-size:11px;
+  font-weight:var(--weight-heavy);
+  line-height:var(--line-height-control);
+  letter-spacing:.08em;
+}
+.reportPage.statisticsPage .timelinePanel .sectionHeadingRow h2{
+  margin:var(--space-1) 0 0;
+  color:var(--text);
+  font-size:var(--text-lg);
+  font-weight:var(--weight-heavy);
+  line-height:var(--line-height-tight);
+}
+.reportPage.statisticsPage .statsDailyList{
+  min-width:0;
+  gap:var(--space-2);
+}
+.reportPage.statisticsPage .statsDailyList article{
+  min-width:0;
+  grid-template-columns:minmax(120px,1.2fr) repeat(3,minmax(0,1fr));
+  gap:var(--space-2);
+  align-items:center;
+  padding:var(--space-3);
+  border:1px solid var(--line);
+  border-radius:var(--radius-md);
+  background:var(--surface-2);
+}
+.reportPage.statisticsPage .statsDailyList article strong{
+  min-width:0;
+  color:var(--text);
+  font-size:var(--text-sm);
+  font-weight:var(--weight-bold);
+  line-height:var(--line-height-control);
+  overflow-wrap:anywhere;
+}
+.reportPage.statisticsPage .statsDailyList article span{
+  min-width:0;
+  color:var(--muted);
+  font-size:var(--text-xs);
+  font-weight:var(--weight-semibold);
+  line-height:var(--line-height-normal);
+  overflow-wrap:anywhere;
+}
+.reportPage.statisticsPage .statsDailyList article span:nth-of-type(1),
+.reportPage.statisticsPage .statsDailyList article span:nth-of-type(2){
+  color:var(--text);
+}
+.reportPage.statisticsPage :is(.historyEmpty,.mutedText,.errorBanner){
+  min-width:0;
+  font-size:var(--text-sm);
+  line-height:var(--line-height-normal);
+  overflow-wrap:anywhere;
+}
+.reportPage.statisticsPage .historyEmpty{
+  padding:var(--space-5) var(--space-4);
+  border:1px dashed var(--line-strong);
+  border-radius:var(--radius-md);
+  color:var(--muted);
+  text-align:center;
+}
+
+/* Tema escuro */
+[data-theme="dark"] .reportPage.statisticsPage .periodTabs,
+[data-theme="dark"] .reportPage.statisticsPage .statsDailyList article{
+  border-color:var(--line);
+  background:var(--surface-2);
+}
+[data-theme="dark"] .reportPage.statisticsPage .periodTabActive,
+[data-theme="dark"] .reportPage.statisticsPage .summaryGrid article,
+[data-theme="dark"] .reportPage.statisticsPage .timelinePanel{
+  border-color:var(--line);
+  background:var(--surface);
+}
+
+@media(max-width:800px){
+  .reportPage.statisticsPage{
+    width:100%;
+    max-width:100%;
+  }
+  .reportPage.statisticsPage .reportHeader{
+    align-items:stretch;
+    flex-direction:column;
+    gap:var(--space-3);
+    padding-inline:0;
+  }
+  .reportPage.statisticsPage .reportHeader h1{
+    font-size:clamp(26px,8vw,32px);
+  }
+  .reportPage.statisticsPage .reportHeader p{
+    font-size:var(--text-sm);
+  }
+  .reportPage.statisticsPage .periodTabs{
+    width:100%;
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+  }
+  .reportPage.statisticsPage .periodTab{width:100%}
+  .reportPage.statisticsPage .summaryGrid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  .reportPage.statisticsPage .statsDailyList article{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+}
+@media(max-width:560px){
+  .reportPage.statisticsPage .timelinePanel{
+    padding:var(--space-3);
+    border-radius:var(--radius-md);
+  }
+  .reportPage.statisticsPage .summaryGrid article{
+    min-height:92px;
+  }
+  .reportPage.statisticsPage .summaryGrid strong{
+    font-size:var(--text-lg);
+  }
+  .reportPage.statisticsPage .statsDailyList article{
+    grid-template-columns:minmax(0,1fr);
+  }
+}
+@media(max-width:420px){
+  .reportPage.statisticsPage .reportHeader h1{font-size:26px}
+  .reportPage.statisticsPage .periodTabs{
+    grid-template-columns:minmax(0,1fr);
+  }
+  .reportPage.statisticsPage .summaryGrid{
+    grid-template-columns:minmax(0,1fr);
+  }
+  .reportPage.statisticsPage .summaryGrid article{
+    min-height:80px;
+  }
+}
