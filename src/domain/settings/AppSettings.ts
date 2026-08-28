@@ -35,7 +35,7 @@ export interface AppSettings {
   workSchedule: WorkScheduleSettings
 }
 
-const CURRENT_SETTINGS_REVISION = 2
+const CURRENT_SETTINGS_REVISION = 3
 
 export const DEFAULT_WORK_SCHEDULE: WorkScheduleSettings = {
   mode: 'fixed',
@@ -47,8 +47,8 @@ export const DEFAULT_WORK_SCHEDULE: WorkScheduleSettings = {
   dayOverrides: [],
   break1: {
     enabled: true,
-    startTime: '12:00',
-    endTime: '12:15',
+    startTime: '11:00',
+    endTime: '11:15',
   },
   break2: {
     enabled: false,
@@ -117,15 +117,16 @@ function normalizeBreak(
   }
 }
 
-function isLegacyDefaultBreak(value: Partial<ScheduledBreakSettings> | undefined) {
-  return value?.enabled === true && value.startTime === '11:00' && value.endTime === '11:15'
+function isPreviousDefaultBreak(value: Partial<ScheduledBreakSettings> | undefined) {
+  return value?.enabled === true && value.startTime === '12:00' && value.endTime === '12:15'
 }
 
 function normalizeWorkSchedule(
   value: Partial<WorkScheduleSettings> | undefined,
   settingsRevision: number,
 ): WorkScheduleSettings {
-  const migrateLegacyBreak = settingsRevision < CURRENT_SETTINGS_REVISION && isLegacyDefaultBreak(value?.break1)
+  const migratePreviousDefaultBreak =
+    settingsRevision < CURRENT_SETTINGS_REVISION && isPreviousDefaultBreak(value?.break1)
 
   return {
     mode: 'fixed',
@@ -135,7 +136,7 @@ function normalizeWorkSchedule(
     sundayEndTime: validClock(value?.sundayEndTime, DEFAULT_WORK_SCHEDULE.sundayEndTime),
     weekendWorkDates: normalizeWeekendWorkDates(value?.weekendWorkDates),
     dayOverrides: normalizeDayOverrides(value?.dayOverrides),
-    break1: migrateLegacyBreak
+    break1: migratePreviousDefaultBreak
       ? { ...DEFAULT_WORK_SCHEDULE.break1 }
       : normalizeBreak(value?.break1, DEFAULT_WORK_SCHEDULE.break1),
     break2: normalizeBreak(value?.break2, DEFAULT_WORK_SCHEDULE.break2),
