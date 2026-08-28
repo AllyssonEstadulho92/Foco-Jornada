@@ -1003,3 +1003,30 @@
   .shiftMapSectionHeader{align-items:flex-start}
   .shiftMapSalaryHero>strong{font-size:32px}
 }
+
+
+/* Revisão final do Mapa de turnos.
+ * Mantém toda a lógica existente e fixa apenas largura, foco e seleção.
+ */
+.shiftMapPage{
+  width:min(100%,1120px);
+  max-width:1120px;
+}
+.shiftMapCalendarScroll:focus-visible{
+  outline:2px solid var(--primary);
+  outline-offset:4px;
+}
+.shiftMapDay{
+  min-width:0;
+}
+.shiftMapDay:focus-visible{
+  border-color:var(--primary);
+  outline:2px solid color-mix(in srgb,var(--primary) 35%,transparent);
+  outline-offset:2px;
+}
+.shiftMapDay[aria-pressed="true"]{
+  border-color:var(--primary);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb,var(--primary) 28%,transparent),
+    0 0 0 2px color-mix(in srgb,var(--primary) 12%,transparent);
+}
