@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState, type CSSProperties } from 'react'
 import {
   NICOTINE_REFERENCE_PROFILES,
   type NicotineAwarenessSettings,
@@ -9,8 +9,9 @@ import type {
   StickPackProjection,
   StickPackSettings,
 } from '../../application/personalStock/StickPackPlannerService'
-import type { StickUsageAnalytics } from '../../application/personalStock/StickUsageAnalyticsService'
+import { getStickPacingStatus, type StickUsageAnalytics } from '../../application/personalStock/StickUsageAnalyticsService'
 import type { PhysicalStockCheck, StickSummary, StockMovement } from '../../domain/personalStock/models'
+import { useNow } from '../hooks/useNow'
 import { useAppServices } from '../providers/AppServicesProvider'
 
 function operationId(): string {
@@ -76,6 +77,15 @@ function durationLabel(minutes?: number | null): string {
   return rest ? `${hours} h ${rest} min` : `${hours} h`
 }
 
+const STICK_PACING_INTERVAL_MINUTES = 30
+
+function pacingCountdownLabel(totalSeconds: number): string {
+  const safeSeconds = Math.max(0, Math.floor(totalSeconds))
+  const minutes = Math.floor(safeSeconds / 60)
+  const seconds = safeSeconds % 60
+  return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
+}
+
 function localDecimal(value?: string | null): string {
   return value ? value.replace('.', ',') : '—'
 }
@@ -130,6 +140,8 @@ export function SticksStockPage() {
   const [physicalQuantity, setPhysicalQuantity] = useState('')
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState('')
+
+  const pacingNow = useNow(1000)
 
   const reload = useCallback(async () => {
     const [
@@ -303,6 +315,14 @@ export function SticksStockPage() {
 
   const maxDailyUsage = Math.max(1, ...(usageAnalytics?.last7Days.map((item) => item.count) ?? [1]))
 
+  const pacingStatus = getStickPacingStatus(
+    usageAnalytics?.lastUseAt ?? null,
+    pacingNow,
+    STICK_PACING_INTERVAL_MINUTES,
+  )
+  const pacingNextTime = pacingStatus.nextTargetAt ? formatTime(pacingStatus.nextTargetAt) : '—'
+  const pacingCountdown = pacingCountdownLabel(pacingStatus.remainingSeconds)
+
   const packTimelineRows = useMemo(() => {
     if (!packProjection) return []
 
@@ -357,6 +377,22 @@ export function SticksStockPage() {
     }
     await personalStockService.restockSticks(restockSticks, operationId())
     setRestockPacks('1')
+  }
+
+  async function registerStickWithPacing() {
+    if (!pacingStatus.ready && pacingStatus.elapsedSeconds !== null) {
+      const confirmed = window.confirm(
+        `A tua meta de espaçamento ainda não terminou. Faltam ${pacingCountdown} para completares ${pacingStatus.targetMinutes} min. Queres registar o stick na mesma? O registo deve continuar exato mesmo quando a meta não é cumprida.`,
+      )
+      if (!confirmed) return
+    }
+
+    await run(
+      () => personalStockService.consumeStick(operationId()),
+      pacingStatus.ready
+        ? '1 stick registado. O relógio de espaçamento começou agora.'
+        : '1 stick registado. O relógio de espaçamento recomeçou a partir deste registo.',
+    )
   }
 
   async function resetSticksControl() {
@@ -495,18 +531,45 @@ export function SticksStockPage() {
               <span className="stockPanelTag">PASSO 2 · REGISTAR</span>
               <h2 id="sticks-register-title">Utilização</h2>
               <p>Cada registo retira exatamente 1 stick. Corrigir cria um novo movimento e preserva o original.</p>
+              <div
+                className={`sticksPacingClock${pacingStatus.ready ? ' isReady' : ' isWaiting'}`}
+                aria-label={
+                  pacingStatus.ready
+                    ? `Meta de espaçamento de ${pacingStatus.targetMinutes} minutos concluída`
+                    : `Faltam ${pacingCountdown} para a meta de espaçamento`
+                }
+              >
+                <div
+                  className="sticksPacingDial"
+                  style={{ '--pacing-progress': `${pacingStatus.progressPercent * 3.6}deg` } as CSSProperties}
+                  aria-hidden="true"
+                >
+                  <span className="sticksPacingDialFace">
+                    <strong>{pacingStatus.ready ? '✓' : pacingCountdown}</strong>
+                    <small>{pacingStatus.targetMinutes} min</small>
+                  </span>
+                </div>
+                <div className="sticksPacingCopy">
+                  <span>INTERVALO CONSCIENTE</span>
+                  <strong>{pacingStatus.ready ? 'Meta de intervalo concluída' : 'Espera antes do próximo stick'}</strong>
+                  <small>
+                    {pacingStatus.nextTargetAt
+                      ? `Próximo marco às ${pacingNextTime}. `
+                      : 'O relógio começa quando registares um stick. '}
+                    Meta comportamental; não representa um intervalo seguro de utilização.
+                  </small>
+                </div>
+              </div>
             </div>
             <div className="sticksRegisterActions">
               <button
                 type="button"
                 className="stockPrimaryAction sticksRegisterPrimary"
                 disabled={busy || (summary.stock ?? 0) <= 0}
-                onClick={() => void run(
-                  () => personalStockService.consumeStick(operationId()),
-                  '1 stick registado. Stock e cálculos atualizados.',
-                )}
+                aria-describedby="sticks-pacing-hint"
+                onClick={() => void registerStickWithPacing()}
               >
-                Registar 1 stick
+                {pacingStatus.ready ? 'Registar 1 stick' : 'Registar mesmo assim'}
               </button>
               <button
                 type="button"
@@ -527,6 +590,9 @@ export function SticksStockPage() {
               >
                 Limpar controlo
               </button>
+              <small id="sticks-pacing-hint" className="sticksPacingHint">
+                O relógio ajuda a criar distância entre registos sem bloquear o histórico real. Se utilizares antes do fim, regista na mesma para manter os dados corretos.
+              </small>
             </div>
           </section>
 

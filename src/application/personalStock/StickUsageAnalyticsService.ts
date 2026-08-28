@@ -14,6 +14,52 @@ export interface StickDailyUsage {
   count: number
 }
 
+export interface StickPacingStatus {
+  targetMinutes: number
+  elapsedSeconds: number | null
+  remainingSeconds: number
+  progressPercent: number
+  ready: boolean
+  nextTargetAt: string | null
+}
+
+export function getStickPacingStatus(
+  lastUseAt: string | null,
+  now = new Date(),
+  targetMinutes = 30,
+): StickPacingStatus {
+  const safeTargetMinutes = Number.isFinite(targetMinutes)
+    ? Math.min(180, Math.max(5, Math.round(targetMinutes)))
+    : 30
+  const targetSeconds = safeTargetMinutes * 60
+
+  if (!lastUseAt || !Number.isFinite(Date.parse(lastUseAt))) {
+    return {
+      targetMinutes: safeTargetMinutes,
+      elapsedSeconds: null,
+      remainingSeconds: 0,
+      progressPercent: 100,
+      ready: true,
+      nextTargetAt: null,
+    }
+  }
+
+  const elapsedSeconds = Math.max(0, Math.floor((now.getTime() - Date.parse(lastUseAt)) / 1000))
+  const remainingSeconds = Math.max(0, targetSeconds - elapsedSeconds)
+  const progressPercent = targetSeconds > 0
+    ? Math.min(100, Math.max(0, Math.round((elapsedSeconds / targetSeconds) * 100)))
+    : 100
+
+  return {
+    targetMinutes: safeTargetMinutes,
+    elapsedSeconds,
+    remainingSeconds,
+    progressPercent,
+    ready: remainingSeconds === 0,
+    nextTargetAt: new Date(Date.parse(lastUseAt) + targetSeconds * 1000).toISOString(),
+  }
+}
+
 export interface StickUsageAnalytics {
   today: string
   todayCount: number

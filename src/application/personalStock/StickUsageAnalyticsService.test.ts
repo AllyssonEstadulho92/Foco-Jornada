@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { AppDatabase } from '../../infrastructure/database/appDatabase'
 import { PersonalStockService, STICKS_ENTITY_ID } from './PersonalStockService'
-import { StickUsageAnalyticsService } from './StickUsageAnalyticsService'
+import { getStickPacingStatus, StickUsageAnalyticsService } from './StickUsageAnalyticsService'
 
 function operationId(): string {
   return globalThis.crypto.randomUUID()
@@ -99,3 +99,40 @@ describe('StickUsageAnalyticsService', () => {
     }
   })
 })
+
+describe('getStickPacingStatus', () => {
+  it('inicia uma meta comportamental de 30 minutos após o último stick', () => {
+    const status = getStickPacingStatus(
+      '2026-08-29T00:00:00.000Z',
+      new Date('2026-08-29T00:10:00.000Z'),
+      30,
+    )
+
+    expect(status.ready).toBe(false)
+    expect(status.elapsedSeconds).toBe(600)
+    expect(status.remainingSeconds).toBe(1200)
+    expect(status.progressPercent).toBe(33)
+    expect(status.nextTargetAt).toBe('2026-08-29T00:30:00.000Z')
+  })
+
+  it('fica concluído quando o intervalo definido termina', () => {
+    const status = getStickPacingStatus(
+      '2026-08-29T00:00:00.000Z',
+      new Date('2026-08-29T00:30:00.000Z'),
+      30,
+    )
+
+    expect(status.ready).toBe(true)
+    expect(status.remainingSeconds).toBe(0)
+    expect(status.progressPercent).toBe(100)
+  })
+
+  it('fica pronto quando ainda não existe utilização registada', () => {
+    const status = getStickPacingStatus(null, new Date('2026-08-29T00:00:00.000Z'), 30)
+
+    expect(status.ready).toBe(true)
+    expect(status.elapsedSeconds).toBeNull()
+    expect(status.nextTargetAt).toBeNull()
+  })
+})
+

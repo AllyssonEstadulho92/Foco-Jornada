@@ -1282,3 +1282,166 @@
     transition:none;
   }
 }
+
+
+/* Relógio de espaçamento entre sticks.
+ * Ajuda a criar distância entre utilizações sem bloquear o ledger real.
+ */
+.sticksLinearPage .sticksPacingClock{
+  display:grid;
+  min-width:0;
+  grid-template-columns:104px minmax(0,1fr);
+  align-items:center;
+  gap:var(--space-3);
+  margin-top:var(--space-3);
+  padding:var(--space-3);
+  border:1px solid var(--line);
+  border-radius:var(--radius-md);
+  background:var(--surface-2);
+}
+.sticksLinearPage .sticksPacingClock.isWaiting{
+  border-color:color-mix(in srgb,var(--primary) 32%,var(--line));
+  background:color-mix(in srgb,var(--primary-soft) 30%,var(--surface));
+}
+.sticksLinearPage .sticksPacingClock.isReady{
+  border-color:color-mix(in srgb,var(--success) 30%,var(--line));
+}
+.sticksLinearPage .sticksPacingDial{
+  --pacing-progress:0deg;
+  display:grid;
+  width:92px;
+  height:92px;
+  place-items:center;
+  border-radius:999px;
+  background:
+    conic-gradient(
+      var(--primary) 0deg var(--pacing-progress),
+      var(--surface-3) var(--pacing-progress) 360deg
+    );
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--line) 75%,transparent);
+}
+.sticksLinearPage .sticksPacingClock.isReady .sticksPacingDial{
+  background:conic-gradient(var(--success) 0deg 360deg);
+}
+.sticksLinearPage .sticksPacingDialFace{
+  display:grid;
+  width:72px;
+  height:72px;
+  place-items:center;
+  align-content:center;
+  gap:2px;
+  border:1px solid var(--line);
+  border-radius:999px;
+  background:var(--surface);
+  color:var(--text);
+  text-align:center;
+}
+.sticksLinearPage .sticksPacingDialFace strong{
+  font-size:var(--text-base);
+  font-weight:var(--weight-heavy);
+  line-height:1;
+  font-variant-numeric:tabular-nums;
+  letter-spacing:-.02em;
+}
+.sticksLinearPage .sticksPacingClock.isReady .sticksPacingDialFace strong{
+  color:var(--success);
+  font-size:var(--text-xl);
+}
+.sticksLinearPage .sticksPacingDialFace small{
+  color:var(--muted);
+  font-size:10px;
+  font-weight:var(--weight-bold);
+  line-height:1;
+}
+.sticksLinearPage .sticksPacingCopy{
+  display:grid;
+  min-width:0;
+  gap:4px;
+}
+.sticksLinearPage .sticksPacingCopy>span{
+  color:var(--primary);
+  font-size:10px;
+  font-weight:var(--weight-heavy);
+  line-height:var(--line-height-normal);
+  letter-spacing:.075em;
+}
+.sticksLinearPage .sticksPacingCopy>strong{
+  color:var(--text);
+  font-size:var(--text-base);
+  font-weight:var(--weight-bold);
+  line-height:var(--line-height-tight);
+  overflow-wrap:anywhere;
+}
+.sticksLinearPage .sticksPacingCopy>small,
+.sticksLinearPage .sticksPacingHint{
+  color:var(--muted);
+  font-size:var(--text-xs);
+  line-height:var(--line-height-normal);
+  overflow-wrap:anywhere;
+}
+.sticksLinearPage .sticksPacingHint{
+  display:block;
+  padding:var(--space-2) 2px 0;
+}
+.sticksLinearPage .sticksRegisterPrimary{
+  transition:
+    transform .08s ease,
+    border-color .15s ease,
+    background .15s ease,
+    opacity .15s ease;
+}
+
+[data-theme="dark"] .sticksLinearPage .sticksPacingClock{
+  border-color:var(--line);
+  background:var(--surface-2);
+}
+[data-theme="dark"] .sticksLinearPage .sticksPacingClock.isWaiting{
+  border-color:color-mix(in srgb,var(--primary) 36%,var(--line));
+  background:color-mix(in srgb,var(--primary-soft) 24%,var(--surface));
+}
+[data-theme="dark"] .sticksLinearPage .sticksPacingDialFace{
+  border-color:var(--line);
+  background:var(--surface);
+}
+
+@media(max-width:700px){
+  .sticksLinearPage .sticksPacingClock{
+    grid-template-columns:88px minmax(0,1fr);
+    gap:var(--space-2);
+    padding:var(--space-3);
+  }
+  .sticksLinearPage .sticksPacingDial{
+    width:80px;
+    height:80px;
+  }
+  .sticksLinearPage .sticksPacingDialFace{
+    width:62px;
+    height:62px;
+  }
+  .sticksLinearPage .sticksPacingDialFace strong{
+    font-size:var(--text-sm);
+  }
+}
+@media(max-width:420px){
+  .sticksLinearPage .sticksPacingClock{
+    grid-template-columns:minmax(0,1fr);
+    justify-items:center;
+    text-align:center;
+  }
+  .sticksLinearPage .sticksPacingCopy{
+    justify-items:center;
+  }
+  .sticksLinearPage .sticksPacingDial{
+    width:88px;
+    height:88px;
+  }
+  .sticksLinearPage .sticksPacingDialFace{
+    width:68px;
+    height:68px;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .sticksLinearPage .sticksRegisterPrimary{
+    transition:none;
+  }
+}
