@@ -35,6 +35,8 @@ describe('StickPackPlannerService', () => {
       expect(projection.packEquivalent).toBe('12.0')
       expect(projection.packTrackingExact).toBe(true)
       expect(projection.packTrackingIssue).toBeNull()
+      expect(projection.forecastAvailable).toBe(false)
+      expect(projection.forecastConfidence).toBe('none')
       expect(projection.historicalReliable).toBe(false)
       expect(projection.historicalDepletionDate).toBeNull()
       expect(projection.currentPackHistoricalDepletionDate).toBeNull()
@@ -92,7 +94,54 @@ describe('StickPackPlannerService', () => {
     }
   })
 
-  it('only estimates duration after at least three observed calendar days', async () => {
+  it('shows a provisional end date for the current and future packs from the first observed day', async () => {
+    const db = makeDatabase()
+    try {
+      const stock = new PersonalStockService(db)
+      const planner = new StickPackPlannerService(db)
+      await planner.saveSettings({ packCount: 12, sticksPerPack: 20 })
+      await stock.initializeSticks(240, operationId())
+      await stock.consumeStick(operationId())
+      await stock.consumeStick(operationId())
+
+      const consumptions = (await db.stockMovements.where('entityId').equals('stock:sticks:glo').toArray())
+        .filter((movement) => movement.type === 'consumption')
+        .sort((left, right) => left.sequence - right.sequence)
+
+      await db.stockMovements.update(consumptions[0].id, { effectiveAt: '2026-08-28T12:27:00.000Z' })
+      await db.stockMovements.update(consumptions[1].id, { effectiveAt: '2026-08-28T13:00:00.000Z' })
+
+      const projection = await planner.getProjection(new Date('2026-08-28T13:28:00.000Z'))
+
+      expect(projection.currentStockSticks).toBe(238)
+      expect(projection.currentPackRemaining).toBe(18)
+      expect(projection.historicalCoverageDays).toBe(1)
+      expect(projection.historicalDailyAverage).toBe('2.0')
+      expect(projection.forecastAvailable).toBe(true)
+      expect(projection.forecastConfidence).toBe('provisional')
+      expect(projection.historicalReliable).toBe(false)
+      expect(projection.currentPackHistoricalDepletionDate).toBe('2026-09-06')
+      expect(projection.packForecasts[0]).toMatchObject({
+        packNumber: 1,
+        kind: 'current',
+        sticks: 18,
+        actualStartAt: '2026-08-28T12:27:00.000Z',
+        estimatedDepletionDate: '2026-09-06',
+      })
+      expect(projection.packForecasts[1]).toMatchObject({
+        packNumber: 2,
+        kind: 'sealed',
+        sticks: 20,
+        estimatedStartDate: '2026-09-07',
+        estimatedDepletionDate: '2026-09-16',
+      })
+    } finally {
+      await db.delete()
+    }
+  })
+
+
+  it('marks the forecast as established after at least three observed calendar days', async () => {
     const db = makeDatabase()
     try {
       const stock = new PersonalStockService(db)
@@ -118,6 +167,8 @@ describe('StickPackPlannerService', () => {
       expect(projection.currentPackRemaining).toBe(7)
       expect(projection.sealedPacksRemaining).toBe(1)
       expect(projection.historicalCoverageDays).toBe(3)
+      expect(projection.forecastAvailable).toBe(true)
+      expect(projection.forecastConfidence).toBe('established')
       expect(projection.historicalReliable).toBe(true)
       expect(projection.historicalDailyAverage).toBe('1.0')
       expect(projection.historicalDays).toBe('27.0')

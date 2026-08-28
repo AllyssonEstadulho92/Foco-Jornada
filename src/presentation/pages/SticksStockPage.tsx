@@ -631,28 +631,30 @@ export function SticksStockPage() {
               <span className="sticksEstimateBadge">ESTIMATIVA</span>
             </div>
 
-            {packProjection?.historicalReliable ? (
+            {packProjection?.forecastAvailable ? (
               <div className="sticksDurationGrid">
                 <article>
-                  <span>Ritmo observado</span>
+                  <span>{packProjection.historicalReliable ? 'Ritmo observado' : 'Ritmo observado provisório'}</span>
                   <strong>{localDecimal(packProjection.historicalDailyAverage)} sticks/dia</strong>
-                  <small>{packProjection.historicalCoverageDays} dias de histórico usados</small>
+                  <small>
+                    {packProjection.historicalCoverageDays} dia(s) de histórico
+                    {packProjection.historicalReliable ? ' · previsão estabilizada' : ' · previsão ainda provisória'}
+                  </small>
                 </article>
                 <article>
-                  <span>Maço atual / próximo</span>
+                  <span>Término previsto do maço atual</span>
                   <strong>{formatDateKey(packProjection.currentPackHistoricalDepletionDate)}</strong>
-                  <small>≈ {localDecimal(packProjection.currentPackHistoricalDays)} dias</small>
+                  <small>≈ {localDecimal(packProjection.currentPackHistoricalDays)} dias restantes</small>
                 </article>
                 <article>
-                  <span>Stock total</span>
+                  <span>Término previsto do stock total</span>
                   <strong>{formatDateKey(packProjection.historicalDepletionDate)}</strong>
-                  <small>≈ {localDecimal(packProjection.historicalDays)} dias</small>
+                  <small>≈ {localDecimal(packProjection.historicalDays)} dias restantes</small>
                 </article>
               </div>
             ) : (
               <p className="sticksNoAssumption">
-                A aplicação não inventa uma média. A previsão só aparece depois de pelo menos 3 dias de utilizações registadas.
-                Histórico atual: {packProjection?.historicalCoverageDays ?? 0}/3 dias.
+                Ainda não existe ritmo observado para calcular uma data de término. Regista utilizações e a primeira previsão aparece no próprio primeiro dia.
               </p>
             )}
 
@@ -666,8 +668,8 @@ export function SticksStockPage() {
                   <div className="sticksPackForecastHeader" role="row">
                     <span role="columnheader">Maço</span>
                     <span role="columnheader">Sticks</span>
-                    <span role="columnheader">Dia inicial</span>
-                    <span role="columnheader">Dia do término</span>
+                    <span role="columnheader">Dia de início</span>
+                    <span role="columnheader">Término previsto / real</span>
                   </div>
                   {packTimelineRows.map((row) => (
                     <div
@@ -700,9 +702,11 @@ export function SticksStockPage() {
                             : row.startActual
                               ? 'REAL · SEQUÊNCIA INCERTA'
                               : row.startValue
-                                ? 'PREVISÃO'
+                                ? packProjection?.historicalReliable
+                                  ? 'PREVISÃO'
+                                  : 'PREVISÃO PROVISÓRIA'
                                 : row.status === 'future'
-                                  ? 'SEM PREVISÃO'
+                                  ? 'SEM DADOS'
                                   : 'INÍCIO NÃO REGISTADO'}
                         </small>
                       </span>
@@ -720,17 +724,19 @@ export function SticksStockPage() {
                             : row.endActual
                               ? 'REAL · SEQUÊNCIA INCERTA'
                               : row.endValue
-                                ? 'PREVISÃO'
+                                ? packProjection?.historicalReliable
+                                  ? 'PREVISÃO DE TÉRMINO'
+                                  : 'TÉRMINO PROVISÓRIO'
                                 : row.status === 'completed'
                                   ? 'FIM NÃO REGISTADO'
-                                  : 'SEM PREVISÃO'}
+                                  : 'SEM DADOS'}
                         </small>
                       </span>
                     </div>
                   ))}
                 </div>
                 <small className="sticksPackForecastNote">
-                  O início passa a REAL · EXATO no primeiro stick registado desse maço e o fim passa a REAL · EXATO no último stick, desde que a fronteira entre maços permaneça determinística. Datas futuras continuam como PREVISÃO e são calculadas a partir do stock restante, descontando as utilizações já registadas hoje.
+                  O início passa a REAL · EXATO no primeiro stick registado desse maço. Enquanto o maço não terminou, a coluna de término mostra a melhor data prevista calculada pelo ritmo realmente observado; no último stick, essa data é substituída pela data/hora REAL · EXATA. Com menos de 3 dias de histórico, a previsão é marcada como provisória e recalculada após cada utilização.
                 </small>
                 {packProjection && !packProjection.packTrackingExact && packProjection.packTrackingIssue ? (
                   <p className="sticksPackTrackingWarning">
@@ -741,7 +747,7 @@ export function SticksStockPage() {
             ) : null}
 
             <p className="sticksEstimateRule">
-              A data é uma projeção matemática do stock com base no teu ritmo observado. Não é uma recomendação de quantos sticks utilizar.
+              A data futura é uma previsão matemática baseada apenas no ritmo que já ficou registado. A data exata do término só existe quando o último stick do maço é efetivamente registado; nessa altura a aplicação substitui a previsão pelo valor real.
             </p>
           </section>
 
