@@ -67,4 +67,78 @@ describe('StickDataProtectionService', () => {
       localStorage.removeItem('foco-jornada:sticks-protection:previous:v1')
     }
   })
+
+  it('archives the active stick cycle before clearing it and does not auto-recover the cleared cycle', async () => {
+    const db = makeDatabase()
+    try {
+      const stock = new PersonalStockService(db)
+      const planner = new StickPackPlannerService(db)
+      const nicotine = new NicotineAwarenessService(db)
+      const protection = new StickDataProtectionService(db)
+
+      await planner.saveSettings({ packCount: 2, sticksPerPack: 20 })
+      await nicotine.saveSettings({
+        profileId: 'veo-green-click-2026',
+        customContentMeanMg: '',
+        customEmissionMeanMg: '',
+        customSourceLabel: '',
+        notes: 'Ciclo antigo',
+      })
+      await stock.initializeSticks(40, operationId())
+      await stock.consumeStick(operationId())
+      await protection.sync()
+
+      const reset = await protection.archiveAndReset()
+
+      expect(reset.archiveKey).toMatch(/^personal-stock:sticks-reset-archive:/)
+      expect(reset.archivedMovementCount).toBe(2)
+      expect(await db.stockEntities.get('stock:sticks:glo')).toBeUndefined()
+      expect(await db.stockMovements.where('entityId').equals('stock:sticks:glo').count()).toBe(0)
+      expect(await db.metadata.get('personal-stock:stick-pack-planner-v1')).toBeUndefined()
+      expect(await db.metadata.get('personal-stock:nicotine-awareness-v2')).toBeUndefined()
+      expect(reset.archiveKey ? await db.metadata.get(reset.archiveKey) : undefined).toBeTruthy()
+
+      const redundant = await protection.status()
+      expect(redundant.valid).toBe(true)
+      expect(redundant.movementCount).toBe(0)
+      expect(await protection.recoverIfNeeded()).toBe(false)
+      expect((await stock.getSticksSummary()).initialized).toBe(false)
+    } finally {
+      await db.delete()
+      localStorage.removeItem('foco-jornada:sticks-protection:v1')
+      localStorage.removeItem('foco-jornada:sticks-protection:previous:v1')
+    }
+  })
+
+  it('keeps medication records untouched when the stick control is reset', async () => {
+    const db = makeDatabase()
+    try {
+      const stock = new PersonalStockService(db)
+      const protection = new StickDataProtectionService(db)
+
+      const medicationId = operationId()
+      await stock.createMedication({
+        medicationId,
+        operationId: operationId(),
+        name: 'Medicamento preservado',
+        dosage: '10 mg',
+        unit: 'comprimidos',
+        initialStock: '30',
+        startDate: '2026-08-28',
+      })
+      await stock.initializeSticks(20, operationId())
+      await stock.consumeStick(operationId())
+
+      await protection.archiveAndReset()
+
+      expect((await stock.getMedicationSummary(medicationId)).stock).toBe('30')
+      expect((await stock.listMedications()).map((item) => item.medication.id)).toContain(medicationId)
+      expect((await stock.getSticksSummary()).initialized).toBe(false)
+    } finally {
+      await db.delete()
+      localStorage.removeItem('foco-jornada:sticks-protection:v1')
+      localStorage.removeItem('foco-jornada:sticks-protection:previous:v1')
+    }
+  })
+
 })

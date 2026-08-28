@@ -4,6 +4,7 @@ import { STICKS_ENTITY_ID } from './PersonalStockService'
 
 const CURRENT_KEY = 'foco-jornada:sticks-protection:v1'
 const PREVIOUS_KEY = 'foco-jornada:sticks-protection:previous:v1'
+const RESET_ARCHIVE_PREFIX = 'personal-stock:sticks-reset-archive:'
 const METADATA_KEYS = new Set([
   'personal-stock:stick-pack-planner-v1',
   'personal-stock:nicotine-awareness-v1',
@@ -109,6 +110,15 @@ function storageSet(key: string, value: string): boolean {
   }
 }
 
+function storageRemove(key: string): void {
+  try {
+    if (typeof globalThis.localStorage === 'undefined') return
+    globalThis.localStorage.removeItem(key)
+  } catch {
+    // O reset continua na base de dados mesmo se o navegador bloquear localStorage.
+  }
+}
+
 function same(left: unknown, right: unknown): boolean {
   return JSON.stringify(left) === JSON.stringify(right)
 }
@@ -205,5 +215,41 @@ export class StickDataProtectionService {
       }
     }
     return false
+  }
+
+  async archiveAndReset(): Promise<{ archiveKey: string | null; archivedMovementCount: number }> {
+    const core = await this.buildCore()
+    const archiveText = serialize(core)
+    const archivedMovementCount = core.movements.length
+    const archiveKey = core.entity || core.movements.length || core.metadata.length
+      ? `${RESET_ARCHIVE_PREFIX}${new Date().toISOString()}`
+      : null
+
+    await this.db.transaction(
+      'rw',
+      [this.db.stockEntities, this.db.stockMovements, this.db.metadata],
+      async () => {
+        if (archiveKey) {
+          await this.db.metadata.put({
+            key: archiveKey,
+            value: archiveText,
+            updatedAt: new Date().toISOString(),
+          })
+        }
+
+        await this.db.stockMovements.where('entityId').equals(STICKS_ENTITY_ID).delete()
+        await this.db.stockEntities.delete(STICKS_ENTITY_ID)
+
+        for (const key of METADATA_KEYS) {
+          await this.db.metadata.delete(key)
+        }
+      },
+    )
+
+    storageRemove(CURRENT_KEY)
+    storageRemove(PREVIOUS_KEY)
+    await this.sync()
+
+    return { archiveKey, archivedMovementCount }
   }
 }

@@ -4,7 +4,7 @@ import { STICKS_ENTITY_ID, STOCK_TIMEZONE } from './PersonalStockService'
 import { addCalendarDays, dateKeyInZone } from './time'
 
 const SETTINGS_KEY = 'personal-stock:stick-pack-planner-v1'
-const DEFAULT_PACK_COUNT = 12
+const DEFAULT_PACK_COUNT = 0
 const DEFAULT_STICKS_PER_PACK = 20
 const MAX_PACK_COUNT = 10_000
 const MAX_STICKS_PER_PACK = 1_000

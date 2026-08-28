@@ -599,3 +599,42 @@
   border-color:#51471f;
   color:#e5d9a6;
 }
+
+
+.sticksResetSection{
+  grid-column:1/-1;
+  border:1px solid #d7b4b4;
+  background:#fff7f7!important;
+}
+.sticksResetSection p{
+  max-width:760px;
+}
+.sticksResetButton{
+  width:max-content;
+  min-height:44px;
+  border:1px solid #b75858;
+  border-radius:11px;
+  background:transparent;
+  color:#9a3434;
+  padding:10px 13px;
+  font:inherit;
+  font-weight:800;
+  cursor:pointer;
+}
+.sticksResetButton:disabled{
+  opacity:.5;
+  cursor:not-allowed;
+}
+[data-theme="dark"] .sticksResetSection{
+  background:#231515!important;
+  border-color:#633a3a!important;
+}
+[data-theme="dark"] .sticksResetButton{
+  border-color:#a65c5c;
+  color:#f0aaaa;
+}
+@media(max-width:620px){
+  .sticksResetButton{
+    width:100%;
+  }
+}
