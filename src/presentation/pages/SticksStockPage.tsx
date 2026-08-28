@@ -87,7 +87,7 @@ function mgLabel(mean?: string | null, sd?: string | null): string {
 
 function initialPackSettings(): StickPackSettings {
   return {
-    packCount: 12,
+    packCount: 0,
     sticksPerPack: 20,
     updatedAt: new Date(0).toISOString(),
   }
@@ -357,6 +357,46 @@ export function SticksStockPage() {
     }
     await personalStockService.restockSticks(restockSticks, operationId())
     setRestockPacks('1')
+  }
+
+  async function resetSticksControl() {
+    if (busy) return
+    const confirmed = window.confirm(
+      'Limpar o controlo de sticks e começar de novo? O stock ativo, utilizações, configurações veo e previsões deixam de entrar nas contas. Uma cópia interna de segurança é arquivada antes da limpeza. Os medicamentos não são alterados.',
+    )
+    if (!confirmed) return
+
+    setBusy(true)
+    setMessage('')
+    try {
+      const reset = await stickDataProtectionService.archiveAndReset()
+      const [nextPackSettings, nextNicotineSettings] = await Promise.all([
+        stickPackPlannerService.getSettings(),
+        nicotineAwarenessService.getSettings(),
+      ])
+
+      setPackSettingsReady(false)
+      setNicotineSettingsReady(false)
+      setPackSettings(nextPackSettings)
+      setNicotineSettings(nextNicotineSettings)
+      setPackSaveState('')
+      setNicotineSaveState('')
+      setRestockPacks('1')
+      setPhysicalQuantity('')
+      setPackSettingsReady(true)
+      setNicotineSettingsReady(true)
+      await reload()
+
+      setMessage(
+        reset.archiveKey
+          ? `Controlo de sticks limpo. ${reset.archivedMovementCount} movimento(s) ficaram num arquivo interno de segurança e já não entram nas contas. Podes configurar um novo stock.`
+          : 'Controlo de sticks limpo. Podes configurar um novo stock.',
+      )
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'Não foi possível limpar o controlo de sticks.')
+    } finally {
+      setBusy(false)
+    }
   }
 
   return (
@@ -886,6 +926,22 @@ export function SticksStockPage() {
                   </label>
                 </div>
                 <small>{packSaveState || 'Guardado automaticamente.'}</small>
+              </section>
+
+              <section className="sticksResetSection">
+                <h3>Começar de novo</h3>
+                <p>
+                  Limpa apenas o controlo ativo dos sticks. Antes disso, a aplicação cria um arquivo interno de segurança.
+                  Os medicamentos não são alterados.
+                </p>
+                <button
+                  type="button"
+                  className="sticksResetButton"
+                  disabled={busy}
+                  onClick={() => void resetSticksControl()}
+                >
+                  Limpar controlo de sticks
+                </button>
               </section>
             </div>
           </details>
