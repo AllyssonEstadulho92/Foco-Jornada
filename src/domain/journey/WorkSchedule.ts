@@ -29,6 +29,15 @@ export interface ResolvedWorkSchedule {
   source: 'default' | 'weekend' | 'manual'
 }
 
+export interface ResolvedScheduledBreak {
+  id: string
+  startTime: string
+  endTime: string
+  startMinutes: number
+  endMinutes: number
+  durationMinutes: number
+}
+
 type ScheduleDate = Date | string
 
 export function parseClockMinutes(value: string): number | null {
@@ -102,18 +111,47 @@ export function resolveWorkScheduleForDate(
   }
 }
 
-function enabledBreaks(schedule: WorkScheduleSettings) {
+function formatClockMinutes(totalMinutes: number) {
+  const normalized = ((Math.round(totalMinutes) % (24 * 60)) + 24 * 60) % (24 * 60)
+  const hours = Math.floor(normalized / 60)
+  const minutes = normalized % 60
+  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`
+}
+
+function enabledBreaks(schedule: WorkScheduleSettings, resolved: ResolvedWorkSchedule) {
+  const baseStart = parseClockMinutes(schedule.startTime)
+  const resolvedStart = parseClockMinutes(resolved.startTime)
+  const shiftMinutes = baseStart !== null && resolvedStart !== null ? resolvedStart - baseStart : 0
+
   return [schedule.break1, schedule.break2]
     .filter((item) => item.enabled)
     .map((item, index) => {
-      const start = parseClockMinutes(item.startTime)
-      const end = parseClockMinutes(item.endTime)
-      return start !== null && end !== null && end > start
-        ? { ...item, start, end, id: `break-${index + 1}` }
-        : null
+      const configuredStart = parseClockMinutes(item.startTime)
+      const configuredEnd = parseClockMinutes(item.endTime)
+      if (configuredStart === null || configuredEnd === null || configuredEnd <= configuredStart) return null
+
+      const startMinutes = configuredStart + shiftMinutes
+      const endMinutes = configuredEnd + shiftMinutes
+      return {
+        id: `break-${index + 1}`,
+        startTime: formatClockMinutes(startMinutes),
+        endTime: formatClockMinutes(endMinutes),
+        startMinutes,
+        endMinutes,
+        durationMinutes: configuredEnd - configuredStart,
+      }
     })
     .filter((item): item is NonNullable<typeof item> => item !== null)
-    .sort((a, b) => a.start - b.start)
+    .sort((a, b) => a.startMinutes - b.startMinutes)
+}
+
+export function getResolvedScheduledBreaks(
+  schedule: WorkScheduleSettings,
+  value: ScheduleDate = new Date(),
+): ResolvedScheduledBreak[] {
+  const resolved = resolveWorkScheduleForDate(schedule, value)
+  if (!resolved.isWorkingDay) return []
+  return enabledBreaks(schedule, resolved)
 }
 
 export function getScheduleSummary(
@@ -130,9 +168,9 @@ export function getScheduleSummary(
   }
 
   const totalMinutes = end - start
-  const breakMinutes = enabledBreaks(schedule).reduce((sum, item) => {
-    const clippedStart = Math.max(start, item.start)
-    const clippedEnd = Math.min(end, item.end)
+  const breakMinutes = enabledBreaks(schedule, resolved).reduce((sum, item) => {
+    const clippedStart = Math.max(start, item.startMinutes)
+    const clippedEnd = Math.min(end, item.endMinutes)
     return sum + Math.max(0, clippedEnd - clippedStart)
   }, 0)
 
@@ -158,22 +196,22 @@ export function getScheduleMilestones(
     { id: 'entry', label: 'Entrada', time: resolved.startTime, minutes: start, kind: 'entry' },
   ]
 
-  enabledBreaks(schedule).forEach((item, index) => {
-    if (item.start >= start && item.start <= end) {
+  enabledBreaks(schedule, resolved).forEach((item, index) => {
+    if (item.startMinutes >= start && item.startMinutes <= end) {
       milestones.push({
         id: `${item.id}-start`,
         label: index === 0 ? 'Pausa' : 'Pausa 2',
         time: item.startTime,
-        minutes: item.start,
+        minutes: item.startMinutes,
         kind: 'break-start',
       })
     }
-    if (item.end >= start && item.end <= end) {
+    if (item.endMinutes >= start && item.endMinutes <= end) {
       milestones.push({
         id: `${item.id}-end`,
         label: 'Regresso',
         time: item.endTime,
-        minutes: item.end,
+        minutes: item.endMinutes,
         kind: 'break-end',
       })
     }
@@ -199,11 +237,11 @@ export function getNextScheduleEvent(schedule: WorkScheduleSettings, now: Date):
   if (current < start) return { label: 'Entrada', time: resolved.startTime, state: 'before' }
   if (current >= end) return { label: 'Jornada planeada concluída', time: null, state: 'done' }
 
-  for (const item of enabledBreaks(schedule)) {
-    if (current >= item.start && current < item.end) {
+  for (const item of enabledBreaks(schedule, resolved)) {
+    if (current >= item.startMinutes && current < item.endMinutes) {
       return { label: 'Regresso', time: item.endTime, state: 'break' }
     }
-    if (current < item.start) {
+    if (current < item.startMinutes) {
       return { label: 'Próxima pausa', time: item.startTime, state: 'work' }
     }
   }

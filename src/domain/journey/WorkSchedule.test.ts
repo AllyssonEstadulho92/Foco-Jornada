@@ -3,6 +3,7 @@ import { DEFAULT_WORK_SCHEDULE } from '../settings/AppSettings'
 import {
   formatPlannedMinutes,
   getNextScheduleEvent,
+  getResolvedScheduledBreaks,
   getScheduleMilestones,
   getScheduleSummary,
   resolveWorkScheduleForDate,
@@ -68,10 +69,21 @@ describe('WorkSchedule', () => {
     })
     expect(getScheduleMilestones(schedule, sunday).map((item) => [item.label, item.time])).toEqual([
       ['Entrada', '09:00'],
-      ['Pausa', '11:00'],
-      ['Regresso', '11:15'],
+      ['Pausa', '12:00'],
+      ['Regresso', '12:15'],
       ['Saída', '18:00'],
     ])
+  })
+
+  it('desloca a pausa com o início do turno, mantendo 15 minutos', () => {
+    const sunday = '2026-08-23'
+    const schedule = { ...DEFAULT_WORK_SCHEDULE, weekendWorkDates: [sunday] }
+
+    expect(getResolvedScheduledBreaks(schedule, sunday)[0]).toMatchObject({
+      startTime: '12:00',
+      endTime: '12:15',
+      durationMinutes: 15,
+    })
   })
 
   it('dá prioridade ao horário manual definido para a data', () => {
