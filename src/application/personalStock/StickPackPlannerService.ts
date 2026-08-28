@@ -151,11 +151,11 @@ function forecastFromCurrentDay(
 
   const consumedShareToday = Math.min(Math.max(usedToday, 0), dailyRate)
   const remainingCapacityToday = Math.max(0, dailyRate - consumedShareToday)
-  const inclusiveEquivalentDays = (sticksRemaining + consumedShareToday) / dailyRate
+  const equivalentDaysRemaining = sticksRemaining / dailyRate
 
   if (sticksRemaining <= remainingCapacityToday) {
     return {
-      days: inclusiveEquivalentDays.toFixed(1),
+      days: equivalentDaysRemaining.toFixed(1),
       date: today,
     }
   }
@@ -163,7 +163,7 @@ function forecastFromCurrentDay(
   const sticksAfterToday = sticksRemaining - remainingCapacityToday
   const futureCalendarDays = Math.max(1, Math.ceil(sticksAfterToday / dailyRate))
   return {
-    days: inclusiveEquivalentDays.toFixed(1),
+    days: equivalentDaysRemaining.toFixed(1),
     date: addCalendarDays(today, futureCalendarDays),
   }
 }
