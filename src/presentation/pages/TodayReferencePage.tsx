@@ -46,6 +46,58 @@ function CalendarGlyph() {
   )
 }
 
+function HeroClockIllustration() {
+  return (
+    <svg
+      className="referenceHeroIllustration"
+      viewBox="0 0 320 320"
+      role="img"
+      aria-label="Relógio de foco"
+    >
+      <defs>
+        <linearGradient id="heroClockRing" x1="52" y1="48" x2="265" y2="274" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#55d3a6" />
+          <stop offset="1" stopColor="#15546a" />
+        </linearGradient>
+        <linearGradient id="heroClockAccent" x1="80" y1="70" x2="245" y2="245" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#b7f27f" />
+          <stop offset="1" stopColor="#2bbf9b" />
+        </linearGradient>
+        <radialGradient id="heroClockGlow" cx="0" cy="0" r="1" gradientTransform="translate(150 148) rotate(47) scale(145)">
+          <stop stopColor="#eafff4" stopOpacity=".95" />
+          <stop offset="1" stopColor="#dff6f1" stopOpacity=".08" />
+        </radialGradient>
+      </defs>
+
+      <circle cx="160" cy="160" r="132" fill="url(#heroClockGlow)" />
+      <circle cx="160" cy="160" r="94" fill="#ffffff" fillOpacity=".92" stroke="#d9ece8" strokeWidth="2" />
+      <circle cx="160" cy="160" r="81" fill="none" stroke="url(#heroClockRing)" strokeWidth="12" />
+      <circle cx="160" cy="160" r="58" fill="#ecfbf6" />
+      <circle cx="160" cy="160" r="39" fill="#d9f7e9" />
+      <circle cx="160" cy="160" r="22" fill="#b7eccf" />
+
+      <path d="M160 66v12M160 242v12M66 160h12M242 160h12" stroke="#20495a" strokeWidth="4" strokeLinecap="round" />
+      <path d="M94 94l8.5 8.5M217.5 217.5l8.5 8.5M226 94l-8.5 8.5M102.5 217.5L94 226" stroke="#20495a" strokeWidth="3" strokeLinecap="round" />
+
+      <path d="M160 160l52-43" stroke="#173f50" strokeWidth="10" strokeLinecap="round" />
+      <path d="M160 160l-36-23" stroke="url(#heroClockAccent)" strokeWidth="9" strokeLinecap="round" />
+      <circle cx="160" cy="160" r="11" fill="#173f50" stroke="#9fe2c4" strokeWidth="3" />
+
+      <path d="M87 69c34-23 81-31 123-17" fill="none" stroke="#2d7d8d" strokeWidth="3" strokeLinecap="round" opacity=".65" />
+      <path d="M236 76c34 23 54 61 54 103" fill="none" stroke="#8bd9d1" strokeWidth="3" strokeLinecap="round" opacity=".55" />
+      <path d="M248 240c-31 27-71 40-112 35" fill="none" stroke="#2d7d8d" strokeWidth="3" strokeLinecap="round" opacity=".55" />
+      <path d="M71 244c-28-30-40-70-34-111" fill="none" stroke="#8bd9d1" strokeWidth="3" strokeLinecap="round" opacity=".55" />
+
+      <circle cx="255" cy="78" r="8" fill="url(#heroClockAccent)" />
+      <circle cx="76" cy="232" r="6" fill="#2d7d8d" />
+      <circle cx="270" cy="221" r="5" fill="#15546a" />
+
+      <path d="M64 104c38-49 111-73 176-42" fill="none" stroke="#b7e9e2" strokeWidth="2" opacity=".8" />
+      <path d="M58 221c43 51 121 68 184 31" fill="none" stroke="#c9efe8" strokeWidth="2" opacity=".75" />
+    </svg>
+  )
+}
+
 function formatFocusTime(ms: number) {
   const totalSeconds = Math.max(0, Math.ceil(ms / 1000))
   const minutes = Math.floor(totalSeconds / 60)
@@ -373,16 +425,7 @@ export function TodayReferencePage() {
           <h2>{greeting}, foco! <i aria-hidden="true">✦</i></h2>
           <p>Que tal manter o ritmo e fazer mais acontecer hoje?</p>
         </div>
-        <img
-          className="referenceHeroIllustration"
-          src={`${import.meta.env.BASE_URL}foco-jornada-hero.webp`}
-          width="320"
-          height="320"
-          alt=""
-          aria-hidden="true"
-          decoding="async"
-          fetchPriority="high"
-        />
+        <HeroClockIllustration />
       </header>
 
       {pageError ? <div className="errorBanner" role="alert">{pageError}</div> : null}
