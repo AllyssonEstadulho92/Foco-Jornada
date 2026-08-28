@@ -7,3 +7,181 @@
 .exportA4Footer{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;margin-top:3mm;padding:0 2px}.exportA4Footer>img{width:50px;height:50px;padding:3px;border:1px solid #dce6df;border-radius:7px;background:#fff}.exportA4Footer>div{display:flex;align-items:center;gap:7px;color:#59655e}.exportA4Footer>div>span{color:#198b54;font-size:18px}.exportA4Footer p{margin:0;font-size:7.6pt;line-height:1.3}.exportA4Footer strong{color:#46534b;font-weight:700}.exportA4Back{display:flex;justify-content:center;margin-top:18px}.exportA4Back a{color:var(--primary);font-weight:700;text-decoration:none}
 @media(max-width:720px){.exportA4Toolbar{align-items:stretch;flex-direction:column}.exportA4ToolbarActions{display:grid;grid-template-columns:1fr 1fr;justify-content:stretch}.exportA4ToolbarActions label{grid-column:1/-1}.exportA4ToolbarActions button{width:100%}.exportA4Sheet{min-height:0;padding:18px 13px;border-radius:16px;font-size:9px}.exportA4Sheet::before{top:90px;height:62px}.exportA4BrandHeader{min-height:92px;gap:10px}.exportA4Brand img{width:38px;height:38px}.exportA4Brand strong{font-size:16px}.exportA4Brand small{font-size:7px}.exportA4DocumentMeta strong{font-size:17px}.exportA4DocumentMeta span{font-size:7px}.exportA4Summary{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.exportA4Metric{min-height:66px;padding:8px;gap:7px}.exportA4MetricIcon{width:30px;height:30px;flex-basis:30px;font-size:15px}.exportA4Metric strong{font-size:13px}.exportA4Metric small{font-size:7px}.exportA4Section{padding:9px 7px 5px}.exportA4Table{font-size:7.2px}.exportA4Table th{padding:4px 3px;font-size:6.2px}.exportA4Table td{padding:5px 3px}.exportA4Table td:first-child{padding-left:15px}.exportA4TimelineDot{left:4px;width:6px;height:6px}.exportA4TypeTag{min-width:0;padding:2px 5px;font-size:6.4px}.exportA4Dashboard{grid-template-columns:1fr;gap:6px}.exportA4Performance{min-height:145px}.exportA4Footer{margin-top:10px}.exportA4Footer>img{width:44px;height:44px}}
 @media print{@page{size:A4 portrait;margin:0}html,body,#root{width:210mm!important;height:297mm!important;min-width:210mm!important;max-width:210mm!important;margin:0!important;padding:0!important;background:#fff!important;overflow:hidden!important}.appShell{display:block!important;width:210mm!important;height:297mm!important;min-width:210mm!important;max-width:210mm!important;margin:0!important;padding:0!important;background:#fff!important;overflow:hidden!important}.appShell>.skipLink,.appShell>.sidebar,.appShell>.mobileDrawerBackdrop,.appShell>.mobileDrawer,.appShell>.bottomNav{display:none!important}.appMainArea{display:block!important;width:210mm!important;height:297mm!important;margin:0!important;padding:0!important;overflow:hidden!important}.appMainArea>:not(.appContent){display:none!important}.appContent{display:block!important;width:210mm!important;height:297mm!important;max-width:none!important;margin:0!important;padding:0!important;background:#fff!important;overflow:hidden!important}.appContent>:not(.exportA4Page){display:none!important}.exportA4Page{display:block!important;width:210mm!important;height:297mm!important;max-width:none!important;margin:0!important;padding:0!important;background:#fff!important;overflow:hidden!important}.exportA4Page>:not(.exportA4Sheet){display:none!important}.exportA4Sheet{box-sizing:border-box!important;width:210mm!important;height:297mm!important;min-height:297mm!important;max-height:297mm!important;margin:0!important;padding:8mm 10mm 7mm!important;border:0!important;border-radius:0!important;box-shadow:none!important;overflow:hidden!important;print-color-adjust:exact!important;-webkit-print-color-adjust:exact!important}.exportA4BrandHeader{min-height:25mm!important;padding-bottom:4mm!important}.exportA4Summary{gap:6px!important;margin-top:1mm!important}.exportA4Metric{min-height:20mm!important;padding:7px 9px!important}.exportA4Section{margin-top:2.5mm!important;padding:8px 10px 5px!important}.exportA4Table th{padding:4px 6px!important}.exportA4Table td{padding:5px 6px!important}.exportA4Dashboard{gap:6px!important;margin-top:2.5mm!important}.exportA4Panel{padding:8px 9px!important}.exportA4Footer{margin-top:2.5mm!important}.exportA4Footer>img{width:46px!important;height:46px!important}.exportA4Metric,.exportA4Section,.exportA4Panel,.exportA4Footer,.exportA4Table tr{break-inside:avoid}.exportA4Dashboard{break-inside:avoid}.mobileDrawer,.mobileDrawerBackdrop,.notificationPanel,.appFeedbackViewport,.prototypeThemeCard{display:none!important}}
+
+
+/* Consolidação visual do ecrã Relatório A4.
+ * O documento A4 e as regras @media print permanecem tecnicamente inalterados.
+ */
+@media screen{
+  .exportA4Page{
+    width:min(100%,1120px);
+    min-width:0;
+    max-width:1120px;
+    margin:0 auto;
+    padding-bottom:var(--space-6);
+  }
+  .exportA4Page>*{min-width:0}
+  .exportA4Toolbar{
+    min-width:0;
+    align-items:flex-end;
+    gap:var(--space-4);
+    margin-bottom:var(--space-4);
+    padding:8px 2px var(--space-2);
+  }
+  .exportA4Toolbar>div:first-child{min-width:0}
+  .exportA4Toolbar .eyebrow{
+    color:var(--muted);
+    font-size:var(--text-xs);
+    font-weight:var(--weight-heavy);
+    line-height:var(--line-height-control);
+    letter-spacing:.08em;
+  }
+  .exportA4Toolbar h1{
+    margin:var(--space-1) 0 var(--space-2);
+    color:var(--text);
+    font-size:clamp(var(--text-2xl),5vw,var(--text-3xl));
+    font-weight:var(--weight-heavy);
+    line-height:var(--line-height-tight);
+    letter-spacing:-.035em;
+    overflow-wrap:anywhere;
+  }
+  .exportA4Toolbar p{
+    max-width:680px;
+    margin:0;
+    color:var(--muted);
+    font-size:var(--text-md);
+    line-height:var(--line-height-normal);
+  }
+  .exportA4ToolbarActions{
+    min-width:0;
+    flex:0 0 auto;
+    gap:var(--space-2);
+  }
+  .exportA4ToolbarActions label{
+    min-width:0;
+    gap:var(--space-2);
+    color:var(--muted);
+    font-size:var(--text-sm);
+    font-weight:var(--weight-semibold);
+    line-height:var(--line-height-control);
+  }
+  .exportA4ToolbarActions input{
+    min-width:0;
+    min-height:var(--control-height-compact);
+    padding:9px var(--field-padding-inline);
+    border:1px solid var(--line-strong);
+    border-radius:var(--control-radius);
+    background:var(--surface);
+    color:var(--text);
+    font-size:var(--text-base);
+    line-height:var(--line-height-control);
+  }
+  .exportA4ToolbarActions button{
+    min-height:var(--control-height-compact);
+    padding:9px var(--control-padding-inline);
+    border-radius:var(--control-radius);
+    font-size:var(--text-sm);
+    font-weight:var(--weight-bold);
+    line-height:var(--line-height-control);
+  }
+  .exportA4ToolbarActions .buttonPrimary{
+    min-height:var(--control-height);
+  }
+  .exportA4Loading,
+  .exportA4Page>.errorBanner{
+    min-width:0;
+    padding:var(--space-4);
+    border:1px solid var(--line);
+    border-radius:var(--radius-md);
+    background:var(--surface);
+    color:var(--muted);
+    font-size:var(--text-sm);
+    line-height:var(--line-height-normal);
+    overflow-wrap:anywhere;
+  }
+
+  /* Pré-visualização: mantém a identidade própria do relatório, mas alinha o contentor. */
+  .exportA4Sheet{
+    max-width:100%;
+    border-radius:var(--radius-lg);
+    box-shadow:0 18px 48px rgba(20,63,36,.11);
+  }
+  .exportA4Back{
+    margin-top:var(--space-4);
+  }
+  .exportA4Back a{
+    min-height:var(--control-height-compact);
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding:9px var(--control-padding-inline);
+    border:1px solid var(--line-strong);
+    border-radius:var(--control-radius);
+    background:var(--surface);
+    color:var(--primary);
+    font-size:var(--text-sm);
+    font-weight:var(--weight-bold);
+    line-height:var(--line-height-control);
+    text-decoration:none;
+  }
+  .exportA4Back a:hover,
+  .exportA4Back a:focus-visible{
+    border-color:color-mix(in srgb,var(--primary) 35%,var(--line));
+    background:var(--primary-soft);
+  }
+
+  [data-theme="dark"] .exportA4Loading{
+    border-color:var(--line);
+    background:var(--surface);
+  }
+}
+
+@media screen and (max-width:900px){
+  .exportA4Page{
+    width:100%;
+    max-width:100%;
+  }
+  .exportA4Toolbar{
+    align-items:stretch;
+    flex-direction:column;
+    gap:var(--space-3);
+    padding-inline:0;
+  }
+  .exportA4Toolbar h1{
+    font-size:clamp(26px,8vw,32px);
+  }
+  .exportA4Toolbar p{
+    font-size:var(--text-sm);
+  }
+  .exportA4ToolbarActions{
+    display:grid;
+    width:100%;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  }
+  .exportA4ToolbarActions label{
+    grid-column:1/-1;
+  }
+  .exportA4ToolbarActions input,
+  .exportA4ToolbarActions button{
+    width:100%;
+  }
+}
+
+@media screen and (max-width:720px){
+  .exportA4Sheet{
+    border-radius:var(--radius-md);
+  }
+  .exportA4ToolbarActions{
+    grid-template-columns:minmax(0,1fr);
+  }
+  .exportA4ToolbarActions label{
+    grid-column:1;
+  }
+}
+
+@media screen and (max-width:420px){
+  .exportA4Toolbar h1{font-size:26px}
+  .exportA4Page{
+    padding-bottom:var(--space-5);
+  }
+}
