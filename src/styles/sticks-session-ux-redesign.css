@@ -1,0 +1,251 @@
+/* UX refinement: intervalo consciente + sessão glo.
+ * Objetivo: reduzir altura, remover competição visual e estabelecer
+ * hierarquia estado -> configuração -> ação -> acompanhamento.
+ */
+
+/* INTERVALO: compacto, informativo e com progresso linear. */
+.sticksLinearPage .sticksPacingClock{
+  gap:18px;
+  margin-top:22px;
+  padding:24px;
+  border-width:1.5px;
+  border-radius:24px;
+}
+.sticksLinearPage .sticksPacingCopy{
+  gap:8px;
+}
+.sticksLinearPage .sticksPacingCopy>span{
+  min-height:40px;
+  padding:6px 12px;
+  font-size:12px;
+  letter-spacing:.12em;
+}
+.sticksLinearPage .sticksPacingCopy>span::before{
+  width:28px;
+  height:28px;
+  flex-basis:28px;
+  border-radius:9px;
+  font-size:17px;
+}
+.sticksLinearPage .sticksPacingCopy>strong{
+  max-width:760px;
+  margin-top:4px;
+  font-size:clamp(25px,2.3vw,32px);
+  line-height:1.1;
+}
+.sticksLinearPage .sticksPacingCopy>small{
+  max-width:760px;
+  font-size:16px;
+  line-height:1.5;
+}
+.sticksLinearPage .sticksPacingZeroButton{
+  width:auto;
+  min-width:0;
+  min-height:46px;
+  margin-top:4px;
+  padding:9px 15px;
+  border-width:1px;
+  border-radius:13px;
+  font-size:15px;
+}
+.sticksLinearPage .sticksPacingZeroButton::before{
+  width:22px;
+  height:22px;
+  font-size:22px;
+}
+.sticksLinearPage .sticksPacingZeroButton:disabled{
+  display:none;
+}
+.sticksLinearPage .sticksPacingDial{
+  height:52px;
+  border-width:1px;
+}
+.sticksLinearPage .sticksPacingDial::before{
+  inset:5px;
+}
+.sticksLinearPage .sticksPacingDialFace{
+  padding:0 18px;
+}
+.sticksLinearPage .sticksPacingDialFace strong{
+  font-size:22px;
+}
+.sticksLinearPage .sticksPacingClock.isReady .sticksPacingDialFace strong{
+  font-size:20px;
+}
+.sticksLinearPage .sticksPacingDialFace small{
+  min-height:30px;
+  padding:0 11px;
+  font-size:13px;
+}
+
+/* SESSÃO GLO: configurações primeiro, dados técnicos compactos e um único estado. */
+.sticksLinearPage .sticksDeviceTimerCard{
+  padding:28px;
+  border-radius:28px;
+}
+.sticksLinearPage .gloSessionIntro{
+  max-width:820px;
+  margin-top:8px;
+  font-size:15px;
+  line-height:1.5;
+}
+.sticksLinearPage .gloSessionSelectors{
+  gap:16px;
+  margin-top:22px;
+}
+.sticksLinearPage .gloSessionSelectors label{
+  gap:8px;
+  font-size:14px;
+}
+.sticksLinearPage .gloSessionSelectors select{
+  min-height:52px;
+  padding:0 16px;
+  border-radius:14px;
+  font-size:17px;
+}
+.sticksLinearPage .gloSessionDurationGrid{
+  gap:12px;
+  margin-top:18px;
+}
+.sticksLinearPage .gloSessionDurationGrid article{
+  min-height:94px;
+  padding:16px;
+  border-radius:18px;
+}
+.sticksLinearPage .gloSessionDurationGrid article>span{
+  font-size:11px;
+  letter-spacing:.1em;
+}
+.sticksLinearPage .gloSessionDurationGrid article>strong{
+  margin-top:8px;
+  font-size:clamp(24px,2.4vw,32px);
+  line-height:1;
+}
+.sticksLinearPage .gloSessionDurationGrid article>small{
+  display:none;
+}
+
+/* O dial técnico deixa de competir com o CTA. Torna-se indicador compacto. */
+.sticksLinearPage .gloSessionTimerLayout{
+  grid-template-columns:1fr;
+  gap:14px;
+  margin-top:18px;
+}
+.sticksLinearPage .gloSessionDial{
+  display:none;
+}
+.sticksLinearPage .gloSessionTimerBody{
+  min-width:0;
+}
+.sticksLinearPage .gloSessionIdleState{
+  min-height:0;
+  padding:18px 20px;
+  border-radius:18px;
+}
+.sticksLinearPage .gloSessionIdleState strong{
+  font-size:20px;
+}
+.sticksLinearPage .gloSessionIdleState span{
+  margin-top:6px;
+  font-size:14px;
+  line-height:1.45;
+}
+
+/* Evita a duplicação “Sem sessão ativa” + “Aguardando registo”. */
+.sticksLinearPage .sticksDeviceTimerCard.is-idle .gloSessionPhaseCopy{
+  display:none;
+}
+.sticksLinearPage .gloSessionPhaseCopy{
+  margin-top:12px;
+  padding:16px 18px;
+  border-radius:18px;
+}
+.sticksLinearPage .gloSessionPhaseCopy>span{
+  font-size:11px;
+  letter-spacing:.11em;
+}
+.sticksLinearPage .gloSessionPhaseCopy>strong{
+  font-size:clamp(28px,3vw,38px);
+}
+.sticksLinearPage .gloSessionPhaseCopy>small{
+  font-size:14px;
+  line-height:1.45;
+}
+
+/* A ação principal continua dominante, mas sem altura excessiva. */
+.sticksLinearPage .sticksRegisterPrimary{
+  min-height:58px;
+  border-radius:16px;
+  font-size:17px;
+}
+
+@media(max-width:640px){
+  .sticksLinearPage .sticksPacingClock{
+    gap:16px;
+    margin-top:18px;
+    padding:20px 16px;
+    border-radius:20px;
+  }
+  .sticksLinearPage .sticksPacingCopy>strong{
+    font-size:24px;
+  }
+  .sticksLinearPage .sticksPacingCopy>small{
+    font-size:15px;
+  }
+  .sticksLinearPage .sticksPacingDial{
+    height:48px;
+  }
+  .sticksLinearPage .sticksPacingDialFace{
+    padding:0 14px;
+  }
+  .sticksLinearPage .sticksPacingDialFace strong{
+    font-size:19px;
+  }
+  .sticksLinearPage .sticksPacingDialFace small{
+    min-height:28px;
+    font-size:12px;
+  }
+  .sticksLinearPage .sticksDeviceTimerCard{
+    padding:20px 16px;
+    border-radius:22px;
+  }
+  .sticksLinearPage .gloSessionSelectors{
+    gap:12px;
+  }
+  .sticksLinearPage .gloSessionSelectors select{
+    min-height:50px;
+    font-size:16px;
+  }
+  .sticksLinearPage .gloSessionDurationGrid{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:8px;
+  }
+  .sticksLinearPage .gloSessionDurationGrid article{
+    min-height:82px;
+    padding:12px 8px;
+    border-radius:15px;
+    text-align:center;
+  }
+  .sticksLinearPage .gloSessionDurationGrid article>span{
+    font-size:9px;
+    letter-spacing:.06em;
+  }
+  .sticksLinearPage .gloSessionDurationGrid article>strong{
+    font-size:21px;
+  }
+  .sticksLinearPage .gloSessionIdleState{
+    padding:16px;
+  }
+  .sticksLinearPage .gloSessionIdleState strong{
+    font-size:18px;
+  }
+}
+
+@media(max-width:390px){
+  .sticksLinearPage .gloSessionDurationGrid article>span{
+    font-size:8px;
+  }
+  .sticksLinearPage .gloSessionDurationGrid article>strong{
+    font-size:19px;
+  }
+}
