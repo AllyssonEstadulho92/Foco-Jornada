@@ -18,6 +18,7 @@ import { DexieJourneyRepository } from './infrastructure/repositories/DexieJourn
 import { DexieSettingsRepository } from './infrastructure/repositories/DexieSettingsRepository'
 import { App } from './presentation/App'
 import { installGloSessionPrototypeEnhancement } from './presentation/utils/installGloSessionPrototypeEnhancement'
+import { installMedicationNextDoseTimerEnhancement } from './presentation/utils/installMedicationNextDoseTimerEnhancement'
 import { installTodayScheduleMenuReveal } from './presentation/utils/installTodayScheduleMenuReveal'
 import { installNumberInputNormalization } from './shared/utils/numberInput'
 import './styles/tokens.css'
@@ -65,6 +66,7 @@ import './styles/nicotine-awareness.css'
 import './styles/stock-integrity-console.css'
 import './styles/medication-protection.css'
 import './styles/medication-prototype-complete.css'
+import './styles/medication-next-dose-timer.css'
 import './styles/sticks-control-v2.css'
 import './styles/glo-session-prototype.css'
 import './styles/glo-session-digital-counter.css'
@@ -111,6 +113,8 @@ function keepInstalledPwaCurrent() {
 keepInstalledPwaCurrent()
 
 const personalStockService = new OperationalPersonalStockService(db)
+const medicationDoseStatusService = new MedicationDoseStatusService(db)
+const medicationDataProtectionService = new MedicationDataProtectionService(db)
 
 const services = {
   journeyRepository: new DexieJourneyRepository(db),
@@ -120,8 +124,8 @@ const services = {
   coffeeRepository: new DexieCoffeeRepository(db),
   settingsRepository: new DexieSettingsRepository(db),
   personalStockService,
-  medicationDoseStatusService: new MedicationDoseStatusService(db),
-  medicationDataProtectionService: new MedicationDataProtectionService(db),
+  medicationDoseStatusService,
+  medicationDataProtectionService,
   stockReconciliationService: new StockReconciliationService(db),
   nicotineAwarenessService: new NicotineAwarenessService(db),
   stickDataProtectionService: new StickDataProtectionService(db),
@@ -129,6 +133,12 @@ const services = {
   stickUsageAnalyticsService: new StickUsageAnalyticsService(db),
   backupService: new AppBackupService(db),
 }
+
+installMedicationNextDoseTimerEnhancement({
+  personalStockService,
+  medicationDoseStatusService,
+  medicationDataProtectionService,
+})
 
 createRoot(root).render(
   <StrictMode>
