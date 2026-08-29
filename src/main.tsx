@@ -71,6 +71,7 @@ import './styles/glo-session-digital-counter.css'
 import './styles/compact-time-displays.css'
 import './styles/sticks-pacing-reference.css'
 import './styles/sticks-session-ux-redesign.css'
+import './styles/sticks-pacing-digital-clock.css'
 
 const root = document.getElementById('root')
 if (!root) throw new Error('Elemento #root não encontrado.')
