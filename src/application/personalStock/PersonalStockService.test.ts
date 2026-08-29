@@ -44,6 +44,23 @@ describe('PersonalStockService - sticks', () => {
     }
   })
 
+  it('stores the exact effective timestamp supplied by the session clock', async () => {
+    const db = makeDatabase()
+    try {
+      const service = new PersonalStockService(db)
+      await service.initializeSticks(2, operationId())
+      const effectiveAt = new Date('2026-08-29T03:14:31.000Z')
+      const result = await service.consumeStick(operationId(), effectiveAt)
+
+      expect(result.movement.effectiveAt).toBe('2026-08-29T03:14:31.000Z')
+      expect(result.summary.stock).toBe(1)
+      const stored = await db.stockMovements.get(result.movement.id)
+      expect(stored?.effectiveAt).toBe('2026-08-29T03:14:31.000Z')
+    } finally {
+      await db.delete()
+    }
+  })
+
   it('serializes two simultaneous consumers when only one stick exists', async () => {
     const db = makeDatabase()
     try {
