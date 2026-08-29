@@ -1,0 +1,612 @@
+/*
+ * Mostradores temporais compactos.
+ * Regra estrutural: o relógio nunca deve dominar o ecrã; informação e ações
+ * principais ficam visíveis em mobile sem criar overflow horizontal.
+ */
+
+/* Barra superior: relógio de estado discreto em web e mobile. */
+.appTopBar{
+  min-height:54px;
+  padding-top:7px;
+  padding-bottom:7px;
+}
+.appClock{
+  min-height:34px;
+  height:34px;
+  gap:6px;
+  padding:4px 5px;
+  font-size:14px;
+  line-height:1;
+}
+.appClock svg{
+  width:16px;
+  height:16px;
+}
+.notificationButton{
+  width:36px;
+  height:36px;
+  min-height:36px;
+}
+
+/* Página Hoje: ilustração e mostrador operacional deixam de ocupar altura excessiva. */
+.referenceGreeting{
+  min-height:132px;
+  padding-top:20px;
+  padding-bottom:10px;
+}
+.referenceHeroIllustration{
+  width:118px;
+  height:118px;
+  flex-basis:118px;
+}
+.referenceFocusCard{
+  padding:18px;
+}
+.referenceFocusBody{
+  gap:14px;
+  padding:18px 2px 14px;
+}
+.referenceFocusBody>div:first-child strong{
+  font-size:clamp(34px,6vw,48px);
+}
+.referenceProgressAction{
+  width:78px;
+  height:78px;
+  box-shadow:inset 0 0 0 9px var(--surface),0 7px 20px rgba(31,157,99,.1);
+}
+.referenceProgressAction>span{
+  width:44px;
+  height:44px;
+  font-size:18px;
+}
+
+/* Foco: um dial funcional compacto, não um elemento decorativo gigante. */
+.focusPage .focusDial{
+  width:clamp(178px,22vw,228px);
+  margin:14px auto 12px;
+}
+.focusPage .focusDial::before{
+  inset:8px;
+}
+.focusPage .focusDialInner{
+  gap:5px;
+}
+.focusPage .focusDialInner strong{
+  font-size:clamp(34px,6vw,48px);
+}
+.focusPage .focusTimerActions,
+.focusPage .focusPrototypeActions{
+  margin-top:12px;
+}
+
+/* Sticks veo: relógio comportamental sempre horizontal e compacto. */
+.sticksLinearPage .sticksPacingClock{
+  grid-template-columns:74px minmax(0,1fr);
+  gap:10px;
+  margin-top:10px;
+  padding:10px;
+}
+.sticksLinearPage .sticksPacingDial{
+  width:66px;
+  height:66px;
+}
+.sticksLinearPage .sticksPacingDialFace{
+  width:50px;
+  height:50px;
+}
+.sticksLinearPage .sticksPacingDialFace strong{
+  font-size:13px;
+}
+.sticksLinearPage .sticksPacingDialFace small{
+  font-size:9px;
+}
+.sticksLinearPage .sticksPacingCopy{
+  gap:3px;
+}
+.sticksLinearPage .sticksPacingCopy>span{
+  font-size:9px;
+}
+.sticksLinearPage .sticksPacingCopy>strong{
+  font-size:13px;
+}
+.sticksLinearPage .sticksPacingCopy>small{
+  font-size:11px;
+}
+.sticksLinearPage .sticksPacingZeroButton{
+  min-width:0;
+  width:max-content;
+  min-height:34px;
+  margin-top:5px;
+  padding:6px 10px;
+  font-size:12px;
+}
+
+/* Sessão glo: dial, seletores e ações permanecem no mesmo bloco visual. */
+.sticksLinearPage .sticksDeviceTimerCard{
+  gap:10px;
+  padding:14px;
+}
+.sticksLinearPage .gloSessionIntro{
+  font-size:12px;
+  line-height:1.35;
+}
+.sticksLinearPage .gloSessionTimerLayout{
+  grid-template-columns:96px minmax(0,1fr);
+  gap:12px;
+  align-items:start;
+}
+.sticksLinearPage .gloSessionDial{
+  width:84px;
+  height:84px;
+}
+.sticksLinearPage .gloSessionDialFace{
+  width:64px;
+  height:64px;
+  gap:2px;
+}
+.sticksLinearPage .gloSessionDialFace strong{
+  font-size:15px;
+}
+.sticksLinearPage .gloSessionDialFace small{
+  font-size:8px;
+}
+.sticksLinearPage .gloSessionTimerBody{
+  gap:8px;
+}
+.sticksLinearPage .gloSessionSelectors{
+  gap:6px;
+}
+.sticksLinearPage .gloSessionSelectors label{
+  gap:4px;
+  font-size:11px;
+}
+.sticksLinearPage .gloSessionSelectors select{
+  min-height:36px;
+  padding:6px 8px;
+  font-size:12px;
+}
+.sticksLinearPage .gloSessionTimelineHeading{
+  gap:6px;
+}
+.sticksLinearPage .gloSessionTimelineHeading>span{
+  font-size:12px;
+}
+.sticksLinearPage .gloSessionTimelineHeading>small{
+  font-size:10px;
+}
+.sticksLinearPage .gloSessionFacts{
+  gap:6px;
+}
+.sticksLinearPage .gloSessionFacts article{
+  gap:3px;
+  padding:7px 8px;
+}
+.sticksLinearPage .gloSessionFacts article>span,
+.sticksLinearPage .gloSessionFacts article>small{
+  font-size:10px;
+}
+.sticksLinearPage .gloSessionFacts article>strong{
+  font-size:12px;
+}
+.sticksLinearPage .gloSessionPhaseCopy{
+  gap:2px;
+  padding:7px 9px;
+}
+.sticksLinearPage .gloSessionPhaseCopy>span{
+  font-size:9px;
+}
+.sticksLinearPage .gloSessionPhaseCopy>strong{
+  font-size:13px;
+}
+.sticksLinearPage .gloSessionPhaseCopy>small{
+  font-size:10px;
+}
+.sticksLinearPage .gloSessionActions{
+  gap:6px;
+}
+.sticksLinearPage .gloSessionActions button{
+  min-height:36px;
+  padding:7px 9px;
+  font-size:12px;
+}
+.sticksLinearPage .gloSessionAccuracyNote{
+  font-size:10px;
+  line-height:1.35;
+}
+
+/* Tablet e telemóvel. */
+@media(max-width:899px){
+  .appTopBar{
+    min-height:54px!important;
+    align-items:center!important;
+    padding:7px max(12px,env(safe-area-inset-right)) 7px max(12px,env(safe-area-inset-left))!important;
+  }
+  .mobileMenuButton{
+    width:36px;
+    height:36px;
+    flex-basis:36px;
+    border-radius:11px;
+  }
+  .mobileMenuButton svg{
+    width:18px;
+    height:18px;
+  }
+  .mobileAppIdentity{
+    gap:8px;
+  }
+  .mobileAppIdentity>strong{
+    font-size:14px;
+  }
+  .topBarStatusGroup{
+    gap:3px;
+  }
+  .appClock{
+    min-height:32px!important;
+    height:32px!important;
+    gap:5px;
+    padding:3px 2px;
+    font-size:13px;
+  }
+  .appClock svg{
+    width:14px;
+    height:14px;
+  }
+  .notificationButton{
+    width:34px;
+    height:34px!important;
+    min-height:34px!important;
+  }
+  .notificationButton svg{
+    width:17px;
+    height:17px;
+  }
+  .appContent{
+    padding-top:12px!important;
+  }
+
+  .referenceGreeting{
+    min-height:104px!important;
+    padding:14px 2px 8px!important;
+  }
+  .referenceGreeting h2{
+    font-size:26px;
+  }
+  .referenceGreeting p{
+    margin-top:5px;
+    font-size:12px;
+  }
+  .referenceHeroIllustration{
+    width:78px!important;
+    height:78px!important;
+    flex-basis:78px!important;
+  }
+  .referenceFocusCard{
+    padding:14px;
+    border-radius:18px;
+  }
+  .referenceRoundIcon{
+    width:42px;
+    height:42px;
+  }
+  .referenceRoundIcon svg{
+    width:22px;
+    height:22px;
+  }
+  .referenceFocusHeader{
+    gap:9px;
+  }
+  .referenceFocusHeader h2{
+    font-size:17px;
+  }
+  .referenceFocusHeader p{
+    font-size:12px;
+  }
+  .referenceFocusBody{
+    padding:13px 0 10px;
+  }
+  .referenceFocusBody>div:first-child strong,
+  .referenceHome .referenceFocusTimeWindow{
+    font-size:31px!important;
+  }
+  .referenceFocusBody>div:first-child span{
+    font-size:12px;
+  }
+  .referenceProgressAction{
+    width:64px;
+    height:64px;
+    box-shadow:inset 0 0 0 7px var(--surface),0 5px 14px rgba(31,157,99,.1);
+  }
+  .referenceProgressAction>span{
+    width:36px;
+    height:36px;
+    font-size:16px;
+  }
+  .referenceEncouragement{
+    padding:9px 11px;
+  }
+  .referenceEncouragement p{
+    font-size:11px;
+  }
+
+  .focusPage .focusPrototypePanel{
+    padding:14px;
+  }
+  .focusPage .focusDial{
+    width:166px!important;
+    margin:12px auto 10px!important;
+  }
+  .focusPage .focusDialInner strong{
+    font-size:36px!important;
+  }
+  .focusPage .focusDialInner>span,
+  .focusPage .focusDialInner small{
+    font-size:10px;
+  }
+  .focusPage .focusAssociation{
+    margin-block:7px;
+    font-size:12px;
+  }
+  .focusPage .focusTimerActions,
+  .focusPage .focusPrototypeActions{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:7px;
+    margin-top:9px;
+  }
+  .focusPage .focusTimerActions button,
+  .focusPage .focusPrototypeActions button{
+    width:100%;
+    min-height:38px;
+    padding:7px 10px;
+  }
+
+  .sticksLinearPage .sticksPacingClock{
+    grid-template-columns:66px minmax(0,1fr)!important;
+    justify-items:stretch!important;
+    text-align:left!important;
+    gap:8px!important;
+    padding:8px!important;
+  }
+  .sticksLinearPage .sticksPacingCopy{
+    justify-items:stretch!important;
+  }
+  .sticksLinearPage .sticksPacingDial{
+    width:58px!important;
+    height:58px!important;
+  }
+  .sticksLinearPage .sticksPacingDialFace{
+    width:44px!important;
+    height:44px!important;
+  }
+  .sticksLinearPage .sticksPacingZeroButton{
+    width:max-content!important;
+    min-width:0!important;
+  }
+
+  .sticksLinearPage .sticksDeviceTimerCard{
+    padding:11px!important;
+  }
+  .sticksLinearPage .gloSessionTimerLayout{
+    grid-template-columns:76px minmax(0,1fr)!important;
+    justify-items:stretch!important;
+    gap:8px!important;
+  }
+  .sticksLinearPage .gloSessionDial{
+    width:68px!important;
+    height:68px!important;
+  }
+  .sticksLinearPage .gloSessionDialFace{
+    width:52px!important;
+    height:52px!important;
+  }
+  .sticksLinearPage .gloSessionDialFace strong{
+    font-size:13px!important;
+  }
+  .sticksLinearPage .gloSessionTimerBody{
+    width:100%;
+    gap:6px;
+  }
+  .sticksLinearPage .gloSessionSelectors{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:5px;
+  }
+  .sticksLinearPage .gloSessionSelectors label{
+    min-width:0;
+  }
+  .sticksLinearPage .gloSessionSelectors select{
+    min-width:0;
+    width:100%;
+  }
+  .sticksLinearPage .gloSessionTimelineHeading{
+    display:flex!important;
+    align-items:baseline;
+  }
+  .sticksLinearPage .gloSessionTimelineHeading>small{
+    display:none;
+  }
+  .sticksLinearPage .gloSessionFacts{
+    grid-template-columns:minmax(0,1fr)!important;
+    gap:4px;
+  }
+  .sticksLinearPage .gloSessionFacts article{
+    grid-template-columns:64px minmax(0,1fr);
+    align-items:center;
+    gap:5px;
+    padding:5px 7px;
+  }
+  .sticksLinearPage .gloSessionFacts article>strong{
+    white-space:normal;
+    text-align:right;
+  }
+  .sticksLinearPage .gloSessionFacts article>small{
+    display:none;
+  }
+  .sticksLinearPage .gloSessionPhaseCopy>small{
+    display:none;
+  }
+  .sticksLinearPage .gloSessionActions{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  }
+  .sticksLinearPage .gloSessionSource{
+    width:max-content!important;
+    text-align:left!important;
+  }
+}
+
+/* Telefones estreitos: preserva duas colunas e elimina texto ornamental. */
+@media(max-width:420px){
+  .mobileAppIdentity>strong{
+    max-width:78px!important;
+    font-size:13px!important;
+  }
+  .appClock{
+    font-size:12px!important;
+  }
+
+  .referenceGreeting{
+    min-height:88px!important;
+    padding-top:10px!important;
+  }
+  .referenceGreeting>div:first-child{
+    max-width:calc(100% - 62px)!important;
+  }
+  .referenceGreeting>div:first-child>span{
+    margin-bottom:4px;
+    font-size:10px;
+  }
+  .referenceGreeting h2{
+    font-size:22px!important;
+  }
+  .referenceGreeting p{
+    display:none;
+  }
+  .referenceHeroIllustration{
+    width:58px!important;
+    height:58px!important;
+    flex-basis:58px!important;
+  }
+  .referenceFocusCard{
+    padding:12px!important;
+  }
+  .referenceFocusHeader h2{
+    font-size:16px!important;
+  }
+  .referenceFocusHeader p{
+    max-width:170px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .referenceFocusBody>div:first-child strong,
+  .referenceHome .referenceFocusTimeWindow{
+    font-size:28px!important;
+  }
+  .referenceProgressAction{
+    width:58px!important;
+    height:58px!important;
+  }
+  .referenceProgressAction>span{
+    width:32px;
+    height:32px;
+  }
+
+  .focusPage .focusHeader{
+    gap:7px!important;
+  }
+  .focusPage .focusHeader h1{
+    font-size:24px!important;
+  }
+  .focusPage .focusHeader p{
+    font-size:12px;
+  }
+  .focusPage .focusPrototypePanel{
+    padding:11px!important;
+  }
+  .focusPage .focusDial{
+    width:142px!important;
+  }
+  .focusPage .focusDialInner strong{
+    font-size:32px!important;
+  }
+  .focusPage .focusTimerActions,
+  .focusPage .focusPrototypeActions{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  }
+
+  .sticksLinearPage .sticksPacingClock{
+    grid-template-columns:58px minmax(0,1fr)!important;
+  }
+  .sticksLinearPage .sticksPacingDial{
+    width:52px!important;
+    height:52px!important;
+  }
+  .sticksLinearPage .sticksPacingDialFace{
+    width:40px!important;
+    height:40px!important;
+  }
+  .sticksLinearPage .sticksPacingCopy>small{
+    display:none;
+  }
+  .sticksLinearPage .sticksPacingZeroButton{
+    min-height:32px;
+    padding:5px 8px;
+    font-size:11px;
+  }
+
+  .sticksLinearPage .gloSessionIntro{
+    display:none;
+  }
+  .sticksLinearPage .gloSessionTimerLayout{
+    grid-template-columns:62px minmax(0,1fr)!important;
+    gap:7px!important;
+  }
+  .sticksLinearPage .gloSessionDial{
+    width:56px!important;
+    height:56px!important;
+  }
+  .sticksLinearPage .gloSessionDialFace{
+    width:42px!important;
+    height:42px!important;
+  }
+  .sticksLinearPage .gloSessionDialFace strong{
+    font-size:11px!important;
+  }
+  .sticksLinearPage .gloSessionDialFace small{
+    display:none;
+  }
+  .sticksLinearPage .gloSessionFacts article{
+    grid-template-columns:55px minmax(0,1fr);
+    font-size:10px;
+  }
+  .sticksLinearPage .gloSessionPhaseCopy{
+    padding:5px 7px;
+  }
+  .sticksLinearPage .gloSessionActions button{
+    min-height:34px;
+    padding:6px;
+    font-size:11px;
+  }
+  .sticksLinearPage .gloSessionAccuracyNote{
+    display:none;
+  }
+}
+
+/* Ecrãs baixos/landscape: mantém o temporizador e ações principais acima da dobra. */
+@media(max-width:899px) and (max-height:700px){
+  .referenceGreeting{
+    min-height:74px!important;
+    padding-block:7px!important;
+  }
+  .referenceHeroIllustration{
+    width:52px!important;
+    height:52px!important;
+    flex-basis:52px!important;
+  }
+  .focusPage .focusDial{
+    width:128px!important;
+    margin-block:8px!important;
+  }
+  .focusPage .focusDialInner strong{
+    font-size:29px!important;
+  }
+}
