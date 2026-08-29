@@ -78,6 +78,7 @@ function durationLabel(minutes?: number | null): string {
 }
 
 const STICK_PACING_INTERVAL_MINUTES = 30
+const STICK_PACING_OPTIONS = [30, 45, 60] as const
 
 function pacingCountdownLabel(totalSeconds: number): string {
   const safeSeconds = Math.max(0, Math.floor(totalSeconds))
@@ -142,6 +143,7 @@ export function SticksStockPage() {
   const [message, setMessage] = useState('')
 
   const pacingNow = useNow(1000)
+  const [pacingIntervalMinutes, setPacingIntervalMinutes] = useState<number>(STICK_PACING_INTERVAL_MINUTES)
 
   const reload = useCallback(async () => {
     const [
@@ -318,7 +320,7 @@ export function SticksStockPage() {
   const pacingStatus = getStickPacingStatus(
     usageAnalytics?.lastUseAt ?? null,
     pacingNow,
-    STICK_PACING_INTERVAL_MINUTES,
+    pacingIntervalMinutes,
   )
   const pacingNextTime = pacingStatus.nextTargetAt ? formatTime(pacingStatus.nextTargetAt) : '—'
   const pacingCountdown = pacingCountdownLabel(pacingStatus.remainingSeconds)
@@ -558,6 +560,20 @@ export function SticksStockPage() {
                       : 'O relógio começa quando registares um stick. '}
                     Meta comportamental; não representa um intervalo seguro de utilização.
                   </small>
+                  <div className="sticksPacingOptions" aria-label="Escolher meta de intervalo">
+                    {STICK_PACING_OPTIONS.map((minutes) => (
+                      <button
+                        type="button"
+                        className={`sticksPacingOption${pacingIntervalMinutes === minutes ? ' isSelected' : ''}`}
+                        aria-pressed={pacingIntervalMinutes === minutes}
+                        onClick={() => setPacingIntervalMinutes(minutes)}
+                        key={minutes}
+                      >
+                        <strong>{minutes} min</strong>
+                        {minutes === STICK_PACING_INTERVAL_MINUTES ? <small>Sugerido</small> : null}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
