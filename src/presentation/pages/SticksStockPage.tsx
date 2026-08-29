@@ -490,6 +490,8 @@ export function SticksStockPage() {
   }
 
   async function registerStickWithPacing() {
+    if (busy || gloSessionActive) return
+
     if (!displayedPacingStatus.ready && displayedPacingStatus.elapsedSeconds !== null) {
       const confirmed = window.confirm(
         `A tua meta de espaçamento ainda não terminou. Faltam ${pacingCountdown} para completares ${displayedPacingStatus.targetMinutes} min. Queres registar o stick na mesma? O registo deve continuar exato mesmo quando a meta não é cumprida.`,
@@ -497,25 +499,44 @@ export function SticksStockPage() {
       if (!confirmed) return
     }
 
-    await run(
-      () => personalStockService.consumeStick(operationId()),
-      displayedPacingStatus.ready
-        ? '1 stick registado. O relógio de espaçamento começou agora.'
-        : '1 stick registado. O relógio de espaçamento recomeçou a partir deste registo.',
-    )
+    setBusy(true)
+    setMessage('')
+    const consumptionOperationId = operationId()
+    const requestedAt = new Date()
+
+    try {
+      const result = await personalStockService.consumeStick(consumptionOperationId, requestedAt)
+      const session = createGloSessionSnapshot({
+        device: gloDeviceModel,
+        mode: gloHeatingMode,
+        startedAt: result.movement.effectiveAt,
+        consumptionOperationId,
+      })
+      setGloSession(session)
+      await stickDataProtectionService.sync()
+      await reload()
+      setMessage(
+        `1 stick registado às ${formatDateTimeSeconds(result.movement.effectiveAt)}. `
+        + `${session.deviceLabel} · ${session.modeLabel}: relógio técnico iniciado no mesmo timestamp do ledger.`,
+      )
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'Não foi possível registar o stick e iniciar a sessão.')
+    } finally {
+      setBusy(false)
+    }
   }
 
-  function startGloSessionTimer() {
-    const startedAt = new Date().toISOString()
-    setGloSessionStartedAt(startedAt)
-    setMessage(
-      `${gloSessionPreset.deviceLabel} · ${gloSessionPreset.modeLabel}: temporizador iniciado. O stock e o histórico não foram alterados.`,
+  async function correctLastStickRegistration() {
+    const corrected = await run(
+      () => personalStockService.undoLastStick(operationId()),
+      'Último registo corrigido. O movimento original permanece no histórico.',
     )
+    if (corrected) setGloSession(null)
   }
 
-  function zeroGloSessionTimer() {
-    setGloSessionStartedAt(null)
-    setMessage('Temporizador da sessão glo zerado. O stock e o histórico não foram alterados.')
+  function clearGloSessionTimer() {
+    setGloSession(null)
+    setMessage('Relógio da sessão glo limpo. O stock e o histórico do stick não foram alterados.')
   }
 
   async function resetSticksControl() {
@@ -542,6 +563,7 @@ export function SticksStockPage() {
       setNicotineSaveState('')
       setRestockPacks('1')
       setPhysicalQuantity('')
+      setGloSession(null)
       setPackSettingsReady(true)
       setNicotineSettingsReady(true)
       await reload()
