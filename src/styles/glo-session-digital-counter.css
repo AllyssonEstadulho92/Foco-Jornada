@@ -1,0 +1,76 @@
+/* Ajuste do relógio técnico: contador digital alinhado + barra de progresso.
+ * Remove apenas o mostrador circular principal da sessão ativa.
+ */
+.sticksLinearPage .sticksDeviceTimerCard .gloSessionTimerLayout{
+  display:block;
+}
+
+.sticksLinearPage .sticksDeviceTimerCard .gloSessionDial{
+  display:none!important;
+}
+
+.sticksLinearPage .sticksDeviceTimerCard .gloSessionTimerBody{
+  width:100%;
+}
+
+.sticksLinearPage .sticksDeviceTimerCard .gloSessionPhaseCopy{
+  position:relative;
+  width:100%;
+  box-sizing:border-box;
+  gap:8px;
+  padding:18px 20px 24px;
+  overflow:hidden;
+  border-left:0;
+  border-radius:18px;
+  background:color-mix(in srgb,var(--primary-soft) 28%,var(--surface));
+}
+
+.sticksLinearPage .sticksDeviceTimerCard .gloSessionPhaseCopy::after{
+  content:'';
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:0;
+  height:7px;
+  background:linear-gradient(
+    90deg,
+    var(--primary) 0 var(--glo-session-progress-percent,0%),
+    var(--surface-3) var(--glo-session-progress-percent,0%) 100%
+  );
+}
+
+.sticksLinearPage .sticksDeviceTimerCard .gloSessionPhaseCopy>span{
+  font-size:12px;
+  letter-spacing:.09em;
+}
+
+.sticksLinearPage .sticksDeviceTimerCard .gloSessionPhaseCopy>strong{
+  font-size:clamp(36px,7vw,54px);
+  font-weight:var(--weight-heavy);
+  line-height:1;
+  letter-spacing:-.04em;
+  font-variant-numeric:tabular-nums;
+}
+
+.sticksLinearPage .sticksDeviceTimerCard .gloSessionPhaseCopy>small{
+  margin-top:2px;
+}
+
+[data-theme='dark'] .sticksLinearPage .sticksDeviceTimerCard .gloSessionPhaseCopy{
+  background:color-mix(in srgb,var(--primary-soft) 20%,var(--surface));
+}
+
+@media(max-width:560px){
+  .sticksLinearPage .sticksDeviceTimerCard .gloSessionPhaseCopy{
+    padding:16px 16px 22px;
+    border-radius:16px;
+  }
+
+  .sticksLinearPage .sticksDeviceTimerCard .gloSessionPhaseCopy>strong{
+    font-size:40px;
+  }
+
+  .sticksLinearPage .sticksDeviceTimerCard .gloSessionPhaseCopy::after{
+    height:6px;
+  }
+}
