@@ -447,6 +447,9 @@
   .sticksLinearPage .gloSessionActions{
     grid-template-columns:repeat(2,minmax(0,1fr))!important;
   }
+  .sticksLinearPage .gloSessionActions.isSingleAction{
+    grid-template-columns:minmax(0,1fr)!important;
+  }
   .sticksLinearPage .gloSessionSource{
     width:max-content!important;
     text-align:left!important;
