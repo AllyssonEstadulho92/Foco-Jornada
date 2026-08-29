@@ -1,0 +1,227 @@
+.medNextDoseCard{
+  display:grid;
+  gap:16px;
+  margin-top:16px;
+  padding:18px;
+  border:1px solid var(--border-subtle,#dfe4df);
+  border-radius:22px;
+  background:var(--surface-elevated,#fff);
+  box-shadow:0 16px 46px rgb(20 31 25/.06);
+}
+.medNextDoseHeader{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:16px;
+}
+.medNextDoseHeader h2{margin:4px 0 5px;letter-spacing:-.025em}
+.medNextDoseHeader p{margin:0;max-width:720px;color:var(--text-muted,#66706a);line-height:1.45}
+.medNextDoseExactBadge{
+  display:inline-flex;
+  align-items:center;
+  min-height:28px;
+  padding:5px 9px;
+  border-radius:999px;
+  border:1px solid color-mix(in srgb,var(--accent,#1d6f5f) 30%,var(--border-subtle,#dfe4df));
+  background:color-mix(in srgb,var(--accent,#1d6f5f) 8%,var(--surface,#fff));
+  color:var(--accent,#1d6f5f);
+  font-size:.68rem;
+  font-weight:850;
+  letter-spacing:.055em;
+  white-space:nowrap;
+}
+.medNextDoseBody{
+  display:grid;
+  grid-template-columns:170px minmax(0,1fr);
+  gap:20px;
+  align-items:center;
+}
+.medNextDoseDial{
+  --med-next-dose-progress:0deg;
+  display:grid;
+  width:150px;
+  height:150px;
+  place-items:center;
+  border-radius:999px;
+  background:conic-gradient(
+    var(--accent,#1d6f5f) 0deg var(--med-next-dose-progress),
+    var(--surface-soft,#edf2ef) var(--med-next-dose-progress) 360deg
+  );
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--border-subtle,#dfe4df) 82%,transparent);
+}
+.medNextDoseDialFace{
+  display:grid;
+  width:118px;
+  height:118px;
+  place-items:center;
+  align-content:center;
+  gap:5px;
+  border:1px solid var(--border-subtle,#dfe4df);
+  border-radius:999px;
+  background:var(--surface,#fff);
+  text-align:center;
+}
+.medNextDoseDialFace strong{
+  font-size:1.65rem;
+  line-height:1;
+  font-weight:900;
+  letter-spacing:-.045em;
+  font-variant-numeric:tabular-nums;
+}
+.medNextDoseDialFace small{
+  color:var(--text-muted,#66706a);
+  font-size:.7rem;
+  font-weight:750;
+  text-transform:uppercase;
+  letter-spacing:.05em;
+}
+.medNextDoseContent{display:grid;gap:12px;min-width:0}
+.medNextDoseMedicine{display:grid;gap:3px}
+.medNextDoseMedicine>span{
+  color:var(--accent,#1d6f5f);
+  font-size:.72rem;
+  font-weight:850;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+}
+.medNextDoseMedicine>strong{font-size:1.22rem;line-height:1.3}
+.medNextDoseFacts{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:9px;
+}
+.medNextDoseFacts>div{
+  display:grid;
+  gap:4px;
+  padding:11px 12px;
+  border:1px solid var(--border-subtle,#dfe4df);
+  border-radius:13px;
+  background:var(--surface-soft,#f6f8f6);
+  min-width:0;
+}
+.medNextDoseFacts span{
+  color:var(--text-muted,#66706a);
+  font-size:.7rem;
+  font-weight:750;
+  text-transform:uppercase;
+  letter-spacing:.045em;
+}
+.medNextDoseFacts strong{
+  font-size:.9rem;
+  line-height:1.35;
+  overflow-wrap:anywhere;
+  font-variant-numeric:tabular-nums;
+}
+.medNextDoseProgress{
+  height:9px;
+  overflow:hidden;
+  border-radius:999px;
+  background:var(--surface-soft,#edf2ef);
+}
+.medNextDoseProgress>span{
+  display:block;
+  width:0;
+  height:100%;
+  border-radius:inherit;
+  background:var(--accent,#1d6f5f);
+  transition:width .3s linear;
+}
+.medNextDoseStatus{
+  padding:10px 12px;
+  border-left:3px solid var(--accent,#1d6f5f);
+  border-radius:0 11px 11px 0;
+  background:color-mix(in srgb,var(--accent,#1d6f5f) 7%,var(--surface,#fff));
+  color:var(--text-primary,#151815);
+  font-weight:700;
+  line-height:1.4;
+}
+.medNextDoseSafety{
+  margin:0;
+  padding:11px 12px;
+  border:1px solid #e2d39b;
+  border-radius:12px;
+  background:#fffaf0;
+  color:#5d512f;
+  font-size:.82rem;
+  line-height:1.45;
+}
+.medNextDoseSources{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  flex-wrap:wrap;
+  color:var(--text-muted,#66706a);
+  font-size:.76rem;
+}
+.medNextDoseSources a{color:var(--accent,#1d6f5f);font-weight:800}
+.medNextDoseCard.isSoon .medNextDoseStatus{
+  border-left-color:#b47a00;
+  background:#fff8e8;
+  color:#6b4c00;
+}
+.medNextDoseCard.isDue .medNextDoseDial{
+  background:conic-gradient(#b13a3a 0deg 360deg);
+}
+.medNextDoseCard.isDue .medNextDoseDialFace strong{color:#a43434}
+.medNextDoseCard.isDue .medNextDoseStatus{
+  border-left-color:#b13a3a;
+  background:#fff4f4;
+  color:#7e2929;
+}
+.medNextDoseCard.isDue .medNextDoseProgress>span{background:#b13a3a}
+.medNextDoseCard.isLoading{opacity:.82}
+
+[data-theme="dark"] .medNextDoseCard{
+  background:#0f1512;
+  border-color:#29352f;
+  box-shadow:none;
+}
+[data-theme="dark"] .medNextDoseDialFace{
+  background:#111915;
+  border-color:#304039;
+}
+[data-theme="dark"] .medNextDoseFacts>div,
+[data-theme="dark"] .medNextDoseProgress{
+  background:#151d19;
+  border-color:#29352f;
+}
+[data-theme="dark"] .medNextDoseStatus{
+  background:color-mix(in srgb,var(--accent,#1d6f5f) 16%,#0f1512);
+}
+[data-theme="dark"] .medNextDoseSafety{
+  background:#221f14;
+  border-color:#51471f;
+  color:#e5d9a6;
+}
+[data-theme="dark"] .medNextDoseCard.isSoon .medNextDoseStatus{
+  background:#2b2411;
+  color:#f2d484;
+}
+[data-theme="dark"] .medNextDoseCard.isDue .medNextDoseStatus{
+  background:#2d1717;
+  color:#f1b3b3;
+}
+
+@media(max-width:820px){
+  .medNextDoseBody{grid-template-columns:132px minmax(0,1fr);gap:14px}
+  .medNextDoseDial{width:118px;height:118px}
+  .medNextDoseDialFace{width:92px;height:92px}
+  .medNextDoseDialFace strong{font-size:1.25rem}
+  .medNextDoseFacts{grid-template-columns:1fr 1fr}
+  .medNextDoseFacts>div:last-child{grid-column:1/-1}
+}
+@media(max-width:560px){
+  .medNextDoseCard{padding:14px;border-radius:18px}
+  .medNextDoseHeader{display:grid;grid-template-columns:1fr}
+  .medNextDoseExactBadge{justify-self:start}
+  .medNextDoseBody{grid-template-columns:1fr;justify-items:center}
+  .medNextDoseContent{width:100%}
+  .medNextDoseMedicine{text-align:center}
+  .medNextDoseFacts{grid-template-columns:1fr}
+  .medNextDoseFacts>div:last-child{grid-column:auto}
+  .medNextDoseStatus{text-align:left}
+  .medNextDoseSources{justify-content:center}
+}
+@media(prefers-reduced-motion:reduce){
+  .medNextDoseProgress>span{transition:none}
+}
