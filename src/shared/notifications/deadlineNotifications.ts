@@ -92,7 +92,6 @@ async function showSystemNotification(item: DeadlineNotification): Promise<boole
   const options: NotificationOptions = {
     body: item.detail,
     tag: item.tag ?? item.id,
-    renotify: false,
     icon: `${import.meta.env.BASE_URL}icon.svg`,
     badge: `${import.meta.env.BASE_URL}icon.svg`,
     data: {
@@ -104,9 +103,11 @@ async function showSystemNotification(item: DeadlineNotification): Promise<boole
 
   try {
     if ('serviceWorker' in navigator) {
-      const registration = await navigator.serviceWorker.ready
-      await registration.showNotification(item.title, options)
-      return true
+      const registration = await navigator.serviceWorker.getRegistration()
+      if (registration) {
+        await registration.showNotification(item.title, options)
+        return true
+      }
     }
 
     new Notification(item.title, options)
