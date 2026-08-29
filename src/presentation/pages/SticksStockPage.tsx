@@ -203,7 +203,7 @@ export function SticksStockPage() {
   const [initialGloSession] = useState(loadGloSessionTimer)
   const [gloDeviceModel, setGloDeviceModel] = useState<GloDeviceModel>(initialGloSession.device)
   const [gloHeatingMode, setGloHeatingMode] = useState<GloHeatingMode>(initialGloSession.mode)
-  const [gloSessionStartedAt, setGloSessionStartedAt] = useState<string | null>(initialGloSession.startedAt)
+  const [gloSession, setGloSession] = useState<GloSessionSnapshot | null>(initialGloSession.session)
 
   const reload = useCallback(async () => {
     const [
@@ -260,11 +260,12 @@ export function SticksStockPage() {
 
   useEffect(() => {
     saveGloSessionTimer({
+      version: 2,
       device: gloDeviceModel,
       mode: gloHeatingMode,
-      startedAt: gloSessionStartedAt,
+      session: gloSession,
     })
-  }, [gloDeviceModel, gloHeatingMode, gloSessionStartedAt])
+  }, [gloDeviceModel, gloHeatingMode, gloSession])
 
   useEffect(() => {
     if (!packSettingsReady) return
@@ -344,8 +345,8 @@ export function SticksStockPage() {
     stickDataProtectionService,
   ])
 
-  async function run(action: () => Promise<unknown>, success: string) {
-    if (busy) return
+  async function run(action: () => Promise<unknown>, success: string): Promise<boolean> {
+    if (busy) return false
     setBusy(true)
     setMessage('')
     try {
@@ -353,8 +354,10 @@ export function SticksStockPage() {
       await stickDataProtectionService.sync()
       await reload()
       setMessage(success)
+      return true
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'Não foi possível concluir a operação.')
+      return false
     } finally {
       setBusy(false)
     }
@@ -407,36 +410,28 @@ export function SticksStockPage() {
   const pacingCountdown = pacingCountdownLabel(displayedPacingStatus.remainingSeconds)
 
   const gloSessionPreset = getGloSessionPreset(gloDeviceModel, gloHeatingMode)
-  const gloSessionStatus = getGloSessionStatus(gloSessionStartedAt, pacingNow, gloSessionPreset)
+  const gloSessionStatus = getGloSessionStatus(gloSession, pacingNow)
   const gloSessionActive = gloSessionStatus.phase === 'heating' || gloSessionStatus.phase === 'session'
   const gloSessionCountdown = pacingCountdownLabel(gloSessionStatus.phaseRemainingSeconds)
-  const gloWarmupLabel = pacingCountdownLabel(gloSessionPreset.warmupSeconds)
-  const gloUseLabel = pacingCountdownLabel(gloSessionPreset.sessionSeconds)
-  const gloTotalLabel = pacingCountdownLabel(gloSessionPreset.warmupSeconds + gloSessionPreset.sessionSeconds)
-  const gloReferenceStartedAt = gloSessionStartedAt
-    ? new Date(gloSessionStartedAt)
-    : pacingNow
-  const gloReferenceReadyAt = new Date(
-    gloReferenceStartedAt.getTime() + gloSessionPreset.warmupSeconds * 1000,
-  )
-  const gloReferenceEndsAt = new Date(
-    gloReferenceReadyAt.getTime() + gloSessionPreset.sessionSeconds * 1000,
-  )
-  const gloReferenceLabel = gloSessionStartedAt ? 'Horário desta sessão' : 'Se iniciares agora'
+  const gloOverallCountdown = pacingCountdownLabel(gloSessionStatus.overallRemainingSeconds)
+  const gloTimingReference = gloSession ?? gloSessionPreset
+  const gloWarmupLabel = pacingCountdownLabel(gloTimingReference.warmupSeconds)
+  const gloUseLabel = pacingCountdownLabel(gloTimingReference.sessionSeconds)
+  const gloTotalLabel = pacingCountdownLabel(gloTimingReference.warmupSeconds + gloTimingReference.sessionSeconds)
   const gloSessionPhaseLabel = gloSessionStatus.phase === 'heating'
     ? 'A aquecer'
     : gloSessionStatus.phase === 'session'
-      ? 'Sessão em curso'
+      ? 'Utilização em curso'
       : gloSessionStatus.phase === 'completed'
         ? 'Sessão concluída'
-        : 'Pronto a iniciar'
+        : 'Aguardando registo'
   const gloSessionPhaseHint = gloSessionStatus.phase === 'heating'
-    ? `O aparelho deverá ficar pronto às ${formatTime(gloSessionStatus.readyAt)}.`
+    ? `Pronto técnico em ${gloSessionCountdown}. Fim técnico às ${formatTime(gloSessionStatus.endsAt)}.`
     : gloSessionStatus.phase === 'session'
-      ? `Fim previsto às ${formatTime(gloSessionStatus.endsAt)}.`
+      ? `Utilização restante: ${gloSessionCountdown}. Fim técnico às ${formatTime(gloSessionStatus.endsAt)}.`
       : gloSessionStatus.phase === 'completed'
-        ? `Tempo oficial concluído às ${formatTime(gloSessionStatus.endsAt)}.`
-        : 'Inicia este relógio ao mesmo tempo que inicias o aparelho.'
+        ? `Fim técnico alcançado em ${formatDateTimeSeconds(gloSessionStatus.endsAt)}.`
+        : 'Ao iniciares o aparelho, usa “Registar 1 stick e iniciar sessão”. O mesmo instante fica no ledger e no relógio.'
 
   const packTimelineRows = useMemo(() => {
     if (!packProjection) return []
