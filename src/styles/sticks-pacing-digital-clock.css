@@ -1,0 +1,261 @@
+/* Intervalo consciente — relógio digital minimalista com progresso linear.
+ * O conteúdo mantém a lógica existente; apenas a apresentação é refinada.
+ */
+
+.sticksLinearPage .sticksPacingClock{
+  gap:16px;
+  padding:22px;
+  border:1.5px solid color-mix(in srgb,var(--success) 34%,var(--line));
+  border-radius:22px;
+  background:linear-gradient(135deg,color-mix(in srgb,var(--success) 5%,var(--surface)),var(--surface));
+}
+
+.sticksLinearPage .sticksPacingCopy{
+  gap:8px;
+}
+
+.sticksLinearPage .sticksPacingCopy>span{
+  min-height:38px;
+  padding:6px 12px;
+  border-radius:999px;
+  font-size:11px;
+  letter-spacing:.12em;
+}
+
+.sticksLinearPage .sticksPacingCopy>span::before{
+  width:26px;
+  height:26px;
+  flex-basis:26px;
+  border-radius:8px;
+  font-size:16px;
+}
+
+.sticksLinearPage .sticksPacingCopy>strong{
+  max-width:720px;
+  margin-top:2px;
+  font-size:clamp(24px,2.4vw,31px);
+  line-height:1.1;
+}
+
+.sticksLinearPage .sticksPacingCopy>small{
+  max-width:760px;
+  font-size:15px;
+  line-height:1.48;
+}
+
+.sticksLinearPage .sticksPacingZeroButton{
+  width:auto;
+  min-height:44px;
+  margin-top:2px;
+  padding:8px 14px;
+  border-width:1px;
+  border-radius:12px;
+  font-size:14px;
+}
+
+.sticksLinearPage .sticksPacingZeroButton::before{
+  width:20px;
+  height:20px;
+  font-size:20px;
+}
+
+.sticksLinearPage .sticksPacingZeroButton:disabled{
+  display:none;
+}
+
+/* O antigo dial passa a ser um mostrador digital horizontal. */
+.sticksLinearPage .sticksPacingDial{
+  --pacing-linear-progress:calc((var(--pacing-progress) / 360deg) * 100%);
+  position:relative;
+  display:grid;
+  width:100%;
+  height:auto;
+  min-height:104px;
+  overflow:visible;
+  border:0;
+  border-radius:0;
+  background:transparent;
+  box-shadow:none;
+}
+
+.sticksLinearPage .sticksPacingDial::before{
+  content:"";
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:0;
+  height:10px;
+  border:0;
+  border-radius:999px;
+  background:color-mix(in srgb,var(--success) 12%,var(--surface-3));
+  pointer-events:none;
+}
+
+.sticksLinearPage .sticksPacingDial::after{
+  content:"";
+  position:absolute;
+  left:0;
+  bottom:0;
+  width:0;
+  width:var(--pacing-linear-progress);
+  max-width:100%;
+  height:10px;
+  border-radius:999px;
+  background:var(--success);
+  transition:width .45s linear;
+  pointer-events:none;
+}
+
+.sticksLinearPage .sticksPacingClock.isReady .sticksPacingDial::after{
+  width:100%;
+}
+
+.sticksLinearPage .sticksPacingClock.isWaiting .sticksPacingDial::before{
+  background:color-mix(in srgb,var(--primary) 12%,var(--surface-3));
+}
+
+.sticksLinearPage .sticksPacingClock.isWaiting .sticksPacingDial::after{
+  background:var(--primary);
+}
+
+.sticksLinearPage .sticksPacingDialFace{
+  position:relative;
+  z-index:1;
+  display:flex;
+  width:100%;
+  height:auto;
+  min-height:82px;
+  box-sizing:border-box;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:18px;
+  padding:0 0 24px;
+  border:0;
+  border-radius:0;
+  background:transparent;
+  text-align:left;
+  box-shadow:none;
+}
+
+.sticksLinearPage .sticksPacingDialFace strong{
+  color:var(--text);
+  font-size:clamp(42px,6vw,64px);
+  font-weight:800;
+  line-height:.92;
+  font-variant-numeric:tabular-nums;
+  letter-spacing:-.055em;
+  white-space:nowrap;
+}
+
+.sticksLinearPage .sticksPacingClock.isReady .sticksPacingDialFace strong{
+  font-size:0;
+}
+
+.sticksLinearPage .sticksPacingClock.isReady .sticksPacingDialFace strong::after{
+  content:"30:00";
+  color:var(--text);
+  font-size:clamp(42px,6vw,64px);
+  font-weight:800;
+  line-height:.92;
+  font-variant-numeric:tabular-nums;
+  letter-spacing:-.055em;
+}
+
+.sticksLinearPage .sticksPacingDialFace small{
+  display:inline-flex;
+  min-height:30px;
+  align-items:center;
+  padding:0 11px;
+  border-radius:999px;
+  background:color-mix(in srgb,var(--surface-2) 84%,var(--surface));
+  color:var(--muted);
+  font-size:12px;
+  font-weight:800;
+  line-height:1;
+  white-space:nowrap;
+  box-shadow:none;
+}
+
+.sticksLinearPage .sticksPacingClock.isWaiting .sticksPacingDialFace small{
+  font-size:0;
+}
+
+.sticksLinearPage .sticksPacingClock.isWaiting .sticksPacingDialFace small::after{
+  content:"tempo restante";
+  font-size:12px;
+}
+
+.sticksLinearPage .sticksPacingClock.isReady .sticksPacingDialFace small{
+  font-size:0;
+  background:color-mix(in srgb,var(--success) 9%,var(--surface));
+  color:var(--success);
+}
+
+.sticksLinearPage .sticksPacingClock.isReady .sticksPacingDialFace small::after{
+  content:"meta concluída";
+  font-size:12px;
+}
+
+[data-theme="dark"] .sticksLinearPage .sticksPacingClock{
+  background:linear-gradient(135deg,color-mix(in srgb,var(--success) 7%,var(--surface)),var(--surface-2));
+}
+
+@media(max-width:640px){
+  .sticksLinearPage .sticksPacingClock{
+    gap:14px;
+    padding:18px 16px;
+    border-radius:20px;
+  }
+
+  .sticksLinearPage .sticksPacingCopy>strong{
+    font-size:23px;
+  }
+
+  .sticksLinearPage .sticksPacingCopy>small{
+    font-size:15px;
+  }
+
+  .sticksLinearPage .sticksPacingDial{
+    min-height:92px;
+  }
+
+  .sticksLinearPage .sticksPacingDialFace{
+    min-height:72px;
+    gap:12px;
+    padding-bottom:22px;
+  }
+
+  .sticksLinearPage .sticksPacingDialFace strong,
+  .sticksLinearPage .sticksPacingClock.isReady .sticksPacingDialFace strong::after{
+    font-size:44px;
+  }
+
+  .sticksLinearPage .sticksPacingDialFace small,
+  .sticksLinearPage .sticksPacingClock.isWaiting .sticksPacingDialFace small::after,
+  .sticksLinearPage .sticksPacingClock.isReady .sticksPacingDialFace small::after{
+    font-size:11px;
+  }
+}
+
+@media(max-width:390px){
+  .sticksLinearPage .sticksPacingDialFace{
+    align-items:flex-start;
+    flex-direction:column;
+    gap:8px;
+  }
+
+  .sticksLinearPage .sticksPacingDial{
+    min-height:112px;
+  }
+
+  .sticksLinearPage .sticksPacingDialFace strong,
+  .sticksLinearPage .sticksPacingClock.isReady .sticksPacingDialFace strong::after{
+    font-size:40px;
+  }
+}
+
+@media(prefers-reduced-motion:reduce){
+  .sticksLinearPage .sticksPacingDial::after{
+    transition:none;
+  }
+}
