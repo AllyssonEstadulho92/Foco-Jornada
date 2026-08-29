@@ -1,0 +1,404 @@
+/* Protótipo profissional da sessão glo.
+ * Atua apenas na apresentação do relógio técnico; a lógica de ledger e temporização mantém-se intacta.
+ */
+.sticksLinearPage .sticksDeviceTimerCard{
+  gap:22px;
+  padding:28px;
+  border:1px solid color-mix(in srgb,var(--line) 92%,transparent);
+  border-radius:30px;
+  background:var(--surface);
+  box-shadow:0 18px 46px color-mix(in srgb,#000 6%,transparent);
+}
+
+.sticksLinearPage .sticksDeviceTimerCard>.sticksSectionHeading{
+  display:grid;
+  grid-template-columns:minmax(0,1fr);
+  gap:16px;
+  align-items:start;
+}
+
+.sticksLinearPage .sticksDeviceTimerCard>.sticksSectionHeading>div{
+  min-width:0;
+}
+
+.sticksLinearPage .sticksDeviceTimerCard>.sticksSectionHeading h2{
+  margin:10px 0 0;
+  font-size:clamp(34px,5vw,52px);
+  line-height:1;
+  letter-spacing:-.045em;
+}
+
+.sticksLinearPage .sticksDeviceTimerCard .gloSessionStatusBadge{
+  width:100%;
+  min-height:54px;
+  box-sizing:border-box;
+  justify-content:flex-start;
+  padding:12px 22px;
+  border-color:var(--line);
+  background:linear-gradient(90deg,var(--surface-2),color-mix(in srgb,var(--surface-2) 72%,var(--surface)));
+  color:var(--muted);
+  font-size:clamp(15px,2vw,18px);
+  font-weight:var(--weight-heavy);
+}
+
+.sticksLinearPage .sticksDeviceTimerCard .gloSessionStatusBadge::before{
+  content:'ⓘ';
+  margin-right:10px;
+  color:var(--primary);
+  font-size:21px;
+  line-height:1;
+}
+
+.sticksLinearPage .sticksDeviceTimerCard .gloSessionIntro{
+  max-width:none;
+  font-size:clamp(16px,2.1vw,20px);
+  line-height:1.5;
+}
+
+.sticksLinearPage .sticksDeviceTimerCard .gloSessionSelectors{
+  gap:18px;
+}
+
+.sticksLinearPage .sticksDeviceTimerCard .gloSessionSelectors label{
+  gap:9px;
+  color:var(--muted);
+  font-size:15px;
+  font-weight:var(--weight-heavy);
+}
+
+.sticksLinearPage .sticksDeviceTimerCard .gloSessionSelectors select{
+  min-height:62px;
+  padding:12px 18px;
+  border-radius:22px;
+  font-size:clamp(18px,2.2vw,23px);
+  font-weight:var(--weight-heavy);
+}
+
+.sticksLinearPage .sticksDeviceTimerCard .gloSessionDurationGrid{
+  gap:18px;
+}
+
+.sticksLinearPage .sticksDeviceTimerCard .gloSessionDurationGrid article{
+  min-height:210px;
+  padding:20px 16px;
+  border-radius:24px;
+  background:linear-gradient(145deg,var(--surface-2),color-mix(in srgb,var(--surface-2) 72%,var(--surface)));
+  align-content:start;
+  justify-items:center;
+  text-align:center;
+}
+
+.sticksLinearPage .sticksDeviceTimerCard .gloSessionDurationGrid span{
+  width:100%;
+  color:var(--muted);
+  font-size:14px;
+  font-weight:var(--weight-heavy);
+  letter-spacing:.07em;
+}
+
+.sticksLinearPage .sticksDeviceTimerCard .gloSessionDurationGrid strong{
+  display:grid;
+  width:126px;
+  height:126px;
+  margin-top:12px;
+  box-sizing:border-box;
+  place-items:center;
+  border:2px solid color-mix(in srgb,var(--primary) 78%,var(--line));
+  border-radius:999px;
+  background:var(--surface);
+  color:var(--text);
+  font-size:clamp(25px,3vw,34px);
+  font-weight:var(--weight-heavy);
+  line-height:1;
+  letter-spacing:-.035em;
+  box-shadow:inset 0 0 0 8px color-mix(in srgb,var(--primary-soft) 25%,transparent);
+}
+
+.sticksLinearPage .sticksDeviceTimerCard .gloSessionDurationGrid small{
+  display:none;
+}
+
+.sticksLinearPage .gloSessionStartAction{
+  position:relative;
+  width:100%;
+  min-height:78px;
+  padding:16px 24px 16px 68px;
+  border:0;
+  border-radius:22px;
+  background:linear-gradient(135deg,color-mix(in srgb,var(--primary) 92%,#000),var(--primary));
+  color:#fff;
+  font:inherit;
+  font-size:clamp(17px,2.4vw,22px);
+  font-weight:var(--weight-heavy);
+  line-height:1.2;
+  text-align:center;
+  cursor:pointer;
+  box-shadow:0 14px 28px color-mix(in srgb,var(--primary) 22%,transparent);
+  transition:transform .12s ease,box-shadow .16s ease,opacity .16s ease;
+}
+
+.sticksLinearPage .gloSessionStartAction::before{
+  content:'▶';
+  position:absolute;
+  left:30px;
+  top:50%;
+  transform:translateY(-50%);
+  font-size:24px;
+  line-height:1;
+}
+
+.sticksLinearPage .gloSessionStartAction:hover:not(:disabled),
+.sticksLinearPage .gloSessionStartAction:focus-visible:not(:disabled){
+  transform:translateY(-1px);
+  box-shadow:0 18px 34px color-mix(in srgb,var(--primary) 28%,transparent);
+}
+
+.sticksLinearPage .gloSessionStartAction:focus-visible{
+  outline:3px solid color-mix(in srgb,var(--primary) 32%,#fff);
+  outline-offset:3px;
+}
+
+.sticksLinearPage .gloSessionStartAction:disabled{
+  opacity:.58;
+  cursor:not-allowed;
+  box-shadow:none;
+}
+
+.sticksLinearPage .gloSessionStartAction.isSessionActive::before{
+  content:'●';
+}
+
+.sticksLinearPage .sticksDeviceTimerCard .gloSessionTimerLayout{
+  grid-template-columns:150px minmax(0,1fr);
+  gap:28px;
+  align-items:center;
+}
+
+.sticksLinearPage .sticksDeviceTimerCard .gloSessionDial{
+  width:138px;
+  height:138px;
+  margin-inline:auto;
+  background:conic-gradient(
+    var(--primary) 0deg var(--glo-session-progress),
+    color-mix(in srgb,var(--primary-soft) 48%,var(--surface-3)) var(--glo-session-progress) 360deg
+  );
+  box-shadow:0 10px 22px color-mix(in srgb,var(--primary) 10%,transparent);
+}
+
+.sticksLinearPage .sticksDeviceTimerCard .gloSessionDialFace{
+  width:108px;
+  height:108px;
+  border-color:color-mix(in srgb,var(--primary) 16%,var(--line));
+}
+
+.sticksLinearPage .sticksDeviceTimerCard .gloSessionDialFace strong{
+  font-size:clamp(22px,3vw,31px);
+}
+
+.sticksLinearPage .sticksDeviceTimerCard .gloSessionDialFace small{
+  font-size:11px;
+  letter-spacing:.08em;
+}
+
+.sticksLinearPage .sticksDeviceTimerCard .gloSessionIdleState{
+  gap:8px;
+  padding:22px 24px;
+  border-radius:22px;
+}
+
+.sticksLinearPage .sticksDeviceTimerCard .gloSessionIdleState strong{
+  font-size:clamp(20px,2.4vw,28px);
+  line-height:1.15;
+}
+
+.sticksLinearPage .sticksDeviceTimerCard .gloSessionIdleState span{
+  font-size:clamp(14px,1.8vw,17px);
+  line-height:1.5;
+}
+
+.sticksLinearPage .sticksDeviceTimerCard .gloSessionPhaseCopy{
+  gap:7px;
+  padding:18px 20px;
+  border-left-width:5px;
+  border-radius:0 20px 20px 0;
+}
+
+.sticksLinearPage .sticksDeviceTimerCard .gloSessionPhaseCopy>span{
+  font-size:12px;
+  letter-spacing:.09em;
+}
+
+.sticksLinearPage .sticksDeviceTimerCard .gloSessionPhaseCopy>strong{
+  font-size:clamp(20px,2.7vw,28px);
+}
+
+.sticksLinearPage .sticksDeviceTimerCard .gloSessionPhaseCopy>small,
+.sticksLinearPage .sticksDeviceTimerCard .gloSessionAccuracyNote{
+  font-size:14px;
+  line-height:1.55;
+}
+
+.sticksLinearPage .sticksDeviceTimerCard .gloSessionSourceBlock{
+  gap:8px;
+  padding-top:4px;
+}
+
+.sticksLinearPage .sticksDeviceTimerCard .gloSessionSourceBlock>span,
+.sticksLinearPage .sticksDeviceTimerCard .gloSessionSourceBlock>small,
+.sticksLinearPage .sticksDeviceTimerCard .gloSessionSource{
+  font-size:13px;
+  line-height:1.45;
+}
+
+[data-theme='dark'] .sticksLinearPage .sticksDeviceTimerCard{
+  background:var(--surface);
+  box-shadow:0 18px 46px rgba(0,0,0,.2);
+}
+
+[data-theme='dark'] .sticksLinearPage .sticksDeviceTimerCard .gloSessionDurationGrid article{
+  background:var(--surface-2);
+}
+
+[data-theme='dark'] .sticksLinearPage .sticksDeviceTimerCard .gloSessionDurationGrid strong{
+  background:var(--surface);
+}
+
+@media(max-width:700px){
+  .sticksLinearPage .sticksDeviceTimerCard{
+    padding:22px;
+    border-radius:26px;
+  }
+
+  .sticksLinearPage .sticksDeviceTimerCard .gloSessionDurationGrid{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:12px;
+  }
+
+  .sticksLinearPage .sticksDeviceTimerCard .gloSessionDurationGrid article{
+    min-height:176px;
+    padding:16px 8px;
+  }
+
+  .sticksLinearPage .sticksDeviceTimerCard .gloSessionDurationGrid strong{
+    width:104px;
+    height:104px;
+    font-size:24px;
+  }
+
+  .sticksLinearPage .sticksDeviceTimerCard .gloSessionTimerLayout{
+    grid-template-columns:128px minmax(0,1fr);
+    gap:18px;
+  }
+
+  .sticksLinearPage .sticksDeviceTimerCard .gloSessionDial{
+    width:118px;
+    height:118px;
+  }
+
+  .sticksLinearPage .sticksDeviceTimerCard .gloSessionDialFace{
+    width:92px;
+    height:92px;
+  }
+}
+
+@media(max-width:560px){
+  .sticksLinearPage .sticksDeviceTimerCard{
+    gap:18px;
+    padding:18px;
+    border-radius:22px;
+  }
+
+  .sticksLinearPage .sticksDeviceTimerCard>.sticksSectionHeading h2{
+    font-size:34px;
+  }
+
+  .sticksLinearPage .sticksDeviceTimerCard .gloSessionStatusBadge{
+    min-height:50px;
+    padding:10px 16px;
+  }
+
+  .sticksLinearPage .sticksDeviceTimerCard .gloSessionSelectors{
+    grid-template-columns:minmax(0,1fr);
+  }
+
+  .sticksLinearPage .sticksDeviceTimerCard .gloSessionDurationGrid{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:8px;
+  }
+
+  .sticksLinearPage .sticksDeviceTimerCard .gloSessionDurationGrid article{
+    min-height:142px;
+    padding:14px 6px;
+    border-radius:18px;
+  }
+
+  .sticksLinearPage .sticksDeviceTimerCard .gloSessionDurationGrid span{
+    font-size:10px;
+    letter-spacing:.04em;
+  }
+
+  .sticksLinearPage .sticksDeviceTimerCard .gloSessionDurationGrid strong{
+    width:82px;
+    height:82px;
+    margin-top:9px;
+    border-width:2px;
+    font-size:19px;
+    box-shadow:inset 0 0 0 5px color-mix(in srgb,var(--primary-soft) 25%,transparent);
+  }
+
+  .sticksLinearPage .gloSessionStartAction{
+    min-height:68px;
+    padding:14px 18px 14px 54px;
+    border-radius:18px;
+    font-size:17px;
+  }
+
+  .sticksLinearPage .gloSessionStartAction::before{
+    left:20px;
+    font-size:20px;
+  }
+
+  .sticksLinearPage .sticksDeviceTimerCard .gloSessionTimerLayout{
+    grid-template-columns:minmax(0,1fr);
+    justify-items:center;
+    gap:18px;
+  }
+
+  .sticksLinearPage .sticksDeviceTimerCard .gloSessionTimerBody{
+    width:100%;
+  }
+}
+
+@media(max-width:390px){
+  .sticksLinearPage .sticksDeviceTimerCard .gloSessionDurationGrid{
+    grid-template-columns:minmax(0,1fr);
+  }
+
+  .sticksLinearPage .sticksDeviceTimerCard .gloSessionDurationGrid article{
+    min-height:0;
+    grid-template-columns:minmax(0,1fr) auto;
+    align-items:center;
+    justify-items:start;
+    text-align:left;
+  }
+
+  .sticksLinearPage .sticksDeviceTimerCard .gloSessionDurationGrid span{
+    grid-column:1;
+    grid-row:1;
+  }
+
+  .sticksLinearPage .sticksDeviceTimerCard .gloSessionDurationGrid strong{
+    grid-column:2;
+    grid-row:1 / span 2;
+    width:76px;
+    height:76px;
+    margin:0;
+    justify-self:end;
+  }
+}
+
+@media(prefers-reduced-motion:reduce){
+  .sticksLinearPage .gloSessionStartAction{
+    transition:none;
+  }
+}
