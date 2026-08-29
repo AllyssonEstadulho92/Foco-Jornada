@@ -31,6 +31,15 @@ function syncGloSessionPrototype(): void {
   if (action.disabled !== sourceAction.disabled) action.disabled = sourceAction.disabled
 
   action.classList.toggle('isSessionActive', sourceAction.textContent?.includes('em curso') ?? false)
+
+  const dial = card.querySelector<HTMLElement>('.gloSessionDial')
+  const rawProgress = dial?.style.getPropertyValue('--glo-session-progress').trim() ?? ''
+  const progressDegrees = Number.parseFloat(rawProgress)
+  const progressPercent = Number.isFinite(progressDegrees)
+    ? Math.max(0, Math.min(100, progressDegrees / 3.6))
+    : 0
+
+  card.style.setProperty('--glo-session-progress-percent', `${progressPercent}%`)
 }
 
 export function installGloSessionPrototypeEnhancement(): void {
@@ -52,6 +61,6 @@ export function installGloSessionPrototypeEnhancement(): void {
     subtree: true,
     childList: true,
     attributes: true,
-    attributeFilter: ['disabled', 'class'],
+    attributeFilter: ['disabled', 'class', 'style'],
   })
 }
