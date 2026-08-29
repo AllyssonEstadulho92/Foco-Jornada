@@ -133,8 +133,8 @@ function validIso(value: unknown): value is string {
 }
 
 function normalizedPositiveSeconds(value: unknown): number | null {
-  if (!Number.isFinite(value) || Number(value) <= 0) return null
-  return Math.round(Number(value))
+  if (typeof value !== 'number' || !Number.isFinite(value) || value <= 0) return null
+  return Math.round(value)
 }
 
 export function getGloSessionPreset(device: GloDeviceModel, mode: GloHeatingMode): GloSessionPreset {
