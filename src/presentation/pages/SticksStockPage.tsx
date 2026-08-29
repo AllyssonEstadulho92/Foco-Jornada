@@ -1,5 +1,13 @@
 import { useCallback, useEffect, useMemo, useState, type CSSProperties } from 'react'
 import {
+  GLO_DEVICE_OPTIONS,
+  GLO_MODE_OPTIONS,
+  getGloSessionPreset,
+  getGloSessionStatus,
+  type GloDeviceModel,
+  type GloHeatingMode,
+} from '../../application/personalStock/GloSessionTimer'
+import {
   NICOTINE_REFERENCE_PROFILES,
   type NicotineAwarenessSettings,
   type NicotineAwarenessSummary,
@@ -86,6 +94,46 @@ function pacingCountdownLabel(totalSeconds: number): string {
   return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
 }
 
+const GLO_SESSION_TIMER_STORAGE_KEY = 'foco-jornada:glo-session-timer-v1'
+
+interface StoredGloSessionTimer {
+  device: GloDeviceModel
+  mode: GloHeatingMode
+  startedAt: string | null
+}
+
+function loadGloSessionTimer(): StoredGloSessionTimer {
+  const fallback: StoredGloSessionTimer = {
+    device: 'hyper-pro',
+    mode: 'standard',
+    startedAt: null,
+  }
+  if (typeof window === 'undefined') return fallback
+
+  try {
+    const raw = window.localStorage.getItem(GLO_SESSION_TIMER_STORAGE_KEY)
+    if (!raw) return fallback
+    const parsed = JSON.parse(raw) as Partial<StoredGloSessionTimer>
+    const device = parsed.device === 'hyper-pro-plus' ? 'hyper-pro-plus' : 'hyper-pro'
+    const mode = parsed.mode === 'boost' ? 'boost' : 'standard'
+    const startedAt = typeof parsed.startedAt === 'string' && Number.isFinite(Date.parse(parsed.startedAt))
+      ? parsed.startedAt
+      : null
+    return { device, mode, startedAt }
+  } catch {
+    return fallback
+  }
+}
+
+function saveGloSessionTimer(state: StoredGloSessionTimer): void {
+  if (typeof window === 'undefined') return
+  try {
+    window.localStorage.setItem(GLO_SESSION_TIMER_STORAGE_KEY, JSON.stringify(state))
+  } catch {
+    // O temporizador continua funcional mesmo quando o armazenamento local não está disponível.
+  }
+}
+
 function localDecimal(value?: string | null): string {
   return value ? value.replace('.', ',') : '—'
 }
@@ -143,6 +191,10 @@ export function SticksStockPage() {
 
   const pacingNow = useNow(1000)
   const [pacingZeroed, setPacingZeroed] = useState(false)
+  const [initialGloSession] = useState(loadGloSessionTimer)
+  const [gloDeviceModel, setGloDeviceModel] = useState<GloDeviceModel>(initialGloSession.device)
+  const [gloHeatingMode, setGloHeatingMode] = useState<GloHeatingMode>(initialGloSession.mode)
+  const [gloSessionStartedAt, setGloSessionStartedAt] = useState<string | null>(initialGloSession.startedAt)
 
   const reload = useCallback(async () => {
     const [
@@ -196,6 +248,14 @@ export function SticksStockPage() {
   useEffect(() => {
     setPacingZeroed(false)
   }, [usageAnalytics?.lastUseAt])
+
+  useEffect(() => {
+    saveGloSessionTimer({
+      device: gloDeviceModel,
+      mode: gloHeatingMode,
+      startedAt: gloSessionStartedAt,
+    })
+  }, [gloDeviceModel, gloHeatingMode, gloSessionStartedAt])
 
   useEffect(() => {
     if (!packSettingsReady) return
@@ -337,6 +397,28 @@ export function SticksStockPage() {
   const pacingNextTime = displayedPacingStatus.nextTargetAt ? formatTime(displayedPacingStatus.nextTargetAt) : '—'
   const pacingCountdown = pacingCountdownLabel(displayedPacingStatus.remainingSeconds)
 
+  const gloSessionPreset = getGloSessionPreset(gloDeviceModel, gloHeatingMode)
+  const gloSessionStatus = getGloSessionStatus(gloSessionStartedAt, pacingNow, gloSessionPreset)
+  const gloSessionActive = gloSessionStatus.phase === 'heating' || gloSessionStatus.phase === 'session'
+  const gloSessionCountdown = pacingCountdownLabel(gloSessionStatus.phaseRemainingSeconds)
+  const gloWarmupLabel = pacingCountdownLabel(gloSessionPreset.warmupSeconds)
+  const gloUseLabel = pacingCountdownLabel(gloSessionPreset.sessionSeconds)
+  const gloTotalLabel = pacingCountdownLabel(gloSessionPreset.warmupSeconds + gloSessionPreset.sessionSeconds)
+  const gloSessionPhaseLabel = gloSessionStatus.phase === 'heating'
+    ? 'A aquecer'
+    : gloSessionStatus.phase === 'session'
+      ? 'Sessão em curso'
+      : gloSessionStatus.phase === 'completed'
+        ? 'Sessão concluída'
+        : 'Pronto a iniciar'
+  const gloSessionPhaseHint = gloSessionStatus.phase === 'heating'
+    ? `O aparelho deverá ficar pronto às ${formatTime(gloSessionStatus.readyAt)}.`
+    : gloSessionStatus.phase === 'session'
+      ? `Fim previsto às ${formatTime(gloSessionStatus.endsAt)}.`
+      : gloSessionStatus.phase === 'completed'
+        ? `Tempo oficial concluído às ${formatTime(gloSessionStatus.endsAt)}.`
+        : 'Inicia este relógio ao mesmo tempo que inicias o aparelho.'
+
   const packTimelineRows = useMemo(() => {
     if (!packProjection) return []
 
@@ -407,6 +489,19 @@ export function SticksStockPage() {
         ? '1 stick registado. O relógio de espaçamento começou agora.'
         : '1 stick registado. O relógio de espaçamento recomeçou a partir deste registo.',
     )
+  }
+
+  function startGloSessionTimer() {
+    const startedAt = new Date().toISOString()
+    setGloSessionStartedAt(startedAt)
+    setMessage(
+      `${gloSessionPreset.deviceLabel} · ${gloSessionPreset.modeLabel}: temporizador iniciado. O stock e o histórico não foram alterados.`,
+    )
+  }
+
+  function zeroGloSessionTimer() {
+    setGloSessionStartedAt(null)
+    setMessage('Temporizador da sessão glo zerado. O stock e o histórico não foram alterados.')
   }
 
   async function resetSticksControl() {
@@ -618,6 +713,114 @@ export function SticksStockPage() {
               <small id="sticks-pacing-hint" className="sticksPacingHint">
                 O relógio ajuda a criar distância entre registos sem bloquear o histórico real. Se utilizares antes do fim, regista na mesma para manter os dados corretos.
               </small>
+            </div>
+          </section>
+
+          <section
+            className={`sticksDeviceTimerCard is-${gloSessionStatus.phase}`}
+            aria-labelledby="glo-session-timer-title"
+          >
+            <div className="sticksSectionHeading">
+              <div>
+                <span className="stockPanelTag">TEMPORIZADOR DO APARELHO</span>
+                <h2 id="glo-session-timer-title">Sessão glo</h2>
+              </div>
+              <span className="gloSessionStatusBadge">{gloSessionPhaseLabel}</span>
+            </div>
+
+            <p className="gloSessionIntro">
+              Relógio técnico separado da meta de 30 minutos. Usa os tempos publicados pela glo para o aparelho e modo escolhidos.
+            </p>
+
+            <div className="gloSessionTimerLayout">
+              <div
+                className="gloSessionDial"
+                style={{ '--glo-session-progress': `${gloSessionStatus.progressPercent * 3.6}deg` } as CSSProperties}
+                aria-label={`${gloSessionPhaseLabel}: ${gloSessionStatus.phase === 'idle' ? 'não iniciado' : gloSessionCountdown}`}
+              >
+                <span className="gloSessionDialFace">
+                  <strong role="timer">{gloSessionStatus.phase === 'idle' ? '—' : gloSessionCountdown}</strong>
+                  <small>{gloSessionStatus.phase === 'heating' ? 'aquecimento' : gloSessionStatus.phase === 'session' ? 'utilização' : 'sessão'}</small>
+                </span>
+              </div>
+
+              <div className="gloSessionTimerBody">
+                <div className="gloSessionSelectors">
+                  <label>
+                    Aparelho
+                    <select
+                      value={gloDeviceModel}
+                      disabled={gloSessionActive}
+                      onChange={(event) => {
+                        setGloDeviceModel(event.target.value as GloDeviceModel)
+                        setGloSessionStartedAt(null)
+                      }}
+                    >
+                      {GLO_DEVICE_OPTIONS.map((option) => (
+                        <option value={option.value} key={option.value}>{option.label}</option>
+                      ))}
+                    </select>
+                  </label>
+                  <label>
+                    Modo
+                    <select
+                      value={gloHeatingMode}
+                      disabled={gloSessionActive}
+                      onChange={(event) => {
+                        setGloHeatingMode(event.target.value as GloHeatingMode)
+                        setGloSessionStartedAt(null)
+                      }}
+                    >
+                      {GLO_MODE_OPTIONS.map((option) => (
+                        <option value={option.value} key={option.value}>{option.label}</option>
+                      ))}
+                    </select>
+                  </label>
+                </div>
+
+                <div className="gloSessionFacts" aria-label="Tempos configurados da sessão">
+                  <span>Aquecimento <strong>{gloWarmupLabel}</strong></span>
+                  <span>Utilização <strong>{gloUseLabel}</strong></span>
+                  <span>Total <strong>{gloTotalLabel}</strong></span>
+                </div>
+
+                <div className="gloSessionPhaseCopy">
+                  <span>{gloSessionPhaseLabel}</span>
+                  <strong>{gloSessionStatus.phase === 'idle' ? 'Temporizador parado' : gloSessionCountdown}</strong>
+                  <small>{gloSessionPhaseHint}</small>
+                </div>
+
+                <div className="gloSessionActions">
+                  <button
+                    type="button"
+                    className="stockPrimaryAction"
+                    disabled={gloSessionActive}
+                    onClick={startGloSessionTimer}
+                  >
+                    {gloSessionStatus.phase === 'completed' ? 'Iniciar nova sessão' : 'Iniciar sessão'}
+                  </button>
+                  <button
+                    type="button"
+                    className="stockSecondaryAction"
+                    disabled={gloSessionStatus.phase === 'idle'}
+                    onClick={zeroGloSessionTimer}
+                  >
+                    Zerar sessão
+                  </button>
+                </div>
+
+                <small className="gloSessionAccuracyNote">
+                  A contagem é calculada pelo instante absoluto de início, por isso mantém o tempo correto quando o browser abranda ou a aplicação fica em segundo plano. Não existe ligação automática ao aparelho: inicia o relógio ao mesmo tempo que o glo. Este temporizador não regista sticks nem altera o stock.
+                </small>
+                <a
+                  className="gloSessionSource"
+                  href={gloSessionPreset.sourceUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Fonte técnica: glo Portugal
+                </a>
+              </div>
             </div>
           </section>
 
