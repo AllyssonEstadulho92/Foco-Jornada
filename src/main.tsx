@@ -65,6 +65,7 @@ import './styles/stock-integrity-console.css'
 import './styles/medication-protection.css'
 import './styles/medication-prototype-complete.css'
 import './styles/sticks-control-v2.css'
+import './styles/compact-time-displays.css'
 
 const root = document.getElementById('root')
 if (!root) throw new Error('Elemento #root não encontrado.')
