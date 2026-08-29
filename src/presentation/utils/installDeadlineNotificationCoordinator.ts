@@ -4,14 +4,17 @@ import type { JourneyRepository } from '../../application/journey/JourneyReposit
 import type { MedicationDataProtectionService } from '../../application/personalStock/MedicationDataProtectionService'
 import type { MedicationDoseStatusService } from '../../application/personalStock/MedicationDoseStatusService'
 import { parseGloSessionTimerState } from '../../application/personalStock/GloSessionTimer'
-import { resolveLastActiveTakenEvent } from '../../application/personalStock/MedicationNextDoseTimer'
 import type { PersonalStockService } from '../../application/personalStock/PersonalStockService'
-import { resolveZonedLocalDateTime } from '../../application/personalStock/time'
+import { minorToDecimal } from '../../application/personalStock/decimal'
+import { addCalendarDays, dateKeyInZone, resolveZonedLocalDateTime } from '../../application/personalStock/time'
 import type { SettingsRepository } from '../../application/settings/SettingsRepository'
 import { resolveWorkScheduleForDate } from '../../domain/journey/WorkSchedule'
+import type { MedicationDoseEvent } from '../../domain/personalStock/models'
 import {
   deliverDueDeadlines,
+  getDeadlineNotificationPermission,
   nextPendingDeadlineAt,
+  requestDeadlineNotificationPermission,
   type DeadlineNotification,
 } from '../../shared/notifications/deadlineNotifications'
 
@@ -20,6 +23,8 @@ const LEGACY_GLO_SESSION_TIMER_STORAGE_KEY = 'foco-jornada:glo-session-timer-v1'
 const PORTUGAL_TIMEZONE = 'Europe/Lisbon'
 const PROVIDER_REFRESH_MS = 5_000
 const MAX_WAKE_DELAY_MS = 60_000
+const MEDICATION_RECONCILIATION_WINDOW_MS = 48 * 60 * 60 * 1000
+const PERMISSION_CONTROL_ID = 'deadline-mobile-notification-permission'
 
 interface DeadlineCoordinatorServices {
   journeyRepository: JourneyRepository
@@ -33,7 +38,6 @@ interface DeadlineCoordinatorServices {
 
 function focusDeadline(session: {
   id: string
-  mode: string
   segmentType: string
   status: string
   startedAt: string
@@ -98,40 +102,93 @@ function gloDeadline(): DeadlineNotification | null {
   }
 }
 
-async function medicationDeadline(services: DeadlineCoordinatorServices, now: Date): Promise<DeadlineNotification | null> {
+function activeEventByOccurrence(events: MedicationDoseEvent[]): Map<string, MedicationDoseEvent> {
+  const correctedIds = new Set(
+    events
+      .filter((event) => event.status === 'corrected' && event.correctionOf)
+      .map((event) => event.correctionOf as string),
+  )
+  const map = new Map<string, MedicationDoseEvent>()
+  for (const event of events) {
+    if (event.status === 'corrected' || correctedIds.has(event.id)) continue
+    const current = map.get(event.occurrenceKey)
+    if (!current || current.createdAt < event.createdAt || (current.createdAt === event.createdAt && current.id < event.id)) {
+      map.set(event.occurrenceKey, event)
+    }
+  }
+  return map
+}
+
+async function medicationDeadlines(
+  services: DeadlineCoordinatorServices,
+  now: Date,
+): Promise<DeadlineNotification[]> {
   const medications = await services.personalStockService.listMedications()
   const candidates: DeadlineNotification[] = []
+  const nowMs = now.getTime()
 
   await Promise.all(medications.map(async (medication) => {
     try {
       const profile = await services.medicationDataProtectionService.getProfile(medication.medication.id)
       if (profile.status !== 'active') return
-      const [forecast, events] = await Promise.all([
-        services.medicationDoseStatusService.forecastMedication(medication.medication.id, now),
-        services.personalStockService.listDoseEvents(medication.medication.id),
-      ])
-      const lastTaken = resolveLastActiveTakenEvent(events)
-      const deadlineAt = forecast.nextDose.scheduledAt
-      if (!Number.isFinite(Date.parse(deadlineAt))) return
+
+      const events = await services.personalStockService.listDoseEvents(medication.medication.id)
+      const activeEvents = activeEventByOccurrence(events)
+      const today = dateKeyInZone(now, medication.medication.timezone)
+      const dates = [addCalendarDays(today, -1), today, addCalendarDays(today, 1)]
       const name = `${medication.medication.name} ${medication.medication.dosage ?? ''}`.trim()
-      candidates.push({
-        id: `medication:${medication.medication.id}:${deadlineAt}`,
-        deadlineAt,
-        title: 'Hora programada da medicação atingida',
-        detail: `${name}: chegou o horário registado (${forecast.nextDose.quantity} ${medication.medication.unit}). Confirma a toma na aplicação. Este aviso não cria nem altera a prescrição.${lastTaken ? '' : ' Não existe confirmação anterior registada.'}`,
-        tone: 'info',
-        tag: `medication-${medication.medication.id}`,
-      })
+
+      for (const onDate of dates) {
+        const schedules = await services.personalStockService.schedulesForDate(medication.medication.id, onDate)
+        for (const schedule of schedules) {
+          const occurrenceKey = `${schedule.id}:${onDate}`
+          const event = activeEvents.get(occurrenceKey)
+          if (event?.status === 'taken' || event?.status === 'not_taken') continue
+
+          let deadlineAt: string
+          let quantityMinor = schedule.quantityMinor
+          if (event?.status === 'postponed') {
+            if (!event.postponedTo) continue
+            deadlineAt = event.postponedTo
+            quantityMinor = event.quantityMinor
+          } else {
+            deadlineAt = resolveZonedLocalDateTime(
+              onDate,
+              schedule.localTime,
+              medication.medication.timezone,
+              schedule.fold,
+            ).toISOString()
+          }
+
+          const deadlineMs = Date.parse(deadlineAt)
+          if (!Number.isFinite(deadlineMs)) continue
+          if (deadlineMs < nowMs - MEDICATION_RECONCILIATION_WINDOW_MS) continue
+          if (deadlineMs > nowMs + MEDICATION_RECONCILIATION_WINDOW_MS) continue
+
+          candidates.push({
+            id: `medication:${medication.medication.id}:${occurrenceKey}:${deadlineAt}`,
+            deadlineAt,
+            title: 'Hora programada da medicação atingida',
+            detail: `${name}: chegou o horário registado (${minorToDecimal(quantityMinor)} ${medication.medication.unit}). Confirma o estado da toma na aplicação. Este aviso não cria nem altera a prescrição.`,
+            tone: 'info',
+            tag: `medication-${medication.medication.id}-${occurrenceKey}`,
+          })
+        }
+      }
     } catch {
-      // Sem dados suficientes ou com adiamento por confirmar: não é criada uma hora por suposição.
+      // Sem dados suficientes: não é criada uma hora alternativa por suposição.
     }
   }))
 
-  candidates.sort((left, right) => Date.parse(left.deadlineAt) - Date.parse(right.deadlineAt))
-  return candidates[0] ?? null
+  return candidates
+    .sort((left, right) => Date.parse(left.deadlineAt) - Date.parse(right.deadlineAt))
+    .slice(0, 24)
 }
 
-async function workScheduleDeadline(services: DeadlineCoordinatorServices, now: Date): Promise<DeadlineNotification | null> {
+async function workScheduleDeadline(
+  services: DeadlineCoordinatorServices,
+  now: Date,
+): Promise<DeadlineNotification | null> {
   const activeJourney = await services.journeyRepository.getActive()
   if (!activeJourney) return null
   const settings = await services.settingsRepository.get()
@@ -153,7 +210,10 @@ async function workScheduleDeadline(services: DeadlineCoordinatorServices, now: 
   }
 }
 
-async function collectDeadlines(services: DeadlineCoordinatorServices, now = new Date()): Promise<DeadlineNotification[]> {
+async function collectDeadlines(
+  services: DeadlineCoordinatorServices,
+  now = new Date(),
+): Promise<DeadlineNotification[]> {
   const deadlines: DeadlineNotification[] = []
   const activeJourney = await services.journeyRepository.getActive()
 
@@ -169,10 +229,10 @@ async function collectDeadlines(services: DeadlineCoordinatorServices, now = new
   }
 
   const [medication, schedule] = await Promise.all([
-    medicationDeadline(services, now),
+    medicationDeadlines(services, now),
     workScheduleDeadline(services, now),
   ])
-  if (medication) deadlines.push(medication)
+  deadlines.push(...medication)
   if (schedule) deadlines.push(schedule)
 
   const glo = gloDeadline()
@@ -181,10 +241,82 @@ async function collectDeadlines(services: DeadlineCoordinatorServices, now = new
   return deadlines
 }
 
+function renderPermissionControl(): void {
+  const panel = document.querySelector<HTMLElement>('.notificationPanel')
+  if (!panel) return
+
+  let control = document.getElementById(PERMISSION_CONTROL_ID)
+  if (!control) {
+    control = document.createElement('section')
+    control.id = PERMISSION_CONTROL_ID
+    control.setAttribute('aria-label', 'Notificações do telemóvel')
+    control.style.cssText = [
+      'margin:10px',
+      'padding:11px 12px',
+      'border:1px solid var(--line)',
+      'border-radius:12px',
+      'background:var(--surface-2)',
+      'display:grid',
+      'gap:8px',
+    ].join(';')
+    const footer = panel.querySelector('.notificationPanelFooter')
+    if (footer) footer.insertAdjacentElement('beforebegin', control)
+    else panel.appendChild(control)
+  }
+
+  const permission = getDeadlineNotificationPermission()
+  const title = permission === 'granted'
+    ? 'Notificações do telemóvel ativas'
+    : permission === 'denied'
+      ? 'Notificações bloqueadas no browser'
+      : permission === 'unsupported'
+        ? 'Notificações do sistema indisponíveis'
+        : 'Ativar notificações do telemóvel'
+  const detail = permission === 'granted'
+    ? 'Quando um deadline terminar e o browser permitir execução, o aviso também é enviado pelo sistema.'
+    : permission === 'denied'
+      ? 'Ativa a permissão nas definições do browser ou da aplicação instalada.'
+      : permission === 'unsupported'
+        ? 'Os avisos continuam guardados no centro de notificações da aplicação.'
+        : 'Autoriza uma vez para receber no sistema os avisos de medicação, Pomodoro, pausas, sessão glo e horário de trabalho.'
+
+  control.innerHTML = ''
+  const strong = document.createElement('strong')
+  strong.textContent = title
+  strong.style.cssText = 'font-size:12px;color:var(--text)'
+  const small = document.createElement('small')
+  small.textContent = detail
+  small.style.cssText = 'font-size:10px;line-height:1.45;color:var(--muted)'
+  control.append(strong, small)
+
+  if (permission === 'default') {
+    const button = document.createElement('button')
+    button.type = 'button'
+    button.textContent = 'Ativar notificações'
+    button.style.cssText = [
+      'min-height:38px',
+      'border:1px solid color-mix(in srgb,var(--primary) 28%,var(--line))',
+      'border-radius:10px',
+      'background:var(--primary-soft)',
+      'color:var(--primary)',
+      'font:inherit',
+      'font-size:11px',
+      'font-weight:800',
+      'cursor:pointer',
+    ].join(';')
+    button.addEventListener('click', () => {
+      button.disabled = true
+      void requestDeadlineNotificationPermission().finally(() => renderPermissionControl())
+    })
+    control.appendChild(button)
+  }
+}
+
 export function installDeadlineNotificationCoordinator(services: DeadlineCoordinatorServices): void {
   let deadlines: DeadlineNotification[] = []
   let refreshTimer: number | null = null
   let wakeTimer: number | null = null
+  let permissionTimer: number | null = null
   let refreshing = false
   let stopped = false
 
@@ -226,7 +358,9 @@ export function installDeadlineNotificationCoordinator(services: DeadlineCoordin
   }
 
   void refresh()
+  renderPermissionControl()
   refreshTimer = window.setInterval(syncNow, PROVIDER_REFRESH_MS)
+  permissionTimer = window.setInterval(renderPermissionControl, 1_000)
   document.addEventListener('visibilitychange', handleVisibility)
   window.addEventListener('focus', syncNow)
   window.addEventListener('pageshow', syncNow)
@@ -237,6 +371,7 @@ export function installDeadlineNotificationCoordinator(services: DeadlineCoordin
     stopped = true
     if (refreshTimer !== null) window.clearInterval(refreshTimer)
     if (wakeTimer !== null) window.clearTimeout(wakeTimer)
+    if (permissionTimer !== null) window.clearInterval(permissionTimer)
     document.removeEventListener('visibilitychange', handleVisibility)
     window.removeEventListener('focus', syncNow)
     window.removeEventListener('pageshow', syncNow)
