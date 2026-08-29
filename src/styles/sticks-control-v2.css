@@ -1285,103 +1285,183 @@
 
 
 /* Relógio de espaçamento entre sticks.
- * Ajuda a criar distância entre utilizações sem bloquear o ledger real.
+ * Mantém o comportamento original, mas ganha uma leitura visual mais clara,
+ * com o temporizador tratado como um cartão próprio dentro do registo.
  */
 .sticksLinearPage .sticksPacingClock{
+  position:relative;
   display:grid;
   min-width:0;
-  grid-template-columns:104px minmax(0,1fr);
+  grid-template-columns:150px minmax(0,1fr);
   align-items:center;
-  gap:var(--space-3);
-  margin-top:var(--space-3);
-  padding:var(--space-3);
-  border:1px solid var(--line);
-  border-radius:var(--radius-md);
-  background:var(--surface-2);
+  gap:28px;
+  margin-top:var(--space-4);
+  padding:28px;
+  overflow:hidden;
+  border:1px solid color-mix(in srgb,var(--primary) 24%,var(--line));
+  border-radius:28px;
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb,var(--primary-soft) 58%,var(--surface)) 0%,
+      color-mix(in srgb,var(--primary-soft) 26%,var(--surface)) 48%,
+      var(--surface) 100%
+    );
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb,#fff 70%,transparent),
+    0 14px 36px color-mix(in srgb,var(--primary) 8%,transparent);
+}
+.sticksLinearPage .sticksPacingClock::after{
+  content:"";
+  position:absolute;
+  top:-96px;
+  right:-76px;
+  width:230px;
+  height:230px;
+  border-radius:999px;
+  background:radial-gradient(
+    circle,
+    color-mix(in srgb,var(--primary) 12%,transparent) 0%,
+    transparent 68%
+  );
+  pointer-events:none;
 }
 .sticksLinearPage .sticksPacingClock.isWaiting{
-  border-color:color-mix(in srgb,var(--primary) 32%,var(--line));
-  background:color-mix(in srgb,var(--primary-soft) 30%,var(--surface));
+  border-color:color-mix(in srgb,var(--primary) 34%,var(--line));
 }
 .sticksLinearPage .sticksPacingClock.isReady{
-  border-color:color-mix(in srgb,var(--success) 30%,var(--line));
+  border-color:color-mix(in srgb,var(--primary) 30%,var(--line));
 }
 .sticksLinearPage .sticksPacingDial{
   --pacing-progress:0deg;
+  position:relative;
+  z-index:1;
   display:grid;
-  width:92px;
-  height:92px;
+  width:132px;
+  height:132px;
   place-items:center;
   border-radius:999px;
   background:
     conic-gradient(
       var(--primary) 0deg var(--pacing-progress),
-      var(--surface-3) var(--pacing-progress) 360deg
+      color-mix(in srgb,var(--primary) 11%,var(--surface-3)) var(--pacing-progress) 360deg
     );
-  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--line) 75%,transparent);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb,var(--primary) 12%,transparent),
+    0 10px 24px color-mix(in srgb,var(--primary) 14%,transparent);
 }
 .sticksLinearPage .sticksPacingClock.isReady .sticksPacingDial{
-  background:conic-gradient(var(--success) 0deg 360deg);
+  background:conic-gradient(var(--primary) 0deg 360deg);
 }
 .sticksLinearPage .sticksPacingDialFace{
   display:grid;
-  width:72px;
-  height:72px;
+  width:104px;
+  height:104px;
+  box-sizing:border-box;
   place-items:center;
   align-content:center;
-  gap:2px;
-  border:1px solid var(--line);
+  gap:5px;
+  border:1px solid color-mix(in srgb,var(--primary) 14%,var(--line));
   border-radius:999px;
   background:var(--surface);
   color:var(--text);
   text-align:center;
+  box-shadow:0 4px 14px color-mix(in srgb,var(--primary) 8%,transparent);
 }
 .sticksLinearPage .sticksPacingDialFace strong{
-  font-size:var(--text-base);
+  color:var(--primary);
+  font-size:var(--text-xl);
   font-weight:var(--weight-heavy);
   line-height:1;
   font-variant-numeric:tabular-nums;
-  letter-spacing:-.02em;
+  letter-spacing:-.03em;
 }
 .sticksLinearPage .sticksPacingClock.isReady .sticksPacingDialFace strong{
-  color:var(--success);
-  font-size:var(--text-xl);
+  font-size:0;
+}
+.sticksLinearPage .sticksPacingClock.isReady .sticksPacingDialFace strong::before{
+  content:"⚡";
+  display:block;
+  color:var(--primary);
+  font-size:29px;
+  line-height:1;
 }
 .sticksLinearPage .sticksPacingDialFace small{
+  color:var(--text);
+  font-size:12px;
+  font-weight:var(--weight-heavy);
+  line-height:1.1;
+}
+.sticksLinearPage .sticksPacingClock.isReady .sticksPacingDialFace small::after{
+  content:"intervalo";
+  display:block;
+  margin-top:4px;
   color:var(--muted);
   font-size:10px;
   font-weight:var(--weight-bold);
-  line-height:1;
+  letter-spacing:.02em;
 }
 .sticksLinearPage .sticksPacingCopy{
+  position:relative;
+  z-index:1;
   display:grid;
   min-width:0;
-  gap:4px;
+  align-content:center;
+  justify-items:start;
+  gap:8px;
 }
 .sticksLinearPage .sticksPacingCopy>span{
+  display:inline-flex;
+  width:max-content;
+  max-width:100%;
+  align-items:center;
+  gap:8px;
+  padding:8px 12px;
+  border:1px solid color-mix(in srgb,var(--primary) 10%,transparent);
+  border-radius:999px;
+  background:color-mix(in srgb,var(--primary-soft) 72%,var(--surface));
   color:var(--primary);
-  font-size:10px;
+  font-size:11px;
   font-weight:var(--weight-heavy);
-  line-height:var(--line-height-normal);
-  letter-spacing:.075em;
+  line-height:1;
+  letter-spacing:.11em;
+}
+.sticksLinearPage .sticksPacingCopy>span::before{
+  content:"✓";
+  display:grid;
+  width:22px;
+  height:22px;
+  flex:0 0 22px;
+  place-items:center;
+  border-radius:8px;
+  background:var(--primary);
+  color:#fff;
+  font-size:13px;
+  font-weight:900;
+  box-shadow:0 5px 12px color-mix(in srgb,var(--primary) 22%,transparent);
 }
 .sticksLinearPage .sticksPacingCopy>strong{
   color:var(--text);
-  font-size:var(--text-base);
-  font-weight:var(--weight-bold);
-  line-height:var(--line-height-tight);
+  font-size:clamp(21px,2.2vw,30px);
+  font-weight:var(--weight-heavy);
+  line-height:1.08;
+  letter-spacing:-.025em;
   overflow-wrap:anywhere;
 }
 .sticksLinearPage .sticksPacingCopy>small,
 .sticksLinearPage .sticksPacingHint{
   color:var(--muted);
-  font-size:var(--text-xs);
-  line-height:var(--line-height-normal);
+  font-size:var(--text-sm);
+  line-height:1.55;
   overflow-wrap:anywhere;
+}
+.sticksLinearPage .sticksPacingCopy>small{
+  max-width:760px;
 }
 .sticksLinearPage .sticksPacingHint{
   display:block;
   padding:var(--space-2) 2px 0;
+  font-size:var(--text-xs);
 }
 .sticksLinearPage .sticksRegisterPrimary{
   transition:
@@ -1391,102 +1471,160 @@
     opacity .15s ease;
 }
 
-[data-theme="dark"] .sticksLinearPage .sticksPacingClock{
-  border-color:var(--line);
-  background:var(--surface-2);
+/* Controlo único do temporizador comportamental. */
+.sticksLinearPage .sticksPacingZeroButton{
+  position:relative;
+  width:min(100%,560px);
+  min-height:54px;
+  margin-top:8px;
+  padding:12px 48px;
+  border:1px solid color-mix(in srgb,var(--primary) 22%,var(--line));
+  border-radius:16px;
+  background:color-mix(in srgb,var(--surface) 90%,var(--primary-soft));
+  color:var(--primary);
+  font:inherit;
+  font-size:var(--text-base);
+  font-weight:var(--weight-heavy);
+  line-height:var(--line-height-control);
+  text-align:left;
+  cursor:pointer;
+  box-shadow:0 6px 18px color-mix(in srgb,var(--primary) 7%,transparent);
+  transition:
+    transform .12s ease,
+    border-color .15s ease,
+    background .15s ease,
+    box-shadow .15s ease;
 }
-[data-theme="dark"] .sticksLinearPage .sticksPacingClock.isWaiting{
-  border-color:color-mix(in srgb,var(--primary) 36%,var(--line));
-  background:color-mix(in srgb,var(--primary-soft) 24%,var(--surface));
+.sticksLinearPage .sticksPacingZeroButton::before{
+  content:"◷";
+  position:absolute;
+  left:17px;
+  top:50%;
+  transform:translateY(-50%);
+  color:var(--primary);
+  font-size:24px;
+  font-weight:var(--weight-bold);
+  line-height:1;
+}
+.sticksLinearPage .sticksPacingZeroButton::after{
+  content:"›";
+  position:absolute;
+  right:18px;
+  top:50%;
+  transform:translateY(-52%);
+  color:var(--primary);
+  font-size:31px;
+  font-weight:400;
+  line-height:1;
+}
+.sticksLinearPage .sticksPacingZeroButton:hover:not(:disabled),
+.sticksLinearPage .sticksPacingZeroButton:focus-visible:not(:disabled){
+  transform:translateY(-1px);
+  border-color:color-mix(in srgb,var(--primary) 52%,var(--line));
+  background:color-mix(in srgb,var(--primary-soft) 52%,var(--surface));
+  box-shadow:0 10px 24px color-mix(in srgb,var(--primary) 12%,transparent);
+}
+.sticksLinearPage .sticksPacingZeroButton:focus-visible{
+  outline:2px solid var(--primary);
+  outline-offset:3px;
+}
+.sticksLinearPage .sticksPacingZeroButton:disabled{
+  opacity:.52;
+  cursor:not-allowed;
+  box-shadow:none;
+}
+
+[data-theme="dark"] .sticksLinearPage .sticksPacingClock{
+  border-color:color-mix(in srgb,var(--primary) 34%,var(--line));
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb,var(--primary-soft) 22%,var(--surface)) 0%,
+      var(--surface-2) 100%
+    );
+  box-shadow:0 14px 34px rgba(0,0,0,.18);
 }
 [data-theme="dark"] .sticksLinearPage .sticksPacingDialFace{
-  border-color:var(--line);
+  border-color:color-mix(in srgb,var(--primary) 20%,var(--line));
+  background:var(--surface);
+}
+[data-theme="dark"] .sticksLinearPage .sticksPacingCopy>span{
+  border-color:color-mix(in srgb,var(--primary) 18%,var(--line));
+  background:color-mix(in srgb,var(--primary-soft) 30%,var(--surface));
+}
+[data-theme="dark"] .sticksLinearPage .sticksPacingZeroButton{
+  border-color:color-mix(in srgb,var(--primary) 26%,var(--line));
   background:var(--surface);
 }
 
 @media(max-width:700px){
   .sticksLinearPage .sticksPacingClock{
-    grid-template-columns:88px minmax(0,1fr);
-    gap:var(--space-2);
-    padding:var(--space-3);
+    grid-template-columns:110px minmax(0,1fr);
+    gap:20px;
+    padding:20px;
+    border-radius:24px;
   }
   .sticksLinearPage .sticksPacingDial{
-    width:80px;
-    height:80px;
+    width:100px;
+    height:100px;
   }
   .sticksLinearPage .sticksPacingDialFace{
-    width:62px;
-    height:62px;
+    width:78px;
+    height:78px;
+    gap:3px;
   }
   .sticksLinearPage .sticksPacingDialFace strong{
-    font-size:var(--text-sm);
+    font-size:var(--text-base);
+  }
+  .sticksLinearPage .sticksPacingClock.isReady .sticksPacingDialFace strong::before{
+    font-size:23px;
+  }
+  .sticksLinearPage .sticksPacingCopy>strong{
+    font-size:clamp(20px,4vw,25px);
   }
 }
-@media(max-width:420px){
+@media(max-width:520px){
   .sticksLinearPage .sticksPacingClock{
     grid-template-columns:minmax(0,1fr);
     justify-items:center;
+    gap:18px;
+    padding:20px 16px;
     text-align:center;
   }
   .sticksLinearPage .sticksPacingCopy{
+    width:100%;
     justify-items:center;
   }
-  .sticksLinearPage .sticksPacingDial{
-    width:88px;
-    height:88px;
+  .sticksLinearPage .sticksPacingCopy>small{
+    max-width:34rem;
   }
-  .sticksLinearPage .sticksPacingDialFace{
-    width:68px;
-    height:68px;
-  }
-}
-@media(prefers-reduced-motion:reduce){
-  .sticksLinearPage .sticksRegisterPrimary{
-    transition:none;
-  }
-}
-
-/* Controlo único do temporizador comportamental. */
-.sticksLinearPage .sticksPacingZeroButton{
-  width:max-content;
-  min-width:160px;
-  min-height:var(--control-height-compact);
-  margin-top:var(--space-2);
-  padding:9px 14px;
-  border:1px solid color-mix(in srgb,var(--primary) 34%,var(--line));
-  border-radius:var(--control-radius);
-  background:var(--surface);
-  color:var(--primary);
-  font:inherit;
-  font-size:var(--text-sm);
-  font-weight:var(--weight-bold);
-  line-height:var(--line-height-control);
-  cursor:pointer;
-}
-.sticksLinearPage .sticksPacingZeroButton:hover:not(:disabled),
-.sticksLinearPage .sticksPacingZeroButton:focus-visible:not(:disabled){
-  border-color:var(--primary);
-  background:color-mix(in srgb,var(--primary-soft) 52%,var(--surface));
-}
-.sticksLinearPage .sticksPacingZeroButton:focus-visible{
-  outline:2px solid var(--primary);
-  outline-offset:2px;
-}
-.sticksLinearPage .sticksPacingZeroButton:disabled{
-  opacity:.5;
-  cursor:not-allowed;
-}
-[data-theme="dark"] .sticksLinearPage .sticksPacingZeroButton{
-  border-color:var(--line);
-  background:var(--surface);
-}
-@media(max-width:420px){
   .sticksLinearPage .sticksPacingZeroButton{
     width:100%;
     min-width:0;
   }
 }
-
+@media(max-width:420px){
+  .sticksLinearPage .sticksPacingClock{
+    border-radius:20px;
+  }
+  .sticksLinearPage .sticksPacingCopy>span{
+    padding:7px 10px;
+    font-size:10px;
+    letter-spacing:.08em;
+  }
+  .sticksLinearPage .sticksPacingCopy>strong{
+    font-size:20px;
+  }
+  .sticksLinearPage .sticksPacingCopy>small{
+    font-size:var(--text-xs);
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .sticksLinearPage .sticksRegisterPrimary,
+  .sticksLinearPage .sticksPacingZeroButton{
+    transition:none;
+  }
+}
 
 /* Temporizador técnico da sessão do aparelho glo.
  * É independente do relógio comportamental de 30 minutos e do ledger.
