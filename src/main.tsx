@@ -68,8 +68,8 @@ import './styles/medication-prototype-complete.css'
 import './styles/sticks-control-v2.css'
 import './styles/glo-session-prototype.css'
 import './styles/glo-session-digital-counter.css'
-import './styles/sticks-pacing-reference.css'
 import './styles/compact-time-displays.css'
+import './styles/sticks-pacing-reference.css'
 
 const root = document.getElementById('root')
 if (!root) throw new Error('Elemento #root não encontrado.')
