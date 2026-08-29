@@ -1792,3 +1792,167 @@
     font-size:var(--text-sm);
   }
 }
+
+
+/* Sessão glo v2: uma única origem temporal, sem horários simulados antes do registo. */
+.sticksLinearPage .gloSessionDurationGrid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:var(--space-2);
+}
+.sticksLinearPage .gloSessionDurationGrid article{
+  display:grid;
+  gap:4px;
+  padding:10px 11px;
+  border:1px solid var(--line);
+  border-radius:var(--control-radius);
+  background:var(--surface-2);
+}
+.sticksLinearPage .gloSessionDurationGrid span{
+  color:var(--muted);
+  font-size:var(--text-xs);
+  font-weight:var(--weight-bold);
+  text-transform:uppercase;
+  letter-spacing:.04em;
+}
+.sticksLinearPage .gloSessionDurationGrid strong{
+  font-size:var(--text-lg);
+  font-variant-numeric:tabular-nums;
+}
+.sticksLinearPage .gloSessionDurationGrid small{
+  color:var(--muted);
+  font-size:var(--text-xs);
+  line-height:1.35;
+}
+
+.sticksLinearPage .gloSessionFixedTimeline{
+  display:grid;
+  border:1px solid var(--line);
+  border-radius:var(--control-radius);
+  overflow:hidden;
+}
+.sticksLinearPage .gloSessionFixedTimeline article{
+  display:grid;
+  grid-template-columns:minmax(120px,.9fr) minmax(210px,1.35fr) auto;
+  gap:10px;
+  align-items:center;
+  padding:9px 10px;
+  background:var(--surface-2);
+  border-top:1px solid var(--line);
+}
+.sticksLinearPage .gloSessionFixedTimeline article:first-child{
+  border-top:0;
+}
+.sticksLinearPage .gloSessionFixedTimeline article>div{
+  display:grid;
+  gap:2px;
+}
+.sticksLinearPage .gloSessionFixedTimeline article>div>span{
+  font-size:var(--text-xs);
+  font-weight:var(--weight-bold);
+}
+.sticksLinearPage .gloSessionFixedTimeline article>div>small{
+  color:var(--muted);
+  font-size:10px;
+}
+.sticksLinearPage .gloSessionFixedTimeline article>strong{
+  text-align:right;
+  font-size:var(--text-sm);
+  font-variant-numeric:tabular-nums;
+  white-space:nowrap;
+}
+.sticksLinearPage .gloSessionFixedTimeline article>em{
+  justify-self:end;
+  min-width:82px;
+  padding:4px 7px;
+  border-radius:999px;
+  background:var(--surface-3);
+  color:var(--muted);
+  font-size:9px;
+  font-style:normal;
+  font-weight:var(--weight-heavy);
+  letter-spacing:.04em;
+  text-align:center;
+}
+.sticksLinearPage .gloSessionFixedTimeline article>em.isExact{
+  background:color-mix(in srgb,var(--success) 14%,var(--surface));
+  color:var(--success);
+}
+
+.sticksLinearPage .gloSessionIdleState{
+  display:grid;
+  gap:4px;
+  padding:10px 12px;
+  border:1px dashed var(--line);
+  border-radius:var(--control-radius);
+  background:var(--surface-2);
+}
+.sticksLinearPage .gloSessionIdleState span{
+  color:var(--muted);
+  font-size:var(--text-xs);
+  line-height:1.4;
+}
+.sticksLinearPage .gloSessionActions.isSingleAction{
+  grid-template-columns:minmax(0,1fr);
+}
+.sticksLinearPage .gloSessionSourceBlock{
+  display:grid;
+  gap:3px;
+  padding-top:2px;
+}
+.sticksLinearPage .gloSessionSourceBlock>span,
+.sticksLinearPage .gloSessionSourceBlock>small{
+  color:var(--muted);
+  font-size:10px;
+  line-height:1.35;
+}
+.sticksLinearPage .gloSessionSourceBlock .gloSessionSource{
+  margin-top:2px;
+}
+[data-theme="dark"] .sticksLinearPage .gloSessionDurationGrid article,
+[data-theme="dark"] .sticksLinearPage .gloSessionFixedTimeline article,
+[data-theme="dark"] .sticksLinearPage .gloSessionIdleState{
+  border-color:var(--line);
+  background:var(--surface-2);
+}
+
+@media(max-width:700px){
+  .sticksLinearPage .gloSessionDurationGrid{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+  }
+  .sticksLinearPage .gloSessionFixedTimeline article{
+    grid-template-columns:minmax(95px,.8fr) minmax(0,1.2fr);
+  }
+  .sticksLinearPage .gloSessionFixedTimeline article>strong{
+    white-space:normal;
+  }
+  .sticksLinearPage .gloSessionFixedTimeline article>em{
+    grid-column:2;
+    justify-self:end;
+  }
+}
+@media(max-width:520px){
+  .sticksLinearPage .gloSessionDurationGrid{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+  }
+  .sticksLinearPage .gloSessionDurationGrid article{
+    padding:8px;
+  }
+  .sticksLinearPage .gloSessionDurationGrid strong{
+    font-size:var(--text-base);
+  }
+  .sticksLinearPage .gloSessionDurationGrid small{
+    display:none;
+  }
+  .sticksLinearPage .gloSessionFixedTimeline article{
+    grid-template-columns:minmax(88px,.7fr) minmax(0,1.3fr);
+    gap:7px;
+    padding:8px;
+  }
+  .sticksLinearPage .gloSessionFixedTimeline article>div>small{
+    display:none;
+  }
+  .sticksLinearPage .gloSessionFixedTimeline article>strong{
+    font-size:11px;
+  }
+}

@@ -222,15 +222,21 @@ export class PersonalStockService {
     return { duplicated, summary: await this.getSticksSummary() }
   }
 
-  async consumeStick(operationId: string): Promise<{ duplicated: boolean; summary: StickSummary }> {
+  async consumeStick(
+    operationId: string,
+    effectiveAt = new Date(),
+  ): Promise<{ duplicated: boolean; summary: StickSummary; movement: StockMovement }> {
     let duplicated = false
+    let movement: StockMovement | null = null
     await this.db.transaction('rw', this.db.stockEntities, this.db.stockMovements, async () => {
       const entity = await this.db.stockEntities.get(STICKS_ENTITY_ID)
       if (!entity) throw new Error('Define primeiro o stock inicial de sticks.')
-      const result = await this.appendMovement(entity, operationId, 'consumption', -1n)
+      const result = await this.appendMovement(entity, operationId, 'consumption', -1n, { effectiveAt })
       duplicated = result.duplicated
+      movement = result.movement
     })
-    return { duplicated, summary: await this.getSticksSummary() }
+    if (!movement) throw new Error('INCONSISTÊNCIA: utilização registada sem movimento de stock.')
+    return { duplicated, summary: await this.getSticksSummary(), movement }
   }
 
   async undoLastStick(operationId: string): Promise<{ duplicated: boolean; summary: StickSummary }> {
