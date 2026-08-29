@@ -1726,3 +1726,69 @@
     transition:none;
   }
 }
+
+
+/* Linha horária do temporizador glo: duração + relógio real. */
+.sticksLinearPage .gloSessionTimelineHeading{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:var(--space-2);
+}
+.sticksLinearPage .gloSessionTimelineHeading>span{
+  color:var(--text);
+  font-size:var(--text-sm);
+  font-weight:var(--weight-bold);
+}
+.sticksLinearPage .gloSessionTimelineHeading>small{
+  color:var(--muted);
+  font-size:var(--text-xs);
+  text-align:right;
+}
+.sticksLinearPage .gloSessionFacts article{
+  display:grid;
+  gap:5px;
+  padding:11px 12px;
+  border:1px solid var(--line);
+  border-radius:var(--control-radius);
+  background:var(--surface-2);
+  min-width:0;
+}
+.sticksLinearPage .gloSessionFacts article>span{
+  display:block;
+  padding:0;
+  border:0;
+  border-radius:0;
+  background:transparent;
+  color:var(--muted);
+  font-size:var(--text-xs);
+}
+.sticksLinearPage .gloSessionFacts article>strong{
+  color:var(--text);
+  font-size:var(--text-base);
+  font-weight:var(--weight-heavy);
+  line-height:1.2;
+  font-variant-numeric:tabular-nums;
+  white-space:nowrap;
+}
+.sticksLinearPage .gloSessionFacts article>small{
+  color:var(--muted);
+  font-size:var(--text-xs);
+  line-height:var(--line-height-normal);
+}
+[data-theme="dark"] .sticksLinearPage .gloSessionFacts article{
+  border-color:var(--line);
+  background:var(--surface-2);
+}
+@media(max-width:700px){
+  .sticksLinearPage .gloSessionTimelineHeading{
+    display:grid;
+    grid-template-columns:minmax(0,1fr);
+  }
+  .sticksLinearPage .gloSessionTimelineHeading>small{
+    text-align:left;
+  }
+  .sticksLinearPage .gloSessionFacts article>strong{
+    font-size:var(--text-sm);
+  }
+}
