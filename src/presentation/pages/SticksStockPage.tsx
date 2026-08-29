@@ -2,10 +2,16 @@ import { useCallback, useEffect, useMemo, useState, type CSSProperties } from 'r
 import {
   GLO_DEVICE_OPTIONS,
   GLO_MODE_OPTIONS,
+  createGloSessionSnapshot,
+  defaultGloSessionTimerState,
   getGloSessionPreset,
   getGloSessionStatus,
+  parseGloSessionTimerState,
+  serializeGloSessionTimerState,
   type GloDeviceModel,
   type GloHeatingMode,
+  type GloSessionSnapshot,
+  type GloSessionTimerState,
 } from '../../application/personalStock/GloSessionTimer'
 import {
   NICOTINE_REFERENCE_PROFILES,
@@ -56,11 +62,14 @@ function formatTime(value?: string | null): string {
   }).format(new Date(value))
 }
 
-function formatClockTime(value?: string | Date | null): string {
+function formatDateTimeSeconds(value?: string | Date | null): string {
   if (!value) return '—'
   const date = value instanceof Date ? value : new Date(value)
   if (Number.isNaN(date.getTime())) return '—'
   return new Intl.DateTimeFormat('pt-PT', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
     second: '2-digit',
@@ -107,43 +116,30 @@ function pacingCountdownLabel(totalSeconds: number): string {
   return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
 }
 
-const GLO_SESSION_TIMER_STORAGE_KEY = 'foco-jornada:glo-session-timer-v1'
+const GLO_SESSION_TIMER_STORAGE_KEY = 'foco-jornada:glo-session-timer-v2'
+const LEGACY_GLO_SESSION_TIMER_STORAGE_KEY = 'foco-jornada:glo-session-timer-v1'
 
-interface StoredGloSessionTimer {
-  device: GloDeviceModel
-  mode: GloHeatingMode
-  startedAt: string | null
-}
-
-function loadGloSessionTimer(): StoredGloSessionTimer {
-  const fallback: StoredGloSessionTimer = {
-    device: 'hyper-pro',
-    mode: 'standard',
-    startedAt: null,
-  }
-  if (typeof window === 'undefined') return fallback
+function loadGloSessionTimer(): GloSessionTimerState {
+  if (typeof window === 'undefined') return defaultGloSessionTimerState()
 
   try {
-    const raw = window.localStorage.getItem(GLO_SESSION_TIMER_STORAGE_KEY)
-    if (!raw) return fallback
-    const parsed = JSON.parse(raw) as Partial<StoredGloSessionTimer>
-    const device = parsed.device === 'hyper-pro-plus' ? 'hyper-pro-plus' : 'hyper-pro'
-    const mode = parsed.mode === 'boost' ? 'boost' : 'standard'
-    const startedAt = typeof parsed.startedAt === 'string' && Number.isFinite(Date.parse(parsed.startedAt))
-      ? parsed.startedAt
-      : null
-    return { device, mode, startedAt }
+    const current = window.localStorage.getItem(GLO_SESSION_TIMER_STORAGE_KEY)
+    if (current) return parseGloSessionTimerState(current)
+
+    const legacy = window.localStorage.getItem(LEGACY_GLO_SESSION_TIMER_STORAGE_KEY)
+    return parseGloSessionTimerState(legacy)
   } catch {
-    return fallback
+    return defaultGloSessionTimerState()
   }
 }
 
-function saveGloSessionTimer(state: StoredGloSessionTimer): void {
+function saveGloSessionTimer(state: GloSessionTimerState): void {
   if (typeof window === 'undefined') return
   try {
-    window.localStorage.setItem(GLO_SESSION_TIMER_STORAGE_KEY, JSON.stringify(state))
+    window.localStorage.setItem(GLO_SESSION_TIMER_STORAGE_KEY, serializeGloSessionTimerState(state))
+    window.localStorage.removeItem(LEGACY_GLO_SESSION_TIMER_STORAGE_KEY)
   } catch {
-    // O temporizador continua funcional mesmo quando o armazenamento local não está disponível.
+    // O relógio continua funcional durante esta abertura mesmo se o armazenamento local falhar.
   }
 }
 
