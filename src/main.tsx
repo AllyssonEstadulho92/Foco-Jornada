@@ -17,6 +17,7 @@ import { DexieFocusRepository } from './infrastructure/repositories/DexieFocusRe
 import { DexieJourneyRepository } from './infrastructure/repositories/DexieJourneyRepository'
 import { DexieSettingsRepository } from './infrastructure/repositories/DexieSettingsRepository'
 import { App } from './presentation/App'
+import { installGloSessionPrototypeEnhancement } from './presentation/utils/installGloSessionPrototypeEnhancement'
 import { installTodayScheduleMenuReveal } from './presentation/utils/installTodayScheduleMenuReveal'
 import { installNumberInputNormalization } from './shared/utils/numberInput'
 import './styles/tokens.css'
@@ -65,6 +66,7 @@ import './styles/stock-integrity-console.css'
 import './styles/medication-protection.css'
 import './styles/medication-prototype-complete.css'
 import './styles/sticks-control-v2.css'
+import './styles/glo-session-prototype.css'
 import './styles/compact-time-displays.css'
 
 const root = document.getElementById('root')
@@ -72,6 +74,7 @@ if (!root) throw new Error('Elemento #root não encontrado.')
 
 installNumberInputNormalization()
 installTodayScheduleMenuReveal()
+installGloSessionPrototypeEnhancement()
 
 function requestPwaUpdate() {
   if (!('serviceWorker' in navigator) || !navigator.onLine) return
