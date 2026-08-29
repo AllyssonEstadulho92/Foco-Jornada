@@ -78,7 +78,6 @@ function durationLabel(minutes?: number | null): string {
 }
 
 const STICK_PACING_INTERVAL_MINUTES = 30
-const STICK_PACING_OPTIONS = [30, 45, 60] as const
 
 function pacingCountdownLabel(totalSeconds: number): string {
   const safeSeconds = Math.max(0, Math.floor(totalSeconds))
@@ -143,7 +142,7 @@ export function SticksStockPage() {
   const [message, setMessage] = useState('')
 
   const pacingNow = useNow(1000)
-  const [pacingIntervalMinutes, setPacingIntervalMinutes] = useState<number>(STICK_PACING_INTERVAL_MINUTES)
+  const [pacingZeroed, setPacingZeroed] = useState(false)
 
   const reload = useCallback(async () => {
     const [
@@ -193,6 +192,10 @@ export function SticksStockPage() {
       setMessage(error instanceof Error ? error.message : 'Não foi possível carregar o controlo de sticks.')
     })
   }, [nicotineAwarenessService, reload, stickDataProtectionService, stickPackPlannerService])
+
+  useEffect(() => {
+    setPacingZeroed(false)
+  }, [usageAnalytics?.lastUseAt])
 
   useEffect(() => {
     if (!packSettingsReady) return
@@ -320,10 +323,19 @@ export function SticksStockPage() {
   const pacingStatus = getStickPacingStatus(
     usageAnalytics?.lastUseAt ?? null,
     pacingNow,
-    pacingIntervalMinutes,
+    STICK_PACING_INTERVAL_MINUTES,
   )
-  const pacingNextTime = pacingStatus.nextTargetAt ? formatTime(pacingStatus.nextTargetAt) : '—'
-  const pacingCountdown = pacingCountdownLabel(pacingStatus.remainingSeconds)
+  const displayedPacingStatus = pacingZeroed
+    ? {
+        ...pacingStatus,
+        remainingSeconds: 0,
+        progressPercent: 100,
+        ready: true,
+        nextTargetAt: null,
+      }
+    : pacingStatus
+  const pacingNextTime = displayedPacingStatus.nextTargetAt ? formatTime(displayedPacingStatus.nextTargetAt) : '—'
+  const pacingCountdown = pacingCountdownLabel(displayedPacingStatus.remainingSeconds)
 
   const packTimelineRows = useMemo(() => {
     if (!packProjection) return []
@@ -382,16 +394,16 @@ export function SticksStockPage() {
   }
 
   async function registerStickWithPacing() {
-    if (!pacingStatus.ready && pacingStatus.elapsedSeconds !== null) {
+    if (!displayedPacingStatus.ready && displayedPacingStatus.elapsedSeconds !== null) {
       const confirmed = window.confirm(
-        `A tua meta de espaçamento ainda não terminou. Faltam ${pacingCountdown} para completares ${pacingStatus.targetMinutes} min. Queres registar o stick na mesma? O registo deve continuar exato mesmo quando a meta não é cumprida.`,
+        `A tua meta de espaçamento ainda não terminou. Faltam ${pacingCountdown} para completares ${displayedPacingStatus.targetMinutes} min. Queres registar o stick na mesma? O registo deve continuar exato mesmo quando a meta não é cumprida.`,
       )
       if (!confirmed) return
     }
 
     await run(
       () => personalStockService.consumeStick(operationId()),
-      pacingStatus.ready
+      displayedPacingStatus.ready
         ? '1 stick registado. O relógio de espaçamento começou agora.'
         : '1 stick registado. O relógio de espaçamento recomeçou a partir deste registo.',
     )
@@ -534,46 +546,43 @@ export function SticksStockPage() {
               <h2 id="sticks-register-title">Utilização</h2>
               <p>Cada registo retira exatamente 1 stick. Corrigir cria um novo movimento e preserva o original.</p>
               <div
-                className={`sticksPacingClock${pacingStatus.ready ? ' isReady' : ' isWaiting'}`}
+                className={`sticksPacingClock${displayedPacingStatus.ready ? ' isReady' : ' isWaiting'}`}
                 aria-label={
-                  pacingStatus.ready
-                    ? `Meta de espaçamento de ${pacingStatus.targetMinutes} minutos concluída`
+                  displayedPacingStatus.ready
+                    ? `Meta de espaçamento de ${displayedPacingStatus.targetMinutes} minutos concluída`
                     : `Faltam ${pacingCountdown} para a meta de espaçamento`
                 }
               >
                 <div
                   className="sticksPacingDial"
-                  style={{ '--pacing-progress': `${pacingStatus.progressPercent * 3.6}deg` } as CSSProperties}
+                  style={{ '--pacing-progress': `${displayedPacingStatus.progressPercent * 3.6}deg` } as CSSProperties}
                   aria-hidden="true"
                 >
                   <span className="sticksPacingDialFace">
-                    <strong>{pacingStatus.ready ? '✓' : pacingCountdown}</strong>
-                    <small>{pacingStatus.targetMinutes} min</small>
+                    <strong>{displayedPacingStatus.ready ? '✓' : pacingCountdown}</strong>
+                    <small>{displayedPacingStatus.targetMinutes} min</small>
                   </span>
                 </div>
                 <div className="sticksPacingCopy">
                   <span>INTERVALO CONSCIENTE</span>
-                  <strong>{pacingStatus.ready ? 'Meta de intervalo concluída' : 'Espera antes do próximo stick'}</strong>
+                  <strong>{displayedPacingStatus.ready ? 'Meta de intervalo concluída' : 'Espera antes do próximo stick'}</strong>
                   <small>
-                    {pacingStatus.nextTargetAt
+                    {displayedPacingStatus.nextTargetAt
                       ? `Próximo marco às ${pacingNextTime}. `
                       : 'O relógio começa quando registares um stick. '}
                     Meta comportamental; não representa um intervalo seguro de utilização.
                   </small>
-                  <div className="sticksPacingOptions" aria-label="Escolher meta de intervalo">
-                    {STICK_PACING_OPTIONS.map((minutes) => (
-                      <button
-                        type="button"
-                        className={`sticksPacingOption${pacingIntervalMinutes === minutes ? ' isSelected' : ''}`}
-                        aria-pressed={pacingIntervalMinutes === minutes}
-                        onClick={() => setPacingIntervalMinutes(minutes)}
-                        key={minutes}
-                      >
-                        <strong>{minutes} min</strong>
-                        {minutes === STICK_PACING_INTERVAL_MINUTES ? <small>Sugerido</small> : null}
-                      </button>
-                    ))}
-                  </div>
+                  <button
+                    type="button"
+                    className="sticksPacingZeroButton"
+                    disabled={displayedPacingStatus.ready}
+                    onClick={() => {
+                      setPacingZeroed(true)
+                      setMessage('Temporizador zerado. O histórico de sticks não foi alterado.')
+                    }}
+                  >
+                    Zerar temporizador
+                  </button>
                 </div>
               </div>
             </div>
@@ -585,7 +594,7 @@ export function SticksStockPage() {
                 aria-describedby="sticks-pacing-hint"
                 onClick={() => void registerStickWithPacing()}
               >
-                {pacingStatus.ready ? 'Registar 1 stick' : 'Registar mesmo assim'}
+                {displayedPacingStatus.ready ? 'Registar 1 stick' : 'Registar mesmo assim'}
               </button>
               <button
                 type="button"
