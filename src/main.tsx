@@ -17,6 +17,7 @@ import { DexieFocusRepository } from './infrastructure/repositories/DexieFocusRe
 import { DexieJourneyRepository } from './infrastructure/repositories/DexieJourneyRepository'
 import { DexieSettingsRepository } from './infrastructure/repositories/DexieSettingsRepository'
 import { App } from './presentation/App'
+import { installDeadlineNotificationCoordinator } from './presentation/utils/installDeadlineNotificationCoordinator'
 import { installGloSessionPrototypeEnhancement } from './presentation/utils/installGloSessionPrototypeEnhancement'
 import { installMedicationNextDoseTimerEnhancement } from './presentation/utils/installMedicationNextDoseTimerEnhancement'
 import { installTodayScheduleMenuReveal } from './presentation/utils/installTodayScheduleMenuReveal'
@@ -135,6 +136,16 @@ const services = {
 }
 
 installMedicationNextDoseTimerEnhancement({
+  personalStockService,
+  medicationDoseStatusService,
+  medicationDataProtectionService,
+})
+
+installDeadlineNotificationCoordinator({
+  journeyRepository: services.journeyRepository,
+  breakRepository: services.breakRepository,
+  focusRepository: services.focusRepository,
+  settingsRepository: services.settingsRepository,
   personalStockService,
   medicationDoseStatusService,
   medicationDataProtectionService,
