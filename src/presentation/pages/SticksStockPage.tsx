@@ -56,6 +56,19 @@ function formatTime(value?: string | null): string {
   }).format(new Date(value))
 }
 
+function formatClockTime(value?: string | Date | null): string {
+  if (!value) return '—'
+  const date = value instanceof Date ? value : new Date(value)
+  if (Number.isNaN(date.getTime())) return '—'
+  return new Intl.DateTimeFormat('pt-PT', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hourCycle: 'h23',
+    timeZone: 'Europe/Lisbon',
+  }).format(date)
+}
+
 function formatDateKey(value?: string | null): string {
   if (!value) return '—'
   const parsed = new Date(`${value}T12:00:00Z`)
@@ -404,6 +417,16 @@ export function SticksStockPage() {
   const gloWarmupLabel = pacingCountdownLabel(gloSessionPreset.warmupSeconds)
   const gloUseLabel = pacingCountdownLabel(gloSessionPreset.sessionSeconds)
   const gloTotalLabel = pacingCountdownLabel(gloSessionPreset.warmupSeconds + gloSessionPreset.sessionSeconds)
+  const gloReferenceStartedAt = gloSessionStartedAt
+    ? new Date(gloSessionStartedAt)
+    : pacingNow
+  const gloReferenceReadyAt = new Date(
+    gloReferenceStartedAt.getTime() + gloSessionPreset.warmupSeconds * 1000,
+  )
+  const gloReferenceEndsAt = new Date(
+    gloReferenceReadyAt.getTime() + gloSessionPreset.sessionSeconds * 1000,
+  )
+  const gloReferenceLabel = gloSessionStartedAt ? 'Horário desta sessão' : 'Se iniciares agora'
   const gloSessionPhaseLabel = gloSessionStatus.phase === 'heating'
     ? 'A aquecer'
     : gloSessionStatus.phase === 'session'
@@ -778,10 +801,27 @@ export function SticksStockPage() {
                   </label>
                 </div>
 
-                <div className="gloSessionFacts" aria-label="Tempos configurados da sessão">
-                  <span>Aquecimento <strong>{gloWarmupLabel}</strong></span>
-                  <span>Utilização <strong>{gloUseLabel}</strong></span>
-                  <span>Total <strong>{gloTotalLabel}</strong></span>
+                <div className="gloSessionTimelineHeading">
+                  <span>{gloReferenceLabel}</span>
+                  <small>referência pelo relógio atual de Lisboa</small>
+                </div>
+
+                <div className="gloSessionFacts" aria-label="Horário e duração configurados da sessão">
+                  <article>
+                    <span>Aquecimento</span>
+                    <strong>{formatClockTime(gloReferenceStartedAt)} → {formatClockTime(gloReferenceReadyAt)}</strong>
+                    <small>{gloWarmupLabel} de duração</small>
+                  </article>
+                  <article>
+                    <span>Utilização</span>
+                    <strong>{formatClockTime(gloReferenceReadyAt)} → {formatClockTime(gloReferenceEndsAt)}</strong>
+                    <small>{gloUseLabel} de duração</small>
+                  </article>
+                  <article>
+                    <span>Total</span>
+                    <strong>{formatClockTime(gloReferenceStartedAt)} → {formatClockTime(gloReferenceEndsAt)}</strong>
+                    <small>{gloTotalLabel} no total</small>
+                  </article>
                 </div>
 
                 <div className="gloSessionPhaseCopy">
@@ -810,7 +850,7 @@ export function SticksStockPage() {
                 </div>
 
                 <small className="gloSessionAccuracyNote">
-                  A contagem é calculada pelo instante absoluto de início, por isso mantém o tempo correto quando o browser abranda ou a aplicação fica em segundo plano. Não existe ligação automática ao aparelho: inicia o relógio ao mesmo tempo que o glo. Este temporizador não regista sticks nem altera o stock.
+                  Antes de iniciares, os horários acima são uma referência móvel baseada na hora atual. Depois de tocares em “Iniciar sessão”, ficam fixos ao instante real do início. A contagem usa esse timestamp absoluto, por isso mantém o tempo correto quando o browser abranda ou a aplicação fica em segundo plano. Não existe ligação automática ao aparelho: inicia o relógio ao mesmo tempo que o glo. Este temporizador não regista sticks nem altera o stock.
                 </small>
                 <a
                   className="gloSessionSource"
