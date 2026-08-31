@@ -9,6 +9,9 @@ export interface NavigationItem {
 
 export const primaryNavigation: NavigationItem[] = [
   { label: 'Hoje', path: '/', icon: 'home', end: true },
+  { label: 'Calendário', path: '/calendario', icon: 'activities' },
+  { label: 'Relatórios', path: '/relatorios', icon: 'stats' },
+  { label: 'Notificações', path: '/notificacoes', icon: 'history' },
   { label: 'Mapa de turnos', path: '/turnos', icon: 'activities' },
   { label: 'Atividades', path: '/atividades', icon: 'activities' },
   { label: 'Foco', path: '/foco', icon: 'focus' },
