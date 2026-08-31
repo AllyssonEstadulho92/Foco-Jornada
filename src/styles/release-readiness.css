@@ -1,0 +1,108 @@
+/* Release 1.0 — acabamento transversal, sem alterar a lógica dos módulos. */
+
+:where(button, a, input, select, textarea, [tabindex]):focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--primary) 58%, transparent);
+  outline-offset: 2px;
+}
+
+:where(button, [role='button']) {
+  touch-action: manipulation;
+}
+
+:where(button:not(.iconButton), .navLink, .mobileQuickLink, input, select) {
+  min-height: 40px;
+}
+
+:where(input, select, textarea) {
+  max-width: 100%;
+}
+
+:where(.appContent, .page, .panel, .card, .notificationPanel) {
+  min-width: 0;
+}
+
+#deadline-mobile-notification-permission {
+  margin: 10px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-2);
+  display: grid;
+  gap: 8px;
+}
+
+#deadline-mobile-notification-permission strong {
+  color: var(--text);
+  font-size: 12px;
+}
+
+#deadline-mobile-notification-permission small {
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.deadlineNotificationActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.deadlineNotificationActions button {
+  min-height: 38px;
+  padding: 7px 10px;
+  border: 1px solid color-mix(in srgb, var(--primary) 28%, var(--line));
+  border-radius: 10px;
+  background: var(--primary-soft);
+  color: var(--primary);
+  cursor: pointer;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.deadlineNotificationActions button:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.releaseStatusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  width: fit-content;
+  padding: 4px 7px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 480px) {
+  :where(button:not(.iconButton), .navLink, .mobileQuickLink) {
+    min-height: 44px;
+  }
+
+  .deadlineNotificationActions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .deadlineNotificationActions button {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
