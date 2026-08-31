@@ -1,52 +1,158 @@
 import { createHashRouter } from 'react-router-dom'
 import { AppShell } from './layouts/AppShell'
-import { ActivitiesPage } from './pages/ActivitiesPage'
-import { ExportDataPage } from './pages/ExportDataPage'
-import { FocusPage } from './pages/FocusPage'
-import { GuideWithMedicationPage } from './pages/GuideWithMedicationPage'
-import { HistoryPage } from './pages/HistoryPage'
-import { HomeReferencePage } from './pages/HomeReferencePage'
-import { MedicationActionsGuidePage } from './pages/MedicationActionsGuidePage'
-import { MedicationsStockPage } from './pages/MedicationsStockPage'
-import { MoreWithBackupPage } from './pages/MoreWithBackupPage'
-import { NotificationCenterV2Page } from './pages/NotificationCenterV2Page'
-import { OperationalCalendarPage } from './pages/OperationalCalendarPage'
-import { PayrollPage } from './pages/PayrollPage'
-import { PayrollReferencePage } from './pages/PayrollReferencePage'
-import { PersonalStockHubPage } from './pages/PersonalStockHubPage'
-import { ReportsV2Page } from './pages/ReportsV2Page'
-import { SettingsReferencePage } from './pages/SettingsReferencePage'
-import { ShiftMapPage } from './pages/ShiftMapPage'
-import { StatisticsPage } from './pages/StatisticsPage'
-import { SticksStockPage } from './pages/SticksStockPage'
-import { WorkHoursCalculatorPage } from './pages/WorkHoursCalculatorPage'
 
 export const router = createHashRouter([
   {
     path: '/',
     element: <AppShell />,
     children: [
-      { index: true, element: <HomeReferencePage /> },
-      { path: 'calendario', element: <OperationalCalendarPage /> },
-      { path: 'notificacoes', element: <NotificationCenterV2Page /> },
-      { path: 'relatorios', element: <ReportsV2Page /> },
-      { path: 'turnos', element: <ShiftMapPage /> },
-      { path: 'atividades', element: <ActivitiesPage /> },
-      { path: 'foco', element: <FocusPage /> },
-      { path: 'historico', element: <HistoryPage /> },
-      { path: 'mais', element: <MoreWithBackupPage /> },
-      { path: 'stock', element: <PersonalStockHubPage /> },
-      { path: 'medicamentos', element: <MedicationsStockPage /> },
-      { path: 'sticks', element: <SticksStockPage /> },
-      { path: 'guia', element: <GuideWithMedicationPage /> },
-      { path: 'guia/medicamentos', element: <MedicationActionsGuidePage /> },
-      { path: 'vencimento', element: <PayrollReferencePage /> },
-      { path: 'vencimento/configurar', element: <PayrollPage /> },
-      { path: 'horas', element: <WorkHoursCalculatorPage /> },
-      { path: 'estatisticas', element: <StatisticsPage /> },
-      { path: 'relatorio', element: <ExportDataPage /> },
-      { path: 'exportar', element: <ExportDataPage /> },
-      { path: 'definicoes', element: <SettingsReferencePage /> },
+      {
+        index: true,
+        lazy: async () => {
+          const { TodayReferencePage } = await import('./pages/TodayReferencePage')
+          return { Component: TodayReferencePage }
+        },
+      },
+      {
+        path: 'calendario',
+        lazy: async () => {
+          const { OperationalCalendarPage } = await import('./pages/OperationalCalendarPage')
+          return { Component: OperationalCalendarPage }
+        },
+      },
+      {
+        path: 'notificacoes',
+        lazy: async () => {
+          const { NotificationCenterV2Page } = await import('./pages/NotificationCenterV2Page')
+          return { Component: NotificationCenterV2Page }
+        },
+      },
+      {
+        path: 'relatorios',
+        lazy: async () => {
+          const { ReportsV2Page } = await import('./pages/ReportsV2Page')
+          return { Component: ReportsV2Page }
+        },
+      },
+      {
+        path: 'turnos',
+        lazy: async () => {
+          const { ShiftMapPage } = await import('./pages/ShiftMapPage')
+          return { Component: ShiftMapPage }
+        },
+      },
+      {
+        path: 'atividades',
+        lazy: async () => {
+          const { ActivitiesPage } = await import('./pages/ActivitiesPage')
+          return { Component: ActivitiesPage }
+        },
+      },
+      {
+        path: 'foco',
+        lazy: async () => {
+          const { FocusPage } = await import('./pages/FocusPage')
+          return { Component: FocusPage }
+        },
+      },
+      {
+        path: 'historico',
+        lazy: async () => {
+          const { HistoryPage } = await import('./pages/HistoryPage')
+          return { Component: HistoryPage }
+        },
+      },
+      {
+        path: 'mais',
+        lazy: async () => {
+          const { MoreWithBackupPage } = await import('./pages/MoreWithBackupPage')
+          return { Component: MoreWithBackupPage }
+        },
+      },
+      {
+        path: 'stock',
+        lazy: async () => {
+          const { PersonalStockHubPage } = await import('./pages/PersonalStockHubPage')
+          return { Component: PersonalStockHubPage }
+        },
+      },
+      {
+        path: 'medicamentos',
+        lazy: async () => {
+          const { MedicationsStockPage } = await import('./pages/MedicationsStockPage')
+          return { Component: MedicationsStockPage }
+        },
+      },
+      {
+        path: 'sticks',
+        lazy: async () => {
+          const { SticksStockPage } = await import('./pages/SticksStockPage')
+          return { Component: SticksStockPage }
+        },
+      },
+      {
+        path: 'guia',
+        lazy: async () => {
+          const { GuideWithMedicationPage } = await import('./pages/GuideWithMedicationPage')
+          return { Component: GuideWithMedicationPage }
+        },
+      },
+      {
+        path: 'guia/medicamentos',
+        lazy: async () => {
+          const { MedicationActionsGuidePage } = await import('./pages/MedicationActionsGuidePage')
+          return { Component: MedicationActionsGuidePage }
+        },
+      },
+      {
+        path: 'vencimento',
+        lazy: async () => {
+          const { PayrollReferencePage } = await import('./pages/PayrollReferencePage')
+          return { Component: PayrollReferencePage }
+        },
+      },
+      {
+        path: 'vencimento/configurar',
+        lazy: async () => {
+          const { PayrollPage } = await import('./pages/PayrollPage')
+          return { Component: PayrollPage }
+        },
+      },
+      {
+        path: 'horas',
+        lazy: async () => {
+          const { WorkHoursCalculatorPage } = await import('./pages/WorkHoursCalculatorPage')
+          return { Component: WorkHoursCalculatorPage }
+        },
+      },
+      {
+        path: 'estatisticas',
+        lazy: async () => {
+          const { StatisticsPage } = await import('./pages/StatisticsPage')
+          return { Component: StatisticsPage }
+        },
+      },
+      {
+        path: 'relatorio',
+        lazy: async () => {
+          const { ExportDataPage } = await import('./pages/ExportDataPage')
+          return { Component: ExportDataPage }
+        },
+      },
+      {
+        path: 'exportar',
+        lazy: async () => {
+          const { ExportDataPage } = await import('./pages/ExportDataPage')
+          return { Component: ExportDataPage }
+        },
+      },
+      {
+        path: 'definicoes',
+        lazy: async () => {
+          const { SettingsReferencePage } = await import('./pages/SettingsReferencePage')
+          return { Component: SettingsReferencePage }
+        },
+      },
     ],
   },
 ])
