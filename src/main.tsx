@@ -22,6 +22,7 @@ import { installDataIntegrityMonitoring } from './presentation/utils/installData
 import { installDeadlineNotificationCoordinator } from './presentation/utils/installDeadlineNotificationCoordinator'
 import { installGloSessionPrototypeEnhancement } from './presentation/utils/installGloSessionPrototypeEnhancement'
 import { installMedicationNextDoseTimerEnhancement } from './presentation/utils/installMedicationNextDoseTimerEnhancement'
+import { installNotificationPermissionDiagnostics } from './presentation/utils/installNotificationPermissionDiagnostics'
 import { installTodayScheduleMenuReveal } from './presentation/utils/installTodayScheduleMenuReveal'
 import { installNumberInputNormalization } from './shared/utils/numberInput'
 import './styles/tokens.css'
@@ -155,6 +156,7 @@ installDeadlineNotificationCoordinator({
   medicationDataProtectionService,
 })
 
+installNotificationPermissionDiagnostics()
 installDataIntegrityMonitoring(dataIntegrityService)
 
 createRoot(root).render(
