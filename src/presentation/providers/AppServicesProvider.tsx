@@ -1,9 +1,10 @@
 /* eslint-disable react-refresh/only-export-components -- o provider e o hook pertencem ao mesmo contexto de serviços. */
 import { createContext, type ReactNode, useContext } from 'react'
-import type { AppBackupService } from '../../application/data/AppBackupService'
 import type { ActivityRepository } from '../../application/activities/ActivityRepository'
 import type { BreakRepository } from '../../application/breaks/BreakRepository'
 import type { CoffeeRepository } from '../../application/coffee/CoffeeRepository'
+import type { AppBackupService } from '../../application/data/AppBackupService'
+import type { AppDataIntegrityService } from '../../application/data/AppDataIntegrityService'
 import type { FocusRepository } from '../../application/focus/FocusRepository'
 import type { JourneyRepository } from '../../application/journey/JourneyRepository'
 import type { MedicationDataProtectionService } from '../../application/personalStock/MedicationDataProtectionService'
@@ -32,6 +33,7 @@ export interface AppServices {
   stickPackPlannerService?: StickPackPlannerService
   stickUsageAnalyticsService?: StickUsageAnalyticsService
   backupService?: AppBackupService
+  dataIntegrityService?: AppDataIntegrityService
 }
 
 type RuntimeAppServices = AppServices & {
@@ -44,6 +46,7 @@ type RuntimeAppServices = AppServices & {
   stickPackPlannerService: StickPackPlannerService
   stickUsageAnalyticsService: StickUsageAnalyticsService
   backupService: AppBackupService
+  dataIntegrityService: AppDataIntegrityService
 }
 
 const AppServicesContext = createContext<AppServices | null>(null)
