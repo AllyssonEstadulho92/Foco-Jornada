@@ -35,32 +35,46 @@ jobs:
             echo "Nenhum browser Chromium disponível no runner."
             exit 1
           fi
+
           mkdir -p .smoke/Foco-Jornada
           cp -R dist/. .smoke/Foco-Jornada/
           python3 -m http.server 4173 --directory .smoke >/tmp/foco-http.log 2>&1 &
           SERVER_PID=$!
           trap 'kill $SERVER_PID || true' EXIT
           sleep 2
-          "$CHROME_BIN" \
-            --headless \
-            --no-sandbox \
-            --disable-gpu \
-            --virtual-time-budget=12000 \
-            --dump-dom \
-            http://127.0.0.1:4173/Foco-Jornada/ \
-            >/tmp/foco-dom.html 2>/tmp/foco-chrome.log || true
-          echo '--- browser stderr ---'
-          cat /tmp/foco-chrome.log || true
-          echo '--- fim browser stderr ---'
-          if grep -q 'id="app-boot-fallback"' /tmp/foco-dom.html; then
-            echo 'ERRO: a aplicação não substituiu o fallback de arranque.'
-            grep -n -E 'app-boot-fallback|A aplicação não iniciou|A carregar a aplicação' /tmp/foco-dom.html || true
-            exit 1
-          fi
-          if ! grep -q 'id="root"' /tmp/foco-dom.html; then
-            echo 'ERRO: o documento final não contém #root.'
-            exit 1
-          fi
+
+          smoke() {
+            local label="$1"
+            local size="$2"
+            local output="/tmp/foco-dom-${label}.html"
+            local log="/tmp/foco-chrome-${label}.log"
+
+            "$CHROME_BIN"               --headless               --no-sandbox               --disable-gpu               --window-size="$size"               --virtual-time-budget=12000               --dump-dom               http://127.0.0.1:4173/Foco-Jornada/               >"$output" 2>"$log" || true
+
+            echo "--- browser stderr (${label}) ---"
+            cat "$log" || true
+            echo "--- fim browser stderr (${label}) ---"
+
+            if grep -q 'id="app-boot-fallback"' "$output"; then
+              echo "ERRO: a aplicação não substituiu o fallback de arranque (${label})."
+              grep -n -E 'app-boot-fallback|A aplicação não iniciou|A carregar a aplicação' "$output" || true
+              exit 1
+            fi
+            if ! grep -q 'id="root"' "$output"; then
+              echo "ERRO: o documento final não contém #root (${label})."
+              exit 1
+            fi
+          }
+
+          smoke desktop 1440,1000
+          smoke mobile 390,844
+
+          MOBILE_DOM=/tmp/foco-dom-mobile.html
+          grep -q 'aria-label="Navegação móvel"' "$MOBILE_DOM"
+          grep -q '>Início<' "$MOBILE_DOM"
+          grep -q '>Foco<' "$MOBILE_DOM"
+          grep -q '>Relatórios<' "$MOBILE_DOM"
+          grep -q '>Perfil<' "$MOBILE_DOM"
       - name: Guardar build como artefacto
         uses: actions/upload-artifact@v4
         with:
