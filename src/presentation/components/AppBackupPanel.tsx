@@ -95,7 +95,7 @@ export function AppBackupPanel() {
       }
       const content = await backupService.exportText()
       downloadText(content, backupFileName())
-      setMessage('Cópia integral criada com todos os dados locais, incluindo stock pessoal, notas e configurações guardadas na base de dados.')
+      setMessage('Cópia integral criada com os dados persistentes da base de dados e o estado operacional suportado do browser.')
       setIntegrityState('ok')
       setIntegrityDetail('Integridade verificada imediatamente antes da exportação.')
       pushAppNotification('success', 'Cópia de segurança criada', 'O ficheiro integral foi validado e guardado no dispositivo.')
@@ -176,8 +176,9 @@ export function AppBackupPanel() {
       </div>
 
       <p>
-        A cópia inclui jornada, pausas, atividades, foco, café, definições, notas guardadas em metadata e as quatro tabelas do stock pessoal:
-        entidades, movimentos, horários de medicação e eventos de toma. A configuração de nicotina e respetivas notas também seguem no backup.
+        A cópia inclui jornada, pausas, atividades, foco, café, definições, notas e as quatro tabelas do stock pessoal:
+        entidades, movimentos, horários de medicação e eventos de toma. Inclui ainda horas registadas, configuração e planos de vencimento,
+        mapa de turnos, preferências da aplicação, centro de notificações e o estado técnico de uma sessão glo em curso.
       </p>
 
       <div className="stockMetricGrid appBackupMetrics">
