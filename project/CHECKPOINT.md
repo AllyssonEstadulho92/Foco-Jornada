@@ -4,7 +4,7 @@
 
 **Baseline publicada:** 1.1.5  
 **Versão candidata:** 1.2.0  
-**Hardening:** PR #150 em validação  
+**Hardening:** PR #153 em validação  
 **Fonte funcional principal:** `project/PROJECT_SPEC.md`  
 **Política temporal:** `docs/TIME-AUTOMATION.md`  
 **Plano de hardening:** `project/docs/HARDENING_1_2.md`
