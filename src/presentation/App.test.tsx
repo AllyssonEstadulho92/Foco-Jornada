@@ -23,9 +23,9 @@ describe('App', () => {
       />,
     )
 
-    expect(screen.getByRole('heading', { name: 'Hoje' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Hoje' })).toBeInTheDocument()
     expect(
-      screen.getByRole('heading', { name: /^(Bom dia|Boa tarde|Boa noite), foco!$/ }),
+      await screen.findByRole('heading', { name: /^(Bom dia|Boa tarde|Boa noite), foco!$/ }),
     ).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Resumo do dia' })).toBeInTheDocument()
     expect(await screen.findAllByRole('button', { name: 'Iniciar jornada' })).not.toHaveLength(0)
@@ -35,6 +35,10 @@ describe('App', () => {
     expect(screen.getAllByRole('link', { name: 'Foco' }).length).toBeGreaterThan(0)
     expect(screen.getAllByRole('link', { name: 'Histórico' }).length).toBeGreaterThan(0)
     expect(screen.getAllByRole('link', { name: 'Mais' }).length).toBeGreaterThan(0)
+
+    expect(screen.getAllByRole('link', { name: 'Início' }).length).toBeGreaterThan(0)
+    expect(screen.getAllByRole('link', { name: 'Relatórios' }).length).toBeGreaterThan(0)
+    expect(screen.getAllByRole('link', { name: 'Perfil' }).length).toBeGreaterThan(0)
 
     view.unmount()
   })
