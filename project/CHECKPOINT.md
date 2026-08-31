@@ -4,7 +4,7 @@
 
 **Baseline publicada:** 1.1.5  
 **Versão candidata:** 1.2.0  
-**Hardening:** PR #153 em validação  
+**Hardening:** PR #153 validada para integração  
 **Fonte funcional principal:** `project/PROJECT_SPEC.md`  
 **Política temporal:** `docs/TIME-AUTOMATION.md`  
 **Plano de hardening:** `project/docs/HARDENING_1_2.md`
@@ -38,13 +38,13 @@
 
 ## Gate obrigatório da 1.2.0
 
-- [ ] Typecheck.
-- [ ] Lint.
-- [ ] Testes.
-- [ ] Build.
-- [ ] Smoke desktop.
-- [ ] Smoke mobile.
-- [ ] Merge apenas após CI verde.
+- [x] Typecheck — PASS.
+- [x] Lint — PASS.
+- [x] Testes — PASS · 47 ficheiros / 197 testes.
+- [x] Build — PASS.
+- [x] Smoke desktop — PASS.
+- [x] Smoke mobile — PASS · 390×844.
+- [x] CI da PR #153 verde; merge autorizado pelo gate.
 
 ## Próximos trabalhos — não misturar com esta fase
 
@@ -54,5 +54,7 @@
 - testes visuais reais em Safari/iPhone, Android, tablet e monitores largos;
 - proteção/ruleset de `main` exigindo o workflow `Qualidade`;
 - lockfile controlado para instalação reprodutível.
+
+Validação da PR #153: 47 ficheiros de teste / 197 testes, typecheck, lint, build, smoke desktop e smoke mobile concluídos com sucesso. O chunk JavaScript inicial foi reduzido para cerca de 560,86 kB (171,60 kB gzip); a consolidação adicional de bundle e CSS fica para fase posterior.
 
 O objetivo da 1.2.0 é reduzir risco técnico sem reconstruir nem alterar o comportamento de negócio já validado.
