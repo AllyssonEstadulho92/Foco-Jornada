@@ -186,7 +186,9 @@ export function ExportDataPage() {
   const plannedJourneyMs = schedule && schedule.totalMinutes > 0
     ? schedule.totalMinutes * 60_000
     : report?.summary.journeyMs ?? 0
-  const plannedDetail = schedule && schedule.totalMinutes > 0 ? 'Tempo planeado' : 'Tempo registado'
+  const hasPlannedSchedule = Boolean(schedule && schedule.totalMinutes > 0)
+  const plannedDetail = hasPlannedSchedule ? 'Tempo planeado' : 'Tempo registado'
+  const journeySummaryLabel = hasPlannedSchedule ? 'Jornada planeada' : 'Jornada registada'
   const workEntry = workHourEntries.find((entry) => entry.date === date)
   const workCalculation = workEntry ? calculateWorkHours(workEntry) : null
   const productivity = report && report.summary.effectiveMs > 0
@@ -241,7 +243,7 @@ export function ExportDataPage() {
 
           <section className="exportA4Summary" aria-label="Indicadores principais">
             <ReportMetric tone="journey" icon="◷" label="Jornada" value={formatDuration(plannedJourneyMs)} detail={plannedDetail} />
-            <ReportMetric tone="break" icon="☕" label="Pausas" value={formatDuration(report.summary.breakMs)} detail="Total de pausas" />
+            <ReportMetric tone="break" icon="Ⅱ" label="Pausas" value={formatDuration(report.summary.breakMs)} detail="Total de pausas" />
             <ReportMetric tone="journey" icon="◎" label="Efetivo" value={formatDuration(report.summary.effectiveMs)} detail="Tempo efetivo" />
             <ReportMetric tone="focus" icon="⊙" label="Foco" value={formatDuration(report.summary.focusMs)} detail="Tempo de foco" />
             <ReportMetric tone="activity" icon="▤" label="Atividades" value={String(report.summary.activityCount)} detail="Concluídas" />
@@ -282,8 +284,8 @@ export function ExportDataPage() {
             <article className="exportA4Panel exportA4DaySummary">
               <h3>Resumo do dia</h3>
               <dl>
-                <div><dt>◷ Jornada planeada</dt><dd>{formatDuration(plannedJourneyMs)}</dd></div>
-                <div><dt>☕ Pausas</dt><dd>{formatDuration(report.summary.breakMs)}</dd></div>
+                <div><dt>◷ {journeySummaryLabel}</dt><dd>{formatDuration(plannedJourneyMs)}</dd></div>
+                <div><dt>Ⅱ Pausas</dt><dd>{formatDuration(report.summary.breakMs)}</dd></div>
                 <div><dt>◎ Tempo efetivo</dt><dd>{formatDuration(report.summary.effectiveMs)}</dd></div>
                 <div><dt>⊙ Foco total</dt><dd>{formatDuration(report.summary.focusMs)}</dd></div>
                 <div><dt>▤ Atividades concluídas</dt><dd>{report.summary.activityCount}</dd></div>
@@ -292,12 +294,12 @@ export function ExportDataPage() {
             </article>
 
             <article className="exportA4Panel exportA4Performance">
-              <h3>Desempenho</h3>
+              <h3>Índice de foco</h3>
               <div className="exportA4Progress" style={{ '--progress': `${productivity * 3.6}deg` } as CSSProperties}>
                 <strong>{productivity}%</strong>
               </div>
-              <b>Produtividade</b>
-              <span>Foco / Efetivo</span>
+              <b>Foco / tempo efetivo</b>
+              <span>Percentagem do tempo efetivo em foco</span>
             </article>
 
             <article className="exportA4Panel exportA4Financial">
