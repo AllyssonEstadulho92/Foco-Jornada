@@ -1,7 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { AppBackupService } from './application/data/AppBackupService'
 import { AppDataIntegrityService } from './application/data/AppDataIntegrityService'
+import { ReleaseAppBackupService } from './application/data/ReleaseAppBackupService'
 import { MedicationDataProtectionService } from './application/personalStock/MedicationDataProtectionService'
 import { MedicationDoseStatusService } from './application/personalStock/MedicationDoseStatusService'
 import { NicotineAwarenessService } from './application/personalStock/NicotineAwarenessService'
@@ -137,7 +137,8 @@ const services = {
   stickDataProtectionService: new StickDataProtectionService(db),
   stickPackPlannerService: new StickPackPlannerService(db),
   stickUsageAnalyticsService: new StickUsageAnalyticsService(db),
-  backupService: new AppBackupService(db),
+  backupService: new ReleaseAppBackupService(db),
+  dataIntegrityService,
 }
 
 installMedicationNextDoseTimerEnhancement({
