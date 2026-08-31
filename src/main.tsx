@@ -148,7 +148,7 @@ const services = {
   stickDataProtectionService: new StickDataProtectionService(db),
   stickPackPlannerService: new StickPackPlannerService(db),
   stickUsageAnalyticsService: new StickUsageAnalyticsService(db),
-  backupService: new ReleaseAppBackupService(db),
+  backupService: new ReleaseAppBackupService(db, window.localStorage),
   dataIntegrityService,
 }
 
