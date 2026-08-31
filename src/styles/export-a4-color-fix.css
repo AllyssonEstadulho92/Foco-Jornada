@@ -1,0 +1,72 @@
+/* Correção isolada do Relatório A4.
+ * O documento exportado deve permanecer claro e branco independentemente
+ * do tema da aplicação ou das preferências de cor do browser/sistema.
+ */
+.exportA4Sheet,
+:root[data-theme='dark'] .appContent .exportA4Sheet {
+  color-scheme: light !important;
+  forced-color-adjust: none !important;
+  background-color: #ffffff !important;
+  background-image:
+    radial-gradient(circle at 96% 5%, rgba(93, 190, 120, 0.14), transparent 18%),
+    radial-gradient(circle at 8% 94%, rgba(90, 181, 112, 0.07), transparent 25%),
+    linear-gradient(180deg, #ffffff 0%, #ffffff 100%) !important;
+  color: #111914 !important;
+}
+
+.exportA4Metric,
+.exportA4Section,
+.exportA4Panel,
+:root[data-theme='dark'] .appContent .exportA4Sheet .exportA4Metric,
+:root[data-theme='dark'] .appContent .exportA4Sheet .exportA4Section,
+:root[data-theme='dark'] .appContent .exportA4Sheet .exportA4Panel {
+  background-color: #ffffff !important;
+}
+
+.exportA4Progress::after,
+:root[data-theme='dark'] .appContent .exportA4Sheet .exportA4Progress::after {
+  background:#ffffff !important;
+}
+
+.exportA4Footer>img,
+:root[data-theme='dark'] .appContent .exportA4Sheet .exportA4Footer>img {
+  background:#ffffff !important;
+}
+
+@media print {
+  html,
+  body,
+  #root,
+  .appShell,
+  .appMainArea,
+  .appContent,
+  .exportA4Page,
+  .exportA4Sheet,
+  :root[data-theme='dark'] html,
+  :root[data-theme='dark'] body,
+  :root[data-theme='dark'] #root,
+  :root[data-theme='dark'] .appShell,
+  :root[data-theme='dark'] .appMainArea,
+  :root[data-theme='dark'] .appContent,
+  :root[data-theme='dark'] .exportA4Page,
+  :root[data-theme='dark'] .appContent .exportA4Sheet {
+    color-scheme: light !important;
+    background-color:#ffffff !important;
+  }
+
+  .exportA4Sheet,
+  :root[data-theme='dark'] .appContent .exportA4Sheet {
+    background-image:
+      radial-gradient(circle at 96% 5%, rgba(93, 190, 120, 0.14), transparent 18%),
+      radial-gradient(circle at 8% 94%, rgba(90, 181, 112, 0.07), transparent 25%),
+      linear-gradient(180deg, #ffffff 0%, #ffffff 100%) !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .exportA4Metric,
+  .exportA4Section,
+  .exportA4Panel {
+    background:#ffffff !important;
+  }
+}
