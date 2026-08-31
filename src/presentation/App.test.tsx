@@ -10,7 +10,7 @@ import { App } from './App'
 
 describe('App', () => {
   it('renderiza o dashboard de referência e a navegação principal', async () => {
-    render(
+    const view = render(
       <App
         services={{
           journeyRepository: new InMemoryJourneyRepository(),
@@ -35,5 +35,7 @@ describe('App', () => {
     expect(screen.getAllByRole('link', { name: 'Foco' }).length).toBeGreaterThan(0)
     expect(screen.getAllByRole('link', { name: 'Histórico' }).length).toBeGreaterThan(0)
     expect(screen.getAllByRole('link', { name: 'Mais' }).length).toBeGreaterThan(0)
+
+    view.unmount()
   })
 })
