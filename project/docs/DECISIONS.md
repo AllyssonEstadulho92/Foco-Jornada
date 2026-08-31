@@ -52,6 +52,30 @@
 **Estado:** aceite  
 **Decisão:** após validar as Fases 1–5 individualmente, as Fases 6–9 foram consolidadas em `release/v1-finalizacao` para reduzir tempo de entrega, mantendo a separação por módulos e o gate integral de CI antes do merge.
 
+## ADR-014 — GitHub Pages publicado apenas por artefacto
+**Estado:** aceite  
+**Contexto:** o workflow copiava `dist/` para a raiz e para `site/`, criava commits automáticos em `main` e, em paralelo, também publicava um artefacto Pages.
+**Decisão:** o código fonte é compilado no CI e apenas `dist/` é entregue a GitHub Pages. Builds compilados deixam de ser fonte versionada.
+**Consequências:** elimina commits automáticos de deploy, reduz duplicação e separa claramente fonte de artefacto.
+
+## ADR-015 — Backup local integral com allowlist
+**Estado:** aceite  
+**Contexto:** IndexedDB contém o domínio principal, mas horas, vencimento, mapa de turnos e alguns estados operacionais ainda persistem em `localStorage`.
+**Decisão:** enquanto a migração para IndexedDB não estiver concluída, a release inclui no backup apenas chaves locais explicitamente autorizadas.
+**Consequências:** o backup cobre o estado operacional atual sem exportar chaves estranhas ao Foco Jornada; backups antigos sem esta extensão continuam suportados.
+
+## ADR-016 — Carregamento lazy por rota
+**Estado:** aceite  
+**Contexto:** todas as páginas eram importadas no arranque e o bundle principal ultrapassava o aviso de 500 kB do Vite.
+**Decisão:** páginas são carregadas através de lazy routes do React Router.
+**Consequências:** reduz o JavaScript inicial e mantém a mesma estrutura de navegação e regras de negócio.
+
+## ADR-017 — CSS global apenas por evolução incremental
+**Estado:** aceite  
+**Contexto:** a aplicação acumulou várias folhas de protótipo, referência e correção; uma ativação global anterior do tema neutro provocou página em branco.
+**Decisão:** não reativar nem substituir globalmente temas históricos de uma só vez. A consolidação visual é feita por ecrã, com validação técnica e mobile antes de remover estilos antigos.
+**Consequências:** privilegia estabilidade e permite reduzir dívida de CSS sem regressões funcionais.
+
 ---
 
 ## Modelo
