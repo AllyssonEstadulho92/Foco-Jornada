@@ -1,6 +1,6 @@
 # Roadmap — Foco & Jornada
 
-## V1
+## V1 — núcleo funcional
 
 | Fase | Objetivo | Estado |
 |---|---|---|
@@ -13,21 +13,52 @@
 | 6 | Café | Concluída |
 | 7 | Dashboard | Concluída |
 | 8 | Histórico/Estatísticas/Definições | Concluída |
-| 9 | Qualidade final/PWA | Concluída — auditoria final na PR #39 |
+| 9 | Qualidade/PWA | Concluída |
 
-## Entrega V1
+## Evolução já integrada após a V1
 
-A V1 inclui persistência IndexedDB, recuperação por timestamps, jornada linear, pausas, atividades, foco/Pomodoro, café, histórico, estatísticas, definições, calculadora de horas e ausências, vencimento/planificação, guia de utilização, exportação JSON, interface responsiva e PWA com manifest, service worker e cache offline.
+A aplicação evoluiu para além do escopo inicial e inclui atualmente:
 
-A auditoria final é integrada em `main` apenas com typecheck, lint, testes e build concluídos com sucesso. A validação manual em browsers e dispositivos reais continua a fazer parte do fecho de qualidade visual, sem alterar o núcleo funcional da V1.
+- calculadora de horas, ausências e horas extra;
+- vencimento e planificação mensal;
+- mapa de turnos;
+- stock pessoal;
+- sticks e sessão técnica glo;
+- medicamentos, horários e estados de toma;
+- reconciliação e proteção de dados de stock;
+- centro de notificações e deadlines;
+- relatório diário A4/PDF;
+- temas claro, escuro e sistema.
 
-## V2 — backlog
+## 1.2 — hardening
+
+| Frente | Estado |
+|---|---|
+| Publicação GitHub Pages apenas por artefacto | Concluída — PR #152 |
+| Remoção de builds compilados do repositório | Validada — PR #153 |
+| Lazy loading/code splitting por rota | Validada — PR #153 |
+| Backup do estado operacional fora do IndexedDB | Validada — PR #153 |
+| Smoke test desktop + mobile | Validada — PR #153 |
+| Redução de polling de permissões | Validada — PR #153 |
+| Rigor semântico do relatório A4 | Validada — PR #153 |
+
+Ver `project/docs/HARDENING_1_2.md`.
+
+## Próximas fases controladas
+
+1. Migrar gradualmente persistências operacionais de `localStorage` para IndexedDB, com migração retrocompatível.
+2. Consolidar CSS e tokens por ecrã sem reintroduzir uma camada global não validada.
+3. Converter manipulações diretas de DOM para componentes/hooks React quando cada módulo for intervencionado.
+4. Expandir testes de browser/visual para Safari/iPhone, Android, tablet e desktop.
+5. Exigir o workflow `Qualidade` através de proteção/ruleset de `main`.
+6. Adotar lockfile controlado para builds reprodutíveis.
+
+## Backlog de produto
 
 - autenticação e contas;
 - sincronização entre dispositivos;
-- backend/cloud e backups;
-- notificações avançadas;
+- backend/cloud e backups online;
 - estatísticas de longo prazo;
-- exportação CSV/PDF;
+- exportação CSV estruturada;
 - publicação nativa Android/iOS;
 - funcionalidades colaborativas, se vierem a ser necessárias.
