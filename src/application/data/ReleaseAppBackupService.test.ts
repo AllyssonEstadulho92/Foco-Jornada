@@ -97,6 +97,28 @@ describe('ReleaseAppBackupService', () => {
     }
   })
 
+  it('repõe o estado local anterior se o restauro da base de dados falhar', async () => {
+    const db = makeDatabase()
+    try {
+      const storage = new MemoryStorage({
+        'foco-jornada-work-hours-v1': 'estado-da-copia',
+      })
+      const backup = new ReleaseAppBackupService(db, storage)
+      const payload = JSON.parse(await backup.exportText()) as {
+        format: string
+        clientState: { values: Record<string, string> }
+      }
+
+      storage.setItem('foco-jornada-work-hours-v1', 'estado-local-mais-recente')
+      payload.format = 'formato-invalido'
+
+      await expect(backup.restoreFromText(JSON.stringify(payload))).rejects.toThrow('não é uma cópia')
+      expect(storage.getItem('foco-jornada-work-hours-v1')).toBe('estado-local-mais-recente')
+    } finally {
+      await db.delete()
+    }
+  })
+
   it('rejeita chaves locais não autorizadas antes de restaurar', async () => {
     const db = makeDatabase()
     try {
