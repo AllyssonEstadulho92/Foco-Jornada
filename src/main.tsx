@@ -79,6 +79,7 @@ import './styles/sticks-pacing-reference.css'
 import './styles/sticks-session-ux-redesign.css'
 import './styles/sticks-pacing-digital-clock.css'
 import './styles/release-readiness.css'
+import './styles/export-a4-color-fix.css'
 
 const root = document.getElementById('root')
 if (!root) throw new Error('Elemento #root não encontrado.')
