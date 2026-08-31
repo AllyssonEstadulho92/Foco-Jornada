@@ -1,6 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { AppBackupService } from './application/data/AppBackupService'
+import { AppDataIntegrityService } from './application/data/AppDataIntegrityService'
+import { ReleaseAppBackupService } from './application/data/ReleaseAppBackupService'
 import { MedicationDataProtectionService } from './application/personalStock/MedicationDataProtectionService'
 import { MedicationDoseStatusService } from './application/personalStock/MedicationDoseStatusService'
 import { NicotineAwarenessService } from './application/personalStock/NicotineAwarenessService'
@@ -17,9 +18,11 @@ import { DexieFocusRepository } from './infrastructure/repositories/DexieFocusRe
 import { DexieJourneyRepository } from './infrastructure/repositories/DexieJourneyRepository'
 import { DexieSettingsRepository } from './infrastructure/repositories/DexieSettingsRepository'
 import { App } from './presentation/App'
+import { installDataIntegrityMonitoring } from './presentation/utils/installDataIntegrityMonitoring'
 import { installDeadlineNotificationCoordinator } from './presentation/utils/installDeadlineNotificationCoordinator'
 import { installGloSessionPrototypeEnhancement } from './presentation/utils/installGloSessionPrototypeEnhancement'
 import { installMedicationNextDoseTimerEnhancement } from './presentation/utils/installMedicationNextDoseTimerEnhancement'
+import { installNotificationPermissionDiagnostics } from './presentation/utils/installNotificationPermissionDiagnostics'
 import { installTodayScheduleMenuReveal } from './presentation/utils/installTodayScheduleMenuReveal'
 import { installNumberInputNormalization } from './shared/utils/numberInput'
 import './styles/tokens.css'
@@ -75,6 +78,7 @@ import './styles/compact-time-displays.css'
 import './styles/sticks-pacing-reference.css'
 import './styles/sticks-session-ux-redesign.css'
 import './styles/sticks-pacing-digital-clock.css'
+import './styles/release-readiness.css'
 
 const root = document.getElementById('root')
 if (!root) throw new Error('Elemento #root não encontrado.')
@@ -116,6 +120,7 @@ keepInstalledPwaCurrent()
 const personalStockService = new OperationalPersonalStockService(db)
 const medicationDoseStatusService = new MedicationDoseStatusService(db)
 const medicationDataProtectionService = new MedicationDataProtectionService(db)
+const dataIntegrityService = new AppDataIntegrityService(db)
 
 const services = {
   journeyRepository: new DexieJourneyRepository(db),
@@ -132,7 +137,8 @@ const services = {
   stickDataProtectionService: new StickDataProtectionService(db),
   stickPackPlannerService: new StickPackPlannerService(db),
   stickUsageAnalyticsService: new StickUsageAnalyticsService(db),
-  backupService: new AppBackupService(db),
+  backupService: new ReleaseAppBackupService(db),
+  dataIntegrityService,
 }
 
 installMedicationNextDoseTimerEnhancement({
@@ -150,6 +156,9 @@ installDeadlineNotificationCoordinator({
   medicationDoseStatusService,
   medicationDataProtectionService,
 })
+
+installNotificationPermissionDiagnostics()
+installDataIntegrityMonitoring(dataIntegrityService)
 
 createRoot(root).render(
   <StrictMode>

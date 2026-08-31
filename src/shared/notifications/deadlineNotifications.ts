@@ -11,6 +11,13 @@ export interface DeadlineNotification {
   tag?: string
 }
 
+export interface DeadlineNotificationCapability {
+  permission: DeadlineNotificationPermission
+  notificationsSupported: boolean
+  serviceWorkerSupported: boolean
+  serviceWorkerRegistered: boolean
+}
+
 const DELIVERED_STORAGE_KEY = 'foco-jornada:deadline-notifications:v1'
 const MAX_DELIVERED_AGE_MS = 14 * 24 * 60 * 60 * 1000
 const PERMISSION_EVENT = 'foco-jornada:notification-permission-changed'
@@ -40,6 +47,18 @@ function saveDelivered(delivered: Record<string, number>): void {
 export function getDeadlineNotificationPermission(): DeadlineNotificationPermission {
   if (typeof window === 'undefined' || !('Notification' in window)) return 'unsupported'
   return Notification.permission
+}
+
+export async function getDeadlineNotificationCapability(): Promise<DeadlineNotificationCapability> {
+  const notificationsSupported = typeof window !== 'undefined' && 'Notification' in window
+  const serviceWorkerSupported = typeof navigator !== 'undefined' && 'serviceWorker' in navigator
+  const registration = serviceWorkerSupported ? await navigator.serviceWorker.getRegistration().catch(() => undefined) : undefined
+  return {
+    permission: getDeadlineNotificationPermission(),
+    notificationsSupported,
+    serviceWorkerSupported,
+    serviceWorkerRegistered: Boolean(registration),
+  }
 }
 
 export async function requestDeadlineNotificationPermission(): Promise<DeadlineNotificationPermission> {
@@ -115,6 +134,21 @@ async function showSystemNotification(item: DeadlineNotification): Promise<boole
   } catch {
     return false
   }
+}
+
+export async function sendDeadlineNotificationTest(): Promise<boolean> {
+  const now = new Date()
+  const item: DeadlineNotification = {
+    id: `notification-test:${now.toISOString()}`,
+    deadlineAt: now.toISOString(),
+    title: 'Teste de notificações concluído',
+    detail: 'O Foco Jornada consegue apresentar notificações do sistema neste dispositivo enquanto o browser/PWA permite execução.',
+    tone: 'success',
+    tag: 'foco-jornada-notification-test',
+  }
+  const shown = await showSystemNotification(item)
+  if (shown) pushAppNotification('success', item.title, item.detail)
+  return shown
 }
 
 export async function deliverDueDeadlines(deadlines: DeadlineNotification[], now = new Date()): Promise<DeadlineNotification[]> {

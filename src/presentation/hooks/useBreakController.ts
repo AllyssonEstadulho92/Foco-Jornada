@@ -3,10 +3,15 @@ import toast from 'react-hot-toast'
 import { finishBreak } from '../../application/breaks/finishBreak'
 import { startBreak } from '../../application/breaks/startBreak'
 import type { BreakRecord, BreakType } from '../../domain/breaks/BreakRecord'
+import { getResolvedScheduledBreaks } from '../../domain/journey/WorkSchedule'
 import { useAppServices } from '../providers/AppServicesProvider'
 
+function currentClockMinutes(now: Date): number {
+  return now.getHours() * 60 + now.getMinutes()
+}
+
 export function useBreakController(journeyId?: string) {
-  const { journeyRepository, breakRepository } = useAppServices()
+  const { journeyRepository, breakRepository, settingsRepository } = useAppServices()
   const [activeBreak, setActiveBreak] = useState<BreakRecord | undefined>()
   const [breaks, setBreaks] = useState<BreakRecord[]>([])
   const [isLoading, setIsLoading] = useState(false)
@@ -55,6 +60,27 @@ export function useBreakController(journeyId?: string) {
     }
   }, [refresh])
 
+  const resolvePlannedDuration = useCallback(
+    async (type: BreakType, explicitDuration?: number): Promise<number | undefined> => {
+      if (type === 'custom') return explicitDuration
+
+      const settings = await settingsRepository.get()
+      const now = new Date()
+      const scheduled = getResolvedScheduledBreaks(settings.workSchedule, now)
+      if (!scheduled.length) return undefined
+
+      const clock = currentClockMinutes(now)
+      const activeWindow = scheduled.find((item) => clock >= item.startMinutes && clock < item.endMinutes)
+      if (activeWindow) return activeWindow.durationMinutes
+
+      const upcoming = scheduled.find((item) => clock < item.startMinutes)
+      if (upcoming) return upcoming.durationMinutes
+
+      return undefined
+    },
+    [settingsRepository],
+  )
+
   const start = useCallback(
     async (type: BreakType, plannedDurationMinutes?: number) => {
       if (isBusy) return
@@ -62,17 +88,22 @@ export function useBreakController(journeyId?: string) {
       try {
         setIsBusy(true)
         setError(null)
+        const resolvedDuration = await resolvePlannedDuration(type, plannedDurationMinutes)
         const result = await startBreak({
           journeyRepository,
           breakRepository,
           type,
-          plannedDurationMinutes,
+          plannedDurationMinutes: resolvedDuration,
         })
 
         await refresh()
 
         if (result.status === 'started') {
-          toast.success('Pausa iniciada.')
+          toast.success(
+            resolvedDuration
+              ? `Pausa iniciada · ${resolvedDuration} min configurados.`
+              : 'Pausa iniciada sem duração automática. Termina-a manualmente.',
+          )
           return
         }
 
@@ -90,7 +121,7 @@ export function useBreakController(journeyId?: string) {
         setIsBusy(false)
       }
     },
-    [breakRepository, isBusy, journeyRepository, refresh],
+    [breakRepository, isBusy, journeyRepository, refresh, resolvePlannedDuration],
   )
 
   const finish = useCallback(async () => {
