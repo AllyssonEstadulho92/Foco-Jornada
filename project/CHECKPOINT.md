@@ -2,63 +2,57 @@
 
 ## Estado atual
 
-**Versão:** V1 funcional auditada  
-**Integração final:** PR #39 integrada em `main`  
+**Baseline publicada:** 1.1.5  
+**Versão candidata:** 1.2.0  
+**Hardening:** PR #150 em validação  
 **Fonte funcional principal:** `project/PROJECT_SPEC.md`  
-**Registo de fecho:** `project/docs/V1_FINAL_AUDIT.md`
+**Política temporal:** `docs/TIME-AUTOMATION.md`  
+**Plano de hardening:** `project/docs/HARDENING_1_2.md`
 
-## Fases
-
-- [x] Fase 0 — Especificação.
-- [x] Fase 1 — Fundação.
-- [x] Fase 2 — Jornada.
-- [x] Fase 3 — Pausas.
-- [x] Fase 4 — Atividades.
-- [x] Fase 5 — Foco/Pomodoro.
-- [x] Fase 6 — Café.
-- [x] Fase 7 — Dashboard.
-- [x] Fase 8 — Histórico, Estatísticas e Definições.
-- [x] Fase 9 — Qualidade/PWA implementada e auditada.
-
-## Funcionalidades da release
+## Núcleo preservado
 
 - Jornada persistente e recuperável.
 - Pausas e cálculo de tempo efetivo.
 - Atividades com exclusividade de atividade ativa.
-- Pomodoro e foco personalizado persistentes.
-- Café com preço configurável e totais diários.
-- Dashboard/Hoje com jornada linear e próximo evento.
-- Timeline diária, resumo e eliminação controlada de registos.
-- Estatísticas de 1, 7 e 30 dias.
-- Definições persistentes.
-- Calculadora de horas e ausências, incluindo doença, consultas e horas extra.
-- Vencimento e planificação mensal parametrizáveis.
-- Guia de utilização integrado.
-- Exportação JSON do relatório diário.
-- PWA com manifest, service worker, atualização automática e cache offline.
-- Interface neutra, clara e responsiva para mobile e computador.
+- Pomodoro e foco personalizado por timestamps.
+- Café e histórico diário.
+- Definições e horário de trabalho.
+- Calculadora de horas e ausências.
+- Vencimento e planificação mensal.
+- Mapa de turnos.
+- Stock pessoal, sticks e reconciliação.
+- Medicamentos, horários, estados de toma e proteção.
+- Centro de notificações e deadlines.
+- Relatório diário A4/PDF.
+- PWA offline e atualização automática.
 
-## Auditoria final — PR #39
+## Hardening 1.2 — alterações em validação
 
-Corrigidos os dois bloqueadores identificados na auditoria:
+1. GitHub Pages deixa de criar commits automáticos do build em `main`; a publicação usa apenas o artefacto `dist/`.
+2. Cópias compiladas históricas da raiz/`site/` são removidas do repositório e bloqueadas no `.gitignore`.
+3. O router passa a carregar páginas por lazy route, reduzindo o bundle inicial.
+4. A cópia integral passa a incluir, por allowlist, horas, vencimento, mapa de turnos, preferências, notificações e sessão glo que ainda persistem fora de IndexedDB.
+5. Diagnósticos de permissão deixam de fazer polling fixo desnecessário e reagem a eventos.
+6. O CI passa a fazer smoke test em desktop e viewport móvel 390×844.
+7. O relatório A4 distingue jornada planeada/registada e apresenta o cálculo foco/efetivo como índice de foco.
 
-1. PWA restaurada com configuração relativa compatível com GitHub Pages; deixou de existir limpeza automática de service workers/caches no arranque.
-2. Zoom do browser voltou a ser permitido; `viewport-fit=cover` e safe areas mantêm-se.
+## Gate obrigatório da 1.2.0
 
-Validação automática da PR #39:
+- [ ] Typecheck.
+- [ ] Lint.
+- [ ] Testes.
+- [ ] Build.
+- [ ] Smoke desktop.
+- [ ] Smoke mobile.
+- [ ] Merge apenas após CI verde.
 
-- Typecheck: **PASS**
-- Lint: **PASS** — permanece 1 warning não bloqueante em `TodayPage.tsx` relativo à dependência de `useMemo`.
-- Testes: **PASS — 54/54**
-- Build: **PASS**
-- Build PWA: **PASS** — gera `manifest.webmanifest`, `registerSW.js`, `sw.js` e Workbox.
-- Publicação: **atualizada** — a cópia compilada em `site/` contém manifest, registo de service worker, service worker e Workbox.
+## Próximos trabalhos — não misturar com esta fase
 
-## Pontos não bloqueantes para evolução
+- migração gradual de persistências operacionais de `localStorage` para IndexedDB;
+- consolidação de CSS por ecrã, sem reativar `neutral-theme.css` globalmente;
+- substituição gradual de DOM enhancements por componentes/hooks React;
+- testes visuais reais em Safari/iPhone, Android, tablet e monitores largos;
+- proteção/ruleset de `main` exigindo o workflow `Qualidade`;
+- lockfile controlado para instalação reprodutível.
 
-- validar manualmente a apresentação final em Safari/iPhone, Android, tablet e monitores largos;
-- eliminar o warning de `useMemo` do ecrã Hoje quando esse ficheiro voltar a ser alterado;
-- considerar code splitting/lazy loading para reduzir o bundle principal, atualmente acima do aviso de 500 kB do Vite;
-- manter as limitações do simulador de vencimento claramente identificadas quando existam regimes fiscais, contributivos ou convencionais específicos.
-
-`main` representa agora a V1 funcional auditada. Autenticação, sincronização cloud, backups online, CSV/PDF e publicação nativa permanecem para V2.
+O objetivo da 1.2.0 é reduzir risco técnico sem reconstruir nem alterar o comportamento de negócio já validado.
