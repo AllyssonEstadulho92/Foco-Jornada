@@ -9,8 +9,8 @@ export const router = createHashRouter([
       {
         index: true,
         lazy: async () => {
-          const { TodayV2Page } = await import('./pages/TodayV2Page')
-          return { Component: TodayV2Page }
+          const { TodayReferencePage } = await import('./pages/TodayReferencePage')
+          return { Component: TodayReferencePage }
         },
       },
       {
