@@ -1,6 +1,7 @@
 import {
   getDeadlineNotificationCapability,
   sendDeadlineNotificationTest,
+  subscribeDeadlineNotificationPermission,
 } from '../../shared/notifications/deadlineNotifications'
 import { pushAppNotification } from '../store/useNotificationStore'
 
@@ -62,6 +63,12 @@ export function installNotificationPermissionDiagnostics(): void {
 
   const observer = new MutationObserver(() => void render())
   observer.observe(document.body, { subtree: true, childList: true })
+  const unsubscribePermission = subscribeDeadlineNotificationPermission(() => void render())
+
   void render()
-  window.setInterval(() => void render(), 2_000)
+
+  window.addEventListener('beforeunload', () => {
+    observer.disconnect()
+    unsubscribePermission()
+  }, { once: true })
 }
