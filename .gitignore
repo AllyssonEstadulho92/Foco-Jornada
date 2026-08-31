@@ -3,3 +3,15 @@ dist
 .vite
 *.local
 .DS_Store
+
+# Builds compilados são artefactos do CI/GitHub Pages, não fonte.
+# A fonte pública vive em public/ e o HTML fonte vive em src/index.html.
+/assets/
+/site/
+/index.html
+/manifest.webmanifest
+/registerSW.js
+/sw.js
+/workbox-*.js
+/icon.svg
+/.nojekyll
