@@ -84,6 +84,7 @@ import './styles/operational-suite-v1.css'
 import './styles/notification-center-v3.css'
 import './styles/notification-professional-v4.css'
 import './styles/mobile-app-shell-fix.css'
+import './styles/home-reference-v2.css'
 
 const root = document.getElementById('root')
 if (!root) throw new Error('Elemento #root não encontrado.')
