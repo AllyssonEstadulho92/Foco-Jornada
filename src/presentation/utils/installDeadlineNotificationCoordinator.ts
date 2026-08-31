@@ -245,7 +245,14 @@ function renderPermissionControl(): void {
   const panel = document.querySelector<HTMLElement>('.notificationPanel')
   if (!panel) return
 
+  const permission = getDeadlineNotificationPermission()
   let control = document.getElementById(PERMISSION_CONTROL_ID)
+
+  if (permission === 'unsupported') {
+    control?.remove()
+    return
+  }
+
   if (!control) {
     control = document.createElement('section')
     control.id = PERMISSION_CONTROL_ID
@@ -264,21 +271,16 @@ function renderPermissionControl(): void {
     else panel.appendChild(control)
   }
 
-  const permission = getDeadlineNotificationPermission()
   const title = permission === 'granted'
     ? 'Notificações do telemóvel ativas'
     : permission === 'denied'
       ? 'Notificações bloqueadas no browser'
-      : permission === 'unsupported'
-        ? 'Notificações do sistema indisponíveis'
-        : 'Ativar notificações do telemóvel'
+      : 'Ativar notificações do telemóvel'
   const detail = permission === 'granted'
     ? 'Quando um deadline terminar e o browser permitir execução, o aviso também é enviado pelo sistema.'
     : permission === 'denied'
       ? 'Ativa a permissão nas definições do browser ou da aplicação instalada.'
-      : permission === 'unsupported'
-        ? 'Os avisos continuam guardados no centro de notificações da aplicação.'
-        : 'Autoriza uma vez para receber no sistema os avisos de medicação, Pomodoro, pausas, sessão glo e horário de trabalho.'
+      : 'Autoriza uma vez para receber no sistema os avisos de medicação, Pomodoro, pausas, sessão glo e horário de trabalho.'
 
   control.innerHTML = ''
   const strong = document.createElement('strong')
