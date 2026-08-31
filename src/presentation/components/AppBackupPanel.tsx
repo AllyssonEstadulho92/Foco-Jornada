@@ -20,13 +20,16 @@ function downloadText(content: string, fileName: string) {
 }
 
 type StorageProtection = 'checking' | 'persistent' | 'best-effort' | 'unsupported'
+type IntegrityState = 'idle' | 'checking' | 'ok' | 'error'
 
 export function AppBackupPanel() {
-  const { backupService, personalStockService } = useAppServices()
+  const { backupService, personalStockService, dataIntegrityService } = useAppServices()
   const inputRef = useRef<HTMLInputElement | null>(null)
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState('')
   const [storageProtection, setStorageProtection] = useState<StorageProtection>('checking')
+  const [integrityState, setIntegrityState] = useState<IntegrityState>('idle')
+  const [integrityDetail, setIntegrityDetail] = useState('Ainda não verificado nesta página.')
 
   useEffect(() => {
     if (!navigator.storage?.persisted) {
@@ -56,15 +59,46 @@ export function AppBackupPanel() {
     }
   }
 
+  async function verifyIntegrity() {
+    if (busy || integrityState === 'checking') return
+    setIntegrityState('checking')
+    setIntegrityDetail('A verificar referências, estados ativos, ledger de stock e eventos de medicação…')
+    try {
+      const report = await dataIntegrityService.audit()
+      if (report.ok) {
+        setIntegrityState('ok')
+        setIntegrityDetail(
+          `Integridade OK · ${report.counts.journeys} jornadas · ${report.counts.stockMovements} movimentos de stock · ${report.counts.medicationDoseEvents} eventos de medicação.`,
+        )
+        pushAppNotification('success', 'Integridade dos dados verificada', 'Não foram encontradas inconsistências estruturais.')
+      } else {
+        setIntegrityState('error')
+        setIntegrityDetail(`${report.issues.length} inconsistência(s) detetada(s). Os dados não foram alterados. Cria uma cópia antes de qualquer correção.`)
+        pushAppNotification('error', 'Integridade dos dados requer atenção', report.issues[0]?.detail ?? 'Foram detetadas inconsistências.')
+      }
+    } catch (error) {
+      const detail = error instanceof Error ? error.message : 'Não foi possível verificar a integridade dos dados.'
+      setIntegrityState('error')
+      setIntegrityDetail(detail)
+      pushAppNotification('error', 'Falha na verificação de integridade', detail)
+    }
+  }
+
   async function exportBackup() {
     if (busy) return
     setBusy(true)
     setMessage('')
     try {
+      const report = await dataIntegrityService.audit()
+      if (!report.ok) {
+        throw new Error('A cópia não foi criada porque a auditoria encontrou inconsistências. Revê o estado dos dados antes de exportar.')
+      }
       const content = await backupService.exportText()
       downloadText(content, backupFileName())
       setMessage('Cópia integral criada com todos os dados locais, incluindo stock pessoal, notas e configurações guardadas na base de dados.')
-      pushAppNotification('success', 'Cópia de segurança criada', 'O ficheiro integral foi guardado no dispositivo.')
+      setIntegrityState('ok')
+      setIntegrityDetail('Integridade verificada imediatamente antes da exportação.')
+      pushAppNotification('success', 'Cópia de segurança criada', 'O ficheiro integral foi validado e guardado no dispositivo.')
     } catch (error) {
       const detail = error instanceof Error ? error.message : 'Não foi possível criar a cópia de segurança.'
       setMessage(detail)
@@ -90,8 +124,14 @@ export function AppBackupPanel() {
       if (diagnostic.integrity !== 'OK') {
         throw new Error('O restauro terminou, mas a reconciliação do stock detetou uma inconsistência.')
       }
+      const integrity = await dataIntegrityService.audit()
+      if (!integrity.ok) {
+        throw new Error(`O restauro terminou, mas a auditoria global encontrou ${integrity.issues.length} inconsistência(s).`)
+      }
       const total = Object.values(summary.tableCounts).reduce((sum, count) => sum + count, 0)
-      setMessage(`Restauro concluído: ${total} registos recuperados. A aplicação será recarregada.`)
+      setMessage(`Restauro concluído: ${total} registos recuperados e validados. A aplicação será recarregada.`)
+      setIntegrityState('ok')
+      setIntegrityDetail('Restauro validado pela reconciliação de stock e pela auditoria global.')
       pushAppNotification('success', 'Dados restaurados', 'A cópia integral foi validada e restaurada.')
       window.setTimeout(() => window.location.reload(), 700)
     } catch (error) {
@@ -116,6 +156,14 @@ export function AppBackupPanel() {
       : storageProtection === 'unsupported'
         ? 'LOCAL'
         : 'A VERIFICAR'
+
+  const integrityLabel = integrityState === 'ok'
+    ? 'ÍNTEGRO'
+    : integrityState === 'error'
+      ? 'ATENÇÃO'
+      : integrityState === 'checking'
+        ? 'A VERIFICAR'
+        : 'VERIFICAR'
 
   return (
     <section className="stockPanel appBackupPanel" aria-labelledby="app-backup-title">
@@ -144,9 +192,9 @@ export function AppBackupPanel() {
           <small>Ou restaura o conjunto completo, ou a operação falha.</small>
         </article>
         <article className="stockMetric">
-          <span>Proteção local</span>
-          <strong>{storageProtection === 'persistent' ? 'Persistente' : 'Melhor esforço'}</strong>
-          <small>O browser continua a ser armazenamento local; uma cópia externa é a proteção adicional.</small>
+          <span>Integridade</span>
+          <strong>{integrityLabel}</strong>
+          <small>{integrityDetail}</small>
         </article>
       </div>
 
@@ -156,6 +204,9 @@ export function AppBackupPanel() {
         </button>
         <button type="button" disabled={busy} onClick={() => inputRef.current?.click()}>
           Restaurar cópia
+        </button>
+        <button type="button" disabled={busy || integrityState === 'checking'} onClick={() => void verifyIntegrity()}>
+          {integrityState === 'checking' ? 'A verificar…' : 'Verificar integridade'}
         </button>
         {storageProtection !== 'persistent' ? (
           <button type="button" disabled={busy} onClick={() => void requestPersistentStorage()}>
