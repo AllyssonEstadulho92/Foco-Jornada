@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { resolveWorkScheduleForDate } from '../../domain/journey/WorkSchedule'
+import { getResolvedScheduledBreaks, resolveWorkScheduleForDate } from '../../domain/journey/WorkSchedule'
 import { formatDuration, toLocalDateKey } from '../../shared/utils/dateTime'
 import { useDayReport } from '../hooks/useDayReport'
 import { useSettingsController } from '../hooks/useSettingsController'
@@ -34,8 +34,10 @@ export function OperationalCalendarPage() {
   const { report, isLoading, error } = useDayReport(selectedDate)
   const cells = useMemo(() => buildMonthCells(monthKey), [monthKey])
 
-  const selectedPlan = resolveWorkScheduleForDate(settings.workSchedule, dateFromKey(selectedDate))
-  const selectedLabel = new Intl.DateTimeFormat('pt-PT', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(dateFromKey(selectedDate))
+  const selectedDay = dateFromKey(selectedDate)
+  const selectedPlan = resolveWorkScheduleForDate(settings.workSchedule, selectedDay)
+  const selectedBreaks = getResolvedScheduledBreaks(settings.workSchedule, selectedDay)
+  const selectedLabel = new Intl.DateTimeFormat('pt-PT', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(selectedDay)
 
   function moveMonth(offset: number) {
     const [year, month] = monthKey.split('-').map(Number)
@@ -67,6 +69,7 @@ export function OperationalCalendarPage() {
             {cells.map((cell) => {
               const date = dateFromKey(cell.key)
               const plan = resolveWorkScheduleForDate(settings.workSchedule, date)
+              const plannedBreaks = getResolvedScheduledBreaks(settings.workSchedule, date)
               const isToday = cell.key === toLocalDateKey(today)
               const isSelected = cell.key === selectedDate
               return (
@@ -79,7 +82,7 @@ export function OperationalCalendarPage() {
                 >
                   <strong>{date.getDate()}</strong>
                   <span>{plan.isWorkingDay ? `${plan.startTime}–${plan.endTime}` : 'Sem turno'}</span>
-                  {plan.breaks.length > 0 ? <small>{plan.breaks.length} pausa{plan.breaks.length > 1 ? 's' : ''}</small> : null}
+                  {plannedBreaks.length > 0 ? <small>{plannedBreaks.length} pausa{plannedBreaks.length > 1 ? 's' : ''}</small> : null}
                 </button>
               )
             })}
@@ -91,7 +94,7 @@ export function OperationalCalendarPage() {
           <h2>{selectedLabel}</h2>
           <div className="opsDayPlan">
             <article><span>Jornada planeada</span><strong>{selectedPlan.isWorkingDay ? `${selectedPlan.startTime}–${selectedPlan.endTime}` : 'Sem jornada planeada'}</strong></article>
-            <article><span>Pausas planeadas</span><strong>{selectedPlan.breaks.length || 'Nenhuma'}</strong></article>
+            <article><span>Pausas planeadas</span><strong>{selectedBreaks.length || 'Nenhuma'}</strong></article>
           </div>
 
           {isLoading ? <div className="opsLoading">A carregar registos…</div> : null}
