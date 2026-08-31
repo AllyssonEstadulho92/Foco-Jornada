@@ -15,6 +15,7 @@ import {
   getDeadlineNotificationPermission,
   nextPendingDeadlineAt,
   requestDeadlineNotificationPermission,
+  subscribeDeadlineNotificationPermission,
   type DeadlineNotification,
 } from '../../shared/notifications/deadlineNotifications'
 
@@ -316,7 +317,6 @@ export function installDeadlineNotificationCoordinator(services: DeadlineCoordin
   let deadlines: DeadlineNotification[] = []
   let refreshTimer: number | null = null
   let wakeTimer: number | null = null
-  let permissionTimer: number | null = null
   let refreshing = false
   let stopped = false
 
@@ -349,6 +349,7 @@ export function installDeadlineNotificationCoordinator(services: DeadlineCoordin
       // Uma falha de um provider nunca deve bloquear a aplicação ou inventar deadlines alternativos.
     } finally {
       refreshing = false
+      renderPermissionControl()
     }
   }
 
@@ -360,7 +361,7 @@ export function installDeadlineNotificationCoordinator(services: DeadlineCoordin
   void refresh()
   renderPermissionControl()
   refreshTimer = window.setInterval(syncNow, PROVIDER_REFRESH_MS)
-  permissionTimer = window.setInterval(renderPermissionControl, 1_000)
+  const unsubscribePermission = subscribeDeadlineNotificationPermission(() => renderPermissionControl())
   document.addEventListener('visibilitychange', handleVisibility)
   window.addEventListener('focus', syncNow)
   window.addEventListener('pageshow', syncNow)
@@ -371,7 +372,7 @@ export function installDeadlineNotificationCoordinator(services: DeadlineCoordin
     stopped = true
     if (refreshTimer !== null) window.clearInterval(refreshTimer)
     if (wakeTimer !== null) window.clearTimeout(wakeTimer)
-    if (permissionTimer !== null) window.clearInterval(permissionTimer)
+    unsubscribePermission()
     document.removeEventListener('visibilitychange', handleVisibility)
     window.removeEventListener('focus', syncNow)
     window.removeEventListener('pageshow', syncNow)
