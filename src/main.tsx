@@ -81,6 +81,7 @@ import './styles/sticks-pacing-digital-clock.css'
 import './styles/release-readiness.css'
 import './styles/export-a4-color-fix.css'
 import './styles/operational-suite-v1.css'
+import './styles/notification-center-v3.css'
 
 const root = document.getElementById('root')
 if (!root) throw new Error('Elemento #root não encontrado.')
