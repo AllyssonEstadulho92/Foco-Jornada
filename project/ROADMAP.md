@@ -35,12 +35,12 @@ A aplicação evoluiu para além do escopo inicial e inclui atualmente:
 | Frente | Estado |
 |---|---|
 | Publicação GitHub Pages apenas por artefacto | Concluída — PR #152 |
-| Remoção de builds compilados do repositório | Em validação — PR #153 |
-| Lazy loading/code splitting por rota | Em validação — PR #153 |
-| Backup do estado operacional fora do IndexedDB | Em validação — PR #153 |
-| Smoke test desktop + mobile | Em validação — PR #153 |
-| Redução de polling de permissões | Em validação — PR #153 |
-| Rigor semântico do relatório A4 | Em validação — PR #153 |
+| Remoção de builds compilados do repositório | Validada — PR #153 |
+| Lazy loading/code splitting por rota | Validada — PR #153 |
+| Backup do estado operacional fora do IndexedDB | Validada — PR #153 |
+| Smoke test desktop + mobile | Validada — PR #153 |
+| Redução de polling de permissões | Validada — PR #153 |
+| Rigor semântico do relatório A4 | Validada — PR #153 |
 
 Ver `project/docs/HARDENING_1_2.md`.
 
