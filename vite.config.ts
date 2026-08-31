@@ -59,8 +59,24 @@ export default defineConfig({
       },
       workbox: {
         navigateFallback: 'index.html',
+        navigateFallbackDenylist: [/^\/Foco-Jornada\//],
         cleanupOutdatedCaches: true,
+        skipWaiting: true,
+        clientsClaim: true,
         globPatterns: ['**/*.{js,css,html,svg,webp,woff2}'],
+        runtimeCaching: [
+          {
+            urlPattern: ({ request }) => request.mode === 'navigate',
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'foco-jornada-navigation-v1',
+              networkTimeoutSeconds: 4,
+              cacheableResponse: {
+                statuses: [0, 200],
+              },
+            },
+          },
+        ],
       },
     }),
   ],

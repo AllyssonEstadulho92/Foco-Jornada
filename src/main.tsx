@@ -90,13 +90,18 @@ installNumberInputNormalization()
 installTodayScheduleMenuReveal()
 installGloSessionPrototypeEnhancement()
 
-function requestPwaUpdate() {
+async function requestPwaUpdate() {
   if (!('serviceWorker' in navigator) || !navigator.onLine) return
-  void navigator.serviceWorker.ready
-    .then((registration) => registration.update())
-    .catch(() => {
-      // Uma falha de rede não impede o uso da versão já instalada.
-    })
+
+  try {
+    const registration = await navigator.serviceWorker.getRegistration(import.meta.env.BASE_URL)
+    if (!registration) return
+
+    await registration.update()
+    if (registration.waiting) registration.waiting.postMessage({ type: 'SKIP_WAITING' })
+  } catch {
+    // Uma falha de rede não impede o uso da versão já instalada.
+  }
 }
 
 function keepInstalledPwaCurrent() {
@@ -109,13 +114,14 @@ function keepInstalledPwaCurrent() {
     window.location.reload()
   })
 
-  requestPwaUpdate()
+  void requestPwaUpdate()
 
   document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible') requestPwaUpdate()
+    if (document.visibilityState === 'visible') void requestPwaUpdate()
   })
-  window.addEventListener('online', requestPwaUpdate)
-  window.setInterval(requestPwaUpdate, 60 * 60 * 1000)
+  window.addEventListener('focus', () => void requestPwaUpdate())
+  window.addEventListener('online', () => void requestPwaUpdate())
+  window.setInterval(() => void requestPwaUpdate(), 5 * 60 * 1000)
 }
 
 keepInstalledPwaCurrent()
