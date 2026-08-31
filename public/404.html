@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="pt-PT">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>A redirecionar — Foco & Jornada</title>
+    <script>
+      ;(() => {
+        const base = '/Foco-Jornada/'
+        const pathname = window.location.pathname
+        let hash = window.location.hash
+
+        if (!hash && pathname.startsWith(base)) {
+          let legacyPath = pathname.slice(base.length)
+          legacyPath = legacyPath.replace(/^site\/?/, '').replace(/^\/+/, '')
+          if (legacyPath) hash = '#/' + legacyPath
+        }
+
+        window.location.replace(base + hash)
+      })()
+    </script>
+  </head>
+  <body>
+    <p>A redirecionar para Foco & Jornada…</p>
+  </body>
+</html>
