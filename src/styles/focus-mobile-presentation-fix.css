@@ -1,0 +1,168 @@
+/* Correção estritamente visual da página Foco.
+ * Mantém intactos temporizador, ciclos, jornada, sessões e persistência.
+ * Esta folha é carregada por último para neutralizar conflitos de CSS legado.
+ */
+
+.focusPage .focusPrototypePanel {
+  box-sizing: border-box;
+  width: min(100%, 660px);
+  max-width: 660px;
+  margin-inline: auto;
+}
+
+.focusPage .focusModeTabs {
+  box-sizing: border-box;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  height: auto !important;
+  min-height: 52px;
+  margin: 0 0 var(--space-4) !important;
+  padding: 4px !important;
+  gap: 4px !important;
+  align-items: stretch;
+  border-radius: var(--control-radius);
+}
+
+.focusPage .focusModeTab {
+  box-sizing: border-box;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  min-height: 44px !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 10px 12px !important;
+  white-space: normal;
+  text-align: center;
+}
+
+.focusPage .focusDial {
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
+  width: min(72vw, 300px) !important;
+  height: auto !important;
+  max-width: 300px !important;
+  min-width: 0 !important;
+  aspect-ratio: 1 / 1 !important;
+  margin: var(--space-5) auto var(--space-4) !important;
+  border-radius: 50% !important;
+  overflow: visible;
+  flex: 0 0 auto;
+}
+
+.focusPage .focusDial::before {
+  border-radius: 50% !important;
+}
+
+.focusPage .focusDialInner {
+  box-sizing: border-box;
+  width: calc(100% - 32px);
+  height: calc(100% - 32px);
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.focusPage .focusDialInner strong {
+  display: block;
+  max-width: 100%;
+  font-size: clamp(38px, 11vw, 62px) !important;
+  line-height: 1 !important;
+  letter-spacing: -0.045em;
+  white-space: nowrap;
+}
+
+.focusPage .focusPrototypeDescription {
+  width: 100%;
+  max-width: 520px;
+  margin-inline: auto;
+  padding-inline: 4px;
+}
+
+.focusPage .focusStartButton {
+  box-sizing: border-box;
+  width: 100% !important;
+  min-height: 48px;
+}
+
+.focusPage .focusHistoryPanel,
+.focusPage .focusStartPanel,
+.focusPage .focusTimerPanel {
+  box-sizing: border-box;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+@media (max-width: 599px) {
+  .focusPage {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: clip;
+  }
+
+  .focusPage .focusPrototypePanel {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 16px !important;
+  }
+
+  .focusPage .focusModeTabs {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .focusPage .focusModeTab {
+    font-size: 14px;
+  }
+
+  .focusPage .focusDial {
+    width: min(70vw, 270px) !important;
+    max-width: 270px !important;
+    aspect-ratio: 1 / 1 !important;
+  }
+
+  .focusPage .focusDialInner strong {
+    font-size: clamp(36px, 12vw, 54px) !important;
+  }
+
+  .focusPage .focusPrototypeDescription,
+  .focusPage .focusHintCentered {
+    font-size: 13px;
+    line-height: 1.45;
+  }
+
+  .focusPage .focusHistoryPanel {
+    margin-top: 16px;
+  }
+}
+
+@media (max-width: 380px) {
+  .focusPage .focusPrototypePanel {
+    padding: 14px !important;
+  }
+
+  .focusPage .focusDial {
+    width: min(72vw, 240px) !important;
+    max-width: 240px !important;
+  }
+
+  .focusPage .focusDialInner strong {
+    font-size: clamp(34px, 11.5vw, 46px) !important;
+  }
+
+  .focusPage .focusModeTab {
+    padding-inline: 8px !important;
+    font-size: 13px;
+  }
+}
