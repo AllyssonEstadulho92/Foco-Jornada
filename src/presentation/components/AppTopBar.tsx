@@ -3,6 +3,7 @@ import { emitAppFeedback } from '../../shared/notifications/appFeedback'
 import { useNow } from '../hooks/useNow'
 import { useAppServices } from '../providers/AppServicesProvider'
 import { useNotificationStore, type AppNotification } from '../store/useNotificationStore'
+import { NotificationAutomationPanel } from './NotificationAutomationPanel'
 
 type StatusNotification = {
   id: string
@@ -270,6 +271,8 @@ export function AppTopBar({ onOpenMenu, menuButtonRef }: { onOpenMenu?: () => vo
                 </div>
               ) : null}
 
+              <NotificationAutomationPanel />
+
               <div className="notificationList">
                 {notifications.length === 0 ? (
                   <div className="notificationEmpty">
@@ -342,7 +345,7 @@ export function AppTopBar({ onOpenMenu, menuButtonRef }: { onOpenMenu?: () => vo
                 )}
               </div>
 
-              <footer className="notificationPanelFooter">As notificações ficam guardadas neste dispositivo.</footer>
+              <footer className="notificationPanelFooter">Os avisos ficam guardados neste dispositivo. O envio com a aplicação totalmente fechada exige Web Push com subscrição ativa.</footer>
             </section>
           ) : null}
         </div>

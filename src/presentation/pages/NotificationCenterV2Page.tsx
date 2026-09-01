@@ -15,6 +15,10 @@ const initialCapability: DeadlineNotificationCapability = {
   notificationsSupported: false,
   serviceWorkerSupported: false,
   serviceWorkerRegistered: false,
+  pushSupported: false,
+  pushSubscribed: false,
+  standalone: false,
+  platform: 'other',
 }
 
 function BellIcon({ checked = false }: { checked?: boolean }) {
@@ -47,11 +51,13 @@ function isToday(value: string) {
 }
 
 function capabilityLabel(capability: DeadlineNotificationCapability) {
+  if (capability.platform === 'ios' && !capability.standalone) return 'iOS · instalar no Ecrã Principal'
   if (!capability.notificationsSupported) return 'Não suportado neste navegador'
   if (capability.permission === 'denied') return 'Bloqueado nas definições do navegador'
   if (capability.permission === 'default') return 'A aguardar autorização'
   if (!capability.serviceWorkerRegistered) return 'Autorizado · canal PWA não detetado'
-  return 'Operacional'
+  if (capability.pushSubscribed) return 'Web Push ativo'
+  return 'Automação local ativa'
 }
 
 export function NotificationCenterV2Page() {
@@ -272,6 +278,9 @@ export function NotificationCenterV2Page() {
               <div><dt>Centro local</dt><dd className="isGood">Ativo ✓</dd></div>
               <div><dt>Permissão do dispositivo</dt><dd className={capability.permission === 'granted' ? 'isGood' : ''}>{capability.permission === 'granted' ? 'Autorizada ✓' : capability.permission === 'denied' ? 'Bloqueada' : capability.permission === 'default' ? 'Pendente' : 'Não suportada'}</dd></div>
               <div><dt>Service Worker</dt><dd className={capability.serviceWorkerRegistered ? 'isGood' : ''}>{capability.serviceWorkerRegistered ? 'Ativo ✓' : capability.serviceWorkerSupported ? 'Não registado' : 'Não suportado'}</dd></div>
+              <div><dt>Plataforma</dt><dd>{capability.platform === 'ios' ? 'iOS / iPadOS' : capability.platform === 'android' ? 'Android' : capability.platform === 'desktop' ? 'Computador' : 'Web'}</dd></div>
+              <div><dt>Modo</dt><dd>{capability.standalone ? 'PWA instalada' : 'Browser'}</dd></div>
+              <div><dt>Web Push</dt><dd className={capability.pushSubscribed ? 'isGood' : ''}>{capability.pushSubscribed ? 'Subscrito ✓' : capability.pushSupported ? 'Por configurar' : 'Indisponível'}</dd></div>
               <div><dt>Jornada</dt><dd>{activeJourney ? 'Em curso' : 'Inativa'}</dd></div>
               <div><dt>Foco</dt><dd>{activeFocus ? 'Em curso' : 'Inativo'}</dd></div>
               <div><dt>Último teste</dt><dd>{lastTestAt ? formatDateTime(lastTestAt) : 'Ainda não executado'}</dd></div>
@@ -298,7 +307,7 @@ export function NotificationCenterV2Page() {
         <span>{localOperational ? 'Proteção local ativa' : ''}</span>
       </footer>
 
-      <p className="notificationTechnicalNote">Limite técnico: numa PWA estática, o sistema operativo pode suspender ou encerrar o navegador. Nesse caso não existe garantia de popup no segundo exato; ao retomar a aplicação, deadlines vencidos são reconciliados pelos timestamps guardados.</p>
+      <p className="notificationTechnicalNote">Limite técnico: os deadlines locais são exatos por timestamp, mas a entrega com a aplicação totalmente fechada só é garantível com uma subscrição Web Push ligada a um serviço de envio. No iOS/iPadOS, Web Push exige a web app adicionada ao Ecrã Principal. Ao retomar a aplicação, deadlines vencidos continuam a ser reconciliados pelos timestamps guardados.</p>
       <span className="notificationCapabilitySummary" aria-hidden="true">{capabilityLabel(capability)}</span>
     </section>
   )

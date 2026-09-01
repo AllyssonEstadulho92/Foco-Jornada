@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { dueDeadlines, validateDeadline, type DeadlineNotification } from './deadlineNotifications'
+import {
+  detectDeadlineNotificationPlatform,
+  dueDeadlines,
+  validateDeadline,
+  type DeadlineNotification,
+} from './deadlineNotifications'
 
 const deadline = (id: string, at: string): DeadlineNotification => ({
   id,
@@ -10,11 +15,17 @@ const deadline = (id: string, at: string): DeadlineNotification => ({
 
 describe('deadlineNotifications', () => {
   it('normaliza um deadline válido para ISO absoluto', () => {
-    expect(validateDeadline(deadline('focus:1', '2026-08-30T10:00:00+02:00'))).toMatchObject({
+    expect(validateDeadline({
+      ...deadline('focus:1', '2026-08-30T10:00:00+02:00'),
+      category: 'focus',
+      url: '#/foco',
+    })).toMatchObject({
       id: 'focus:1',
       deadlineAt: '2026-08-30T08:00:00.000Z',
       title: 'Tempo concluído',
       tone: 'info',
+      category: 'focus',
+      url: '#/foco',
     })
   })
 
@@ -48,5 +59,12 @@ describe('deadlineNotifications', () => {
       new Date('2026-08-30T08:30:00.000Z'),
     )
     expect(due.map((item) => item.id)).toEqual(['first', 'second'])
+  })
+
+  it('deteta iOS, Android e computador sem depender do nome do browser', () => {
+    expect(detectDeadlineNotificationPlatform('Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X)', 5)).toBe('ios')
+    expect(detectDeadlineNotificationPlatform('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15) AppleWebKit', 5)).toBe('ios')
+    expect(detectDeadlineNotificationPlatform('Mozilla/5.0 (Linux; Android 15; Pixel 9)', 5)).toBe('android')
+    expect(detectDeadlineNotificationPlatform('Mozilla/5.0 (Windows NT 10.0; Win64; x64)', 0)).toBe('desktop')
   })
 })
