@@ -23,7 +23,7 @@ describe('App', () => {
       />,
     )
 
-    expect(screen.getByRole('heading', { name: 'Hoje' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Início' })).toBeInTheDocument()
     expect(
       screen.getByRole('heading', { name: /^(Bom dia|Boa tarde|Boa noite), foco!$/ }),
     ).toBeInTheDocument()
