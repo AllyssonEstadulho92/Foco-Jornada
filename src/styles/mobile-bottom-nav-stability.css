@@ -123,3 +123,98 @@
     transition: none !important;
   }
 }
+
+
+/*
+ * Estabilidade do painel "Mais".
+ * Neutraliza regras históricas que deixavam translateX(-50%) ativo depois de
+ * mobile-shell.css voltar a posicionar o painel pelas margens esquerda/direita.
+ * O resultado anterior deslocava metade do painel para fora do viewport.
+ */
+@media (max-width: 899px) {
+  .mobileQuickPanel {
+    position: fixed !important;
+    z-index: 119 !important;
+    right: max(8px, env(safe-area-inset-right)) !important;
+    bottom: calc(82px + env(safe-area-inset-bottom)) !important;
+    left: max(8px, env(safe-area-inset-left)) !important;
+    width: auto !important;
+    max-width: none !important;
+    max-height: min(60dvh, 480px) !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+    padding: 10px !important;
+    overflow-y: auto !important;
+    box-sizing: border-box !important;
+    border: 1px solid var(--line) !important;
+    border-radius: 18px !important;
+    background: color-mix(in srgb, var(--surface) 97%, transparent) !important;
+    box-shadow: 0 18px 46px rgba(28, 38, 32, .15) !important;
+    transform: none !important;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .mobileQuickPanelHeader,
+  .mobileQuickPanelCallout {
+    display: none !important;
+  }
+
+  .mobileQuickPanel .mobileQuickLink,
+  .mobileQuickPanel .mobileQuickLink:last-child {
+    display: flex !important;
+    min-width: 0 !important;
+    min-height: 72px !important;
+    grid-column: auto !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 10px !important;
+    padding: 10px 12px !important;
+    border: 1px solid var(--line) !important;
+    border-radius: 14px !important;
+    background: var(--surface-2) !important;
+    color: var(--text) !important;
+    text-align: left !important;
+    transform: none !important;
+  }
+
+  .mobileQuickPanel .mobileQuickLink:last-child {
+    grid-column: 1 / -1 !important;
+  }
+
+  .mobileQuickPanel .mobileQuickLink > svg {
+    width: 24px !important;
+    height: 24px !important;
+    flex: 0 0 24px !important;
+    color: var(--primary) !important;
+  }
+
+  .mobileQuickPanel .mobileQuickLinkCopy {
+    display: grid !important;
+    min-width: 0 !important;
+    gap: 2px !important;
+    justify-items: start !important;
+    text-align: left !important;
+  }
+
+  .mobileQuickPanel .mobileQuickLinkCopy strong,
+  .mobileQuickPanel .mobileQuickLinkCopy small {
+    min-width: 0 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .mobileQuickPanel {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .mobileQuickPanel .mobileQuickLink,
+  .mobileQuickPanel .mobileQuickLink:last-child {
+    grid-column: 1 !important;
+    min-height: 64px !important;
+  }
+}
