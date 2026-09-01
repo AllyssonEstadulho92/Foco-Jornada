@@ -23,7 +23,6 @@ import { installDeadlineNotificationCoordinator } from './presentation/utils/ins
 import { installGloSessionPrototypeEnhancement } from './presentation/utils/installGloSessionPrototypeEnhancement'
 import { installMedicationNextDoseTimerEnhancement } from './presentation/utils/installMedicationNextDoseTimerEnhancement'
 import { installNotificationPermissionDiagnostics } from './presentation/utils/installNotificationPermissionDiagnostics'
-import { installTodayScheduleMenuReveal } from './presentation/utils/installTodayScheduleMenuReveal'
 import { installNumberInputNormalization } from './shared/utils/numberInput'
 import './styles/tokens.css'
 import './styles/global.css'
@@ -92,7 +91,6 @@ const root = document.getElementById('root')
 if (!root) throw new Error('Elemento #root não encontrado.')
 
 installNumberInputNormalization()
-installTodayScheduleMenuReveal()
 installGloSessionPrototypeEnhancement()
 
 async function requestPwaUpdate() {
