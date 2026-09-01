@@ -1,0 +1,535 @@
+/* Foco Jornada 1.2.1 — migração visual das páginas principais.
+   Esta camada não altera lógica, dados ou tempos; apenas consolida hierarquia e responsividade. */
+
+.focusPage,
+.opsPage,
+.notificationV3Page,
+.medicationsStockPage {
+  width: min(100%, 1180px);
+  margin: 0 auto;
+}
+
+.focusHeader,
+.opsPageHeader,
+.notificationV3Header,
+.personalStockHeader.personalStockHeaderActions {
+  align-items: flex-start;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+}
+
+.focusHeader h1,
+.opsPageHeader h1,
+.notificationV3Header h1,
+.medicationsStockPage .personalStockHeader h1 {
+  margin: 4px 0 6px;
+  font-size: clamp(1.75rem, 3vw, 2.4rem);
+  line-height: var(--line-height-tight);
+  letter-spacing: -0.03em;
+}
+
+.focusHeader p,
+.opsPageHeader p,
+.notificationV3Header p,
+.medicationsStockPage .personalStockHeader p {
+  max-width: 720px;
+  margin: 0;
+  color: var(--muted);
+}
+
+.focusPrototypePanel,
+.focusHistoryPanel,
+.opsCalendarCard,
+.opsDayPanel,
+.opsTableCard,
+.notificationInboxCard,
+.notificationHistoryCard,
+.notificationSystemCard,
+.notificationStatusCard,
+.notificationQuickCard,
+.notificationPrivacyCard,
+.medicationsStockPage .stockCard,
+.medicationsStockPage .medicationWorkspace,
+.medicationsStockPage .medicationLinearSection {
+  border: 1px solid var(--line) !important;
+  border-radius: var(--radius-lg) !important;
+  background: var(--surface) !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+
+/* Foco */
+.focusPage {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.focusHeader {
+  display: flex;
+  justify-content: space-between;
+}
+
+.focusJourneyState {
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  white-space: nowrap;
+}
+
+.focusJourneyStateActive {
+  border-color: rgba(31, 157, 99, 0.22);
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+.focusPrototypePanel {
+  padding: clamp(20px, 4vw, 36px) !important;
+}
+
+.focusModeTabs {
+  width: fit-content;
+  margin: 0 auto var(--space-5);
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+}
+
+.focusModeTab {
+  min-height: 40px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--muted);
+  font-weight: var(--weight-semibold);
+}
+
+.focusModeTabActive {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow-sm);
+}
+
+.focusDial {
+  width: min(70vw, 300px) !important;
+  height: min(70vw, 300px) !important;
+  margin: var(--space-5) auto !important;
+}
+
+.focusDialInner strong {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.04em;
+}
+
+.focusPrototypeDescription,
+.focusHintCentered,
+.focusAssociationCentered {
+  max-width: 560px;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  color: var(--muted);
+  text-align: center;
+}
+
+.focusStartButton {
+  min-width: min(100%, 260px);
+}
+
+.focusTimerActions {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.focusTimerActions button,
+.focusStartButton {
+  min-height: var(--control-height);
+  border-radius: var(--control-radius) !important;
+}
+
+.focusHistoryPanel {
+  padding: clamp(18px, 3vw, 28px) !important;
+}
+
+.focusHistoryItem {
+  border-radius: var(--radius-md) !important;
+}
+
+/* Calendário e Relatórios */
+.opsPage {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.opsPageHeader {
+  display: flex;
+  justify-content: space-between;
+}
+
+.opsControls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.opsControls :where(button, input, select) {
+  min-height: var(--control-height-compact);
+  border: 1px solid var(--line) !important;
+  border-radius: var(--control-radius) !important;
+  background: var(--surface) !important;
+}
+
+.opsControls button {
+  padding-inline: 14px;
+  font-weight: var(--weight-semibold);
+}
+
+.opsControls input,
+.opsControls select {
+  padding-inline: 12px;
+  color: var(--text);
+}
+
+.opsCalendarLayout {
+  gap: var(--space-4) !important;
+  align-items: start;
+}
+
+.opsCalendarCard,
+.opsDayPanel,
+.opsTableCard {
+  overflow: hidden;
+}
+
+.opsCalendarCard {
+  padding: clamp(12px, 2vw, 20px) !important;
+}
+
+.opsCalendarDay {
+  min-height: 88px;
+  border-radius: var(--radius-md) !important;
+  transition: border-color 120ms ease, background 120ms ease, transform 120ms ease;
+}
+
+.opsCalendarDay:hover {
+  border-color: var(--line-strong) !important;
+  transform: translateY(-1px);
+}
+
+.opsCalendarDay.isSelected {
+  border-color: var(--primary) !important;
+  background: var(--primary-soft) !important;
+}
+
+.opsCalendarDay.isToday strong {
+  color: var(--primary);
+}
+
+.opsDayPanel {
+  position: sticky;
+  top: 20px;
+  padding: clamp(18px, 3vw, 26px) !important;
+}
+
+.opsDayPlan,
+.opsDayActual,
+.opsSummaryGrid {
+  gap: var(--space-3) !important;
+}
+
+.opsDayPlan article,
+.opsDayActual article,
+.opsSummaryGrid article {
+  border: 1px solid var(--line) !important;
+  border-radius: var(--radius-md) !important;
+  background: var(--surface-2) !important;
+  box-shadow: none !important;
+}
+
+.opsSummaryGrid article strong,
+.opsDayActual article strong,
+.opsDayPlan article strong {
+  font-variant-numeric: tabular-nums;
+}
+
+.opsTimelineMini article {
+  border-radius: var(--radius-md);
+}
+
+.opsTableHeader {
+  padding: 18px 20px !important;
+  border-bottom: 1px solid var(--line);
+}
+
+.opsTable th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--surface-2) !important;
+  color: var(--muted);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.opsTable td,
+.opsTable th {
+  padding: 13px 14px !important;
+}
+
+.opsTable tbody tr:hover {
+  background: var(--surface-2);
+}
+
+/* Centro de notificações */
+.notificationV3Page {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.notificationV3Header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.notificationV3TitleGroup {
+  align-items: flex-start !important;
+}
+
+.notificationV3Logo {
+  width: 44px !important;
+  height: 44px !important;
+  flex: 0 0 44px !important;
+  border-radius: var(--radius-md) !important;
+}
+
+.notificationV3FilterRow {
+  display: flex;
+  gap: var(--space-2);
+  overflow-x: auto;
+  padding: 2px 2px 8px;
+  scrollbar-width: thin;
+}
+
+.notificationV3FilterRow button {
+  flex: 0 0 auto;
+  min-height: 38px;
+  padding: 0 14px !important;
+  border-radius: var(--radius-pill) !important;
+  border: 1px solid var(--line) !important;
+  background: var(--surface) !important;
+  color: var(--muted);
+}
+
+.notificationV3FilterRow button.isActive {
+  border-color: rgba(31, 157, 99, 0.28) !important;
+  background: var(--primary-soft) !important;
+  color: var(--primary) !important;
+}
+
+.notificationV3Layout {
+  gap: var(--space-4) !important;
+  align-items: start;
+}
+
+.notificationV3MainColumn,
+.notificationV3SideColumn {
+  gap: var(--space-4) !important;
+}
+
+.notificationV3SideColumn {
+  position: sticky;
+  top: 20px;
+}
+
+.notificationHistoryItem {
+  border-radius: var(--radius-md) !important;
+}
+
+.notificationMarkRead,
+.notificationTestButton,
+.notificationSystemCard button,
+.notificationHistoryActions button {
+  min-height: var(--control-height-compact);
+  border-radius: var(--control-radius) !important;
+  font-weight: var(--weight-semibold);
+}
+
+.notificationTechnicalNote {
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius-md);
+  color: var(--muted);
+  font-size: var(--text-xs);
+  line-height: var(--line-height-relaxed);
+}
+
+/* Medicação: preserva a estrutura funcional, reduz ruído visual e melhora leitura. */
+.medicationsStockPage {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.medicationsStockPage .personalStockHeaderActions {
+  display: flex;
+  justify-content: space-between;
+}
+
+.medicationsStockPage .personalStockHeaderActions > button {
+  min-height: var(--control-height-compact);
+  padding: 0 16px;
+  border: 1px solid var(--primary) !important;
+  border-radius: var(--control-radius) !important;
+  background: var(--primary) !important;
+  color: #fff !important;
+  font-weight: var(--weight-semibold);
+  white-space: nowrap;
+}
+
+.medicationsStockPage :where(input, select, textarea) {
+  min-height: var(--control-height-compact);
+  border-color: var(--line) !important;
+  border-radius: var(--control-radius) !important;
+  background: var(--surface) !important;
+}
+
+.medicationsStockPage :where(button) {
+  border-radius: var(--control-radius);
+}
+
+.medicationsStockPage .stockStatusOk,
+.medicationsStockPage .stockStatusWarning,
+.medicationsStockPage .stockStatusNeutral {
+  border-radius: var(--radius-pill) !important;
+}
+
+.medicationsStockPage [class*='medication'] :where(h2, h3) {
+  letter-spacing: -0.015em;
+}
+
+/* Tablet/mobile */
+@media (max-width: 899px) {
+  .focusPage,
+  .opsPage,
+  .notificationV3Page,
+  .medicationsStockPage {
+    width: 100%;
+  }
+
+  .focusHeader,
+  .opsPageHeader,
+  .notificationV3Header,
+  .medicationsStockPage .personalStockHeaderActions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .focusJourneyState {
+    width: fit-content;
+  }
+
+  .opsControls {
+    width: 100%;
+  }
+
+  .opsControls input,
+  .opsControls select {
+    flex: 1 1 150px;
+    min-width: 0;
+  }
+
+  .opsCalendarLayout,
+  .notificationV3Layout {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .opsDayPanel,
+  .notificationV3SideColumn {
+    position: static;
+  }
+
+  .notificationV3HeaderActions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .medicationsStockPage .personalStockHeaderActions > button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .focusPrototypePanel,
+  .focusHistoryPanel,
+  .opsDayPanel,
+  .notificationInboxCard,
+  .notificationHistoryCard,
+  .notificationSystemCard,
+  .notificationStatusCard,
+  .notificationQuickCard,
+  .notificationPrivacyCard {
+    border-radius: var(--radius-md) !important;
+  }
+
+  .focusDial {
+    width: min(78vw, 270px) !important;
+    height: min(78vw, 270px) !important;
+  }
+
+  .focusTimerActions > button {
+    flex: 1 1 140px;
+  }
+
+  .opsCalendarCard {
+    padding: 8px !important;
+    overflow-x: auto;
+  }
+
+  .opsWeekdays,
+  .opsCalendarGrid {
+    min-width: 620px;
+  }
+
+  .opsCalendarDay {
+    min-height: 78px;
+  }
+
+  .opsSummaryGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .notificationV3HeaderActions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .notificationUnreadCard,
+  .notificationMarkRead {
+    width: 100%;
+  }
+
+  .notificationPrivacyCard {
+    align-items: flex-start !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .opsSummaryGrid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .focusPrototypePanel,
+  .focusHistoryPanel {
+    padding: 16px !important;
+  }
+}
