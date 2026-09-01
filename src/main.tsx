@@ -86,6 +86,7 @@ import './styles/ui-primitives.css'
 import './styles/page-migration-v121.css'
 import './styles/mobile-shell.css'
 import './styles/focus.css'
+import './styles/mobile-bottom-nav-stability.css'
 
 const root = document.getElementById('root')
 if (!root) throw new Error('Elemento #root não encontrado.')
