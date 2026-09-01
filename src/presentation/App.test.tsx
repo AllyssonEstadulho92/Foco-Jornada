@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { InMemoryActivityRepository } from '../test/InMemoryActivityRepository'
 import { InMemoryBreakRepository } from '../test/InMemoryBreakRepository'
@@ -37,6 +37,19 @@ describe('App', () => {
     expect(screen.getAllByRole('link', { name: 'Relatórios' }).length).toBeGreaterThan(0)
     expect(screen.getAllByRole('link', { name: 'Mais' }).length).toBeGreaterThan(0)
     expect(screen.getByRole('link', { name: 'Ver tudo' })).toHaveAttribute('href', '#/historico')
+
+    const mobileNavigation = screen.getByRole('navigation', { name: 'Navegação móvel' })
+    const moreButton = within(mobileNavigation).getByRole('button', { name: 'Abrir menu Mais' })
+    expect(moreButton).toHaveTextContent('Mais')
+    expect(moreButton).toHaveAttribute('aria-expanded', 'false')
+
+    fireEvent.click(moreButton)
+
+    const closeMoreButton = within(mobileNavigation).getByRole('button', { name: 'Fechar menu Mais' })
+    expect(closeMoreButton).toHaveTextContent('Mais')
+    expect(closeMoreButton).not.toHaveTextContent('Fechar')
+    expect(closeMoreButton).toHaveAttribute('aria-expanded', 'true')
+    expect(screen.getByRole('navigation', { name: 'Acesso rápido' })).toBeInTheDocument()
 
     view.unmount()
   })
