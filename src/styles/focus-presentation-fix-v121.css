@@ -1,0 +1,181 @@
+/* Ajuste estritamente visual da página Foco.
+ * Corrige conflitos históricos de CSS no Safari/iPhone sem alterar qualquer lógica.
+ */
+
+.focusPage .focusStartPanel,
+.focusPage .focusTimerPanel,
+.focusPage .focusHistoryPanel {
+  box-sizing: border-box;
+  width: min(100%, 680px);
+  max-width: 100%;
+  margin-inline: auto;
+}
+
+.focusPage .focusModeTabs {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  grid-auto-flow: column;
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  height: auto !important;
+  min-height: 52px;
+  margin: 0 0 var(--space-4) !important;
+  padding: 4px !important;
+  overflow: hidden;
+}
+
+.focusPage .focusModeTab {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  height: 48px !important;
+  min-height: 48px !important;
+  margin: 0 !important;
+  padding: 0 12px !important;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.focusPage .focusDial {
+  box-sizing: border-box;
+  display: grid !important;
+  place-items: center;
+  width: min(72vw, 300px) !important;
+  min-width: 0 !important;
+  max-width: 300px !important;
+  height: auto !important;
+  min-height: 0 !important;
+  aspect-ratio: 1 / 1 !important;
+  margin: var(--space-5) auto var(--space-4) !important;
+  border-radius: 50% !important;
+  flex: 0 0 auto;
+}
+
+.focusPage .focusDial::before {
+  box-sizing: border-box;
+  border-radius: 50% !important;
+}
+
+.focusPage .focusDialInner {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  padding: 20px;
+  overflow: hidden;
+  text-align: center;
+}
+
+.focusPage .focusDialInner strong {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  font-size: clamp(38px, 10vw, 62px) !important;
+  line-height: 1 !important;
+  letter-spacing: -0.045em !important;
+  white-space: nowrap;
+}
+
+.focusPage .focusPrototypeDescription,
+.focusPage .focusHintCentered {
+  max-width: 520px;
+  margin-inline: auto;
+  padding-inline: 4px;
+}
+
+.focusPage .focusStartButton {
+  min-height: 52px;
+  border-radius: 14px;
+}
+
+.focusPage .sectionHeadingRow {
+  min-width: 0;
+}
+
+.focusPage .focusCounters {
+  min-width: 0;
+}
+
+@media (max-width: 640px) {
+  .focusPage {
+    width: 100%;
+    max-width: 100%;
+    padding-inline: 0;
+  }
+
+  .focusPage .focusStartPanel,
+  .focusPage .focusTimerPanel,
+  .focusPage .focusHistoryPanel {
+    width: 100%;
+    max-width: 100%;
+    padding: 18px;
+    border-radius: 20px;
+  }
+
+  .focusPage .focusDial {
+    width: min(74vw, 286px) !important;
+    max-width: 286px !important;
+  }
+
+  .focusPage .focusDialInner strong {
+    font-size: clamp(36px, 11.5vw, 54px) !important;
+  }
+
+  .focusPage .focusModeTabs {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .focusPage .focusModeTab {
+    font-size: 14px;
+  }
+
+  .focusPage .focusPrototypeDescription,
+  .focusPage .focusHintCentered {
+    font-size: 14px;
+    line-height: 1.45;
+  }
+}
+
+@media (max-width: 430px) {
+  .focusPage .focusStartPanel,
+  .focusPage .focusTimerPanel,
+  .focusPage .focusHistoryPanel {
+    padding: 16px;
+  }
+
+  .focusPage .focusModeTabs {
+    min-height: 50px;
+  }
+
+  .focusPage .focusModeTab {
+    height: 46px !important;
+    min-height: 46px !important;
+    padding-inline: 8px !important;
+    font-size: 13px;
+  }
+
+  .focusPage .focusDial {
+    width: min(76vw, 274px) !important;
+    max-width: 274px !important;
+  }
+
+  .focusPage .focusDialInner {
+    padding: 16px;
+  }
+
+  .focusPage .focusDialInner strong {
+    font-size: clamp(34px, 11vw, 48px) !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .focusPage .focusDial {
+    width: min(78vw, 252px) !important;
+    max-width: 252px !important;
+  }
+
+  .focusPage .focusDialInner strong {
+    font-size: clamp(31px, 10.5vw, 42px) !important;
+  }
+}
