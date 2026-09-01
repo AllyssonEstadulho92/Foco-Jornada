@@ -1,6 +1,8 @@
 import { pushAppNotification, type NotificationTone } from '../../presentation/store/useNotificationStore'
 
 export type DeadlineNotificationPermission = NotificationPermission | 'unsupported'
+export type DeadlineNotificationPlatform = 'ios' | 'android' | 'desktop' | 'other'
+export type DeadlineNotificationCategory = 'journey' | 'break' | 'focus' | 'medication' | 'glo' | 'system'
 
 export interface DeadlineNotification {
   id: string
@@ -9,6 +11,8 @@ export interface DeadlineNotification {
   detail: string
   tone?: NotificationTone
   tag?: string
+  category?: DeadlineNotificationCategory
+  url?: string
 }
 
 export interface DeadlineNotificationCapability {
@@ -16,6 +20,10 @@ export interface DeadlineNotificationCapability {
   notificationsSupported: boolean
   serviceWorkerSupported: boolean
   serviceWorkerRegistered: boolean
+  pushSupported: boolean
+  pushSubscribed: boolean
+  standalone: boolean
+  platform: DeadlineNotificationPlatform
 }
 
 const DELIVERED_STORAGE_KEY = 'foco-jornada:deadline-notifications:v1'
@@ -44,6 +52,26 @@ function saveDelivered(delivered: Record<string, number>): void {
   }
 }
 
+export function detectDeadlineNotificationPlatform(
+  userAgent = typeof navigator === 'undefined' ? '' : navigator.userAgent,
+  maxTouchPoints = typeof navigator === 'undefined' ? 0 : navigator.maxTouchPoints,
+): DeadlineNotificationPlatform {
+  const isIOS = /iPad|iPhone|iPod/i.test(userAgent)
+    || (/Macintosh/i.test(userAgent) && maxTouchPoints > 1)
+  if (isIOS) return 'ios'
+  if (/Android/i.test(userAgent)) return 'android'
+  if (/Windows|Macintosh|Linux/i.test(userAgent)) return 'desktop'
+  return 'other'
+}
+
+export function isStandaloneWebApp(): boolean {
+  if (typeof window === 'undefined' || typeof navigator === 'undefined') return false
+  const mediaStandalone = typeof window.matchMedia === 'function'
+    && window.matchMedia('(display-mode: standalone)').matches
+  const navigatorStandalone = Boolean((navigator as Navigator & { standalone?: boolean }).standalone)
+  return mediaStandalone || navigatorStandalone
+}
+
 export function getDeadlineNotificationPermission(): DeadlineNotificationPermission {
   if (typeof window === 'undefined' || !('Notification' in window)) return 'unsupported'
   return Notification.permission
@@ -52,12 +80,23 @@ export function getDeadlineNotificationPermission(): DeadlineNotificationPermiss
 export async function getDeadlineNotificationCapability(): Promise<DeadlineNotificationCapability> {
   const notificationsSupported = typeof window !== 'undefined' && 'Notification' in window
   const serviceWorkerSupported = typeof navigator !== 'undefined' && 'serviceWorker' in navigator
-  const registration = serviceWorkerSupported ? await navigator.serviceWorker.getRegistration().catch(() => undefined) : undefined
+  const registration = serviceWorkerSupported
+    ? await navigator.serviceWorker.getRegistration(import.meta.env.BASE_URL).catch(() => undefined)
+    : undefined
+  const pushSupported = Boolean(registration && 'pushManager' in registration)
+  const subscription = pushSupported
+    ? await registration?.pushManager.getSubscription().catch(() => null)
+    : null
+
   return {
     permission: getDeadlineNotificationPermission(),
     notificationsSupported,
     serviceWorkerSupported,
     serviceWorkerRegistered: Boolean(registration),
+    pushSupported,
+    pushSubscribed: Boolean(subscription),
+    standalone: isStandaloneWebApp(),
+    platform: detectDeadlineNotificationPlatform(),
   }
 }
 
@@ -89,7 +128,16 @@ export function validateDeadline(input: DeadlineNotification): DeadlineNotificat
     detail: input.detail.trim(),
     tone: input.tone ?? 'info',
     tag: input.tag?.trim() || input.id.trim(),
+    category: input.category ?? 'system',
+    url: input.url?.trim() || undefined,
   }
+}
+
+function notificationTargetUrl(item: DeadlineNotification): string {
+  const target = item.url?.trim()
+  if (!target) return import.meta.env.BASE_URL
+  if (target.startsWith('#')) return `${import.meta.env.BASE_URL}${target}`
+  return target
 }
 
 export function dueDeadlines(
@@ -116,20 +164,26 @@ async function showSystemNotification(item: DeadlineNotification): Promise<boole
     data: {
       deadlineId: item.id,
       deadlineAt: item.deadlineAt,
-      url: import.meta.env.BASE_URL,
+      category: item.category ?? 'system',
+      url: notificationTargetUrl(item),
     },
   }
 
   try {
     if ('serviceWorker' in navigator) {
-      const registration = await navigator.serviceWorker.getRegistration()
+      const registration = await navigator.serviceWorker.getRegistration(import.meta.env.BASE_URL)
       if (registration) {
         await registration.showNotification(item.title, options)
         return true
       }
     }
 
-    new Notification(item.title, options)
+    const notification = new Notification(item.title, options)
+    notification.onclick = () => {
+      window.focus()
+      if (item.url?.startsWith('#')) window.location.hash = item.url.slice(1)
+      notification.close()
+    }
     return true
   } catch {
     return false
@@ -145,6 +199,8 @@ export async function sendDeadlineNotificationTest(): Promise<boolean> {
     detail: 'O Foco Jornada consegue apresentar notificações do sistema neste dispositivo enquanto o browser/PWA permite execução.',
     tone: 'success',
     tag: 'foco-jornada-notification-test',
+    category: 'system',
+    url: '#/notificacoes',
   }
   const shown = await showSystemNotification(item)
   if (shown) pushAppNotification('success', item.title, item.detail)
