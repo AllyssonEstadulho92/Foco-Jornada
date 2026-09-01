@@ -1,0 +1,125 @@
+/*
+ * Estabilidade final da barra inferior móvel.
+ * O botão "Mais" mantém exatamente a mesma caixa, posição e rótulo
+ * antes e depois de abrir o painel; apenas o símbolo + roda para indicar fecho.
+ */
+@media (max-width: 899px) {
+  .bottomNav.mobileBottomBar {
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+    align-items: center !important;
+    overflow: visible !important;
+  }
+
+  .mobileBottomBar .navLink,
+  .mobileBottomBar .mobileQuickButton,
+  .mobileBottomBar .mobileQuickButtonActive {
+    min-width: 0 !important;
+    min-height: 58px !important;
+    height: 58px !important;
+    align-self: stretch !important;
+    justify-self: stretch !important;
+    gap: 4px !important;
+    margin: 0 !important;
+    padding: 3px 2px !important;
+  }
+
+  .mobileBottomBar .mobileQuickButton,
+  .mobileBottomBar .mobileQuickButtonActive {
+    position: relative !important;
+    top: 0 !important;
+    display: flex !important;
+    width: auto !important;
+    max-width: none !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border: 0 !important;
+    border-radius: 14px !important;
+    background: transparent !important;
+    color: var(--muted) !important;
+    box-shadow: none !important;
+    transform: none !important;
+  }
+
+  .mobileBottomBar .mobileQuickButton > .mobileQuickButtonIcon,
+  .mobileBottomBar .mobileQuickButtonActive > .mobileQuickButtonIcon {
+    display: grid !important;
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px !important;
+    min-height: 42px !important;
+    flex: 0 0 42px !important;
+    place-items: center !important;
+    margin: 0 !important;
+    border: 1px solid color-mix(in srgb, var(--primary) 34%, transparent) !important;
+    border-radius: 999px !important;
+    background: var(--primary) !important;
+    color: #fff !important;
+    box-shadow: 0 7px 18px rgba(31, 157, 99, .20) !important;
+    font-size: 28px !important;
+    font-weight: var(--weight-medium) !important;
+    line-height: 1 !important;
+    transform-origin: 50% 50% !important;
+    transition: transform 160ms ease !important;
+  }
+
+  .mobileBottomBar .mobileQuickButtonActive > .mobileQuickButtonIcon {
+    transform: rotate(45deg) !important;
+  }
+
+  .mobileBottomBar .mobileQuickButton > .mobileQuickButtonLabel,
+  .mobileBottomBar .mobileQuickButtonActive > .mobileQuickButtonLabel {
+    position: static !important;
+    display: block !important;
+    width: 100% !important;
+    margin: 0 !important;
+    color: inherit !important;
+    font-size: 10px !important;
+    font-weight: var(--weight-semibold) !important;
+    line-height: 1.05 !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+  }
+
+  .mobileBottomBar .mobileQuickButtonActive {
+    color: var(--primary) !important;
+  }
+
+  .mobileBottomBar .mobileQuickButton:focus-visible,
+  .mobileBottomBar .mobileQuickButtonActive:focus-visible {
+    outline: 2px solid var(--primary) !important;
+    outline-offset: 2px !important;
+  }
+}
+
+@media (max-width: 420px) {
+  .mobileBottomBar .navLink,
+  .mobileBottomBar .mobileQuickButton,
+  .mobileBottomBar .mobileQuickButtonActive {
+    min-height: 54px !important;
+    height: 54px !important;
+    gap: 3px !important;
+  }
+
+  .mobileBottomBar .mobileQuickButton > .mobileQuickButtonIcon,
+  .mobileBottomBar .mobileQuickButtonActive > .mobileQuickButtonIcon {
+    width: 38px !important;
+    height: 38px !important;
+    min-width: 38px !important;
+    min-height: 38px !important;
+    flex-basis: 38px !important;
+    font-size: 26px !important;
+  }
+
+  .mobileBottomBar .mobileQuickButton > .mobileQuickButtonLabel,
+  .mobileBottomBar .mobileQuickButtonActive > .mobileQuickButtonLabel {
+    font-size: 9px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mobileBottomBar .mobileQuickButton > .mobileQuickButtonIcon,
+  .mobileBottomBar .mobileQuickButtonActive > .mobileQuickButtonIcon {
+    transition: none !important;
+  }
+}
