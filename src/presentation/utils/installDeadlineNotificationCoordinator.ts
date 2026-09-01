@@ -8,23 +8,22 @@ import type { PersonalStockService } from '../../application/personalStock/Perso
 import { minorToDecimal } from '../../application/personalStock/decimal'
 import { addCalendarDays, dateKeyInZone, resolveZonedLocalDateTime } from '../../application/personalStock/time'
 import type { SettingsRepository } from '../../application/settings/SettingsRepository'
-import { resolveWorkScheduleForDate } from '../../domain/journey/WorkSchedule'
+import { getScheduleMilestones, resolveWorkScheduleForDate, type ScheduleMilestone } from '../../domain/journey/WorkSchedule'
 import type { MedicationDoseEvent } from '../../domain/personalStock/models'
 import {
   deliverDueDeadlines,
-  getDeadlineNotificationPermission,
   nextPendingDeadlineAt,
-  requestDeadlineNotificationPermission,
   type DeadlineNotification,
 } from '../../shared/notifications/deadlineNotifications'
 
 const GLO_SESSION_TIMER_STORAGE_KEY = 'foco-jornada:glo-session-timer-v2'
 const LEGACY_GLO_SESSION_TIMER_STORAGE_KEY = 'foco-jornada:glo-session-timer-v1'
 const PORTUGAL_TIMEZONE = 'Europe/Lisbon'
-const PROVIDER_REFRESH_MS = 5_000
+const PROVIDER_REFRESH_MS = 15_000
 const MAX_WAKE_DELAY_MS = 60_000
 const MEDICATION_RECONCILIATION_WINDOW_MS = 48 * 60 * 60 * 1000
-const PERMISSION_CONTROL_ID = 'deadline-mobile-notification-permission'
+const SCHEDULE_PAST_GRACE_MS = 15 * 60 * 1000
+const SCHEDULE_LOOKAHEAD_MS = 30 * 60 * 60 * 1000
 
 interface DeadlineCoordinatorServices {
   journeyRepository: JourneyRepository
@@ -60,6 +59,8 @@ function focusDeadline(session: {
       : 'O tempo programado da sessão de foco terminou.',
     tone: 'success',
     tag: `focus-${session.id}`,
+    category: 'focus',
+    url: '#/foco',
   }
 }
 
@@ -80,6 +81,8 @@ function breakDeadline(record: {
     detail: 'A duração planeada da pausa terminou. A pausa continua aberta até ser terminada na aplicação.',
     tone: 'info',
     tag: `break-${record.id}`,
+    category: 'break',
+    url: '#/',
   }
 }
 
@@ -96,6 +99,8 @@ function gloDeadline(): DeadlineNotification | null {
       detail: `${state.session.deviceLabel} · ${state.session.modeLabel}: o tempo técnico configurado da sessão terminou.`,
       tone: 'success',
       tag: `glo-${state.session.startedAt}`,
+      category: 'glo',
+      url: '#/sticks',
     }
   } catch {
     return null
@@ -172,6 +177,8 @@ async function medicationDeadlines(
             detail: `${name}: chegou o horário registado (${minorToDecimal(quantityMinor)} ${medication.medication.unit}). Confirma o estado da toma na aplicação. Este aviso não cria nem altera a prescrição.`,
             tone: 'info',
             tag: `medication-${medication.medication.id}-${occurrenceKey}`,
+            category: 'medication',
+            url: '#/medicamentos',
           })
         }
       }
@@ -185,29 +192,85 @@ async function medicationDeadlines(
     .slice(0, 24)
 }
 
-async function workScheduleDeadline(
+function scheduleMilestoneCopy(
+  milestone: ScheduleMilestone,
+  hasActiveJourney: boolean,
+): Pick<DeadlineNotification, 'title' | 'detail' | 'category'> {
+  if (milestone.kind === 'entry') {
+    return {
+      title: 'Hora de entrada planeada',
+      detail: `O horário configurado começa às ${milestone.time}. Regista a entrada quando iniciares a jornada.`,
+      category: 'journey',
+    }
+  }
+
+  if (milestone.kind === 'break-start') {
+    return {
+      title: 'Pausa planeada',
+      detail: `Chegou a hora planeada da pausa (${milestone.time}). O registo real da pausa continua a depender da tua ação na aplicação.`,
+      category: 'break',
+    }
+  }
+
+  if (milestone.kind === 'break-end') {
+    return {
+      title: 'Regresso planeado',
+      detail: `O horário configurado prevê o regresso às ${milestone.time}. Confirma o estado real da pausa na aplicação.`,
+      category: 'break',
+    }
+  }
+
+  return {
+    title: 'Hora de saída planeada',
+    detail: hasActiveJourney
+      ? `O horário configurado terminou às ${milestone.time}. A jornada continua aberta até registares a saída.`
+      : `O horário de trabalho configurado para hoje termina às ${milestone.time}.`,
+    category: 'journey',
+  }
+}
+
+async function workScheduleDeadlines(
   services: DeadlineCoordinatorServices,
   now: Date,
-): Promise<DeadlineNotification | null> {
-  const activeJourney = await services.journeyRepository.getActive()
-  if (!activeJourney) return null
-  const settings = await services.settingsRepository.get()
-  const resolved = resolveWorkScheduleForDate(settings.workSchedule, now)
-  if (!resolved.isWorkingDay) return null
+): Promise<DeadlineNotification[]> {
+  const [settings, activeJourney] = await Promise.all([
+    services.settingsRepository.get(),
+    services.journeyRepository.getActive(),
+  ])
+  const today = dateKeyInZone(now, PORTUGAL_TIMEZONE)
+  const dates = [today, addCalendarDays(today, 1)]
+  const nowMs = now.getTime()
+  const candidates: DeadlineNotification[] = []
 
-  try {
-    const deadline = resolveZonedLocalDateTime(resolved.dateKey, resolved.endTime, PORTUGAL_TIMEZONE)
-    return {
-      id: `work-schedule:${activeJourney.id}:${deadline.toISOString()}`,
-      deadlineAt: deadline.toISOString(),
-      title: 'Horário de trabalho planeado concluído',
-      detail: `O horário configurado para hoje terminou às ${resolved.endTime}. A jornada só é encerrada quando registares a saída.`,
-      tone: 'info',
-      tag: `work-schedule-${activeJourney.id}`,
+  for (const onDate of dates) {
+    const resolved = resolveWorkScheduleForDate(settings.workSchedule, onDate)
+    if (!resolved.isWorkingDay) continue
+
+    for (const milestone of getScheduleMilestones(settings.workSchedule, onDate)) {
+      try {
+        const deadline = resolveZonedLocalDateTime(onDate, milestone.time, PORTUGAL_TIMEZONE)
+        const deadlineMs = deadline.getTime()
+        if (deadlineMs < nowMs - SCHEDULE_PAST_GRACE_MS) continue
+        if (deadlineMs > nowMs + SCHEDULE_LOOKAHEAD_MS) continue
+
+        const copy = scheduleMilestoneCopy(milestone, Boolean(activeJourney))
+        candidates.push({
+          id: `schedule:${onDate}:${milestone.id}:${deadline.toISOString()}`,
+          deadlineAt: deadline.toISOString(),
+          title: copy.title,
+          detail: copy.detail,
+          tone: 'info',
+          tag: `schedule-${onDate}-${milestone.id}`,
+          category: copy.category,
+          url: '#/',
+        })
+      } catch {
+        // Um horário inválido não é substituído por uma estimativa.
+      }
     }
-  } catch {
-    return null
   }
+
+  return candidates.sort((left, right) => Date.parse(left.deadlineAt) - Date.parse(right.deadlineAt))
 }
 
 async function collectDeadlines(
@@ -230,10 +293,9 @@ async function collectDeadlines(
 
   const [medication, schedule] = await Promise.all([
     medicationDeadlines(services, now),
-    workScheduleDeadline(services, now),
+    workScheduleDeadlines(services, now),
   ])
-  deadlines.push(...medication)
-  if (schedule) deadlines.push(schedule)
+  deadlines.push(...medication, ...schedule)
 
   const glo = gloDeadline()
   if (glo) deadlines.push(glo)
@@ -241,84 +303,11 @@ async function collectDeadlines(
   return deadlines
 }
 
-function renderPermissionControl(): void {
-  const panel = document.querySelector<HTMLElement>('.notificationPanel')
-  if (!panel) return
-
-  const permission = getDeadlineNotificationPermission()
-  let control = document.getElementById(PERMISSION_CONTROL_ID)
-
-  if (permission === 'unsupported') {
-    control?.remove()
-    return
-  }
-
-  if (!control) {
-    control = document.createElement('section')
-    control.id = PERMISSION_CONTROL_ID
-    control.setAttribute('aria-label', 'Notificações do telemóvel')
-    control.style.cssText = [
-      'margin:10px',
-      'padding:11px 12px',
-      'border:1px solid var(--line)',
-      'border-radius:12px',
-      'background:var(--surface-2)',
-      'display:grid',
-      'gap:8px',
-    ].join(';')
-    const footer = panel.querySelector('.notificationPanelFooter')
-    if (footer) footer.insertAdjacentElement('beforebegin', control)
-    else panel.appendChild(control)
-  }
-
-  const title = permission === 'granted'
-    ? 'Notificações do telemóvel ativas'
-    : permission === 'denied'
-      ? 'Notificações bloqueadas no browser'
-      : 'Ativar notificações do telemóvel'
-  const detail = permission === 'granted'
-    ? 'Quando um deadline terminar e o browser permitir execução, o aviso também é enviado pelo sistema.'
-    : permission === 'denied'
-      ? 'Ativa a permissão nas definições do browser ou da aplicação instalada.'
-      : 'Autoriza uma vez para receber no sistema os avisos de medicação, Pomodoro, pausas, sessão glo e horário de trabalho.'
-
-  control.innerHTML = ''
-  const strong = document.createElement('strong')
-  strong.textContent = title
-  strong.style.cssText = 'font-size:12px;color:var(--text)'
-  const small = document.createElement('small')
-  small.textContent = detail
-  small.style.cssText = 'font-size:10px;line-height:1.45;color:var(--muted)'
-  control.append(strong, small)
-
-  if (permission === 'default') {
-    const button = document.createElement('button')
-    button.type = 'button'
-    button.textContent = 'Ativar notificações'
-    button.style.cssText = [
-      'min-height:38px',
-      'border:1px solid color-mix(in srgb,var(--primary) 28%,var(--line))',
-      'border-radius:10px',
-      'background:var(--primary-soft)',
-      'color:var(--primary)',
-      'font:inherit',
-      'font-size:11px',
-      'font-weight:800',
-      'cursor:pointer',
-    ].join(';')
-    button.addEventListener('click', () => {
-      button.disabled = true
-      void requestDeadlineNotificationPermission().finally(() => renderPermissionControl())
-    })
-    control.appendChild(button)
-  }
-}
-
 export function installDeadlineNotificationCoordinator(services: DeadlineCoordinatorServices): void {
   let deadlines: DeadlineNotification[] = []
   let refreshTimer: number | null = null
   let wakeTimer: number | null = null
-  let permissionTimer: number | null = null
+  let clickTimer: number | null = null
   let refreshing = false
   let stopped = false
 
@@ -358,25 +347,28 @@ export function installDeadlineNotificationCoordinator(services: DeadlineCoordin
   const handleVisibility = () => {
     if (document.visibilityState === 'visible') syncNow()
   }
+  const handleDocumentClick = () => {
+    if (clickTimer !== null) window.clearTimeout(clickTimer)
+    clickTimer = window.setTimeout(syncNow, 350)
+  }
 
   void refresh()
-  renderPermissionControl()
   refreshTimer = window.setInterval(syncNow, PROVIDER_REFRESH_MS)
-  permissionTimer = window.setInterval(renderPermissionControl, 1_000)
   document.addEventListener('visibilitychange', handleVisibility)
   window.addEventListener('focus', syncNow)
   window.addEventListener('pageshow', syncNow)
   window.addEventListener('storage', syncNow)
-  document.addEventListener('click', () => window.setTimeout(syncNow, 350), true)
+  document.addEventListener('click', handleDocumentClick, true)
 
   window.addEventListener('beforeunload', () => {
     stopped = true
     if (refreshTimer !== null) window.clearInterval(refreshTimer)
     if (wakeTimer !== null) window.clearTimeout(wakeTimer)
-    if (permissionTimer !== null) window.clearInterval(permissionTimer)
+    if (clickTimer !== null) window.clearTimeout(clickTimer)
     document.removeEventListener('visibilitychange', handleVisibility)
     window.removeEventListener('focus', syncNow)
     window.removeEventListener('pageshow', syncNow)
     window.removeEventListener('storage', syncNow)
+    document.removeEventListener('click', handleDocumentClick, true)
   }, { once: true })
 }
