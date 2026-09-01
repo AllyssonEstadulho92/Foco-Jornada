@@ -358,7 +358,7 @@ export function AppShell() {
           aria-controls="mobile-quick-panel"
         >
           <span className="mobileQuickButtonIcon" aria-hidden="true">+</span>
-          <span className="mobileQuickButtonLabel">{mobileQuickOpen ? 'Fechar' : 'Mais'}</span>
+          <span className="mobileQuickButtonLabel">Mais</span>
         </button>
         <NavigationLink item={mobileBottomNavigation[2]} />
         <NavigationLink item={mobileBottomNavigation[3]} />
