@@ -16,7 +16,6 @@
   margin-bottom: var(--space-5);
 }
 
-.focusHeader h1,
 .opsPageHeader h1,
 .notificationV3Header h1,
 .medicationsStockPage .personalStockHeader h1 {
@@ -26,7 +25,6 @@
   letter-spacing: -0.03em;
 }
 
-.focusHeader p,
 .opsPageHeader p,
 .notificationV3Header p,
 .medicationsStockPage .personalStockHeader p {
@@ -309,21 +307,17 @@
 
 /* Tablet/mobile */
 @media (max-width: 899px) {
-    .opsPage,
+  .opsPage,
   .notificationV3Page,
   .medicationsStockPage {
     width: 100%;
   }
 
-    .opsPageHeader,
+  .opsPageHeader,
   .notificationV3Header,
   .medicationsStockPage .personalStockHeaderActions {
     flex-direction: column;
     align-items: stretch;
-  }
-
-  .focusJourneyState {
-    width: fit-content;
   }
 
   .opsControls {
@@ -357,7 +351,7 @@
 }
 
 @media (max-width: 640px) {
-      .opsDayPanel,
+  .opsDayPanel,
   .notificationInboxCard,
   .notificationHistoryCard,
   .notificationSystemCard,
@@ -365,15 +359,6 @@
   .notificationQuickCard,
   .notificationPrivacyCard {
     border-radius: var(--radius-md) !important;
-  }
-
-  .focusDial {
-    width: min(78vw, 270px) !important;
-    height: min(78vw, 270px) !important;
-  }
-
-  .focusTimerActions > button {
-    flex: 1 1 140px;
   }
 
   .opsCalendarCard {
@@ -412,9 +397,5 @@
 @media (max-width: 380px) {
   .opsSummaryGrid {
     grid-template-columns: minmax(0, 1fr) !important;
-  }
-
-    .focusHistoryPanel {
-    padding: 16px !important;
   }
 }
