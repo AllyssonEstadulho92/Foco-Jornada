@@ -245,17 +245,13 @@
   }
 
   .activitiesHeader h1,
-  .focusHeader h1,
   .reportHeader h1 {
     font-size: clamp(34px, 10vw, 48px);
   }
 
   .activityCreatePanel,
   .activityListPanel,
-  .currentActivityPanel,
-  .focusTimerPanel,
-  .focusStartPanel,
-  .focusHistoryPanel {
+  .currentActivityPanel {
     border-radius: 20px;
   }
 
@@ -280,52 +276,23 @@
   }
 
   .activitiesHeader,
-  .focusHeader,
   .reportHeader {
     margin-bottom: 20px;
   }
 
   .activitiesHeader p,
-  .focusHeader p,
   .reportHeader p {
     font-size: 13px;
   }
 
   .activityCreatePanel,
   .activityListPanel,
-  .currentActivityPanel,
-  .focusTimerPanel,
-  .focusStartPanel,
-  .focusHistoryPanel {
+  .currentActivityPanel {
     padding: 18px;
   }
 
-  .activityCreatePanel .sectionHeadingRow,
-  .focusStartPanel .sectionHeadingRow {
+  .activityCreatePanel .sectionHeadingRow {
     margin-bottom: 18px;
-  }
-
-  .focusPrototypePanel {
-    padding-inline: 16px;
-  }
-
-  .focusDial {
-    width: min(72vw, 270px);
-    margin-top: 22px;
-  }
-
-  .focusDialInner strong {
-    font-size: clamp(44px, 15vw, 62px);
-  }
-
-  .focusPrototypeActions {
-    display: grid;
-    grid-template-columns: 1fr;
-  }
-
-  .focusPrototypeActions button {
-    width: 100%;
-    min-width: 0;
   }
 
   .moreRow {
