@@ -24,6 +24,27 @@ function sessionStatusLabel(session: FocusSession): string {
   return 'Cancelada'
 }
 
+function CycleDots({ cycle }: { cycle: number }) {
+  return (
+    <span className="focusCycleDots" aria-hidden="true">
+      {[1, 2, 3, 4].map((item) => (
+        <i key={item} className={item === cycle ? 'isActive' : ''} />
+      ))}
+    </span>
+  )
+}
+
+function PomodoroSummary() {
+  return (
+    <div className="focusPomodoroSummary" aria-label="Configuração do Pomodoro">
+      <span><b aria-hidden="true">◎</b><strong>25 min</strong><small>Foco</small></span>
+      <span><b aria-hidden="true">♨</b><strong>5 min</strong><small>Pausa</small></span>
+      <span><b aria-hidden="true">◷</b><strong>15 min</strong><small>Pausa longa</small></span>
+      <span><b aria-hidden="true">↻</b><strong>Repetir</strong><small>4 ciclos</small></span>
+    </div>
+  )
+}
+
 export function FocusPage() {
   const {
     activeJourney,
@@ -98,7 +119,7 @@ export function FocusPage() {
   return (
     <section className="focusPage" aria-labelledby="focus-title">
       <header className="focusHeader">
-        <div>
+        <div className="focusHeaderCopy">
           <span className="eyebrow">FOCO</span>
           <h1 id="focus-title">Foco</h1>
           <p>Escolhe uma tarefa e concentra-te no que importa agora.</p>
@@ -108,11 +129,7 @@ export function FocusPage() {
         </span>
       </header>
 
-      {error ? (
-        <div className="errorBanner" role="alert">
-          {error}
-        </div>
-      ) : null}
+      {error ? <div className="errorBanner" role="alert">{error}</div> : null}
 
       {activeSession ? (
         <section className="focusTimerPanel focusPrototypePanel" aria-labelledby="active-focus-title">
@@ -132,36 +149,26 @@ export function FocusPage() {
             <div className="focusDialInner">
               <span>{segmentLabel(activeSession.segmentType).toUpperCase()}</span>
               <strong>{formatDuration(remainingMs)}</strong>
-              <small>Ciclo {activeSession.cycle} / 4</small>
+              <small>Ciclo {activeSession.cycle} de 4</small>
+              <CycleDots cycle={activeSession.cycle} />
             </div>
           </div>
 
+          {activeSession.mode === 'pomodoro' ? <PomodoroSummary /> : null}
+
           {activeSession.activityId ? (
-            <p className="focusAssociation focusAssociationCentered">
-              {activeActivity?.name ?? 'Atividade associada'}
-            </p>
+            <p className="focusAssociation focusAssociationCentered">{activeActivity?.name ?? 'Atividade associada'}</p>
           ) : (
-            <p className="focusAssociation focusAssociationCentered">
-              Início às {formatClockTime(activeSession.startedAt)}
-            </p>
+            <p className="focusAssociation focusAssociationCentered">Início às {formatClockTime(activeSession.startedAt)}</p>
           )}
 
           <div className="focusTimerActions focusPrototypeActions">
             {activeSession.status === 'running' ? (
-              <button type="button" disabled={isBusy} onClick={() => void pause()}>
-                Pausar
-              </button>
+              <button type="button" disabled={isBusy} onClick={() => void pause()}>Pausar</button>
             ) : (
-              <button type="button" disabled={isBusy} onClick={() => void resume()}>
-                Retomar
-              </button>
+              <button type="button" disabled={isBusy} onClick={() => void resume()}>Retomar</button>
             )}
-            <button
-              className="focusCancelAction"
-              type="button"
-              disabled={isBusy}
-              onClick={() => void cancel()}
-            >
+            <button className="focusCancelAction" type="button" disabled={isBusy} onClick={() => void cancel()}>
               Terminar
             </button>
           </div>
@@ -195,9 +202,12 @@ export function FocusPage() {
                 <div className="focusDialInner">
                   <span>{segmentLabel(recommendedStep.segmentType).toUpperCase()}</span>
                   <strong>{formatDuration(recommendedStep.plannedDurationSeconds * 1000)}</strong>
-                  <small>Ciclo {recommendedStep.cycle} / 4</small>
+                  <small>Ciclo {recommendedStep.cycle} de 4</small>
+                  <CycleDots cycle={recommendedStep.cycle} />
                 </div>
               </div>
+
+              <PomodoroSummary />
 
               {activeActivity && recommendedStep.segmentType === 'focus' ? (
                 <label className="focusAssociateToggle focusAssociateCentered">
@@ -220,7 +230,7 @@ export function FocusPage() {
                 disabled={isBusy || journeyBusy || journeyLoading || isLoading}
                 onClick={() => void handleStartPomodoro()}
               >
-                Iniciar foco
+                <span aria-hidden="true">▶</span> Iniciar foco
               </button>
             </>
           ) : (
@@ -254,13 +264,8 @@ export function FocusPage() {
                 className="actionButton actionButtonPrimary focusStartButton"
                 type="button"
                 disabled={
-                  isBusy ||
-                  journeyBusy ||
-                  journeyLoading ||
-                  isLoading ||
-                  !Number.isFinite(Number(customMinutes)) ||
-                  Number(customMinutes) <= 0 ||
-                  Number(customMinutes) > 480
+                  isBusy || journeyBusy || journeyLoading || isLoading ||
+                  !Number.isFinite(Number(customMinutes)) || Number(customMinutes) <= 0 || Number(customMinutes) > 480
                 }
                 onClick={() => void handleStartCustom()}
               >
@@ -293,30 +298,21 @@ export function FocusPage() {
           <div className="historyEmpty">Ainda não há sessões de foco nesta jornada.</div>
         ) : (
           <div className="focusHistoryList">
-            {sessions
-              .slice()
-              .reverse()
-              .map((session) => (
-                <article className="focusHistoryItem" key={session.id}>
-                  <div>
-                    <strong>
-                      {session.mode === 'pomodoro' ? 'Pomodoro' : 'Personalizado'} ·{' '}
-                      {segmentLabel(session.segmentType)}
-                    </strong>
-                    <span>
-                      {formatClockTime(session.startedAt)} · ciclo {session.cycle}/4 ·{' '}
-                      {sessionStatusLabel(session)}
-                    </span>
-                  </div>
-                  <time>
-                    {formatDuration(
-                      session.status === 'completed' || session.status === 'cancelled'
-                        ? getFocusElapsedMs(session, session.endedAt)
-                        : getFocusElapsedMs(session, nowIso),
-                    )}
-                  </time>
-                </article>
-              ))}
+            {sessions.slice().reverse().map((session) => (
+              <article className="focusHistoryItem" key={session.id}>
+                <div>
+                  <strong>{session.mode === 'pomodoro' ? 'Pomodoro' : 'Personalizado'} · {segmentLabel(session.segmentType)}</strong>
+                  <span>{formatClockTime(session.startedAt)} · ciclo {session.cycle}/4 · {sessionStatusLabel(session)}</span>
+                </div>
+                <time>
+                  {formatDuration(
+                    session.status === 'completed' || session.status === 'cancelled'
+                      ? getFocusElapsedMs(session, session.endedAt)
+                      : getFocusElapsedMs(session, nowIso),
+                  )}
+                </time>
+              </article>
+            ))}
           </div>
         )}
       </section>
