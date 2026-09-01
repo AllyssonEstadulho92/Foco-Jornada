@@ -37,8 +37,9 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['icon.svg'],
+      includeAssets: ['icon.svg', 'notification-sw.js'],
       manifest: {
+        id: githubPagesBase,
         name: 'Foco & Jornada',
         short_name: 'Foco & Jornada',
         description: 'Jornada, pausas, atividades, foco e produtividade num único espaço.',
@@ -59,6 +60,7 @@ export default defineConfig({
       },
       workbox: {
         navigateFallback: 'index.html',
+        importScripts: ['notification-sw.js'],
         navigateFallbackDenylist: [/^\/Foco-Jornada\//],
         cleanupOutdatedCaches: true,
         skipWaiting: true,
