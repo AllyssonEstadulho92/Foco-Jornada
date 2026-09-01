@@ -7,16 +7,14 @@ export interface NavigationItem {
   end?: boolean
 }
 
+// Navegação principal 1.2: apenas áreas de uso frequente.
+// As ferramentas operacionais e administrativas continuam acessíveis em “Mais”.
 export const primaryNavigation: NavigationItem[] = [
-  { label: 'Hoje', path: '/', icon: 'home', end: true },
-  { label: 'Calendário', path: '/calendario', icon: 'activities' },
-  { label: 'Relatórios', path: '/relatorios', icon: 'stats' },
-  { label: 'Notificações', path: '/notificacoes', icon: 'history' },
-  { label: 'Mapa de turnos', path: '/turnos', icon: 'activities' },
-  { label: 'Atividades', path: '/atividades', icon: 'activities' },
+  { label: 'Início', path: '/', icon: 'home', end: true },
   { label: 'Foco', path: '/foco', icon: 'focus' },
-  { label: 'Histórico', path: '/historico', icon: 'history' },
-  { label: 'Stock pessoal', path: '/stock', icon: 'more' },
+  { label: 'Calendário', path: '/calendario', icon: 'activities' },
+  { label: 'Notificações', path: '/notificacoes', icon: 'history' },
+  { label: 'Relatórios', path: '/relatorios', icon: 'stats' },
   { label: 'Mais', path: '/mais', icon: 'more' },
 ]
 
