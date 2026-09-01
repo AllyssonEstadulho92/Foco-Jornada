@@ -23,7 +23,7 @@ describe('App', () => {
       />,
     )
 
-    expect(screen.getByRole('heading', { name: 'Hoje' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Início' })).toBeInTheDocument()
     expect(
       screen.getByRole('heading', { name: /^(Bom dia|Boa tarde|Boa noite), foco!$/ }),
     ).toBeInTheDocument()
@@ -33,8 +33,10 @@ describe('App', () => {
     expect(screen.getByRole('button', { name: 'Café +1 registo' })).toBeInTheDocument()
     expect(screen.getAllByRole('link', { name: 'Atividades' }).length).toBeGreaterThan(0)
     expect(screen.getAllByRole('link', { name: 'Foco' }).length).toBeGreaterThan(0)
-    expect(screen.getAllByRole('link', { name: 'Histórico' }).length).toBeGreaterThan(0)
+    expect(screen.getAllByRole('link', { name: 'Calendário' }).length).toBeGreaterThan(0)
+    expect(screen.getAllByRole('link', { name: 'Relatórios' }).length).toBeGreaterThan(0)
     expect(screen.getAllByRole('link', { name: 'Mais' }).length).toBeGreaterThan(0)
+    expect(screen.getByRole('link', { name: 'Ver tudo' })).toHaveAttribute('href', '#/historico')
 
     view.unmount()
   })

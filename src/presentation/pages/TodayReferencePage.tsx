@@ -15,6 +15,7 @@ import {
 } from '../../domain/journey/WorkSchedule'
 import { formatClockTime, formatDuration, toLocalDateKey } from '../../shared/utils/dateTime'
 import { getTimeGreeting } from '../../shared/utils/timeGreeting'
+import { ErrorState } from '../components/ui/UiPrimitives'
 import { useActivityController } from '../hooks/useActivityController'
 import { useBreakController } from '../hooks/useBreakController'
 import { useCoffeeController } from '../hooks/useCoffeeController'
@@ -325,7 +326,7 @@ export function TodayReferencePage() {
     if (activeFocus?.status === 'running') {
       await pauseFocus()
     }
-    await startBreak('short', 15)
+    await startBreak('short')
     await refreshReport()
   }
 
@@ -417,7 +418,7 @@ export function TodayReferencePage() {
 
   return (
     <section className="referenceHome" aria-labelledby="reference-home-title">
-      <h1 id="reference-home-title" className="referenceVisuallyHidden">Hoje</h1>
+      <h1 id="reference-home-title" className="referenceVisuallyHidden">Início</h1>
 
       <header className="referenceGreeting">
         <div>
@@ -428,7 +429,7 @@ export function TodayReferencePage() {
         <HeroClockIllustration />
       </header>
 
-      {pageError ? <div className="errorBanner" role="alert">{pageError}</div> : null}
+      {pageError ? <ErrorState title="Não foi possível atualizar o Início." description={pageError} /> : null}
 
       <section className="referenceFocusCard" aria-labelledby="reference-focus-title">
         <div className="referenceFocusHeader">
@@ -561,7 +562,9 @@ export function TodayReferencePage() {
               <button type="button" onClick={() => void handleFinishJourney()} disabled={busy}>Terminar jornada</button>
             )}
             {activeJourney && !activeBreak ? (
-              <button type="button" onClick={() => void handleStartBreak()} disabled={busy}>Pausa 15 min</button>
+              <button type="button" onClick={() => void handleStartBreak()} disabled={busy}>
+                {plannedBreakDurationMinutes ? `Pausa ${plannedBreakDurationMinutes} min` : 'Iniciar pausa'}
+              </button>
             ) : null}
             {activeBreak ? (
               <button type="button" onClick={() => void handleFinishBreak()} disabled={busy}>Terminar pausa</button>

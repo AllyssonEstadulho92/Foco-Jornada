@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { SectionHeader } from '../components/ui/UiPrimitives'
 import { TodayReferencePage } from './TodayReferencePage'
 
 function QuickIcon({ type }: { type: 'calendar' | 'notifications' | 'reports' | 'medication' }) {
@@ -20,7 +21,11 @@ export function HomeReferencePage() {
       <TodayReferencePage />
 
       <section className="homeQuickAccess" aria-labelledby="home-quick-access-title">
-        <h2 id="home-quick-access-title">Acesso rápido</h2>
+        <SectionHeader
+          id="home-quick-access-title"
+          title="Acesso rápido"
+          description="Áreas principais sem duplicar informação do dashboard."
+        />
         <nav aria-label="Acesso rápido do Início">
           <Link to="/calendario">
             <span className="homeQuickIcon"><QuickIcon type="calendar" /></span>

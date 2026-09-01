@@ -48,25 +48,27 @@ function BrandLockup({ compact = false }: { compact?: boolean }) {
 
 const mobileQuickNavigation = [
   { label: 'Mapa de turnos', path: '/turnos', icon: 'activities' as const, description: 'Ver e editar turnos' },
-  { label: 'Stock pessoal', path: '/stock', icon: 'more' as const, description: 'Gerir stock' },
-  { label: 'Horas', path: '/horas', icon: 'hours' as const, description: 'Registar e consultar' },
+  { label: 'Medicação', path: '/medicamentos', icon: 'more' as const, description: 'Horários, tomas e stock' },
+  { label: 'Stock pessoal', path: '/stock', icon: 'more' as const, description: 'Gerir stock pessoal' },
+  { label: 'Horas', path: '/horas', icon: 'hours' as const, description: 'Calcular e consultar' },
   { label: 'Vencimento', path: '/vencimento', icon: 'payroll' as const, description: 'Simular e consultar' },
-  { label: 'Foco', path: '/foco', icon: 'focus' as const, description: 'Focar e ser produtivo' },
 ]
 
 const mobileMainNavigation: NavigationItem[] = [
-  { label: 'Hoje', path: '/', icon: 'home', end: true },
+  { label: 'Início', path: '/', icon: 'home', end: true },
+  { label: 'Calendário', path: '/calendario', icon: 'activities' },
+  { label: 'Notificações', path: '/notificacoes', icon: 'history' },
+  { label: 'Relatórios', path: '/relatorios', icon: 'stats' },
   { label: 'Atividades', path: '/atividades', icon: 'activities' },
   { label: 'Histórico', path: '/historico', icon: 'history' },
-  { label: 'Estatísticas', path: '/estatisticas', icon: 'stats' },
   { label: 'Guia', path: '/guia', icon: 'guide' },
   { label: 'Definições', path: '/definicoes', icon: 'settings' },
 ]
 
 const mobileDataNavigation: NavigationItem[] = [
   { label: 'Estado da aplicação', path: '/mais', icon: 'focus' },
-  { label: 'Exportar dados', path: '/mais', icon: 'export' },
-  { label: 'Importar dados', path: '/mais', icon: 'export' },
+  { label: 'Estatísticas detalhadas', path: '/estatisticas', icon: 'stats' },
+  { label: 'Exportar dados', path: '/exportar', icon: 'export' },
   { label: 'Cópia de segurança', path: '/mais', icon: 'more' },
 ]
 
@@ -75,8 +77,8 @@ const appVersion = typeof __APP_VERSION__ === 'string' ? __APP_VERSION__ : '0.1.
 const mobileBottomNavigation: NavigationItem[] = [
   { label: 'Início', path: '/', icon: 'home', end: true },
   { label: 'Foco', path: '/foco', icon: 'focus' },
-  { label: 'Relatórios', path: '/estatisticas', icon: 'stats' },
-  { label: 'Perfil', path: '/definicoes', icon: 'settings' },
+  { label: 'Calendário', path: '/calendario', icon: 'activities' },
+  { label: 'Relatórios', path: '/relatorios', icon: 'stats' },
 ]
 
 export function AppShell() {
@@ -263,7 +265,7 @@ export function AppShell() {
           <BrandLockup />
           <button ref={mobileDrawerCloseRef} type="button" onClick={() => setMobileMenuOpen(false)} aria-label="Fechar menu">×</button>
         </header>
-        <p className="mobileDrawerTagline">Organiza o teu tempo, os turnos e o vencimento.</p>
+        <p className="mobileDrawerTagline">Organiza tempo, foco, jornada e dados pessoais.</p>
 
         <section className="mobileDrawerQuickSection" aria-labelledby="mobile-quick-title">
           <div className="mobileDrawerSectionHeading">
