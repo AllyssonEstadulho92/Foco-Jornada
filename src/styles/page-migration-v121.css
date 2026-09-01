@@ -363,16 +363,77 @@
 
   .opsCalendarCard {
     padding: 8px !important;
-    overflow-x: auto;
+    overflow: hidden;
   }
 
   .opsWeekdays,
   .opsCalendarGrid {
-    min-width: 620px;
+    width: 100%;
+    min-width: 0;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+  }
+
+  .opsWeekdays {
+    padding-inline: 4px;
+  }
+
+  .opsWeekdays span {
+    min-width: 0;
+    overflow: hidden;
+    font-size: 9px;
+    text-overflow: clip;
+  }
+
+  .opsCalendarGrid {
+    gap: 3px;
+    padding: 5px;
   }
 
   .opsCalendarDay {
-    min-height: 78px;
+    min-width: 0;
+    min-height: 64px;
+    padding: 5px;
+  }
+
+  .opsCalendarDay strong {
+    font-size: 13px;
+  }
+
+  .opsCalendarDay span {
+    display: none;
+  }
+
+  .opsCalendarDay small {
+    overflow: hidden;
+    font-size: 8px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .opsTableScroll {
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  .opsTable {
+    width: 100%;
+    min-width: 0;
+    table-layout: fixed;
+  }
+
+  .opsTable th,
+  .opsTable td {
+    min-width: 0;
+    padding: 10px 6px !important;
+    overflow: hidden;
+    font-size: 11px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .opsTable th:first-child,
+  .opsTable td:first-child {
+    width: 31%;
   }
 
   .opsSummaryGrid {
@@ -397,5 +458,24 @@
 @media (max-width: 380px) {
   .opsSummaryGrid {
     grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .opsCalendarDay {
+    min-height: 58px;
+    padding: 4px;
+  }
+
+  .opsCalendarDay strong {
+    font-size: 12px;
+  }
+
+  .opsCalendarDay small {
+    display: none;
+  }
+
+  .opsTable th,
+  .opsTable td {
+    padding-inline: 4px !important;
+    font-size: 10px;
   }
 }
