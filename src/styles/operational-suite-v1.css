@@ -1,1 +1,443 @@
-.opsPage{width:min(100%,1180px);margin:0 auto;padding:0 0 32px}.opsPageHeader{display:flex;justify-content:space-between;gap:18px;align-items:flex-end;margin-bottom:18px}.opsPageHeader h1{margin:5px 0 6px;font-size:clamp(28px,5vw,42px);letter-spacing:-.04em;color:var(--text)}.opsPageHeader p{margin:0;max-width:760px;color:var(--muted)}.opsEyebrow{display:block;color:var(--primary);font-size:12px;font-weight:800;letter-spacing:.08em}.opsControls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.opsControls :where(select,input,button),.opsNotificationActions button,.opsFilterBar button{min-height:42px;border:1px solid var(--line-strong);border-radius:12px;background:var(--surface);color:var(--text);padding:8px 12px;font:inherit;font-weight:700}.opsControls button,.opsNotificationActions button{cursor:pointer}.opsLoading,.opsInlineStatus,.opsEmptyState,.opsTechnicalNote{padding:14px 16px;border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--muted)}.opsSummaryGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:14px 0}.opsSummaryGrid article,.opsDayPlan article,.opsDayActual article{padding:14px;border:1px solid var(--line);border-radius:16px;background:var(--surface);min-width:0}.opsSummaryGrid span,.opsDayPlan span,.opsDayActual span{display:block;color:var(--muted);font-size:12px}.opsSummaryGrid strong,.opsDayPlan strong,.opsDayActual strong{display:block;margin-top:4px;color:var(--text);font-size:20px;overflow-wrap:anywhere}.opsSummaryGrid small{display:block;margin-top:4px;color:var(--muted)}.opsTableCard,.opsCalendarCard,.opsDayPanel,.opsNotificationTimeline{border:1px solid var(--line);border-radius:18px;background:var(--surface);overflow:hidden}.opsTableHeader{display:flex;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--line)}.opsTableScroll{overflow:auto}.opsTable{width:100%;border-collapse:collapse;min-width:760px}.opsTable th,.opsTable td{padding:11px 12px;border-bottom:1px solid var(--line);text-align:left;font-variant-numeric:tabular-nums}.opsTable th{color:var(--muted);font-size:12px}.opsTable tbody tr.isEmpty{opacity:.5}.opsCalendarLayout{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(300px,.8fr);gap:14px}.opsWeekdays,.opsCalendarGrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr))}.opsWeekdays{padding:10px;border-bottom:1px solid var(--line);color:var(--muted);font-size:12px;font-weight:800;text-align:center}.opsCalendarGrid{padding:8px;gap:6px}.opsCalendarDay{min-height:94px;padding:9px;border:1px solid var(--line);border-radius:13px;background:var(--surface-2);color:var(--text);text-align:left;display:flex;flex-direction:column;gap:4px;cursor:pointer}.opsCalendarDay strong{font-size:16px}.opsCalendarDay span,.opsCalendarDay small{font-size:11px;color:var(--muted)}.opsCalendarDay.isOutside{opacity:.38}.opsCalendarDay.isToday{border-color:var(--primary)}.opsCalendarDay.isSelected{outline:2px solid color-mix(in srgb,var(--primary) 70%,transparent);background:var(--primary-soft)}.opsDayPanel{padding:16px}.opsDayPanel h2{margin:5px 0 14px;text-transform:capitalize}.opsDayPlan,.opsDayActual{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}.opsDayPlan strong,.opsDayActual strong{font-size:15px}.opsTimelineMini{display:grid;gap:8px;margin-top:12px}.opsTimelineMini>div{display:flex;justify-content:space-between}.opsTimelineMini article{display:grid;grid-template-columns:64px 1fr;gap:8px;padding:8px 0;border-top:1px solid var(--line)}.opsTimelineMini article span{display:grid}.opsTimelineMini small{color:var(--muted)}.opsDayLinks,.todayV2QuickLinks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:14px}.opsDayLinks a,.todayV2QuickLinks a{padding:11px 12px;border:1px solid var(--line);border-radius:13px;background:var(--surface-2);color:var(--text);text-decoration:none}.opsNotificationHealth{grid-template-columns:repeat(5,minmax(0,1fr))}.opsNotificationActions{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.opsFilterBar{display:flex;gap:7px;overflow:auto;padding:8px 0}.opsFilterBar button{white-space:nowrap;cursor:pointer}.opsFilterBar button.isActive{border-color:var(--primary);background:var(--primary-soft);color:var(--primary)}.opsNotificationTimeline{display:grid;padding:10px}.opsNotificationEntry{display:grid;grid-template-columns:10px 1fr 36px;gap:10px;align-items:start;padding:13px 8px;border-bottom:1px solid var(--line)}.opsNotificationEntry:last-child{border-bottom:0}.opsNotificationEntry p{margin:4px 0;color:var(--muted)}.opsNotificationEntry time{color:var(--muted);font-size:12px}.opsNotificationEntry>button{border:0;background:transparent;color:var(--muted);font-size:24px;cursor:pointer}.opsNotificationMarker{width:9px;height:9px;border-radius:50%;margin-top:5px;background:var(--muted)}.opsNotificationEntry.tone-success .opsNotificationMarker{background:var(--primary)}.opsNotificationEntry.tone-error .opsNotificationMarker{background:var(--danger)}.opsNotificationEntry.isUnread{background:color-mix(in srgb,var(--primary-soft) 70%,transparent)}.opsTechnicalNote{margin-top:12px;font-size:13px}.todayV2Overview{width:min(100%,1180px);margin:0 auto 18px;padding:16px;border:1px solid var(--line);border-radius:20px;background:linear-gradient(135deg,var(--surface),var(--surface-2))}.todayV2Header{display:flex;justify-content:space-between;gap:16px;align-items:flex-start}.todayV2Header>div:first-child>strong{display:block;font-size:24px;color:var(--text);margin:4px 0}.todayV2Header small{color:var(--muted)}.todayV2Next{text-align:right}.todayV2Next>span{display:block;color:var(--muted);font-size:11px;font-weight:800}.todayV2Next>strong{display:block;font-size:24px;color:var(--primary)}.todayV2Next>small{color:var(--muted)}.todayV2Metrics{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-top:14px}.todayV2Metrics article{padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}.todayV2Metrics span,.todayV2Metrics small{display:block;color:var(--muted);font-size:11px}.todayV2Metrics strong{display:block;margin:4px 0;font-size:18px;color:var(--text)}.todayV2QuickLinks{grid-template-columns:repeat(4,minmax(0,1fr))}.todayV2QuickLinks a span,.todayV2QuickLinks a strong{display:block}.todayV2QuickLinks a span{font-size:11px;color:var(--muted)}.todayV2QuickLinks a strong{margin-top:3px;font-size:13px}@media(max-width:900px){.opsPageHeader{align-items:stretch;flex-direction:column}.opsSummaryGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.opsNotificationHealth{grid-template-columns:repeat(2,minmax(0,1fr))}.opsCalendarLayout{grid-template-columns:1fr}.todayV2Metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.todayV2QuickLinks{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:620px){.opsControls{display:grid;grid-template-columns:1fr 1fr}.opsControls input,.opsControls select{width:100%}.opsSummaryGrid,.opsNotificationHealth,.opsDayPlan,.opsDayActual{grid-template-columns:1fr}.opsWeekdays span{font-size:10px}.opsCalendarGrid{gap:3px;padding:5px}.opsCalendarDay{min-height:72px;padding:6px}.opsCalendarDay span{display:none}.opsCalendarDay small{font-size:9px}.todayV2Header{flex-direction:column}.todayV2Next{text-align:left}.todayV2Metrics,.todayV2QuickLinks,.opsDayLinks{grid-template-columns:1fr 1fr}.opsNotificationActions{display:grid;grid-template-columns:1fr 1fr}.opsNotificationActions button{width:100%}}
+.opsPage {
+  width: min(100%, 1180px);
+  margin: 0 auto;
+  padding: 0 0 32px;
+}
+
+.opsPageHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.opsPageHeader h1 {
+  margin: 5px 0 6px;
+  color: var(--text);
+  font-size: clamp(28px, 5vw, 42px);
+  letter-spacing: -.04em;
+}
+
+.opsPageHeader p {
+  max-width: 760px;
+  margin: 0;
+  color: var(--muted);
+}
+
+.opsEyebrow {
+  display: block;
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .08em;
+}
+
+.opsControls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.opsControls :where(select, input, button),
+.opsNotificationActions button,
+.opsFilterBar button {
+  min-height: 42px;
+  padding: 8px 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-weight: 700;
+}
+
+.opsControls button,
+.opsNotificationActions button {
+  cursor: pointer;
+}
+
+.opsLoading,
+.opsInlineStatus,
+.opsEmptyState,
+.opsTechnicalNote {
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--muted);
+}
+
+.opsSummaryGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 14px 0;
+}
+
+.opsSummaryGrid article,
+.opsDayPlan article,
+.opsDayActual article {
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+}
+
+.opsSummaryGrid span,
+.opsDayPlan span,
+.opsDayActual span {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.opsSummaryGrid strong,
+.opsDayPlan strong,
+.opsDayActual strong {
+  display: block;
+  margin-top: 4px;
+  color: var(--text);
+  font-size: 20px;
+  overflow-wrap: anywhere;
+}
+
+.opsSummaryGrid small {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+}
+
+.opsTableCard,
+.opsCalendarCard,
+.opsDayPanel,
+.opsNotificationTimeline {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--surface);
+}
+
+.opsTableHeader {
+  display: flex;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.opsTableScroll {
+  overflow: auto;
+}
+
+.opsTable {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+}
+
+.opsTable th,
+.opsTable td {
+  padding: 11px 12px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  font-variant-numeric: tabular-nums;
+}
+
+.opsTable th {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.opsTable tbody tr.isEmpty {
+  opacity: .5;
+}
+
+.opsCalendarLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(300px, .8fr);
+  gap: 14px;
+}
+
+.opsWeekdays,
+.opsCalendarGrid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.opsWeekdays {
+  padding: 10px;
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.opsCalendarGrid {
+  gap: 6px;
+  padding: 8px;
+}
+
+.opsCalendarDay {
+  display: flex;
+  min-height: 94px;
+  flex-direction: column;
+  gap: 4px;
+  padding: 9px;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  background: var(--surface-2);
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+}
+
+.opsCalendarDay strong {
+  font-size: 16px;
+}
+
+.opsCalendarDay span,
+.opsCalendarDay small {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.opsCalendarDay.isOutside {
+  opacity: .38;
+}
+
+.opsCalendarDay.isToday {
+  border-color: var(--primary);
+}
+
+.opsCalendarDay.isSelected {
+  outline: 2px solid color-mix(in srgb, var(--primary) 70%, transparent);
+  background: var(--primary-soft);
+}
+
+.opsDayPanel {
+  padding: 16px;
+}
+
+.opsDayPanel h2 {
+  margin: 5px 0 14px;
+  text-transform: capitalize;
+}
+
+.opsDayPlan,
+.opsDayActual {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.opsDayPlan strong,
+.opsDayActual strong {
+  font-size: 15px;
+}
+
+.opsTimelineMini {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.opsTimelineMini > div {
+  display: flex;
+  justify-content: space-between;
+}
+
+.opsTimelineMini article {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  gap: 8px;
+  padding: 8px 0;
+  border-top: 1px solid var(--line);
+}
+
+.opsTimelineMini article span {
+  display: grid;
+}
+
+.opsTimelineMini small {
+  color: var(--muted);
+}
+
+.opsDayLinks {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.opsDayLinks a {
+  padding: 11px 12px;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  background: var(--surface-2);
+  color: var(--text);
+  text-decoration: none;
+}
+
+.opsNotificationHealth {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.opsNotificationActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.opsFilterBar {
+  display: flex;
+  gap: 7px;
+  padding: 8px 0;
+  overflow: auto;
+}
+
+.opsFilterBar button {
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.opsFilterBar button.isActive {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+.opsNotificationTimeline {
+  display: grid;
+  padding: 10px;
+}
+
+.opsNotificationEntry {
+  display: grid;
+  grid-template-columns: 10px 1fr 36px;
+  align-items: start;
+  gap: 10px;
+  padding: 13px 8px;
+  border-bottom: 1px solid var(--line);
+}
+
+.opsNotificationEntry:last-child {
+  border-bottom: 0;
+}
+
+.opsNotificationEntry p {
+  margin: 4px 0;
+  color: var(--muted);
+}
+
+.opsNotificationEntry time {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.opsNotificationEntry > button {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 24px;
+}
+
+.opsNotificationMarker {
+  width: 9px;
+  height: 9px;
+  margin-top: 5px;
+  border-radius: 50%;
+  background: var(--muted);
+}
+
+.opsNotificationEntry.tone-success .opsNotificationMarker {
+  background: var(--primary);
+}
+
+.opsNotificationEntry.tone-error .opsNotificationMarker {
+  background: var(--danger);
+}
+
+.opsNotificationEntry.isUnread {
+  background: color-mix(in srgb, var(--primary-soft) 70%, transparent);
+}
+
+.opsTechnicalNote {
+  margin-top: 12px;
+  font-size: 13px;
+}
+
+@media (max-width: 900px) {
+  .opsPageHeader {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .opsSummaryGrid,
+  .opsNotificationHealth {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .opsCalendarLayout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 620px) {
+  .opsControls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .opsControls input,
+  .opsControls select {
+    width: 100%;
+  }
+
+  .opsSummaryGrid,
+  .opsNotificationHealth,
+  .opsDayPlan,
+  .opsDayActual {
+    grid-template-columns: 1fr;
+  }
+
+  .opsWeekdays span {
+    font-size: 10px;
+  }
+
+  .opsCalendarGrid {
+    gap: 3px;
+    padding: 5px;
+  }
+
+  .opsCalendarDay {
+    min-height: 72px;
+    padding: 6px;
+  }
+
+  .opsCalendarDay span {
+    display: none;
+  }
+
+  .opsCalendarDay small {
+    font-size: 9px;
+  }
+
+  .opsDayLinks {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .opsNotificationActions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .opsNotificationActions button {
+    width: 100%;
+  }
+}
