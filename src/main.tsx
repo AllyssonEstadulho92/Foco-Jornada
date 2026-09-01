@@ -88,6 +88,7 @@ import './styles/home-reference-v2.css'
 import './styles/design-system-v12.css'
 import './styles/ui-primitives.css'
 import './styles/page-migration-v121.css'
+import './styles/focus-presentation-fix-v121.css'
 
 const root = document.getElementById('root')
 if (!root) throw new Error('Elemento #root não encontrado.')
