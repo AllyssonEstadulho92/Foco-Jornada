@@ -1,3 +1,4 @@
+/* global self, URL */
 /* Foco Jornada — extensão do service worker para notificações.
  * É importada pelo Workbox. Suporta clique nas notificações atuais e deixa
  * preparada a receção Web Push padrão sem depender do React estar aberto.
