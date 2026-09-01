@@ -30,7 +30,6 @@ import './styles/global.css'
 import './styles/journey.css'
 import './styles/breaks.css'
 import './styles/activities.css'
-import './styles/focus.css'
 import './styles/reports.css'
 import './styles/history.css'
 import './styles/prototype.css'
@@ -87,6 +86,7 @@ import './styles/design-system-v12.css'
 import './styles/ui-primitives.css'
 import './styles/page-migration-v121.css'
 import './styles/mobile-shell.css'
+import './styles/focus.css'
 
 const root = document.getElementById('root')
 if (!root) throw new Error('Elemento #root não encontrado.')
