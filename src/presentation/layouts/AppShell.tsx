@@ -2,7 +2,15 @@ import { useEffect, useRef, useState } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { AppTopBar } from '../components/AppTopBar'
 import { NavigationIcon } from '../navigation/NavigationIcon'
-import { primaryNavigation, secondaryNavigation, type NavigationItem } from '../navigation/navigationItems'
+import {
+  mobileBottomNavigation,
+  mobileDataNavigation,
+  mobileMainNavigation,
+  mobileQuickNavigation,
+  primaryNavigation,
+  secondaryNavigation,
+  type NavigationItem,
+} from '../navigation/navigationItems'
 import { useUiStore } from '../store/useUiStore'
 
 type ResolvedTheme = 'light' | 'dark'
@@ -46,40 +54,7 @@ function BrandLockup({ compact = false }: { compact?: boolean }) {
   )
 }
 
-const mobileQuickNavigation = [
-  { label: 'Mapa de turnos', path: '/turnos', icon: 'activities' as const, description: 'Ver e editar turnos' },
-  { label: 'Medicação', path: '/medicamentos', icon: 'more' as const, description: 'Horários, tomas e stock' },
-  { label: 'Stock pessoal', path: '/stock', icon: 'more' as const, description: 'Gerir stock pessoal' },
-  { label: 'Horas', path: '/horas', icon: 'hours' as const, description: 'Calcular e consultar' },
-  { label: 'Vencimento', path: '/vencimento', icon: 'payroll' as const, description: 'Simular e consultar' },
-]
-
-const mobileMainNavigation: NavigationItem[] = [
-  { label: 'Início', path: '/', icon: 'home', end: true },
-  { label: 'Calendário', path: '/calendario', icon: 'activities' },
-  { label: 'Notificações', path: '/notificacoes', icon: 'history' },
-  { label: 'Relatórios', path: '/relatorios', icon: 'stats' },
-  { label: 'Atividades', path: '/atividades', icon: 'activities' },
-  { label: 'Histórico', path: '/historico', icon: 'history' },
-  { label: 'Guia', path: '/guia', icon: 'guide' },
-  { label: 'Definições', path: '/definicoes', icon: 'settings' },
-]
-
-const mobileDataNavigation: NavigationItem[] = [
-  { label: 'Estado da aplicação', path: '/mais', icon: 'focus' },
-  { label: 'Estatísticas detalhadas', path: '/estatisticas', icon: 'stats' },
-  { label: 'Exportar dados', path: '/exportar', icon: 'export' },
-  { label: 'Cópia de segurança', path: '/mais', icon: 'more' },
-]
-
 const appVersion = typeof __APP_VERSION__ === 'string' ? __APP_VERSION__ : '0.1.0'
-
-const mobileBottomNavigation: NavigationItem[] = [
-  { label: 'Início', path: '/', icon: 'home', end: true },
-  { label: 'Foco', path: '/foco', icon: 'focus' },
-  { label: 'Calendário', path: '/calendario', icon: 'activities' },
-  { label: 'Relatórios', path: '/relatorios', icon: 'stats' },
-]
 
 export function AppShell() {
   const sidebarCollapsed = useUiStore((state) => state.sidebarCollapsed)
