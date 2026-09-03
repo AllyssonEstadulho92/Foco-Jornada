@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import type { DayEvent } from '../../application/reports/buildDayReport'
 import { deleteDayEventRecord } from '../../application/reports/deleteDayEventRecord'
 import { formatClockTime, formatDuration, toLocalDateKey } from '../../shared/utils/dateTime'
+import { AppIcon } from '../components/ui/AppIcon'
 import { useDayReport } from '../hooks/useDayReport'
 import { useAppServices } from '../providers/AppServicesProvider'
 
@@ -45,10 +46,7 @@ export function HistoryPage() {
         </div>
 
         <label className="historyDateControl">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
-            <rect x="4" y="5" width="16" height="15" rx="2.5" />
-            <path d="M8 3v4M16 3v4M4 10h16" />
-          </svg>
+          <AppIcon name="calendar" />
           <input aria-label="Escolher dia" type="date" value={date} onChange={(event) => setDate(event.target.value)} />
         </label>
       </header>
@@ -65,7 +63,7 @@ export function HistoryPage() {
         <section className="historySummaryCard referenceHistorySummary" aria-label="Resumo do dia">
           <header className="referenceHistorySummaryHeader">
             <div><strong>Resumo do dia</strong><small>{date}</small></div>
-            <Link to="/estatisticas">Ver relatório <span aria-hidden="true">›</span></Link>
+            <Link to="/estatisticas">Ver relatório <span aria-hidden="true"><AppIcon name="chevron-right" /></span></Link>
           </header>
           <div className="historySummaryPrimary">
             <article className="historySummaryMetric">
