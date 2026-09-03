@@ -401,7 +401,7 @@ export class SecurityManager {
       || typeof profile.recoveryWrappedDataKey?.iv !== 'string'
       || typeof profile.recoveryWrappedDataKey.ciphertext !== 'string'
       || !Number.isSafeInteger(profile.autoLockMinutes)
-      || ![1, 5, 10, 15, 30].includes(profile.autoLockMinutes)
+      || ![1, 5, 10, 15, 30].includes(Number(profile.autoLockMinutes))
       || !vault
       || vault.profileId !== profile.id
       || vault.schemaVersion !== 1
