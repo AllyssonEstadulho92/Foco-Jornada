@@ -111,21 +111,7 @@
   white-space:nowrap;
 }
 
-.sticksLinearPage .sticksPacingCopy > span::before{
-  content:"✓";
-  display:grid;
-  width:32px;
-  height:32px;
-  flex:0 0 32px;
-  place-items:center;
-  border-radius:10px;
-  background:var(--success);
-  color:#fff;
-  font-size:20px;
-  font-weight:900;
-  line-height:1;
-  box-shadow:none;
-}
+.sticksLinearPage .sticksPacingCopy > span::before{content:none;display:none}
 
 .sticksLinearPage .sticksPacingClock.isWaiting .sticksPacingCopy > span{
   border-color:color-mix(in srgb,var(--primary) 16%,var(--line));
@@ -198,9 +184,7 @@
   line-height:1;
 }
 
-.sticksLinearPage .sticksPacingZeroButton::after{
-  content:none;
-}
+.sticksLinearPage .sticksPacingZeroButton::after{content:none;display:none}
 
 .sticksLinearPage .sticksPacingZeroButton:hover:not(:disabled),
 .sticksLinearPage .sticksPacingZeroButton:focus-visible:not(:disabled){
@@ -365,12 +349,7 @@
     font-size:13px;
   }
 
-  .sticksLinearPage .sticksPacingCopy > span::before{
-    width:30px;
-    height:30px;
-    flex-basis:30px;
-    font-size:19px;
-  }
+  .sticksLinearPage .sticksPacingCopy > span::before{content:none;display:none}
 
   .sticksLinearPage .sticksPacingDial{
     height:70px;
@@ -415,13 +394,7 @@
     white-space:normal;
   }
 
-  .sticksLinearPage .sticksPacingCopy > span::before{
-    width:28px;
-    height:28px;
-    flex-basis:28px;
-    border-radius:9px;
-    font-size:18px;
-  }
+  .sticksLinearPage .sticksPacingCopy > span::before{content:none;display:none}
 
   .sticksLinearPage .sticksPacingCopy > strong{
     font-size:25px;
