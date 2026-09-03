@@ -222,7 +222,8 @@ export class SecurityManager {
   }
 
   async disablePasskey(session: SecuritySession): Promise<SecuritySession> {
-    const { passkey: _passkey, ...withoutPasskey } = session.profile
+    const withoutPasskey: SecurityProfile = { ...session.profile }
+    delete withoutPasskey.passkey
     const updated: SecurityProfile = {
       ...withoutPasskey,
       updatedAt: new Date().toISOString(),
