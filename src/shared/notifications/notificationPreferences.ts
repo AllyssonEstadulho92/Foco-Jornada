@@ -178,9 +178,19 @@ export function activeCategoryCount(preferences = loadNotificationPreferences())
   return Object.values(preferences.categories).filter(Boolean).length
 }
 
+function weekdaySummary(weekdays: number[]): string {
+  const sorted = [...weekdays].sort((left, right) => left - right)
+  if (sorted.length === 7) return 'Todos os dias'
+  if (JSON.stringify(sorted) === JSON.stringify([1, 2, 3, 4, 5])) return 'Seg–Sex'
+  if (JSON.stringify(sorted) === JSON.stringify([0, 6])) return 'Fim de semana'
+  const labels = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
+  return sorted.map((day) => labels[day]).join(', ')
+}
+
 export function notificationScheduleSummary(preferences = loadNotificationPreferences()): string {
   const { schedule } = preferences
   if (schedule.mode === 'always') return 'Sempre'
-  if (schedule.mode === 'window') return `${schedule.startTime}–${schedule.endTime}`
-  return `Não perturbar · ${schedule.startTime}–${schedule.endTime}`
+  const days = weekdaySummary(schedule.weekdays)
+  if (schedule.mode === 'window') return `${schedule.startTime}–${schedule.endTime} · ${days}`
+  return `Não perturbar · ${schedule.startTime}–${schedule.endTime} · ${days}`
 }
