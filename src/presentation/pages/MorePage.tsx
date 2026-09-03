@@ -309,7 +309,7 @@ export function MorePage() {
             <RowArrow />
           </Link>
           <Link to="/sticks" className="moreRow">
-            <span className="moreRowIcon" aria-hidden="true"><NavigationIcon name="status" /></span>
+            <span className="moreRowIcon" aria-hidden="true"><NavigationIcon name="glo" /></span>
             <span className="moreRowCopy"><strong>glo</strong><small>Sessões, ritmo, utilização e stock</small></span>
             <RowArrow />
           </Link>
