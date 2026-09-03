@@ -25,7 +25,7 @@ class SecureStorage implements Storage {
   }
 
   getItem(key: string): string | null {
-    return this.backend?.getStorageItem(key) ?? null
+    return this.backend?.getStorageItem(key) ?? this.fallback()?.getItem(key) ?? null
   }
 
   key(_index: number): string | null {
@@ -33,11 +33,11 @@ class SecureStorage implements Storage {
   }
 
   removeItem(key: string): void {
-    this.backend?.removeStorageItem(key)
+    if (this.backend) this.backend.removeStorageItem(key)\n    else this.fallback()?.removeItem(key)
   }
 
   setItem(key: string, value: string): void {
-    this.backend?.setStorageItem(key, value)
+    if (this.backend) this.backend.setStorageItem(key, value)\n    else this.fallback()?.setItem(key, value)
   }
 
   async flush(): Promise<void> {
