@@ -135,3 +135,75 @@ button:hover .appIcon--edit {
     transform: none !important;
   }
 }
+
+
+/* Integração do sistema de ícones nas superfícies existentes. */
+.referenceSettingsIcon .appIcon,
+.referencePayrollIcon .appIcon,
+.exportA4MetricIcon .appIcon,
+.medProtoTimelineIcon .appIcon,
+.medProtoSearch .appIcon,
+.uiStateIcon .appIcon,
+.guideChevron .appIcon,
+.moreRowArrow .appIcon,
+.referenceChevron .appIcon,
+.referenceSummaryGlyph .appIcon,
+.referenceEncouragement > span .appIcon,
+.referenceMoreMenu summary .appIcon,
+.historyDateControl .appIcon,
+.notificationInboxList article > button .appIcon,
+.moreProtectionClose .appIcon {
+  width: 18px;
+  height: 18px;
+}
+
+.referenceProgressAction .appIcon {
+  width: 22px;
+  height: 22px;
+}
+
+.referenceGreeting h2 i .appIcon {
+  width: 18px;
+  height: 18px;
+}
+
+.notificationPlatformIcon .appIcon {
+  width: 24px;
+  height: 24px;
+}
+
+.notificationStatusDot .appIcon,
+.notificationSetupProgress .appIcon,
+.notificationInfoCallout > span .appIcon {
+  width: 12px;
+  height: 12px;
+}
+
+.notificationCategorySymbol .appIcon {
+  width: 17px;
+  height: 17px;
+}
+
+.focusPage b[aria-hidden='true'] .appIcon,
+.focusPresetGuide b[aria-hidden='true'] .appIcon {
+  width: 19px;
+  height: 19px;
+}
+
+.sticksPacingDialFace .appIcon {
+  width: 26px;
+  height: 26px;
+  margin: 0 auto;
+}
+
+button .appIcon,
+a .appIcon,
+summary .appIcon {
+  flex: 0 0 auto;
+}
+
+button:focus-visible .appIcon,
+a:focus-visible .appIcon,
+summary:focus-visible .appIcon {
+  filter: drop-shadow(0 0 4px color-mix(in srgb, currentColor 24%, transparent));
+}
