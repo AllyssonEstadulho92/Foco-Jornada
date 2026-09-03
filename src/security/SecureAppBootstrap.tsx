@@ -30,7 +30,7 @@ import {
 } from './legacyMigration'
 import type { SecurityProfile } from './profileStore'
 import { secureStorage } from './secureStorage'
-import { SecurityContextProvider } from './SecurityRuntimeContext'
+import { SecurityProvider } from './SecurityContext'
 import { SecurityGate } from './SecurityGate'
 import {
   securityManager,
@@ -235,7 +235,7 @@ export function SecureAppBootstrap() {
   }
 
   return (
-    <SecurityContextProvider
+    <SecurityProvider
       session={session}
       onSessionChange={setSession}
       onLock={lock}
@@ -247,6 +247,6 @@ export function SecureAppBootstrap() {
         </div>
       ) : null}
       <App services={runtime.services} />
-    </SecurityContextProvider>
+    </SecurityProvider>
   )
 }
