@@ -361,7 +361,7 @@ export function installDeadlineNotificationCoordinator(services: DeadlineCoordin
   window.addEventListener('storage', syncNow)
   document.addEventListener('click', handleDocumentClick, true)
 
-  window.addEventListener('beforeunload', () => {
+  const cleanup = () => {
     stopped = true
     if (refreshTimer !== null) window.clearInterval(refreshTimer)
     if (wakeTimer !== null) window.clearTimeout(wakeTimer)
@@ -371,5 +371,9 @@ export function installDeadlineNotificationCoordinator(services: DeadlineCoordin
     window.removeEventListener('pageshow', syncNow)
     window.removeEventListener('storage', syncNow)
     document.removeEventListener('click', handleDocumentClick, true)
-  }, { once: true })
+    window.removeEventListener('beforeunload', cleanup)
+  }
+
+  window.addEventListener('beforeunload', cleanup, { once: true })
+  return cleanup
 }
