@@ -51,6 +51,7 @@ export type AppIconName =
   | 'phone'
   | 'monitor'
   | 'globe'
+  | 'refresh'
 
 export type AppIconMotion = 'none' | 'ring' | 'pulse' | 'draw' | 'float'
 
@@ -295,6 +296,12 @@ function iconContent(name: AppIconName) {
     return <>
       <circle cx="12" cy="12" r="8.5" />
       <path d="M3.8 12h16.4M12 3.5c2.3 2.4 3.5 5.2 3.5 8.5S14.3 18.1 12 20.5M12 3.5C9.7 5.9 8.5 8.7 8.5 12s1.2 6.1 3.5 8.5" />
+    </>
+  }
+  if (name === 'refresh') {
+    return <>
+      <path d="M19 8a7.5 7.5 0 1 0 1 7" />
+      <path d="M19 3v5h-5" />
     </>
   }
   return null
