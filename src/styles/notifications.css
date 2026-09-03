@@ -324,170 +324,54 @@
   width: 92px;
   height: 92px;
   place-items: center;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 38% 32%, color-mix(in srgb, var(--primary-soft) 96%, white), var(--primary-soft));
+  color: var(--primary);
+  box-shadow:
+    0 16px 36px color-mix(in srgb, var(--primary) 10%, transparent),
+    inset 0 0 0 1px color-mix(in srgb, var(--primary) 10%, transparent);
+}
+
+.notificationEmptyAnimatedIcon::before,
+.notificationEmptyAnimatedIcon::after {
+  position: absolute;
+  border: 1px solid color-mix(in srgb, var(--primary) 18%, transparent);
+  border-radius: 50%;
+  content: '';
+  pointer-events: none;
 }
 
 .notificationEmptyAnimatedIcon::before {
-  position: absolute;
-  width: 76px;
-  height: 76px;
-  border: 1px solid color-mix(in srgb, var(--primary) 12%, transparent);
-  border-radius: 50%;
-  box-shadow:
-    0 14px 34px color-mix(in srgb, var(--primary) 11%, transparent),
-    inset 0 0 28px color-mix(in srgb, var(--primary-soft) 68%, transparent);
-  content: '';
-  animation: notificationIconAura 4.4s ease-in-out infinite;
+  inset: -8px;
+  animation: notificationIconAura 3.8s ease-in-out infinite;
 }
 
-.notificationEmptyGlyph {
+.notificationEmptyAnimatedIcon::after {
+  inset: 11px;
+  opacity: .28;
+}
+
+.notificationEmptyAnimatedIcon .appIcon {
   position: relative;
   z-index: 1;
-  width: 86px;
-  height: 86px;
-  overflow: visible;
-  filter: drop-shadow(0 8px 18px color-mix(in srgb, var(--primary) 10%, transparent));
+  width: 48px;
+  height: 48px;
+  stroke-width: 1.75;
+  filter: drop-shadow(0 7px 16px color-mix(in srgb, var(--primary) 12%, transparent));
 }
 
-.notificationEmptyHalo {
-  fill: color-mix(in srgb, var(--primary-soft) 82%, transparent);
-  transform-origin: 32px 32px;
-  animation: notificationEmptyHaloPulse 4.4s ease-in-out infinite;
+.notificationItemActions .appIcon {
+  transition: transform 160ms cubic-bezier(.2,.8,.2,1);
 }
 
-.notificationEmptyRing,
-.notificationEmptyCheck {
-  fill: none;
-  stroke: var(--primary);
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.notificationEmptyRing {
-  stroke-width: 1.45;
-  opacity: .24;
-  stroke-dasharray: 114;
-  animation: notificationRingLoop 4.4s cubic-bezier(.2,.8,.2,1) infinite;
-}
-
-.notificationEmptyCheck {
-  stroke-width: 3.1;
-  stroke-dasharray: 30;
-  animation: notificationCheckLoop 4.4s cubic-bezier(.2,.9,.3,1) infinite;
-}
-
-.notificationEmptySpark {
-  fill: var(--primary);
-  opacity: 0;
-  transform-origin: center;
-  animation: notificationSparkPop 4.4s ease-in-out infinite;
-}
-
-.notificationEmptySparkTwo {
-  animation-delay: .16s;
-}
-
-.notificationEmptySparkThree {
-  animation-delay: .32s;
-}
-
-.notificationBellGlyph {
-  overflow: visible;
-}
-
-.notificationBellGlyph .notificationBellBody {
-  transform-origin: 12px 4px;
-}
-
-.notificationBellWave {
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.45;
-  stroke-linecap: round;
-  opacity: 0;
-}
-
-.notificationBellGlyph.isAnimated .notificationBellBody {
-  animation: notificationBellSwing 3.4s cubic-bezier(.2,.8,.2,1) infinite;
-}
-
-.notificationBellGlyph.isAnimated .notificationBellClapper {
-  animation: notificationClapperMove 3.4s cubic-bezier(.2,.8,.2,1) infinite;
-}
-
-.notificationBellGlyph.isAnimated .notificationBellWave {
-  animation: notificationBellWave 3.4s ease-out infinite;
-}
-
-.notificationBellGlyph.isAnimated .notificationBellWaveRight {
-  animation-delay: .08s;
-}
-
-.notificationItemActions svg {
-  transition: transform 160ms cubic-bezier(.2,.8,.2,1), stroke 160ms ease;
-}
-
-.notificationItemActions button:hover svg {
-  transform: translateY(-1px) scale(1.06);
-}
-
-.notificationItemActions .notificationDeleteButton:hover svg {
-  animation: notificationTrashNudge .34s ease-out;
-}
-
-@keyframes notificationBellSwing {
-  0%, 20%, 100% { transform: rotate(0deg); }
-  4% { transform: rotate(7deg); }
-  8% { transform: rotate(-6deg); }
-  12% { transform: rotate(3.5deg); }
-  16% { transform: rotate(-1.5deg); }
-}
-
-@keyframes notificationClapperMove {
-  0%, 20%, 100% { transform: translateX(0); }
-  6% { transform: translateX(1px); }
-  10% { transform: translateX(-1px); }
-}
-
-@keyframes notificationBellWave {
-  0%, 2%, 20%, 100% { opacity: 0; transform: scale(.92); }
-  7% { opacity: .58; transform: scale(1); }
-  14% { opacity: 0; transform: scale(1.08); }
+.notificationItemActions button:hover .appIcon {
+  transform: translateY(-1px) scale(1.04);
 }
 
 @keyframes notificationIconAura {
-  0%, 100% { opacity: .58; transform: scale(.94); }
-  45% { opacity: 1; transform: scale(1.04); }
-  72% { opacity: .72; transform: scale(.985); }
-}
-
-@keyframes notificationEmptyHaloPulse {
-  0%, 100% { opacity: .74; transform: scale(.94); }
-  45% { opacity: 1; transform: scale(1.035); }
-  72% { opacity: .82; transform: scale(.99); }
-}
-
-@keyframes notificationRingLoop {
-  0%, 8% { stroke-dashoffset: 114; opacity: .08; }
-  24%, 76% { stroke-dashoffset: 0; opacity: .26; }
-  92%, 100% { stroke-dashoffset: 0; opacity: .08; }
-}
-
-@keyframes notificationCheckLoop {
-  0%, 17% { stroke-dashoffset: 30; opacity: 0; }
-  34%, 78% { stroke-dashoffset: 0; opacity: 1; }
-  92%, 100% { stroke-dashoffset: 0; opacity: .72; }
-}
-
-@keyframes notificationSparkPop {
-  0%, 20%, 100% { opacity: 0; transform: scale(.45); }
-  31% { opacity: .72; transform: scale(1.12); }
-  41% { opacity: 0; transform: scale(1.42); }
-}
-
-@keyframes notificationTrashNudge {
-  0%, 100% { transform: rotate(0deg) scale(1.06); }
-  35% { transform: rotate(-6deg) scale(1.06); }
-  70% { transform: rotate(5deg) scale(1.06); }
+  0%, 100% { opacity: .42; transform: scale(.94); }
+  48% { opacity: .9; transform: scale(1.035); }
 }
 
 @media (max-width: 899px) {
@@ -519,24 +403,8 @@
 
 
 @media (prefers-reduced-motion: reduce) {
-  .notificationBellGlyph.isAnimated .notificationBellBody,
-  .notificationBellGlyph.isAnimated .notificationBellClapper,
-  .notificationBellGlyph.isAnimated .notificationBellWave,
-  .notificationEmptyAnimatedIcon::before,
-  .notificationEmptyHalo,
-  .notificationEmptyRing,
-  .notificationEmptyCheck,
-  .notificationEmptySpark,
-  .notificationItemActions .notificationDeleteButton:hover svg {
+  .notificationEmptyAnimatedIcon::before {
     animation: none !important;
   }
-
-  .notificationEmptyRing,
-  .notificationEmptyCheck {
-    stroke-dashoffset: 0;
-  }
-
-  .notificationEmptySpark {
-    display: none;
-  }
 }
+
