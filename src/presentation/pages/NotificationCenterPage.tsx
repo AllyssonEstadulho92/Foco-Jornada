@@ -711,7 +711,7 @@ export function NotificationCenterPage() {
                   {item.detail ? <p>{item.detail}</p> : null}
                   <time dateTime={item.createdAt}>{formatDateTime(item.createdAt)}</time>
                 </div>
-                <button type="button" onClick={() => remove(item.id)} aria-label={'Eliminar notificação: ' + item.title}>×</button>
+                <button type="button" onClick={() => remove(item.id)} aria-label={'Eliminar notificação: ' + item.title}><AppIcon name="trash" /></button>
               </article>
             ))}
           </div>
