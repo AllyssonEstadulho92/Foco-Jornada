@@ -311,32 +311,47 @@
   line-height: 1.45;
 }
 
-.notificationEmpty {
-  min-height: 190px;
-  justify-content: center;
-  gap: 7px;
-  padding: 24px 18px 28px;
+.notificationEmpty.notificationEmptyIconOnly {
+  min-height: 224px;
+  display: grid;
+  place-items: center;
+  padding: 32px 18px;
 }
 
 .notificationEmptyAnimatedIcon {
   position: relative;
   display: grid;
+  width: 92px;
+  height: 92px;
+  place-items: center;
+}
+
+.notificationEmptyAnimatedIcon::before {
+  position: absolute;
   width: 76px;
   height: 76px;
-  place-items: center;
-  margin-bottom: 8px;
+  border: 1px solid color-mix(in srgb, var(--primary) 12%, transparent);
+  border-radius: 50%;
+  box-shadow:
+    0 14px 34px color-mix(in srgb, var(--primary) 11%, transparent),
+    inset 0 0 28px color-mix(in srgb, var(--primary-soft) 68%, transparent);
+  content: '';
+  animation: notificationIconAura 4.4s ease-in-out infinite;
 }
 
 .notificationEmptyGlyph {
-  width: 76px;
-  height: 76px;
+  position: relative;
+  z-index: 1;
+  width: 86px;
+  height: 86px;
   overflow: visible;
+  filter: drop-shadow(0 8px 18px color-mix(in srgb, var(--primary) 10%, transparent));
 }
 
 .notificationEmptyHalo {
-  fill: color-mix(in srgb, var(--primary-soft) 80%, transparent);
+  fill: color-mix(in srgb, var(--primary-soft) 82%, transparent);
   transform-origin: 32px 32px;
-  animation: notificationEmptyHaloPulse 3.6s ease-in-out infinite;
+  animation: notificationEmptyHaloPulse 4.4s ease-in-out infinite;
 }
 
 .notificationEmptyRing,
@@ -348,33 +363,31 @@
 }
 
 .notificationEmptyRing {
-  stroke-width: 1.65;
-  opacity: .2;
+  stroke-width: 1.45;
+  opacity: .24;
   stroke-dasharray: 114;
-  stroke-dashoffset: 114;
-  animation: notificationRingDraw .8s cubic-bezier(.2,.8,.2,1) .08s forwards;
+  animation: notificationRingLoop 4.4s cubic-bezier(.2,.8,.2,1) infinite;
 }
 
 .notificationEmptyCheck {
-  stroke-width: 3;
+  stroke-width: 3.1;
   stroke-dasharray: 30;
-  stroke-dashoffset: 30;
-  animation: notificationCheckDraw .55s cubic-bezier(.2,.9,.3,1) .48s forwards;
+  animation: notificationCheckLoop 4.4s cubic-bezier(.2,.9,.3,1) infinite;
 }
 
 .notificationEmptySpark {
   fill: var(--primary);
   opacity: 0;
   transform-origin: center;
-  animation: notificationSparkPop 3.6s ease-in-out infinite;
+  animation: notificationSparkPop 4.4s ease-in-out infinite;
 }
 
 .notificationEmptySparkTwo {
-  animation-delay: .18s;
+  animation-delay: .16s;
 }
 
 .notificationEmptySparkThree {
-  animation-delay: .36s;
+  animation-delay: .32s;
 }
 
 .notificationBellGlyph {
@@ -394,15 +407,15 @@
 }
 
 .notificationBellGlyph.isAnimated .notificationBellBody {
-  animation: notificationBellSwing 3.2s cubic-bezier(.2,.8,.2,1) infinite;
+  animation: notificationBellSwing 3.4s cubic-bezier(.2,.8,.2,1) infinite;
 }
 
 .notificationBellGlyph.isAnimated .notificationBellClapper {
-  animation: notificationClapperMove 3.2s cubic-bezier(.2,.8,.2,1) infinite;
+  animation: notificationClapperMove 3.4s cubic-bezier(.2,.8,.2,1) infinite;
 }
 
 .notificationBellGlyph.isAnimated .notificationBellWave {
-  animation: notificationBellWave 3.2s ease-out infinite;
+  animation: notificationBellWave 3.4s ease-out infinite;
 }
 
 .notificationBellGlyph.isAnimated .notificationBellWaveRight {
@@ -422,42 +435,53 @@
 }
 
 @keyframes notificationBellSwing {
-  0%, 18%, 100% { transform: rotate(0deg); }
-  4% { transform: rotate(8deg); }
-  8% { transform: rotate(-7deg); }
-  12% { transform: rotate(4deg); }
-  15% { transform: rotate(-2deg); }
+  0%, 20%, 100% { transform: rotate(0deg); }
+  4% { transform: rotate(7deg); }
+  8% { transform: rotate(-6deg); }
+  12% { transform: rotate(3.5deg); }
+  16% { transform: rotate(-1.5deg); }
 }
 
 @keyframes notificationClapperMove {
-  0%, 18%, 100% { transform: translateX(0); }
+  0%, 20%, 100% { transform: translateX(0); }
   6% { transform: translateX(1px); }
   10% { transform: translateX(-1px); }
 }
 
 @keyframes notificationBellWave {
-  0%, 2%, 18%, 100% { opacity: 0; transform: scale(.92); }
-  7% { opacity: .65; transform: scale(1); }
-  13% { opacity: 0; transform: scale(1.08); }
+  0%, 2%, 20%, 100% { opacity: 0; transform: scale(.92); }
+  7% { opacity: .58; transform: scale(1); }
+  14% { opacity: 0; transform: scale(1.08); }
+}
+
+@keyframes notificationIconAura {
+  0%, 100% { opacity: .58; transform: scale(.94); }
+  45% { opacity: 1; transform: scale(1.04); }
+  72% { opacity: .72; transform: scale(.985); }
 }
 
 @keyframes notificationEmptyHaloPulse {
-  0%, 100% { opacity: .72; transform: scale(.94); }
-  50% { opacity: 1; transform: scale(1.04); }
+  0%, 100% { opacity: .74; transform: scale(.94); }
+  45% { opacity: 1; transform: scale(1.035); }
+  72% { opacity: .82; transform: scale(.99); }
 }
 
-@keyframes notificationRingDraw {
-  to { stroke-dashoffset: 0; }
+@keyframes notificationRingLoop {
+  0%, 8% { stroke-dashoffset: 114; opacity: .08; }
+  24%, 76% { stroke-dashoffset: 0; opacity: .26; }
+  92%, 100% { stroke-dashoffset: 0; opacity: .08; }
 }
 
-@keyframes notificationCheckDraw {
-  to { stroke-dashoffset: 0; }
+@keyframes notificationCheckLoop {
+  0%, 17% { stroke-dashoffset: 30; opacity: 0; }
+  34%, 78% { stroke-dashoffset: 0; opacity: 1; }
+  92%, 100% { stroke-dashoffset: 0; opacity: .72; }
 }
 
 @keyframes notificationSparkPop {
-  0%, 8%, 100% { opacity: 0; transform: scale(.4); }
-  14% { opacity: .8; transform: scale(1.15); }
-  20% { opacity: 0; transform: scale(1.4); }
+  0%, 20%, 100% { opacity: 0; transform: scale(.45); }
+  31% { opacity: .72; transform: scale(1.12); }
+  41% { opacity: 0; transform: scale(1.42); }
 }
 
 @keyframes notificationTrashNudge {
@@ -498,6 +522,7 @@
   .notificationBellGlyph.isAnimated .notificationBellBody,
   .notificationBellGlyph.isAnimated .notificationBellClapper,
   .notificationBellGlyph.isAnimated .notificationBellWave,
+  .notificationEmptyAnimatedIcon::before,
   .notificationEmptyHalo,
   .notificationEmptyRing,
   .notificationEmptyCheck,
