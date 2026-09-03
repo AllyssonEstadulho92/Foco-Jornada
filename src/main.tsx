@@ -1,30 +1,10 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { AppDataIntegrityService } from './application/data/AppDataIntegrityService'
-import { ReleaseAppBackupService } from './application/data/ReleaseAppBackupService'
-import { MedicationDataProtectionService } from './application/personalStock/MedicationDataProtectionService'
-import { MedicationDoseStatusService } from './application/personalStock/MedicationDoseStatusService'
-import { NicotineAwarenessService } from './application/personalStock/NicotineAwarenessService'
-import { OperationalPersonalStockService } from './application/personalStock/OperationalPersonalStockService'
-import { StickDataProtectionService } from './application/personalStock/StickDataProtectionService'
-import { StickPackPlannerService } from './application/personalStock/StickPackPlannerService'
-import { StickUsageAnalyticsService } from './application/personalStock/StickUsageAnalyticsService'
-import { StockReconciliationService } from './application/personalStock/StockReconciliationService'
-import { db } from './infrastructure/database/appDatabase'
-import { DexieActivityRepository } from './infrastructure/repositories/DexieActivityRepository'
-import { DexieBreakRepository } from './infrastructure/repositories/DexieBreakRepository'
-import { DexieCoffeeRepository } from './infrastructure/repositories/DexieCoffeeRepository'
-import { DexieFocusRepository } from './infrastructure/repositories/DexieFocusRepository'
-import { DexieJourneyRepository } from './infrastructure/repositories/DexieJourneyRepository'
-import { DexieSettingsRepository } from './infrastructure/repositories/DexieSettingsRepository'
-import { App } from './presentation/App'
-import { installDataIntegrityMonitoring } from './presentation/utils/installDataIntegrityMonitoring'
-import { installDeadlineNotificationCoordinator } from './presentation/utils/installDeadlineNotificationCoordinator'
-import { installGloSessionPrototypeEnhancement } from './presentation/utils/installGloSessionPrototypeEnhancement'
-import { installMedicationNextDoseTimerEnhancement } from './presentation/utils/installMedicationNextDoseTimerEnhancement'
+import { SecureAppBootstrap } from './security/SecureAppBootstrap'
 import { installNumberInputNormalization } from './shared/utils/numberInput'
 import './styles/tokens.css'
 import './styles/global.css'
+import './styles/security.css'
 import './styles/journey.css'
 import './styles/breaks.css'
 import './styles/activities.css'
@@ -91,7 +71,6 @@ const root = document.getElementById('root')
 if (!root) throw new Error('Elemento #root não encontrado.')
 
 installNumberInputNormalization()
-installGloSessionPrototypeEnhancement()
 
 async function requestPwaUpdate() {
   if (!('serviceWorker' in navigator) || !navigator.onLine) return
@@ -129,50 +108,8 @@ function keepInstalledPwaCurrent() {
 
 keepInstalledPwaCurrent()
 
-const personalStockService = new OperationalPersonalStockService(db)
-const medicationDoseStatusService = new MedicationDoseStatusService(db)
-const medicationDataProtectionService = new MedicationDataProtectionService(db)
-const dataIntegrityService = new AppDataIntegrityService(db)
-
-const services = {
-  journeyRepository: new DexieJourneyRepository(db),
-  breakRepository: new DexieBreakRepository(db),
-  activityRepository: new DexieActivityRepository(db),
-  focusRepository: new DexieFocusRepository(db),
-  coffeeRepository: new DexieCoffeeRepository(db),
-  settingsRepository: new DexieSettingsRepository(db),
-  personalStockService,
-  medicationDoseStatusService,
-  medicationDataProtectionService,
-  stockReconciliationService: new StockReconciliationService(db),
-  nicotineAwarenessService: new NicotineAwarenessService(db),
-  stickDataProtectionService: new StickDataProtectionService(db),
-  stickPackPlannerService: new StickPackPlannerService(db),
-  stickUsageAnalyticsService: new StickUsageAnalyticsService(db),
-  backupService: new ReleaseAppBackupService(db),
-  dataIntegrityService,
-}
-
-installMedicationNextDoseTimerEnhancement({
-  personalStockService,
-  medicationDoseStatusService,
-  medicationDataProtectionService,
-})
-
-installDeadlineNotificationCoordinator({
-  journeyRepository: services.journeyRepository,
-  breakRepository: services.breakRepository,
-  focusRepository: services.focusRepository,
-  settingsRepository: services.settingsRepository,
-  personalStockService,
-  medicationDoseStatusService,
-  medicationDataProtectionService,
-})
-
-installDataIntegrityMonitoring(dataIntegrityService)
-
 createRoot(root).render(
   <StrictMode>
-    <App services={services} />
+    <SecureAppBootstrap />
   </StrictMode>,
 )
