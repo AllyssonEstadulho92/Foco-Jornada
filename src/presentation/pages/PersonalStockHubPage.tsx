@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { GloLogo } from '../components/brand/GloLogo'
 import { AppIcon } from '../components/ui/AppIcon'
 import { useAppServices } from '../providers/AppServicesProvider'
 
@@ -16,7 +17,7 @@ function MedicationIcon() {
 }
 
 function SticksIcon() {
-  return <AppIcon name="list" />
+  return <GloLogo />
 }
 
 function ShieldIcon() {

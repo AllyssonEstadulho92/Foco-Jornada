@@ -15,6 +15,7 @@ import {
   type NotificationPreferences,
   type NotificationScheduleMode,
 } from '../../shared/notifications/notificationPreferences'
+import { GloLogo } from '../components/brand/GloLogo'
 import { AppIcon, type AppIconName } from '../components/ui/AppIcon'
 import { useNotificationStore } from '../store/useNotificationStore'
 
@@ -43,13 +44,13 @@ const categoryOptions: Array<{
   key: keyof NotificationCategoryPreferences
   title: string
   detail: string
-  icon: AppIconName
+  icon: AppIconName | 'glo'
 }> = [
   { key: 'journey', title: 'Jornada', detail: 'Início, fim, lembretes e turnos', icon: 'journey' },
   { key: 'break', title: 'Pausas', detail: 'Lembretes e fim de pausa', icon: 'break' },
   { key: 'focus', title: 'Foco', detail: 'Sessões, objetivos e avisos', icon: 'focus' },
   { key: 'medication', title: 'Medicação', detail: 'Horários e lembretes configurados', icon: 'medication' },
-  { key: 'glo', title: 'glo', detail: 'Alertas das sessões configuradas', icon: 'status' },
+  { key: 'glo', title: 'glo', detail: 'Alertas das sessões configuradas', icon: 'glo' },
   { key: 'system', title: 'Geral', detail: 'Atualizações e avisos importantes', icon: 'bell' },
 ]
 
@@ -451,7 +452,7 @@ export function NotificationCenterPage() {
             <div className="notificationCategoryList">
               {categoryOptions.map((option) => (
                 <label key={option.key}>
-                  <span className={'notificationCategorySymbol category-' + option.key}><AppIcon name={option.icon} /></span>
+                  <span className={'notificationCategorySymbol category-' + option.key}>{option.icon === 'glo' ? <GloLogo /> : <AppIcon name={option.icon} />}</span>
                   <span>
                     <strong>{option.title}</strong>
                     <small>{option.detail}</small>
