@@ -207,3 +207,28 @@ a:focus-visible .appIcon,
 summary:focus-visible .appIcon {
   filter: drop-shadow(0 0 4px color-mix(in srgb, currentColor 24%, transparent));
 }
+
+
+.sticksPacingCopy > span .appIcon,
+.sticksPacingZeroButton .appIcon,
+.gloSessionStatusBadge .appIcon {
+  width: 16px;
+  height: 16px;
+}
+
+.sticksPacingCopy > span,
+.sticksPacingZeroButton,
+.gloSessionStatusBadge {
+  align-items: center;
+  gap: 7px;
+}
+
+.sticksPacingCopy > span,
+.gloSessionStatusBadge {
+  display: inline-flex;
+}
+
+.sticksPacingZeroButton {
+  display: inline-flex;
+  justify-content: center;
+}
