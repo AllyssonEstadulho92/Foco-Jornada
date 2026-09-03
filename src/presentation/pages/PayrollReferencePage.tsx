@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { calculatePayroll } from '../../application/payroll/calculatePayroll'
 import { defaultPayrollConfig, type PayrollConfig, type PayrollDayPlan } from '../../domain/payroll/Payroll'
+import { AppIcon, type AppIconName } from '../components/ui/AppIcon'
 import { pushAppNotification } from '../store/useNotificationStore'
 
 const CONFIG_KEY = 'foco-jornada-payroll-config-v1'
@@ -52,7 +53,7 @@ function monthLabel(month: string) {
 }
 
 function PayrollRow({ icon, label, hint, value, positive = false, negative = false }: {
-  icon: string
+  icon: AppIconName
   label: string
   hint?: string
   value: string
@@ -61,7 +62,7 @@ function PayrollRow({ icon, label, hint, value, positive = false, negative = fal
 }) {
   return (
     <div className="referencePayrollRow">
-      <span className="referencePayrollIcon" aria-hidden="true">{icon}</span>
+      <span className="referencePayrollIcon" aria-hidden="true"><AppIcon name={icon} /></span>
       <span><strong>{label}</strong>{hint ? <small>{hint}</small> : null}</span>
       <b className={negative ? 'negative' : positive ? 'positive' : ''}>{value}</b>
     </div>
@@ -90,7 +91,7 @@ export function PayrollReferencePage() {
   return (
     <section className="referencePayrollPage" aria-labelledby="reference-payroll-title">
       <header className="referencePayrollHeader">
-        <div className="referencePayrollTitleIcon" aria-hidden="true">▣</div>
+        <div className="referencePayrollTitleIcon" aria-hidden="true"><AppIcon name="payroll" /></div>
         <div>
           <h1 id="reference-payroll-title">Vencimento</h1>
           <p>Consulta a estimativa do que vais receber.</p>
@@ -107,14 +108,14 @@ export function PayrollReferencePage() {
       <section className="referencePayrollDetails" aria-labelledby="reference-payroll-detail-title">
         <h2 id="reference-payroll-detail-title">Resumo do vencimento</h2>
         <div className="referencePayrollRows">
-          <PayrollRow icon="○" label="Salário base" value={money(config.baseSalary)} positive />
-          <PayrollRow icon="♨" label="Subsídio de alimentação" hint={`${result.mealDays} dias`} value={money(result.mealAllowanceGross)} positive />
-          <PayrollRow icon="◷" label="Horas extra" hint={`${result.overtimeHours.toFixed(2)} h`} value={money(result.overtimePay)} positive={result.overtimePay > 0} />
-          <PayrollRow icon="□" label="Faltas/ausências" hint={`${result.unpaidAbsenceHours.toFixed(2)} h não remuneradas`} value={result.absenceDeduction > 0 ? `−${money(result.absenceDeduction)}` : money(0)} negative={result.absenceDeduction > 0} />
-          <PayrollRow icon="◇" label="Segurança Social" hint={`${config.socialSecurityRate.toFixed(2)}%`} value={`−${money(result.socialSecurity)}`} negative />
-          <PayrollRow icon="▤" label="IRS" hint="retenção" value={`−${money(result.irsTotal)}`} negative={result.irsTotal > 0} />
-          <PayrollRow icon="✦" label="Outros abonos" value={money(otherAllowances)} positive={otherAllowances > 0} />
-          <PayrollRow icon="⊖" label="Outros descontos" value={config.otherDeductions > 0 ? `−${money(config.otherDeductions)}` : money(0)} negative={config.otherDeductions > 0} />
+          <PayrollRow icon="wallet" label="Salário base" value={money(config.baseSalary)} positive />
+          <PayrollRow icon="meal" label="Subsídio de alimentação" hint={`${result.mealDays} dias`} value={money(result.mealAllowanceGross)} positive />
+          <PayrollRow icon="clock" label="Horas extra" hint={`${result.overtimeHours.toFixed(2)} h`} value={money(result.overtimePay)} positive={result.overtimePay > 0} />
+          <PayrollRow icon="minus-circle" label="Faltas/ausências" hint={`${result.unpaidAbsenceHours.toFixed(2)} h não remuneradas`} value={result.absenceDeduction > 0 ? `−${money(result.absenceDeduction)}` : money(0)} negative={result.absenceDeduction > 0} />
+          <PayrollRow icon="shield" label="Segurança Social" hint={`${config.socialSecurityRate.toFixed(2)}%`} value={`−${money(result.socialSecurity)}`} negative />
+          <PayrollRow icon="document" label="IRS" hint="retenção" value={`−${money(result.irsTotal)}`} negative={result.irsTotal > 0} />
+          <PayrollRow icon="plus" label="Outros abonos" value={money(otherAllowances)} positive={otherAllowances > 0} />
+          <PayrollRow icon="minus-circle" label="Outros descontos" value={config.otherDeductions > 0 ? `−${money(config.otherDeductions)}` : money(0)} negative={config.otherDeductions > 0} />
         </div>
 
         <div className="referencePayrollTotals">
@@ -125,7 +126,7 @@ export function PayrollReferencePage() {
       </section>
 
       <div className="referencePayrollNotice">
-        <span aria-hidden="true">ⓘ</span>
+        <span aria-hidden="true"><AppIcon name="info" /></span>
         <p>Estimativa baseada nos turnos e nos dados fiscais guardados. Compara com o recibo quando o receberes.</p>
       </div>
 
