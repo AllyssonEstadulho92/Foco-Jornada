@@ -8,8 +8,17 @@ export interface SecureStorageBackend {
 class SecureStorage implements Storage {
   private backend: SecureStorageBackend | null = null
 
+  private fallback(): Storage | null {
+    if (import.meta.env.MODE !== 'test') return null
+    try {
+      return window.localStorage
+    } catch {
+      return null
+    }
+  }
+
   get length(): number {
-    return 0
+    return this.backend ? 0 : (this.fallback()?.length ?? 0)
   }
 
   bind(backend: SecureStorageBackend): void {
@@ -21,6 +30,10 @@ class SecureStorage implements Storage {
   }
 
   clear(): void {
+    if (!this.backend) {
+      this.fallback()?.clear()
+      return
+    }
     throw new Error('Limpeza global do armazenamento seguro não é permitida.')
   }
 
@@ -28,16 +41,18 @@ class SecureStorage implements Storage {
     return this.backend?.getStorageItem(key) ?? this.fallback()?.getItem(key) ?? null
   }
 
-  key(_index: number): string | null {
-    return null
+  key(index: number): string | null {
+    return this.backend ? null : (this.fallback()?.key(index) ?? null)
   }
 
   removeItem(key: string): void {
-    if (this.backend) this.backend.removeStorageItem(key)\n    else this.fallback()?.removeItem(key)
+    if (this.backend) this.backend.removeStorageItem(key)
+    else this.fallback()?.removeItem(key)
   }
 
   setItem(key: string, value: string): void {
-    if (this.backend) this.backend.setStorageItem(key, value)\n    else this.fallback()?.setItem(key, value)
+    if (this.backend) this.backend.setStorageItem(key, value)
+    else this.fallback()?.setItem(key, value)
   }
 
   async flush(): Promise<void> {
