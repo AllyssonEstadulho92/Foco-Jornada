@@ -236,6 +236,13 @@ function normalizeProfileText(value: string, label: string): string {
   return normalized
 }
 
+function nextIsoTimestamp(previous?: string): string {
+  const now = Date.now()
+  const previousMs = previous ? Date.parse(previous) : Number.NaN
+  const nextMs = Number.isFinite(previousMs) && now <= previousMs ? previousMs + 1 : now
+  return new Date(nextMs).toISOString()
+}
+
 function statusLabel(status: MedicationLifecycleStatus): string {
   if (status === 'active') return 'Em uso'
   if (status === 'paused') return 'Pausado'
@@ -524,7 +531,7 @@ export class MedicationDataProtectionService {
       return { changed: false, profile: current }
     }
 
-    const updatedAt = new Date().toISOString()
+    const updatedAt = nextIsoTimestamp(current.updatedAt)
     const profile: MedicationProtectedProfile = {
       version: 1,
       medicationId,
@@ -564,12 +571,14 @@ export class MedicationDataProtectionService {
     const normalized = note.replace(/\r\n/g, '\n')
     const currentKey = `${NOTE_CURRENT_PREFIX}${medicationId}`
     const currentRecord = await this.db.metadata.get(currentKey)
+    let previousUpdatedAt: string | undefined
     if (currentRecord) {
       const current = parseJson<MedicationNotePayload>(currentRecord.value, 'nota protegida')
+      previousUpdatedAt = current.updatedAt
       if (current.note === normalized) return { changed: false, updatedAt: current.updatedAt }
     }
 
-    const updatedAt = new Date().toISOString()
+    const updatedAt = nextIsoTimestamp(previousUpdatedAt)
     const payload: MedicationNotePayload = { version: 1, medicationId, note: normalized, updatedAt }
     const historyKey = `${NOTE_HISTORY_PREFIX}${medicationId}:${updatedAt}:${newId()}`
     await this.db.transaction('rw', this.db.metadata, async () => {
@@ -688,7 +697,7 @@ export class MedicationDataProtectionService {
       }
     }
 
-    const createdAt = new Date().toISOString()
+    const createdAt = nextIsoTimestamp(previous?.updatedAt)
     const payload: MedicationCheckpointPayload = {
       version: 1,
       medicationId,
