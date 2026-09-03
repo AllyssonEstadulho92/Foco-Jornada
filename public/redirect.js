@@ -1,3 +1,4 @@
+/* global window */
 const base = '/Foco-Jornada/'
 const pathname = window.location.pathname
 let hash = window.location.hash
