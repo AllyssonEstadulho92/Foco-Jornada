@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } from 'react'
+import { Link } from 'react-router-dom'
 import { useSecurityOptional } from '../../security/SecurityContext'
 import { emitAppFeedback } from '../../shared/notifications/appFeedback'
 import { useNow } from '../hooks/useNow'
@@ -269,8 +270,7 @@ export function AppTopBar({ onOpenMenu, menuButtonRef }: { onOpenMenu?: () => vo
             <section className="notificationPanel" role="dialog" aria-label="Centro de notificações">
               <header className="notificationPanelHeader">
                 <div>
-                  <span>NOTIFICAÇÕES</span>
-                  <strong>Centro de notificações</strong>
+                  <strong>Notificações</strong>
                 </div>
                 <div className="notificationHeaderActions">
                   <span className="notificationCount">{notifications.length}</span>
@@ -299,8 +299,8 @@ export function AppTopBar({ onOpenMenu, menuButtonRef }: { onOpenMenu?: () => vo
               <div className="notificationList">
                 {notifications.length === 0 ? (
                   <div className="notificationEmpty">
-                    <strong>Sem notificações por ler</strong>
-                    <span>As ações da aplicação passam a ficar guardadas aqui, sem popups no ecrã.</span>
+                    <strong>Tudo em dia</strong>
+                    <span>Sem notificações novas.</span>
                   </div>
                 ) : (
                   notifications.map((item) => {
@@ -368,7 +368,9 @@ export function AppTopBar({ onOpenMenu, menuButtonRef }: { onOpenMenu?: () => vo
                 )}
               </div>
 
-              <footer className="notificationPanelFooter">Os avisos ficam guardados neste dispositivo. O envio com a aplicação totalmente fechada exige Web Push com subscrição ativa.</footer>
+              <footer className="notificationPanelFooter">
+                <Link to="/notificacoes" onClick={() => setIsOpen(false)}>Abrir centro completo</Link>
+              </footer>
             </section>
           ) : null}
         </div>

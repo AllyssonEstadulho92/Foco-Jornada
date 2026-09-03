@@ -23,105 +23,132 @@
 
 .notificationAutomationPanel {
   display: grid;
-  gap: 9px;
+  gap: 8px;
   margin: 10px;
   padding: 12px;
-  border: 1px solid color-mix(in srgb, var(--primary) 14%, var(--line));
+  border: 1px solid var(--line);
   border-radius: 14px;
-  background: color-mix(in srgb, var(--primary-soft) 28%, var(--surface-2));
+  background: var(--surface);
 }
 
-.notificationAutomationHeading {
-  display: flex;
-  min-width: 0;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 10px;
+.notificationAutomationPanel.isLoading {
+  grid-template-columns: 10px minmax(0, 1fr);
+  align-items: center;
+  color: var(--muted);
+  font-size: 12px;
 }
 
-.notificationAutomationHeading > div {
+.notificationAutomationCompact {
   display: grid;
+  grid-template-columns: 10px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
   min-width: 0;
-  gap: 2px;
 }
 
-.notificationAutomationHeading > div > span {
-  color: var(--primary);
-  font-size: 9px;
-  font-weight: 850;
-  letter-spacing: .08em;
+.notificationAutomationStateDot {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: var(--muted);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--muted) 10%, transparent);
 }
 
-.notificationAutomationHeading strong {
+.notificationAutomationPanel[data-state='ready'] .notificationAutomationStateDot {
+  background: var(--primary);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 12%, transparent);
+}
+
+.notificationAutomationPanel[data-state='attention'] .notificationAutomationStateDot {
+  background: #b7791f;
+  box-shadow: 0 0 0 4px color-mix(in srgb, #b7791f 12%, transparent);
+}
+
+.notificationAutomationPanel[data-state='blocked'] .notificationAutomationStateDot {
+  background: var(--danger);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--danger) 12%, transparent);
+}
+
+.notificationAutomationCopy {
+  min-width: 0;
+}
+
+.notificationAutomationCopy strong {
+  display: block;
   color: var(--text);
   font-size: 12px;
   line-height: 1.3;
 }
 
-.notificationAutomationPanel p {
-  margin: 0;
+.notificationAutomationCopy p,
+.notificationAutomationDetails p {
+  margin: 2px 0 0;
   color: var(--muted);
   font-size: 10px;
-  line-height: 1.5;
+  line-height: 1.4;
 }
 
-.notificationAutomationBadges,
-.notificationAutomationCoverage {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.notificationAutomationCoverage span {
-  display: inline-flex;
-  align-items: center;
-  min-height: 24px;
-  padding: 3px 7px;
-  border: 1px solid color-mix(in srgb, var(--primary) 18%, var(--line));
-  border-radius: 999px;
-  background: var(--surface);
-  color: var(--text);
-  font-size: 9px;
-  font-weight: 700;
-}
-
-.deadlineNotificationActions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 7px;
-}
-
-.deadlineNotificationActions button {
-  min-height: 38px;
-  padding: 7px 10px;
+.notificationAutomationPrimary,
+.notificationAutomationTest {
+  min-height: 34px;
+  padding: 6px 10px;
   border: 1px solid color-mix(in srgb, var(--primary) 28%, var(--line));
   border-radius: 10px;
   background: var(--primary-soft);
   color: var(--primary);
   cursor: pointer;
   font: inherit;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 800;
+  white-space: nowrap;
 }
 
-.deadlineNotificationActions button:disabled {
+.notificationAutomationPrimary:disabled,
+.notificationAutomationTest:disabled {
   cursor: default;
-  opacity: 0.6;
+  opacity: .6;
 }
 
-.releaseStatusBadge {
+.notificationAutomationDetails {
+  padding-left: 20px;
+}
+
+.notificationAutomationDetails summary {
+  width: fit-content;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 700;
+  list-style-position: inside;
+}
+
+.notificationAutomationDetails[open] {
+  display: grid;
+  gap: 8px;
+  padding-top: 2px;
+}
+
+.notificationAutomationBadges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.notificationAutomationBadges span {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  width: fit-content;
-  padding: 4px 7px;
+  min-height: 22px;
+  padding: 3px 7px;
   border: 1px solid var(--line);
   border-radius: 999px;
+  background: var(--surface-2);
   color: var(--muted);
   font-size: 9px;
-  font-weight: 800;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.notificationAutomationTest {
+  width: fit-content;
 }
 
 @media (max-width: 480px) {
@@ -129,22 +156,23 @@
     min-height: 44px;
   }
 
-  .notificationAutomationHeading {
-    display: grid;
+  .notificationAutomationPanel {
+    margin: 8px 10px;
+    padding: 11px;
   }
 
-  .notificationAutomationBadges,
-  .notificationAutomationCoverage {
-    gap: 5px;
+  .notificationAutomationCompact {
+    grid-template-columns: 10px minmax(0, 1fr);
   }
 
-  .deadlineNotificationActions {
-    display: grid;
-    grid-template-columns: 1fr;
+  .notificationAutomationPrimary {
+    grid-column: 2;
+    width: fit-content;
+    min-height: 34px;
   }
 
-  .deadlineNotificationActions button {
-    width: 100%;
+  .notificationAutomationDetails {
+    padding-left: 20px;
   }
 }
 
