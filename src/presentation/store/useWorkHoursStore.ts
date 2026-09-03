@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { createJSONStorage, persist } from 'zustand/middleware'\nimport { secureStorage } from '../../security/secureStorage'
 import type { WorkHoursEntry, WorkHoursEntryInput } from '../../domain/work-hours/WorkHours'
 
 interface WorkHoursState {
@@ -52,7 +52,7 @@ export const useWorkHoursStore = create<WorkHoursState>()(
         set((state) => ({ entries: state.entries.filter((item) => !item.date.startsWith(monthKey)) })),
     }),
     {
-      name: 'foco-jornada-work-hours-v1',
+      name: 'foco-jornada-work-hours-v1',\n      storage: createJSONStorage(() => secureStorage),
       partialize: (state) => ({ entries: state.entries }),
     },
   ),
