@@ -697,7 +697,7 @@ export function SticksStockPage() {
                   </span>
                 </div>
                 <div className="sticksPacingCopy">
-                  <span>INTERVALO CONSCIENTE</span>
+                  <span><AppIcon name="check" /> INTERVALO CONSCIENTE</span>
                   <strong>{displayedPacingStatus.ready ? 'Meta de intervalo concluída' : 'Espera antes do próximo stick'}</strong>
                   <small>
                     {displayedPacingStatus.nextTargetAt
@@ -714,7 +714,7 @@ export function SticksStockPage() {
                       setMessage('Temporizador zerado. O histórico de sticks não foi alterado.')
                     }}
                   >
-                    Zerar temporizador
+                    Zerar temporizador <AppIcon name="chevron-right" />
                   </button>
                 </div>
               </div>
@@ -764,7 +764,7 @@ export function SticksStockPage() {
                 <span className="stockPanelTag">RELÓGIO TÉCNICO DO APARELHO</span>
                 <h2 id="glo-session-timer-title">Sessão glo</h2>
               </div>
-              <span className="gloSessionStatusBadge">{gloSessionPhaseLabel}</span>
+              <span className="gloSessionStatusBadge"><AppIcon name="info" />{gloSessionPhaseLabel}</span>
             </div>
 
             <p className="gloSessionIntro">
