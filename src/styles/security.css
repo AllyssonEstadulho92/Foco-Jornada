@@ -103,7 +103,11 @@
   width: clamp(68px, 19vw, 78px);
   height: clamp(68px, 19vw, 78px);
   min-height: 0;
+  display: grid;
   justify-self: center;
+  place-items: center;
+  align-content: center;
+  gap: 2px;
   padding: 0;
   border: 1px solid color-mix(in srgb, var(--line, #dde3df) 92%, transparent);
   border-radius: 50%;
@@ -126,6 +130,15 @@
   font-size: 24px;
   font-weight: 500;
   line-height: 1;
+}
+
+.securityKeypad button small {
+  min-height: 11px;
+  color: var(--muted, #68736d);
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: .18em;
 }
 
 .securityKeypadSpacer {
