@@ -110,8 +110,12 @@ export function SecurityProvider({
   return <SecurityContext.Provider value={value}>{children}</SecurityContext.Provider>
 }
 
+export function useSecurityOptional(): SecurityContextValue | null {
+  return useContext(SecurityContext)
+}
+
 export function useSecurity(): SecurityContextValue {
-  const value = useContext(SecurityContext)
+  const value = useSecurityOptional()
   if (!value) throw new Error('SecurityProvider não foi configurado.')
   return value
 }
