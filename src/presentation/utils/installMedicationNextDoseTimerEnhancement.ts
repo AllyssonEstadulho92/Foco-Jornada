@@ -244,7 +244,7 @@ async function resolveNextSnapshot(services: MedicationTimerServices, now = new 
   }
 }
 
-export function installMedicationNextDoseTimerEnhancement(services: MedicationTimerServices): void {
+export function installMedicationNextDoseTimerEnhancement(services: MedicationTimerServices): () => void {
   const state: TimerState = {
     snapshot: null,
     statusMessage: '',
@@ -303,28 +303,36 @@ export function installMedicationNextDoseTimerEnhancement(services: MedicationTi
   })
   observer.observe(document.body, { subtree: true, childList: true, attributes: true, attributeFilter: ['class'] })
 
-  document.addEventListener('click', (event) => {
+  const handleClick = (event: MouseEvent) => {
     const target = event.target
     if (!(target instanceof Element) || !target.closest(PAGE_SELECTOR)) return
     if (!target.closest('button')) return
     window.setTimeout(scheduleRefresh, 350)
     window.setTimeout(scheduleRefresh, 1200)
-  }, true)
+  }
 
-  document.addEventListener('visibilitychange', () => {
+  const handleVisibility = () => {
     if (document.visibilityState === 'visible') {
       tick()
       scheduleRefresh()
     }
-  })
+  }
+
+  document.addEventListener('click', handleClick, true)
+  document.addEventListener('visibilitychange', handleVisibility)
 
   tickTimer = window.setInterval(tick, 1000)
   refreshTimer = window.setInterval(() => void refresh(), REFRESH_INTERVAL_MS)
   void refresh()
 
-  window.addEventListener('beforeunload', () => {
+  const cleanup = () => {
     if (tickTimer !== null) window.clearInterval(tickTimer)
     if (refreshTimer !== null) window.clearInterval(refreshTimer)
     observer.disconnect()
-  }, { once: true })
+    document.removeEventListener('click', handleClick, true)
+    document.removeEventListener('visibilitychange', handleVisibility)
+    window.removeEventListener('beforeunload', cleanup)
+  }
+  window.addEventListener('beforeunload', cleanup, { once: true })
+  return cleanup
 }
