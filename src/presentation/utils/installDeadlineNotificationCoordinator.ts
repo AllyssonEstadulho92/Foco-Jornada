@@ -1,3 +1,4 @@
+import { secureStorage } from '../../security/secureStorage'
 import type { BreakRepository } from '../../application/breaks/BreakRepository'
 import type { FocusRepository } from '../../application/focus/FocusRepository'
 import type { JourneyRepository } from '../../application/journey/JourneyRepository'
@@ -88,8 +89,8 @@ function breakDeadline(record: {
 
 function gloDeadline(): DeadlineNotification | null {
   try {
-    const raw = window.localStorage.getItem(GLO_SESSION_TIMER_STORAGE_KEY)
-      ?? window.localStorage.getItem(LEGACY_GLO_SESSION_TIMER_STORAGE_KEY)
+    const raw = secureStorage.getItem(GLO_SESSION_TIMER_STORAGE_KEY)
+      ?? secureStorage.getItem(LEGACY_GLO_SESSION_TIMER_STORAGE_KEY)
     const state = parseGloSessionTimerState(raw)
     if (!state.session) return null
     return {
