@@ -152,10 +152,14 @@ export function notificationScheduleAllows(
   const schedule = preferences.schedule
   if (schedule.mode === 'always') return true
 
-  const weekdayEnabled = schedule.weekdays.includes(at.getDay())
   const current = at.getHours() * 60 + at.getMinutes()
   const start = minutesForClock(schedule.startTime)
   const end = minutesForClock(schedule.endTime)
+  const crossesMidnight = start > end
+  const scheduleDay = crossesMidnight && current < end
+    ? (at.getDay() + 6) % 7
+    : at.getDay()
+  const weekdayEnabled = schedule.weekdays.includes(scheduleDay)
   const inside = weekdayEnabled && timeInsideRange(current, start, end)
 
   return schedule.mode === 'window' ? inside : !inside
