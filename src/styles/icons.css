@@ -232,3 +232,36 @@ summary:focus-visible .appIcon {
   display: inline-flex;
   justify-content: center;
 }
+
+
+/* Marca glo fornecida como referência visual pelo utilizador.
+ * Mantida localmente para não depender de CDN nem de assets remotos.
+ */
+.gloBrandLogo {
+  width: 30px;
+  height: auto;
+  display: block;
+  overflow: visible;
+  flex: 0 0 auto;
+}
+
+.navMark .gloBrandLogo {
+  width: 27px;
+}
+
+.moreListGrouped .moreRowIcon .gloBrandLogo,
+.stockHubLinearIcon .gloBrandLogo {
+  width: 32px;
+}
+
+[data-theme='dark'] .gloBrandLogo {
+  --glo-logo-ink: #e4e6ea;
+}
+
+@media (max-width: 899px) {
+  .mobileBottomBar .gloBrandLogo,
+  .mobileDrawerNav .gloBrandLogo,
+  .mobileDrawerQuickAccess .gloBrandLogo {
+    width: 27px;
+  }
+}
