@@ -1,3 +1,4 @@
+import { secureStorage } from '../../security/secureStorage'
 import type { AppDatabase, AppMetadataRecord } from '../../infrastructure/database/appDatabase'
 import type { StockEntity, StockMovement } from '../../domain/personalStock/models'
 import { STICKS_ENTITY_ID } from './PersonalStockService'
@@ -94,7 +95,7 @@ function parse(text: string): StickProtectionSnapshot {
 
 function storageGet(key: string): string | null {
   try {
-    return typeof globalThis.localStorage === 'undefined' ? null : globalThis.localStorage.getItem(key)
+    return secureStorage.getItem(key)
   } catch {
     return null
   }
@@ -102,8 +103,7 @@ function storageGet(key: string): string | null {
 
 function storageSet(key: string, value: string): boolean {
   try {
-    if (typeof globalThis.localStorage === 'undefined') return false
-    globalThis.localStorage.setItem(key, value)
+    secureStorage.setItem(key, value)
     return true
   } catch {
     return false
@@ -112,8 +112,7 @@ function storageSet(key: string, value: string): boolean {
 
 function storageRemove(key: string): void {
   try {
-    if (typeof globalThis.localStorage === 'undefined') return
-    globalThis.localStorage.removeItem(key)
+    secureStorage.removeItem(key)
   } catch {
     // O reset continua na base de dados mesmo se o navegador bloquear localStorage.
   }
