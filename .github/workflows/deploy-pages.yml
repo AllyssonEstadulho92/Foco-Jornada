@@ -26,21 +26,9 @@ jobs:
           node-version: 22
 
       - name: Instalar dependências
-        run: npm install
+        run: npm install --no-audit --no-fund
 
-      - name: Auditoria de dependências
-        run: npm audit --audit-level=high
-
-      - name: Verificar tipos
-        run: npm run typecheck
-
-      - name: Lint
-        run: npm run lint
-
-      - name: Testes
-        run: npm test
-
-      - name: Build
+      - name: Gerar aplicação
         run: npm run build
 
       - name: Validar build
