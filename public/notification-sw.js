@@ -4,7 +4,7 @@
  * preparada a receção Web Push padrão sem depender do React estar aberto.
  */
 
-const ACTIVE_NAVIGATION_CACHE = 'foco-jornada-navigation-v3'
+const ACTIVE_NAVIGATION_CACHE = 'foco-jornada-navigation-v4'
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
