@@ -80,6 +80,7 @@ describe('notificationPreferences', () => {
     })
 
     expect(notificationScheduleAllows(new Date(2026, 8, 1, 23, 0), value)).toBe(false)
+    expect(notificationScheduleAllows(new Date(2026, 8, 2, 1, 0), value)).toBe(false)
     expect(notificationScheduleAllows(new Date(2026, 8, 1, 12, 0), value)).toBe(true)
   })
 })
