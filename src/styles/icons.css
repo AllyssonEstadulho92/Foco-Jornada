@@ -1,0 +1,137 @@
+.appIcon {
+  width: 1em;
+  height: 1em;
+  display: block;
+  overflow: visible;
+  color: currentColor;
+  vector-effect: non-scaling-stroke;
+}
+
+.appIcon--motion-ring .appIconBellBody {
+  transform-origin: 12px 6px;
+  animation: appIconBellRing 3.2s cubic-bezier(.2,.8,.2,1) infinite;
+}
+
+.appIcon--motion-ring .appIconBellClapper {
+  transform-origin: 12px 18px;
+  animation: appIconBellClapper 3.2s ease-in-out infinite;
+}
+
+.appIconBellWave {
+  opacity: 0;
+}
+
+.appIcon--motion-ring .appIconBellWave {
+  animation: appIconBellWave 3.2s ease-out infinite;
+}
+
+.appIcon--motion-ring .appIconBellWaveRight {
+  animation-delay: .06s;
+}
+
+.appIcon--motion-draw .appIconCheckRing {
+  stroke-dasharray: 54;
+  stroke-dashoffset: 54;
+  animation: appIconRingDraw .55s ease-out forwards;
+}
+
+.appIcon--motion-draw .appIconCheckPath {
+  stroke-dasharray: 18;
+  stroke-dashoffset: 18;
+  animation: appIconCheckDraw .38s .34s cubic-bezier(.2,.8,.2,1) forwards;
+}
+
+.appIcon--motion-pulse {
+  animation: appIconPulse 2.8s ease-in-out infinite;
+}
+
+.appIcon--motion-float {
+  animation: appIconFloat 3.6s ease-in-out infinite;
+}
+
+button:hover .appIcon--chevron-right,
+a:hover .appIcon--chevron-right {
+  transform: translateX(1.5px);
+}
+
+button:hover .appIcon--chevron-down,
+summary:hover .appIcon--chevron-down {
+  transform: translateY(1px);
+}
+
+button:hover .appIcon--trash {
+  transform: rotate(-3deg);
+}
+
+button:hover .appIcon--edit {
+  transform: translate(-.5px, .5px);
+}
+
+.appIcon--chevron-right,
+.appIcon--chevron-down,
+.appIcon--trash,
+.appIcon--edit {
+  transition: transform 150ms ease;
+}
+
+@keyframes appIconBellRing {
+  0%, 72%, 100% { transform: rotate(0deg); }
+  77% { transform: rotate(8deg); }
+  82% { transform: rotate(-7deg); }
+  87% { transform: rotate(4deg); }
+  92% { transform: rotate(-2deg); }
+}
+
+@keyframes appIconBellClapper {
+  0%, 72%, 100% { transform: translateX(0); }
+  78% { transform: translateX(1.2px); }
+  84% { transform: translateX(-1.1px); }
+  90% { transform: translateX(.5px); }
+}
+
+@keyframes appIconBellWave {
+  0%, 71%, 100% { opacity: 0; }
+  77% { opacity: .85; }
+  88% { opacity: 0; }
+}
+
+@keyframes appIconRingDraw {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes appIconCheckDraw {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes appIconPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.045); opacity: .88; }
+}
+
+@keyframes appIconFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .appIcon--motion-ring .appIconBellBody,
+  .appIcon--motion-ring .appIconBellClapper,
+  .appIcon--motion-ring .appIconBellWave,
+  .appIcon--motion-draw .appIconCheckRing,
+  .appIcon--motion-draw .appIconCheckPath,
+  .appIcon--motion-pulse,
+  .appIcon--motion-float {
+    animation: none !important;
+  }
+
+  .appIcon--motion-draw .appIconCheckRing,
+  .appIcon--motion-draw .appIconCheckPath {
+    stroke-dashoffset: 0;
+  }
+
+  button:hover .appIcon,
+  a:hover .appIcon,
+  summary:hover .appIcon {
+    transform: none !important;
+  }
+}
