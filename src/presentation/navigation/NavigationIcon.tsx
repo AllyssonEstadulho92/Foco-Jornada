@@ -12,6 +12,13 @@ export type NavigationIconName =
   | 'hours'
   | 'guide'
   | 'export'
+  | 'bell'
+  | 'medication'
+  | 'status'
+  | 'list'
+  | 'shield'
+  | 'calendar'
+  | 'journey'
 
 export function NavigationIcon({ name }: { name: NavigationIconName }) {
   return <AppIcon name={name as AppIconName} />
