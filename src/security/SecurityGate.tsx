@@ -493,7 +493,10 @@ export function SecurityGate({
                 disabled={busy || !secret.length}
                 onClick={() => setSecret((current) => current.slice(0, -1))}
               >
-                ⌫
+                <svg className="securityBackspaceIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M10 6h9a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-9L3 12l7-6Z" />
+                  <path d="m13 10 4 4M17 10l-4 4" />
+                </svg>
               </button>
             </div>
           </>
