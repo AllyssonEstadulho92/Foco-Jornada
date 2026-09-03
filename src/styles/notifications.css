@@ -522,6 +522,7 @@
   .notificationBellGlyph.isAnimated .notificationBellBody,
   .notificationBellGlyph.isAnimated .notificationBellClapper,
   .notificationBellGlyph.isAnimated .notificationBellWave,
+  .notificationEmptyAnimatedIcon::before,
   .notificationEmptyHalo,
   .notificationEmptyRing,
   .notificationEmptyCheck,
