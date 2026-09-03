@@ -27,7 +27,7 @@ describe('NotificationCenterPage', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Guardar e continuar' }))
 
     expect(screen.getByRole('heading', { name: 'Horários', level: 1 })).toBeInTheDocument()
-    fireEvent.click(screen.getByLabelText('Horário personalizado'))
+    fireEvent.click(screen.getByLabelText(/Horário personalizado/))
     fireEvent.change(screen.getByLabelText('Das'), { target: { value: '08:00' } })
     fireEvent.change(screen.getByLabelText('Até'), { target: { value: '20:00' } })
     fireEvent.click(screen.getByRole('button', { name: 'Guardar e continuar' }))
