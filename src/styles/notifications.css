@@ -312,53 +312,158 @@
 }
 
 .notificationEmpty {
-  min-height: 96px;
+  min-height: 190px;
   justify-content: center;
-  gap: 5px;
-  padding: 16px;
+  gap: 7px;
+  padding: 24px 18px 28px;
 }
 
-.notificationEmpty::before {
-  content: '✓';
+.notificationEmptyAnimatedIcon {
+  position: relative;
   display: grid;
-  width: 34px;
-  height: 34px;
+  width: 76px;
+  height: 76px;
   place-items: center;
-  margin-bottom: 2px;
-  border-radius: 50%;
-  background: var(--primary-soft);
-  color: var(--primary);
-  font-size: 15px;
-  font-weight: 900;
+  margin-bottom: 8px;
 }
 
-#deadline-mobile-notification-permission {
-  flex: 0 0 auto;
-  margin: 0 10px 10px !important;
-  padding: 10px 11px !important;
-  gap: 4px !important;
-  border-radius: 12px !important;
-  border-color: var(--line) !important;
-  background: var(--surface-2) !important;
+.notificationEmptyGlyph {
+  width: 76px;
+  height: 76px;
+  overflow: visible;
 }
 
-.notificationPanelFooter {
-  flex: 0 0 auto;
-  padding: 8px 14px 10px;
-  background: var(--surface);
-  border-top: 1px solid var(--line);
-  text-align: center;
+.notificationEmptyHalo {
+  fill: color-mix(in srgb, var(--primary-soft) 80%, transparent);
+  transform-origin: 32px 32px;
+  animation: notificationEmptyHaloPulse 3.6s ease-in-out infinite;
 }
 
-.notificationPanelFooter a {
-  color: var(--primary);
-  font-size: 10.5px;
-  font-weight: 750;
-  text-decoration: none;
+.notificationEmptyRing,
+.notificationEmptyCheck {
+  fill: none;
+  stroke: var(--primary);
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
-.notificationPanelFooter a:hover {
-  text-decoration: underline;
+.notificationEmptyRing {
+  stroke-width: 1.65;
+  opacity: .2;
+  stroke-dasharray: 114;
+  stroke-dashoffset: 114;
+  animation: notificationRingDraw .8s cubic-bezier(.2,.8,.2,1) .08s forwards;
+}
+
+.notificationEmptyCheck {
+  stroke-width: 3;
+  stroke-dasharray: 30;
+  stroke-dashoffset: 30;
+  animation: notificationCheckDraw .55s cubic-bezier(.2,.9,.3,1) .48s forwards;
+}
+
+.notificationEmptySpark {
+  fill: var(--primary);
+  opacity: 0;
+  transform-origin: center;
+  animation: notificationSparkPop 3.6s ease-in-out infinite;
+}
+
+.notificationEmptySparkTwo {
+  animation-delay: .18s;
+}
+
+.notificationEmptySparkThree {
+  animation-delay: .36s;
+}
+
+.notificationBellGlyph {
+  overflow: visible;
+}
+
+.notificationBellGlyph .notificationBellBody {
+  transform-origin: 12px 4px;
+}
+
+.notificationBellWave {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.45;
+  stroke-linecap: round;
+  opacity: 0;
+}
+
+.notificationBellGlyph.isAnimated .notificationBellBody {
+  animation: notificationBellSwing 3.2s cubic-bezier(.2,.8,.2,1) infinite;
+}
+
+.notificationBellGlyph.isAnimated .notificationBellClapper {
+  animation: notificationClapperMove 3.2s cubic-bezier(.2,.8,.2,1) infinite;
+}
+
+.notificationBellGlyph.isAnimated .notificationBellWave {
+  animation: notificationBellWave 3.2s ease-out infinite;
+}
+
+.notificationBellGlyph.isAnimated .notificationBellWaveRight {
+  animation-delay: .08s;
+}
+
+.notificationItemActions svg {
+  transition: transform 160ms cubic-bezier(.2,.8,.2,1), stroke 160ms ease;
+}
+
+.notificationItemActions button:hover svg {
+  transform: translateY(-1px) scale(1.06);
+}
+
+.notificationItemActions .notificationDeleteButton:hover svg {
+  animation: notificationTrashNudge .34s ease-out;
+}
+
+@keyframes notificationBellSwing {
+  0%, 18%, 100% { transform: rotate(0deg); }
+  4% { transform: rotate(8deg); }
+  8% { transform: rotate(-7deg); }
+  12% { transform: rotate(4deg); }
+  15% { transform: rotate(-2deg); }
+}
+
+@keyframes notificationClapperMove {
+  0%, 18%, 100% { transform: translateX(0); }
+  6% { transform: translateX(1px); }
+  10% { transform: translateX(-1px); }
+}
+
+@keyframes notificationBellWave {
+  0%, 2%, 18%, 100% { opacity: 0; transform: scale(.92); }
+  7% { opacity: .65; transform: scale(1); }
+  13% { opacity: 0; transform: scale(1.08); }
+}
+
+@keyframes notificationEmptyHaloPulse {
+  0%, 100% { opacity: .72; transform: scale(.94); }
+  50% { opacity: 1; transform: scale(1.04); }
+}
+
+@keyframes notificationRingDraw {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes notificationCheckDraw {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes notificationSparkPop {
+  0%, 8%, 100% { opacity: 0; transform: scale(.4); }
+  14% { opacity: .8; transform: scale(1.15); }
+  20% { opacity: 0; transform: scale(1.4); }
+}
+
+@keyframes notificationTrashNudge {
+  0%, 100% { transform: rotate(0deg) scale(1.06); }
+  35% { transform: rotate(-6deg) scale(1.06); }
+  70% { transform: rotate(5deg) scale(1.06); }
 }
 
 @media (max-width: 899px) {
@@ -386,11 +491,27 @@
     padding: 8px;
   }
 
-  #deadline-mobile-notification-permission {
-    margin: 0 8px 8px !important;
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+  .notificationBellGlyph.isAnimated .notificationBellBody,
+  .notificationBellGlyph.isAnimated .notificationBellClapper,
+  .notificationBellGlyph.isAnimated .notificationBellWave,
+  .notificationEmptyHalo,
+  .notificationEmptyRing,
+  .notificationEmptyCheck,
+  .notificationEmptySpark,
+  .notificationItemActions .notificationDeleteButton:hover svg {
+    animation: none !important;
   }
 
-  .notificationPanelFooter {
-    padding: 8px 12px 10px;
+  .notificationEmptyRing,
+  .notificationEmptyCheck {
+    stroke-dashoffset: 0;
+  }
+
+  .notificationEmptySpark {
+    display: none;
   }
 }
