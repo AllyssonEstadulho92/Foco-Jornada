@@ -16,55 +16,57 @@ function platformLabel(capability: DeadlineNotificationCapability): string {
 }
 
 function permissionLabel(capability: DeadlineNotificationCapability): string {
-  if (capability.permission === 'granted') return 'Sistema permitido'
-  if (capability.permission === 'denied') return 'Sistema bloqueado'
+  if (capability.permission === 'granted') return 'Permitidas'
+  if (capability.permission === 'denied') return 'Bloqueadas'
   if (capability.permission === 'default') return 'Por autorizar'
-  return 'API indisponível'
+  return 'Indisponíveis'
 }
 
-function backgroundLabel(capability: DeadlineNotificationCapability): string {
-  if (capability.pushSubscribed) return 'Push em segundo plano ativo'
-  if (capability.platform === 'ios' && !capability.standalone) return 'Instalar no Ecrã Principal'
-  if (capability.pushSupported) return 'Push por configurar'
-  return 'Automação local'
-}
+type CompactState = 'ready' | 'attention' | 'blocked' | 'limited'
 
-function statusCopy(capability: DeadlineNotificationCapability): { title: string; detail: string } {
+function compactCopy(capability: DeadlineNotificationCapability): {
+  title: string
+  detail: string
+  state: CompactState
+} {
   if (capability.platform === 'ios' && !capability.standalone) {
     return {
-      title: 'Notificações no iPhone/iPad',
-      detail: 'Para Web Push no iOS/iPadOS, adiciona o Foco Jornada ao Ecrã Principal, abre-o pelo ícone instalado e autoriza as notificações. No browser, o centro da aplicação continua disponível.',
+      title: 'Instala a app para receber alertas',
+      detail: 'No iPhone/iPad, adiciona o Foco Jornada ao Ecrã Principal.',
+      state: 'attention',
     }
   }
 
   if (capability.permission === 'granted') {
-    const backgroundDetail = capability.pushSubscribed
-      ? 'A subscrição Web Push deste dispositivo está ativa.'
-      : 'A automação local está ativa. Sem uma subscrição Web Push ligada a um serviço de envio, um aviso com a aplicação totalmente fechada não pode ser garantido.'
-
     return {
-      title: 'Automação de notificações ativa',
-      detail: `Entrada, pausas planeadas, regresso, saída, pausas temporizadas, foco, medicação e sessão glo são acompanhados automaticamente. ${backgroundDetail}`,
+      title: 'Notificações ativas',
+      detail: capability.pushSubscribed
+        ? 'Alertas do sistema e Web Push estão ativos.'
+        : 'Os alertas do dispositivo estão autorizados.',
+      state: 'ready',
     }
   }
 
   if (capability.permission === 'denied') {
     return {
-      title: 'Notificações bloqueadas no dispositivo',
-      detail: 'Ativa a permissão nas definições do browser ou da aplicação instalada. Os avisos continuam a ser guardados no centro de notificações do Foco Jornada.',
+      title: 'Notificações bloqueadas',
+      detail: 'Ativa-as nas definições do navegador ou do dispositivo.',
+      state: 'blocked',
     }
   }
 
   if (capability.permission === 'unsupported') {
     return {
-      title: 'Notificações do sistema indisponíveis neste modo',
-      detail: 'O Foco Jornada continua a registar avisos internamente. Para notificações fora da página é necessário um browser/PWA com Notifications API e Service Worker.',
+      title: 'Alertas do sistema indisponíveis',
+      detail: 'Os avisos continuam guardados no Foco Jornada.',
+      state: 'limited',
     }
   }
 
   return {
-    title: 'Ativar notificações automáticas',
-    detail: 'Autoriza uma vez para receber avisos do sistema para jornada e horário, pausas, foco, medicação e sessão glo quando o browser/PWA puder executar.',
+    title: 'Ativar notificações',
+    detail: 'Recebe avisos de jornada, pausas, foco e medicação.',
+    state: 'attention',
   }
 }
 
@@ -104,7 +106,7 @@ export function NotificationAutomationPanel() {
         pushAppNotification(
           'error',
           'Notificações bloqueadas',
-          'A permissão foi recusada. Podes alterá-la nas definições do browser ou da aplicação instalada.',
+          'A permissão foi recusada. Podes alterá-la nas definições do navegador ou da aplicação instalada.',
         )
       }
     } finally {
@@ -130,55 +132,68 @@ export function NotificationAutomationPanel() {
 
   if (!capability) {
     return (
-      <section className="notificationAutomationPanel" aria-label="Automação de notificações">
+      <section className="notificationAutomationPanel isLoading" aria-label="Estado das notificações">
+        <span className="notificationAutomationStateDot" aria-hidden="true" />
         <strong>A verificar notificações…</strong>
       </section>
     )
   }
 
-  const copy = statusCopy(capability)
+  const copy = compactCopy(capability)
   const canRequest = capability.permission === 'default'
   const canTest = capability.permission === 'granted'
 
   return (
-    <section className="notificationAutomationPanel" aria-label="Automação de notificações">
-      <div className="notificationAutomationHeading">
-        <div>
-          <span>AUTOMAÇÃO</span>
+    <section
+      className="notificationAutomationPanel"
+      data-state={copy.state}
+      aria-label="Estado das notificações"
+    >
+      <div className="notificationAutomationCompact">
+        <span className="notificationAutomationStateDot" aria-hidden="true" />
+        <div className="notificationAutomationCopy">
           <strong>{copy.title}</strong>
+          <p>{copy.detail}</p>
         </div>
-        <span className="releaseStatusBadge">{backgroundLabel(capability)}</span>
-      </div>
-
-      <p>{copy.detail}</p>
-
-      <div className="notificationAutomationBadges" aria-label="Estado técnico das notificações">
-        <span className="releaseStatusBadge">{platformLabel(capability)}</span>
-        <span className="releaseStatusBadge">{capability.standalone ? 'PWA instalada' : 'Browser'}</span>
-        <span className="releaseStatusBadge">{permissionLabel(capability)}</span>
-        <span className="releaseStatusBadge">{capability.serviceWorkerRegistered ? 'Service Worker pronto' : 'Service Worker pendente'}</span>
-      </div>
-
-      <div className="notificationAutomationCoverage" aria-label="Áreas automatizadas">
-        <span>Jornada</span>
-        <span>Pausas</span>
-        <span>Foco</span>
-        <span>Medicação</span>
-        <span>glo</span>
-      </div>
-
-      <div className="deadlineNotificationActions">
         {canRequest ? (
-          <button type="button" onClick={() => void handleEnable()} disabled={busy}>
-            Ativar notificações
+          <button
+            className="notificationAutomationPrimary"
+            type="button"
+            onClick={() => void handleEnable()}
+            disabled={busy}
+          >
+            Ativar
           </button>
         ) : null}
+      </div>
+
+      <details className="notificationAutomationDetails">
+        <summary>Detalhes</summary>
+        <div className="notificationAutomationBadges" aria-label="Estado técnico das notificações">
+          <span>{platformLabel(capability)}</span>
+          <span>{capability.standalone ? 'App instalada' : 'Browser'}</span>
+          <span>{permissionLabel(capability)}</span>
+          <span>{capability.serviceWorkerRegistered ? 'Canal pronto' : 'Canal pendente'}</span>
+        </div>
+
+        {capability.platform === 'ios' && !capability.standalone ? (
+          <p>
+            No iOS/iPadOS, instala pelo menu Partilhar → Adicionar ao Ecrã Principal e abre depois
+            a aplicação pelo novo ícone.
+          </p>
+        ) : null}
+
         {canTest ? (
-          <button type="button" onClick={() => void handleTest()} disabled={busy}>
+          <button
+            className="notificationAutomationTest"
+            type="button"
+            onClick={() => void handleTest()}
+            disabled={busy}
+          >
             Testar notificação
           </button>
         ) : null}
-      </div>
+      </details>
     </section>
   )
 }
