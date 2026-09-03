@@ -34,7 +34,7 @@ describe('App', () => {
     expect(screen.getByRole('button', { name: 'Café +1 registo' })).toBeInTheDocument()
     expect(screen.getAllByRole('link', { name: 'Atividades' }).length).toBeGreaterThan(0)
     expect(screen.getAllByRole('link', { name: 'Foco' }).length).toBeGreaterThan(0)
-    expect(screen.getAllByRole('link', { name: 'Calendário' }).length).toBeGreaterThan(0)
+    expect(screen.getAllByRole('link', { name: 'Jornada' }).length).toBeGreaterThan(0)
     expect(screen.getAllByRole('link', { name: 'Relatórios' }).length).toBeGreaterThan(0)
     expect(screen.getAllByRole('link', { name: 'Mais' }).length).toBeGreaterThan(0)
     expect(screen.getByRole('link', { name: 'Ver tudo' })).toHaveAttribute('href', '#/historico')
