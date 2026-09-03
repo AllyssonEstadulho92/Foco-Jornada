@@ -1,11 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } from 'react'
-import { Link } from 'react-router-dom'
 import { useSecurityOptional } from '../../security/SecurityContext'
 import { emitAppFeedback } from '../../shared/notifications/appFeedback'
 import { useNow } from '../hooks/useNow'
 import { useAppServices } from '../providers/AppServicesProvider'
 import { useNotificationStore, type AppNotification } from '../store/useNotificationStore'
-import { NotificationAutomationPanel } from './NotificationAutomationPanel'
 
 type StatusNotification = {
   id: string
@@ -32,11 +30,32 @@ function LockIcon() {
   )
 }
 
-function BellIcon() {
+function BellIcon({ animated = false }: { animated?: boolean }) {
   return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 7h18s-3 0-3-7" />
-      <path d="M10 20h4" />
+    <svg
+      className={animated ? 'notificationBellGlyph isAnimated' : 'notificationBellGlyph'}
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+    >
+      <g className="notificationBellBody">
+        <path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 7h18s-3 0-3-7" />
+        <path d="M10 20h4" className="notificationBellClapper" />
+      </g>
+      <path d="M4.8 6.5c.45-.95 1.05-1.8 1.8-2.5" className="notificationBellWave notificationBellWaveLeft" />
+      <path d="M19.2 6.5c-.45-.95-1.05-1.8-1.8-2.5" className="notificationBellWave notificationBellWaveRight" />
+    </svg>
+  )
+}
+
+function EmptyStateIcon() {
+  return (
+    <svg className="notificationEmptyGlyph" viewBox="0 0 64 64" aria-hidden="true">
+      <circle className="notificationEmptyHalo" cx="32" cy="32" r="24" />
+      <circle className="notificationEmptyRing" cx="32" cy="32" r="18" />
+      <path className="notificationEmptyCheck" d="m23.5 32.5 6 6L41.5 25" />
+      <circle className="notificationEmptySpark notificationEmptySparkOne" cx="50" cy="18" r="1.8" />
+      <circle className="notificationEmptySpark notificationEmptySparkTwo" cx="16" cy="20" r="1.4" />
+      <circle className="notificationEmptySpark notificationEmptySparkThree" cx="47" cy="46" r="1.2" />
     </svg>
   )
 }
@@ -260,7 +279,7 @@ export function AppTopBar({ onOpenMenu, menuButtonRef }: { onOpenMenu?: () => vo
             aria-expanded={isOpen}
             aria-haspopup="dialog"
           >
-            <BellIcon />
+            <BellIcon animated={isOpen || unreadCount > 0} />
             {unreadCount > 0 ? (
               <span className="notificationBadge">{unreadCount > 9 ? '9+' : unreadCount}</span>
             ) : null}
@@ -294,11 +313,13 @@ export function AppTopBar({ onOpenMenu, menuButtonRef }: { onOpenMenu?: () => vo
                 </div>
               ) : null}
 
-              <NotificationAutomationPanel />
 
               <div className="notificationList">
                 {notifications.length === 0 ? (
                   <div className="notificationEmpty">
+                    <span className="notificationEmptyAnimatedIcon" aria-hidden="true">
+                      <EmptyStateIcon />
+                    </span>
                     <strong>Tudo em dia</strong>
                     <span>Sem notificações novas.</span>
                   </div>
@@ -368,9 +389,6 @@ export function AppTopBar({ onOpenMenu, menuButtonRef }: { onOpenMenu?: () => vo
                 )}
               </div>
 
-              <footer className="notificationPanelFooter">
-                <Link to="/notificacoes" onClick={() => setIsOpen(false)}>Abrir centro completo</Link>
-              </footer>
             </section>
           ) : null}
         </div>
