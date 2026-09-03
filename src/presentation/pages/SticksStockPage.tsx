@@ -27,6 +27,7 @@ import type {
 import { getStickPacingStatus, type StickUsageAnalytics } from '../../application/personalStock/StickUsageAnalyticsService'
 import type { PhysicalStockCheck, StickSummary, StockMovement } from '../../domain/personalStock/models'
 import { useNow } from '../hooks/useNow'
+import { AppIcon } from '../components/ui/AppIcon'
 import { useAppServices } from '../providers/AppServicesProvider'
 
 function operationId(): string {
@@ -691,7 +692,7 @@ export function SticksStockPage() {
                   aria-hidden="true"
                 >
                   <span className="sticksPacingDialFace">
-                    <strong>{displayedPacingStatus.ready ? '✓' : pacingCountdown}</strong>
+                    <strong>{displayedPacingStatus.ready ? <AppIcon name="check" motion="draw" /> : pacingCountdown}</strong>
                     <small>{displayedPacingStatus.targetMinutes} min</small>
                   </span>
                 </div>
