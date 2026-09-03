@@ -7,6 +7,7 @@ import { InMemoryFocusRepository } from '../test/InMemoryFocusRepository'
 import { InMemoryJourneyRepository } from '../test/InMemoryJourneyRepository'
 import { InMemorySettingsRepository } from '../test/InMemorySettingsRepository'
 import { App } from './App'
+import { useNotificationStore } from './store/useNotificationStore'
 
 describe('App', () => {
   it('renderiza o dashboard de referência e a navegação principal', async () => {
@@ -53,4 +54,32 @@ describe('App', () => {
 
     view.unmount()
   })
+  it('mantém o painel rápido de notificações limpo e usa o estado animado local', () => {
+    useNotificationStore.setState({ notifications: [] })
+
+    const view = render(
+      <App
+        services={{
+          journeyRepository: new InMemoryJourneyRepository(),
+          breakRepository: new InMemoryBreakRepository(),
+          activityRepository: new InMemoryActivityRepository(),
+          focusRepository: new InMemoryFocusRepository(),
+          coffeeRepository: new InMemoryCoffeeRepository(),
+          settingsRepository: new InMemorySettingsRepository(),
+        }}
+      />,
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Abrir centro de notificações' }))
+
+    const panel = screen.getByRole('dialog', { name: 'Centro de notificações' })
+    expect(within(panel).getByText('Tudo em dia')).toBeInTheDocument()
+    expect(within(panel).getByText('Sem notificações novas.')).toBeInTheDocument()
+    expect(panel.querySelector('.notificationEmptyGlyph')).not.toBeNull()
+    expect(screen.queryByText('Instala a app para receber alertas')).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Abrir centro completo' })).not.toBeInTheDocument()
+
+    view.unmount()
+  })
+
 })
