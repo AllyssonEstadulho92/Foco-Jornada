@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { createJSONStorage, persist } from 'zustand/middleware'\nimport { secureStorage } from '../../security/secureStorage'
 import { emitAppFeedback } from '../../shared/notifications/appFeedback'
 
 export type NotificationTone = 'success' | 'error' | 'info'
@@ -67,7 +67,7 @@ export const useNotificationStore = create<NotificationState>()(
         set((state) => ({ notifications: state.notifications.filter((item) => item.id !== id) })),
     }),
     {
-      name: 'foco-jornada-notifications-v1',
+      name: 'foco-jornada-notifications-v1',\n      storage: createJSONStorage(() => secureStorage),
       partialize: (state) => ({ notifications: state.notifications }),
     },
   ),
