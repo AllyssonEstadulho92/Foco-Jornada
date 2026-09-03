@@ -73,6 +73,16 @@ export function MorePage() {
         : 'A ligação não é segura. Abre a aplicação através de HTTPS.',
     })
 
+    const webCryptoReady = Boolean(window.crypto?.subtle)
+    checks.push({
+      id: 'web-crypto',
+      label: 'Criptografia do navegador',
+      status: webCryptoReady ? 'ok' : 'error',
+      detail: webCryptoReady
+        ? 'A Web Crypto API está disponível para proteger o cofre local.'
+        : 'Este navegador não disponibiliza a Web Crypto API necessária ao cofre encriptado.',
+    })
+
     try {
       const date = toLocalDateKey(new Date())
       await Promise.all([
@@ -90,7 +100,7 @@ export function MorePage() {
         id: 'database',
         label: 'Dados locais',
         status: 'ok',
-        detail: 'Os dados guardados neste dispositivo estão acessíveis.',
+        detail: 'O cofre desbloqueado deste perfil está acessível através da camada local protegida.',
       })
     } catch {
       checks.push({
@@ -217,14 +227,14 @@ export function MorePage() {
       id: 'data-location',
       label: 'Onde ficam os dados',
       status: 'info',
-      detail: 'A versão atual guarda jornada, pausas, atividades, foco, café e definições neste dispositivo. Ainda não existe sincronização automática na cloud.',
+      detail: 'Os dados pessoais deste perfil ficam no cofre local encriptado deste dispositivo. Não existe sincronização automática na cloud.',
     })
 
     checks.push({
       id: 'backup',
       label: 'Cópia de segurança',
       status: 'info',
-      detail: 'Limpar os dados do navegador ou perder o dispositivo pode eliminar os registos. Exporta uma cópia quando precisares.',
+      detail: 'Limpar os dados do navegador ou perder o dispositivo pode eliminar os registos. Mantém uma cópia de segurança cifrada e o código de recuperação em locais separados.',
     })
 
     setProtectionChecks(checks)
