@@ -1,11 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } from 'react'
-import { Link } from 'react-router-dom'
 import { useSecurityOptional } from '../../security/SecurityContext'
 import { emitAppFeedback } from '../../shared/notifications/appFeedback'
 import { useNow } from '../hooks/useNow'
 import { useAppServices } from '../providers/AppServicesProvider'
 import { useNotificationStore, type AppNotification } from '../store/useNotificationStore'
-import { NotificationAutomationPanel } from './NotificationAutomationPanel'
 
 type StatusNotification = {
   id: string
@@ -37,6 +35,15 @@ function BellIcon() {
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 7h18s-3 0-3-7" />
       <path d="M10 20h4" />
+    </svg>
+  )
+}
+
+function AnimatedCheckIcon() {
+  return (
+    <svg viewBox="0 0 64 64" aria-hidden="true">
+      <circle className="notificationAnimatedCheckRing" cx="32" cy="32" r="24" />
+      <path className="notificationAnimatedCheckPath" d="m20 32 8 8 16-18" />
     </svg>
   )
 }
@@ -260,7 +267,7 @@ export function AppTopBar({ onOpenMenu, menuButtonRef }: { onOpenMenu?: () => vo
             aria-expanded={isOpen}
             aria-haspopup="dialog"
           >
-            <BellIcon />
+            <span className="notificationBellMotion" aria-hidden="true"><BellIcon /></span>
             {unreadCount > 0 ? (
               <span className="notificationBadge">{unreadCount > 9 ? '9+' : unreadCount}</span>
             ) : null}
@@ -294,11 +301,10 @@ export function AppTopBar({ onOpenMenu, menuButtonRef }: { onOpenMenu?: () => vo
                 </div>
               ) : null}
 
-              <NotificationAutomationPanel />
-
               <div className="notificationList">
                 {notifications.length === 0 ? (
                   <div className="notificationEmpty">
+                    <span className="notificationAnimatedCheck"><AnimatedCheckIcon /></span>
                     <strong>Tudo em dia</strong>
                     <span>Sem notificações novas.</span>
                   </div>
@@ -368,9 +374,6 @@ export function AppTopBar({ onOpenMenu, menuButtonRef }: { onOpenMenu?: () => vo
                 )}
               </div>
 
-              <footer className="notificationPanelFooter">
-                <Link to="/notificacoes" onClick={() => setIsOpen(false)}>Abrir centro completo</Link>
-              </footer>
             </section>
           ) : null}
         </div>
