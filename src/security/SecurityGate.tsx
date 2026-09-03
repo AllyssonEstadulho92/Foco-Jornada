@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type FormEvent } from 'react'
+import { useEffect, useMemo, useRef, useState, type ChangeEvent, type FormEvent } from 'react'
 import type { SecurityProfile } from './profileStore'
 import {
   securityManager,
@@ -35,6 +35,7 @@ export function SecurityGate({
   const [message, setMessage] = useState('')
   const [busy, setBusy] = useState(false)
   const [now, setNow] = useState(Date.now())
+  const importRef = useRef<HTMLInputElement | null>(null)
 
   const selected = profiles.find((profile) => profile.id === selectedId) ?? profiles[0]
 
@@ -153,6 +154,23 @@ export function SecurityGate({
       await onProfilesChanged()
       onUnlocked(recovered)
     })
+  }
+
+  async function importSecureBackup(file: File) {
+    await run(async () => {
+      const imported = await securityManager.importSecureBackup(await file.text())
+      await onProfilesChanged()
+      setSelectedId(imported.id)
+      setView('unlock')
+      setSecret('')
+      setMessage('Cópia segura importada. Introduz o PIN/palavra-passe existente ou usa o código de recuperação.')
+    })
+  }
+
+  function handleImportChange(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0]
+    event.target.value = ''
+    if (file) void importSecureBackup(file)
   }
 
   async function resetProfile() {
@@ -288,6 +306,23 @@ export function SecurityGate({
               {busy ? 'A criar proteção…' : 'Criar acesso'}
             </button>
           </form>
+
+          <button
+            className="securitySecondary"
+            type="button"
+            disabled={busy}
+            onClick={() => importRef.current?.click()}
+          >
+            Importar cópia segura
+          </button>
+          <input
+            ref={importRef}
+            className="securityHiddenFileInput"
+            type="file"
+            accept="application/json,.json"
+            onChange={handleImportChange}
+            aria-label="Importar cópia segura do Foco Jornada"
+          />
 
           {profiles.length ? (
             <button
@@ -533,6 +568,22 @@ export function SecurityGate({
         >
           Criar outro perfil local
         </button>
+        <button
+          className="securityTextAction"
+          type="button"
+          disabled={busy}
+          onClick={() => importRef.current?.click()}
+        >
+          Importar cópia segura
+        </button>
+        <input
+          ref={importRef}
+          className="securityHiddenFileInput"
+          type="file"
+          accept="application/json,.json"
+          onChange={handleImportChange}
+          aria-label="Importar cópia segura do Foco Jornada"
+        />
       </section>
     </main>
   )
