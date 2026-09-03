@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState, type CSSProperties } from 'react'
 import {
-import { AppIcon } from '../components/ui/AppIcon'
   getFocusElapsedMs,
   getFocusRemainingMs,
   type FocusSegmentType,
   type FocusSession,
 } from '../../domain/focus/FocusSession'
+import { AppIcon } from '../components/ui/AppIcon'
 import { formatClockTime, formatDuration } from '../../shared/utils/dateTime'
 import { useActivityController } from '../hooks/useActivityController'
 import { useFocusController } from '../hooks/useFocusController'
