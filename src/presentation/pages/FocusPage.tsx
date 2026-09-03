@@ -5,6 +5,7 @@ import {
   type FocusSegmentType,
   type FocusSession,
 } from '../../domain/focus/FocusSession'
+import { AppIcon } from '../components/ui/AppIcon'
 import { formatClockTime, formatDuration } from '../../shared/utils/dateTime'
 import { useActivityController } from '../hooks/useActivityController'
 import { useFocusController } from '../hooks/useFocusController'
@@ -37,10 +38,10 @@ function CycleDots({ cycle }: { cycle: number }) {
 function PomodoroSummary() {
   return (
     <div className="focusPomodoroSummary" aria-label="Configuração do Pomodoro">
-      <span><b aria-hidden="true">◎</b><strong>25 min</strong><small>Foco</small></span>
-      <span><b aria-hidden="true">♨</b><strong>5 min</strong><small>Pausa</small></span>
-      <span><b aria-hidden="true">◷</b><strong>15 min</strong><small>Pausa longa</small></span>
-      <span><b aria-hidden="true">↻</b><strong>Repetir</strong><small>4 ciclos</small></span>
+      <span><b aria-hidden="true"><AppIcon name="focus" /></b><strong>25 min</strong><small>Foco</small></span>
+      <span><b aria-hidden="true"><AppIcon name="break" /></b><strong>5 min</strong><small>Pausa</small></span>
+      <span><b aria-hidden="true"><AppIcon name="clock" /></b><strong>15 min</strong><small>Pausa longa</small></span>
+      <span><b aria-hidden="true"><AppIcon name="refresh" /></b><strong>Repetir</strong><small>4 ciclos</small></span>
     </div>
   )
 }
@@ -230,7 +231,7 @@ export function FocusPage() {
                 disabled={isBusy || journeyBusy || journeyLoading || isLoading}
                 onClick={() => void handleStartPomodoro()}
               >
-                <span aria-hidden="true">▶</span> Iniciar foco
+                <span aria-hidden="true"><AppIcon name="play" /></span> Iniciar foco
               </button>
             </>
           ) : (

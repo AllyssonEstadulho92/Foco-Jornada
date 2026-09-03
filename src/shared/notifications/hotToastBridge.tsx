@@ -1,5 +1,6 @@
 /* eslint-disable react-refresh/only-export-components -- este ficheiro adapta a API de react-hot-toast ao centro de notificações interno. */
 import { useEffect, useRef, useState } from 'react'
+import { AppIcon } from '../../presentation/components/ui/AppIcon'
 import { pushAppNotification } from '../../presentation/store/useNotificationStore'
 import {
   subscribeAppFeedback,
@@ -39,27 +40,9 @@ const toast = Object.assign(baseToast, {
 export default toast
 
 function FeedbackIcon({ tone }: { tone: AppFeedback['tone'] }) {
-  if (tone === 'success') {
-    return (
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="m6.5 12.5 3.3 3.3 7.7-8" />
-      </svg>
-    )
-  }
-
-  if (tone === 'error') {
-    return (
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M12 7.5v5.2M12 16.5h.01" />
-      </svg>
-    )
-  }
-
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M12 10.5v6M12 7.5h.01" />
-    </svg>
-  )
+  if (tone === 'success') return <AppIcon name="check" motion="draw" />
+  if (tone === 'error') return <AppIcon name="warning" />
+  return <AppIcon name="info" />
 }
 
 export function Toaster() {

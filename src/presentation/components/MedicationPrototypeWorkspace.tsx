@@ -8,6 +8,7 @@ import type {
 } from '../../application/personalStock/MedicationDataProtectionService'
 import { minorToDecimal } from '../../application/personalStock/decimal'
 import type { MedicationDoseEvent, MedicationSchedule, MedicationSummary } from '../../domain/personalStock/models'
+import { AppIcon, type AppIconName } from './ui/AppIcon'
 import { useAppServices } from '../providers/AppServicesProvider'
 
 type WorkspaceTab = 'history' | 'evolution' | 'information'
@@ -65,14 +66,14 @@ function formatDate(value?: string): string {
 }
 
 
-function timelineIcon(kind: MedicationTimelineItem['kind']): string {
-  if (kind === 'dose') return '✓'
-  if (kind === 'schedule') return '◷'
-  if (kind === 'stock') return '±'
-  if (kind === 'note') return '✎'
-  if (kind === 'profile') return 'i'
-  if (kind === 'protection') return '◆'
-  return '+'
+function timelineIcon(kind: MedicationTimelineItem['kind']): AppIconName {
+  if (kind === 'dose') return 'check'
+  if (kind === 'schedule') return 'clock'
+  if (kind === 'stock') return 'list'
+  if (kind === 'note') return 'note'
+  if (kind === 'profile') return 'user'
+  if (kind === 'protection') return 'shield'
+  return 'plus'
 }
 
 export function MedicationPrototypeWorkspace({
@@ -226,7 +227,7 @@ export function MedicationPrototypeWorkspace({
 
       <div className="medProtoListTools">
         <label className="medProtoSearch">
-          <span aria-hidden="true">⌕</span>
+          <span aria-hidden="true"><AppIcon name="search" /></span>
           <input
             value={search}
             onChange={(event) => setSearch(event.target.value)}
@@ -266,7 +267,7 @@ export function MedicationPrototypeWorkspace({
                   <small>{item.stock} {item.medication.unit} em stock · código protegido</small>
                 </span>
                 <span className={statusClass(profile.status)}>{statusLabel(profile.status)}</span>
-                <span className="medProtoChevron" aria-hidden="true">›</span>
+                <span className="medProtoChevron" aria-hidden="true"><AppIcon name="chevron-right" /></span>
               </button>
             )
           }) : (
@@ -307,7 +308,7 @@ export function MedicationPrototypeWorkspace({
                 <div className="medProtoTimelineNotice">Nada é apagado. Alterações, correções e configurações permanecem auditáveis.</div>
                 {timeline.length ? timeline.slice(0, 80).map((item) => (
                   <div className="medProtoTimelineRow" key={item.id}>
-                    <span className="medProtoTimelineIcon" aria-hidden="true">{timelineIcon(item.kind)}</span>
+                    <span className="medProtoTimelineIcon" aria-hidden="true"><AppIcon name={timelineIcon(item.kind)} /></span>
                     <div>
                       <strong>{item.title}</strong>
                       <span>{item.description}</span>

@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { AppIcon } from '../components/ui/AppIcon'
 
 export function MedicationActionsGuidePage() {
   return (
@@ -30,7 +31,7 @@ export function MedicationActionsGuidePage() {
         <details className="guideCard" open>
           <summary>
             <span><strong>Estados apresentados</strong><small>O estado muda conforme os registos feitos na aplicação.</small></span>
-            <span className="guideChevron" aria-hidden="true">⌄</span>
+            <span className="guideChevron" aria-hidden="true"><AppIcon name="chevron-down" /></span>
           </summary>
           <div className="guideCardBody">
             <div className="guideExample">
@@ -59,7 +60,7 @@ export function MedicationActionsGuidePage() {
         <details className="guideCard">
           <summary>
             <span><strong>Ações rápidas</strong><small>As ações principais ficam visíveis; as secundárias ficam no menu ···.</small></span>
-            <span className="guideChevron" aria-hidden="true">⌄</span>
+            <span className="guideChevron" aria-hidden="true"><AppIcon name="chevron-down" /></span>
           </summary>
           <div className="guideCardBody">
             <p><strong>Tomada / Tomada agora</strong> confirma a ocorrência e regista o consumo correspondente.</p>
@@ -73,7 +74,7 @@ export function MedicationActionsGuidePage() {
         <details className="guideCard">
           <summary>
             <span><strong>Correções e histórico</strong><small>Os registos anteriores não são apagados silenciosamente.</small></span>
-            <span className="guideChevron" aria-hidden="true">⌄</span>
+            <span className="guideChevron" aria-hidden="true"><AppIcon name="chevron-down" /></span>
           </summary>
           <div className="guideCardBody">
             <p>Quando corriges uma toma ou um adiamento, o Foco Jornada acrescenta um evento de correção e mantém o registo original.</p>
@@ -92,7 +93,7 @@ export function MedicationActionsGuidePage() {
         <details className="guideCard">
           <summary>
             <span><strong>Relação com o stock</strong><small>O saldo continua baseado no ledger auditável.</small></span>
-            <span className="guideChevron" aria-hidden="true">⌄</span>
+            <span className="guideChevron" aria-hidden="true"><AppIcon name="chevron-down" /></span>
           </summary>
           <div className="guideCardBody">
             <p><strong>Adiar</strong> e <strong>Não tomada</strong> não descontam stock.</p>

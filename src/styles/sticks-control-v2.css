@@ -1426,20 +1426,7 @@
   line-height:1;
   letter-spacing:.11em;
 }
-.sticksLinearPage .sticksPacingCopy>span::before{
-  content:"✓";
-  display:grid;
-  width:22px;
-  height:22px;
-  flex:0 0 22px;
-  place-items:center;
-  border-radius:8px;
-  background:var(--primary);
-  color:#fff;
-  font-size:13px;
-  font-weight:900;
-  box-shadow:0 5px 12px color-mix(in srgb,var(--primary) 22%,transparent);
-}
+.sticksLinearPage .sticksPacingCopy > span::before{content:none;display:none}
 .sticksLinearPage .sticksPacingCopy>strong{
   color:var(--text);
   font-size:clamp(21px,2.2vw,30px);
@@ -1506,17 +1493,7 @@
   font-weight:var(--weight-bold);
   line-height:1;
 }
-.sticksLinearPage .sticksPacingZeroButton::after{
-  content:"›";
-  position:absolute;
-  right:18px;
-  top:50%;
-  transform:translateY(-52%);
-  color:var(--primary);
-  font-size:31px;
-  font-weight:400;
-  line-height:1;
-}
+.sticksLinearPage .sticksPacingZeroButton::after{content:none;display:none}
 .sticksLinearPage .sticksPacingZeroButton:hover:not(:disabled),
 .sticksLinearPage .sticksPacingZeroButton:focus-visible:not(:disabled){
   transform:translateY(-1px);

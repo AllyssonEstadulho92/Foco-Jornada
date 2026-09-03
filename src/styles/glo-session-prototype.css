@@ -41,13 +41,7 @@
   font-weight:var(--weight-heavy);
 }
 
-.sticksLinearPage .sticksDeviceTimerCard .gloSessionStatusBadge::before{
-  content:'ⓘ';
-  margin-right:10px;
-  color:var(--primary);
-  font-size:21px;
-  line-height:1;
-}
+.sticksLinearPage .sticksDeviceTimerCard .gloSessionStatusBadge::before{content:none;display:none}
 
 .sticksLinearPage .sticksDeviceTimerCard .gloSessionIntro{
   max-width:none;

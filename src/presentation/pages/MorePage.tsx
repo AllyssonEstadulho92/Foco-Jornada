@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { buildDayReport } from '../../application/reports/buildDayReport'
 import { toLocalDateKey } from '../../shared/utils/dateTime'
+import { AppIcon } from '../components/ui/AppIcon'
 import { NavigationIcon } from '../navigation/NavigationIcon'
 import { useAppServices } from '../providers/AppServicesProvider'
 import { pushAppNotification } from '../store/useNotificationStore'
@@ -17,24 +18,11 @@ interface ProtectionCheck {
 }
 
 function RowArrow() {
-  return <span className="moreRowArrow" aria-hidden="true">›</span>
+  return <span className="moreRowArrow" aria-hidden="true"><AppIcon name="chevron-right" /></span>
 }
 
 function SectionIcon({ type }: { type: 'quick' | 'management' }) {
-  if (type === 'quick') {
-    return (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        <path d="m13.5 2-8 11h6l-1 9 8-12h-6z" />
-      </svg>
-    )
-  }
-
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <circle cx="12" cy="12" r="3" />
-      <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.86 2.86-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21H9.6v-.1A1.7 1.7 0 0 0 8.5 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.86-2.86.06-.06A1.7 1.7 0 0 0 4.1 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H2.3V9.6h.1A1.7 1.7 0 0 0 4.1 8.5a1.7 1.7 0 0 0-.34-1.88l-.06-.06L6.56 3.7l.06.06A1.7 1.7 0 0 0 8.5 4.1a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V2.3h4.04v.1A1.7 1.7 0 0 0 15 4.1a1.7 1.7 0 0 0 1.88-.34l.06-.06 2.86 2.86-.06.06A1.7 1.7 0 0 0 19.4 8.5a1.7 1.7 0 0 0 .6 1 1.7 1.7 0 0 0 1.1.4h.1v4.04h-.1A1.7 1.7 0 0 0 19.4 15Z" />
-    </svg>
-  )
+  return <AppIcon name={type === 'quick' ? 'sparkle' : 'settings'} />
 }
 
 function formatBytes(value: number): string {
@@ -355,7 +343,7 @@ export function MorePage() {
               <h2 id="local-protection-title">Proteção dos dados</h2>
               <p>{protectionLoading ? 'A verificar…' : protectionSummary}</p>
             </div>
-            <button type="button" className="moreProtectionClose" onClick={() => setProtectionOpen(false)} aria-label="Fechar estado da aplicação">×</button>
+            <button type="button" className="moreProtectionClose" onClick={() => setProtectionOpen(false)} aria-label="Fechar estado da aplicação"><AppIcon name="close" /></button>
           </div>
 
           {protectionLoading ? (

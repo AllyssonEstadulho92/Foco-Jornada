@@ -1,4 +1,5 @@
 import type { ButtonHTMLAttributes, HTMLAttributes, ReactNode } from 'react'
+import { AppIcon } from './AppIcon'
 
 export function UiCard({ className = '', ...props }: HTMLAttributes<HTMLElement>) {
   return <article className={`uiCard ${className}`.trim()} {...props} />
@@ -56,7 +57,7 @@ export function UiButton({
 export function EmptyState({ title, description, action }: { title: string; description?: string; action?: ReactNode }) {
   return (
     <div className="uiState uiState-empty" role="status">
-      <span className="uiStateIcon" aria-hidden="true">○</span>
+      <span className="uiStateIcon" aria-hidden="true"><AppIcon name="check" /></span>
       <strong>{title}</strong>
       {description ? <p>{description}</p> : null}
       {action ? <div className="uiStateAction">{action}</div> : null}
@@ -67,7 +68,7 @@ export function EmptyState({ title, description, action }: { title: string; desc
 export function ErrorState({ title = 'Não foi possível concluir a operação.', description, action }: { title?: string; description?: string; action?: ReactNode }) {
   return (
     <div className="uiState uiState-error" role="alert">
-      <span className="uiStateIcon" aria-hidden="true">!</span>
+      <span className="uiStateIcon" aria-hidden="true"><AppIcon name="warning" /></span>
       <strong>{title}</strong>
       {description ? <p>{description}</p> : null}
       {action ? <div className="uiStateAction">{action}</div> : null}
@@ -111,7 +112,7 @@ export function Modal({
             <h2 id="ui-modal-title">{title}</h2>
             {description ? <p>{description}</p> : null}
           </div>
-          <button type="button" className="uiIconButton" aria-label="Fechar" onClick={onClose}>×</button>
+          <button type="button" className="uiIconButton" aria-label="Fechar" onClick={onClose}><AppIcon name="close" /></button>
         </header>
         <div className="uiModalBody">{children}</div>
         {footer ? <footer>{footer}</footer> : null}

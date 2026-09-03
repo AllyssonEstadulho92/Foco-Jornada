@@ -8,6 +8,7 @@ import { getScheduleSummary } from '../../domain/journey/WorkSchedule'
 import type { AppSettings } from '../../domain/settings/AppSettings'
 import { calculateWorkHours, formatHoursMinutes } from '../../domain/work-hours/WorkHours'
 import { formatClockTime, formatDuration, toLocalDateKey } from '../../shared/utils/dateTime'
+import { AppIcon, type AppIconName } from '../components/ui/AppIcon'
 import { useAppServices } from '../providers/AppServicesProvider'
 import { useWorkHoursStore } from '../store/useWorkHoursStore'
 
@@ -123,14 +124,14 @@ function buildTimeline(report: DayReport, nowIso: string): TimelineRow[] {
 
 function ReportMetric({ tone, icon, label, value, detail }: {
   tone: TimelineTone
-  icon: string
+  icon: AppIconName
   label: string
   value: string
   detail: string
 }) {
   return (
     <article className={`exportA4Metric is-${tone}`}>
-      <span className="exportA4MetricIcon" aria-hidden="true">{icon}</span>
+      <span className="exportA4MetricIcon" aria-hidden="true"><AppIcon name={icon} /></span>
       <div>
         <span>{label}</span>
         <strong>{value}</strong>
@@ -240,12 +241,12 @@ export function ExportDataPage() {
           </header>
 
           <section className="exportA4Summary" aria-label="Indicadores principais">
-            <ReportMetric tone="journey" icon="◷" label="Jornada" value={formatDuration(plannedJourneyMs)} detail={plannedDetail} />
-            <ReportMetric tone="break" icon="☕" label="Pausas" value={formatDuration(report.summary.breakMs)} detail="Total de pausas" />
-            <ReportMetric tone="journey" icon="◎" label="Efetivo" value={formatDuration(report.summary.effectiveMs)} detail="Tempo efetivo" />
-            <ReportMetric tone="focus" icon="⊙" label="Foco" value={formatDuration(report.summary.focusMs)} detail="Tempo de foco" />
-            <ReportMetric tone="activity" icon="▤" label="Atividades" value={String(report.summary.activityCount)} detail="Concluídas" />
-            <ReportMetric tone="coffee" icon="☕" label="Cafés" value={String(report.summary.coffeeCount)} detail="Cafés registados" />
+            <ReportMetric tone="journey" icon="journey" label="Jornada" value={formatDuration(plannedJourneyMs)} detail={plannedDetail} />
+            <ReportMetric tone="break" icon="break" label="Pausas" value={formatDuration(report.summary.breakMs)} detail="Total de pausas" />
+            <ReportMetric tone="journey" icon="clock" label="Efetivo" value={formatDuration(report.summary.effectiveMs)} detail="Tempo efetivo" />
+            <ReportMetric tone="focus" icon="focus" label="Foco" value={formatDuration(report.summary.focusMs)} detail="Tempo de foco" />
+            <ReportMetric tone="activity" icon="activities" label="Atividades" value={String(report.summary.activityCount)} detail="Concluídas" />
+            <ReportMetric tone="coffee" icon="coffee" label="Cafés" value={String(report.summary.coffeeCount)} detail="Cafés registados" />
           </section>
 
           <section className="exportA4Section">
@@ -308,14 +309,14 @@ export function ExportDataPage() {
                 <div><dt>Faltas / ausências</dt><dd>{workCalculation ? formatDuration(workCalculation.nonWorkedMinutes * 60_000) : '00:00:00'}</dd></div>
                 <div><dt>Saldo de horas</dt><dd>{workCalculation ? signedHoursMinutes(workCalculation.balanceMinutes) : '00:00'}</dd></div>
               </dl>
-              <p><span aria-hidden="true">◆</span>{productivityMessage}</p>
+              <p><span aria-hidden="true"><AppIcon name="sparkle" /></span>{productivityMessage}</p>
             </article>
           </section>
 
           <footer className="exportA4Footer">
             <img src="./report-qr.svg" alt="QR code para abrir Foco Jornada" />
             <div>
-              <span aria-hidden="true">▣</span>
+              <span aria-hidden="true"><AppIcon name="document" /></span>
               <p>Gerado em<br /><strong>{new Intl.DateTimeFormat('pt-PT', { dateStyle: 'short', timeStyle: 'short' }).format(generatedAt)}</strong></p>
             </div>
           </footer>

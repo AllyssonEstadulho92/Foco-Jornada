@@ -15,6 +15,7 @@ import {
 } from '../../domain/journey/WorkSchedule'
 import { formatClockTime, formatDuration, toLocalDateKey } from '../../shared/utils/dateTime'
 import { getTimeGreeting } from '../../shared/utils/timeGreeting'
+import { AppIcon, type AppIconName } from '../components/ui/AppIcon'
 import { ErrorState } from '../components/ui/UiPrimitives'
 import { useActivityController } from '../hooks/useActivityController'
 import { useBreakController } from '../hooks/useBreakController'
@@ -29,22 +30,11 @@ import { pushAppNotification } from '../store/useNotificationStore'
 const notifiedBreaks = new Set<string>()
 
 function FocusGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <circle cx="12" cy="12" r="7" />
-      <circle cx="12" cy="12" r="2.4" />
-      <path d="M12 2v3M12 19v3M2 12h3M19 12h3" />
-    </svg>
-  )
+  return <AppIcon name="focus" />
 }
 
 function CalendarGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <rect x="4" y="5" width="16" height="15" rx="2.5" />
-      <path d="M8 3v4M16 3v4M4 10h16" />
-    </svg>
-  )
+  return <AppIcon name="calendar" />
 }
 
 function HeroClockIllustration() {
@@ -270,15 +260,15 @@ export function TodayReferencePage() {
               ? 'Iniciar pausa'
               : 'Iniciar foco'
             : 'Iniciar jornada'
-  const primaryActionGlyph = activeBreak
-    ? '▶'
+  const primaryActionIcon: AppIconName = activeBreak
+    ? 'play'
     : activeFocus?.status === 'paused'
-      ? '▶'
+      ? 'play'
       : activeFocus
-        ? 'Ⅱ'
+        ? 'pause'
         : activeActivity
-          ? '✓'
-          : '▶'
+          ? 'check'
+          : 'play'
 
   const dateLabel = new Intl.DateTimeFormat('pt-PT', {
     weekday: 'long',
@@ -423,7 +413,7 @@ export function TodayReferencePage() {
       <header className="referenceGreeting">
         <div>
           <span>{dateLabel}</span>
-          <h2>{greeting}, foco! <i aria-hidden="true">✦</i></h2>
+          <h2>{greeting}, foco! <i aria-hidden="true"><AppIcon name="sparkle" motion="float" /></i></h2>
           <p>Que tal manter o ritmo e fazer mais acontecer hoje?</p>
         </div>
         <HeroClockIllustration />
@@ -439,7 +429,7 @@ export function TodayReferencePage() {
             <p>{mainSubtitle}</p>
           </div>
           <details className="referenceMoreMenu">
-            <summary aria-label="Mais ações">•••</summary>
+            <summary aria-label="Mais ações"><AppIcon name="more" /></summary>
             <div>
               <Link to="/foco">Abrir Foco</Link>
               <Link to="/atividades">Atividades</Link>
@@ -463,14 +453,14 @@ export function TodayReferencePage() {
               disabled={busy}
               aria-label={primaryActionLabel}
             >
-              <span>{primaryActionGlyph}</span>
+              <span><AppIcon name={primaryActionIcon} motion={activeFocus ? "pulse" : "none"} /></span>
             </button>
             <small>{primaryActionLabel}</small>
           </div>
         </div>
 
         <div className="referenceEncouragement">
-          <span aria-hidden="true">⌁</span>
+          <span aria-hidden="true"><AppIcon name="status" /></span>
           <p>
             {activeBreak
               ? breakReachedPlan
@@ -495,8 +485,8 @@ export function TodayReferencePage() {
 
       <section className="referenceSummaryCard" aria-labelledby="reference-summary-title">
         <header>
-          <div><span className="referenceSummaryGlyph" aria-hidden="true">▥</span><h2 id="reference-summary-title">Resumo do dia</h2></div>
-          <Link to="/historico">Ver tudo <span aria-hidden="true">›</span></Link>
+          <div><span className="referenceSummaryGlyph" aria-hidden="true"><AppIcon name="list" /></span><h2 id="reference-summary-title">Resumo do dia</h2></div>
+          <Link to="/historico">Ver tudo <span aria-hidden="true"><AppIcon name="chevron-right" /></span></Link>
         </header>
         <div className="referenceSummaryGrid">
           <article>
@@ -543,7 +533,7 @@ export function TodayReferencePage() {
             <strong>Jornada de trabalho</strong>
             <small>{resolvedSchedule.isWorkingDay ? `${resolvedSchedule.startTime}–${resolvedSchedule.endTime} · ${formatPlannedMinutes(scheduleSummary.effectiveMinutes)} efetivo` : 'Folga planeada'}</small>
           </span>
-          <span aria-hidden="true">⌄</span>
+          <span aria-hidden="true"><AppIcon name="chevron-down" /></span>
         </summary>
 
         <div className="referenceWorkPanelBody">

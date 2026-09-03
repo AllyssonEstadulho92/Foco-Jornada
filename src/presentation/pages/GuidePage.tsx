@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { AppIcon } from '../components/ui/AppIcon'
 
 const sections = [
   {
@@ -167,7 +168,7 @@ export function GuidePage() {
                 <strong>{section.title}</strong>
                 <small>{section.summary}</small>
               </span>
-              <span className="guideChevron" aria-hidden="true">⌄</span>
+              <span className="guideChevron" aria-hidden="true"><AppIcon name="chevron-down" /></span>
             </summary>
             <div className="guideCardBody">{section.content}</div>
           </details>

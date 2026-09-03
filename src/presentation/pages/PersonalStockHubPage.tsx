@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { AppIcon } from '../components/ui/AppIcon'
 import { useAppServices } from '../providers/AppServicesProvider'
 
 interface StockHubOverview {
@@ -11,30 +12,15 @@ interface StockHubOverview {
 }
 
 function MedicationIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M8.1 4.6a4.4 4.4 0 0 1 6.2 0l5.1 5.1a4.4 4.4 0 0 1-6.2 6.2L8.1 10.8a4.4 4.4 0 0 1 0-6.2Z" />
-      <path d="m10.2 12.9 6.2-6.2" />
-    </svg>
-  )
+  return <AppIcon name="medication" />
 }
 
 function SticksIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <rect x="4" y="5" width="16" height="14" rx="1.8" />
-      <path d="M7 7.5v9M9.5 7.5v9M12 7.5v9M14.5 7.5v9M17 7.5v9" />
-    </svg>
-  )
+  return <AppIcon name="list" />
 }
 
 function ShieldIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M12 3 19 6v5.1c0 4.7-2.9 8-7 9.9-4.1-1.9-7-5.2-7-9.9V6l7-3Z" />
-      <path d="m9.2 12.1 1.9 1.9 3.9-4.3" />
-    </svg>
-  )
+  return <AppIcon name="shield" />
 }
 
 function formatCheck(value?: string): string {
@@ -92,7 +78,7 @@ export function PersonalStockHubPage() {
             <p>Horários, tomas, stock, notas protegidas e histórico de correções.</p>
             <small>{overview?.medicationCount ?? 0} medicamento(s) registado(s)</small>
           </div>
-          <span aria-hidden="true">→</span>
+          <span aria-hidden="true"><AppIcon name="chevron-right" /></span>
         </Link>
 
         <Link to="/sticks" className="stockHubLinearCard">
@@ -107,7 +93,7 @@ export function PersonalStockHubPage() {
                 : 'stock inicial ainda por confirmar'}
             </small>
           </div>
-          <span aria-hidden="true">→</span>
+          <span aria-hidden="true"><AppIcon name="chevron-right" /></span>
         </Link>
       </div>
 
