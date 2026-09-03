@@ -199,3 +199,198 @@
     flex-basis: 36px;
   }
 }
+
+
+/* Centro rápido de notificações — autoridade visual consolidada. */
+.notificationPanel {
+  width: min(390px, calc(100vw - 24px));
+  max-height: min(560px, calc(100dvh - 82px));
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 20px;
+  border-color: color-mix(in srgb, var(--line) 88%, transparent);
+  background: color-mix(in srgb, var(--surface) 98%, transparent);
+  box-shadow: 0 24px 64px rgba(18, 28, 22, .16);
+}
+
+.notificationPanelHeader {
+  flex: 0 0 auto;
+  padding: 13px 14px 12px;
+  background: var(--surface);
+}
+
+.notificationPanelHeader > div:first-child {
+  gap: 3px;
+}
+
+.notificationPanelHeader > div:first-child > span {
+  font-size: 9px;
+  letter-spacing: .15em;
+}
+
+.notificationPanelHeader strong {
+  font-size: 16px;
+  letter-spacing: -.02em;
+}
+
+.notificationCount {
+  min-width: 32px;
+  height: 32px;
+  color: var(--primary);
+  background: var(--primary-soft);
+  border-color: color-mix(in srgb, var(--primary) 20%, var(--line));
+}
+
+.notificationHeaderActions > button {
+  min-height: 34px !important;
+  height: 34px !important;
+  padding: 0 10px !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: var(--muted) !important;
+  font-size: 11px !important;
+}
+
+.notificationHeaderActions > button:hover {
+  color: var(--text) !important;
+  background: var(--surface-2) !important;
+}
+
+.notificationStatusStrip {
+  flex: 0 0 auto;
+  display: grid;
+  gap: 6px;
+  padding: 10px 10px 2px;
+  background: var(--surface);
+}
+
+.notificationStatusStrip .notificationItem {
+  min-height: auto;
+  padding: 9px 11px;
+  border-radius: 12px;
+  border-color: color-mix(in srgb, var(--primary) 14%, var(--line));
+  background: color-mix(in srgb, var(--primary-soft) 36%, var(--surface));
+}
+
+.notificationList {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: none;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 10px;
+  gap: 7px;
+  background: var(--surface);
+}
+
+.notificationItem {
+  align-items: flex-start;
+  padding: 11px;
+  border-radius: 13px;
+  background: var(--surface-2);
+  box-shadow: none;
+}
+
+.notificationItemUnread {
+  border-color: color-mix(in srgb, var(--primary) 26%, var(--line));
+  background: color-mix(in srgb, var(--primary-soft) 45%, var(--surface));
+}
+
+.notificationItemContent {
+  gap: 3px !important;
+}
+
+.notificationItemContent strong {
+  font-size: 12.5px;
+  line-height: 1.3;
+}
+
+.notificationItemContent span {
+  font-size: 10.5px;
+  line-height: 1.45;
+}
+
+.notificationEmpty {
+  min-height: 96px;
+  justify-content: center;
+  gap: 5px;
+  padding: 16px;
+}
+
+.notificationEmpty::before {
+  content: '✓';
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  margin-bottom: 2px;
+  border-radius: 50%;
+  background: var(--primary-soft);
+  color: var(--primary);
+  font-size: 15px;
+  font-weight: 900;
+}
+
+#deadline-mobile-notification-permission {
+  flex: 0 0 auto;
+  margin: 0 10px 10px !important;
+  padding: 10px 11px !important;
+  gap: 4px !important;
+  border-radius: 12px !important;
+  border-color: var(--line) !important;
+  background: var(--surface-2) !important;
+}
+
+.notificationPanelFooter {
+  flex: 0 0 auto;
+  padding: 8px 14px 10px;
+  background: var(--surface);
+  border-top: 1px solid var(--line);
+  text-align: center;
+}
+
+.notificationPanelFooter a {
+  color: var(--primary);
+  font-size: 10.5px;
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.notificationPanelFooter a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 899px) {
+  .notificationPanel {
+    position: fixed !important;
+    z-index: 90 !important;
+    top: max(72px, calc(env(safe-area-inset-top) + 64px)) !important;
+    right: max(10px, env(safe-area-inset-right)) !important;
+    left: max(10px, env(safe-area-inset-left)) !important;
+    width: auto !important;
+    max-height: calc(100dvh - max(88px, calc(env(safe-area-inset-top) + 76px)) - max(12px, env(safe-area-inset-bottom))) !important;
+    border-radius: 18px !important;
+    box-shadow: 0 24px 70px rgba(8, 14, 10, .2) !important;
+  }
+
+  .notificationPanelHeader {
+    padding: 14px 14px 12px;
+  }
+
+  .notificationStatusStrip {
+    padding: 8px 8px 1px;
+  }
+
+  .notificationList {
+    padding: 8px;
+  }
+
+  #deadline-mobile-notification-permission {
+    margin: 0 8px 8px !important;
+  }
+
+  .notificationPanelFooter {
+    padding: 8px 12px 10px;
+  }
+}

@@ -1,5 +1,6 @@
 import { secureStorage } from '../../security/secureStorage'
 import { pushAppNotification, type NotificationTone } from '../../presentation/store/useNotificationStore'
+import { shouldDeliverSystemNotification } from './notificationPreferences'
 
 export type DeadlineNotificationPermission = NotificationPermission | 'unsupported'
 export type DeadlineNotificationPlatform = 'ios' | 'android' | 'desktop' | 'other'
@@ -154,8 +155,9 @@ export function dueDeadlines(
     .sort((left, right) => Date.parse(left.deadlineAt) - Date.parse(right.deadlineAt))
 }
 
-async function showSystemNotification(item: DeadlineNotification): Promise<boolean> {
+async function showSystemNotification(item: DeadlineNotification, force = false): Promise<boolean> {
   if (getDeadlineNotificationPermission() !== 'granted') return false
+  if (!force && !shouldDeliverSystemNotification(item.category, new Date())) return false
 
   const options: NotificationOptions = {
     body: item.detail,
@@ -203,7 +205,7 @@ export async function sendDeadlineNotificationTest(): Promise<boolean> {
     category: 'system',
     url: '#/notificacoes',
   }
-  const shown = await showSystemNotification(item)
+  const shown = await showSystemNotification(item, true)
   if (shown) pushAppNotification('success', item.title, item.detail)
   return shown
 }

@@ -9,7 +9,7 @@ import { HomeReferencePage } from './pages/HomeReferencePage'
 import { MedicationActionsGuidePage } from './pages/MedicationActionsGuidePage'
 import { MedicationsStockPage } from './pages/MedicationsStockPage'
 import { MoreWithBackupPage } from './pages/MoreWithBackupPage'
-import { NotificationCenterV2Page } from './pages/NotificationCenterV2Page'
+import { NotificationCenterPage } from './pages/NotificationCenterPage'
 import { OperationalCalendarPage } from './pages/OperationalCalendarPage'
 import { PayrollPage } from './pages/PayrollPage'
 import { PayrollReferencePage } from './pages/PayrollReferencePage'
@@ -28,7 +28,7 @@ export const router = createHashRouter([
     children: [
       { index: true, element: <HomeReferencePage /> },
       { path: 'calendario', element: <OperationalCalendarPage /> },
-      { path: 'notificacoes', element: <NotificationCenterV2Page /> },
+      { path: 'notificacoes', element: <NotificationCenterPage /> },
       { path: 'relatorios', element: <ReportsV2Page /> },
       { path: 'turnos', element: <ShiftMapPage /> },
       { path: 'atividades', element: <ActivitiesPage /> },
