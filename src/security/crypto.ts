@@ -1,6 +1,10 @@
 const encoder = new TextEncoder()
 const decoder = new TextDecoder()
 
+function asArrayBuffer(bytes: Uint8Array): ArrayBuffer {
+  return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer
+}
+
 export const PBKDF2_ITERATIONS = 600_000
 export const PIN_LENGTH = 6
 
@@ -71,9 +75,9 @@ export async function generateDataKey(): Promise<CryptoKey> {
 }
 
 export async function deriveSecretKey(secret: string, salt: Uint8Array, iterations = PBKDF2_ITERATIONS): Promise<CryptoKey> {
-  const material = await crypto.subtle.importKey('raw', encoder.encode(secret), 'PBKDF2', false, ['deriveKey'])
+  const material = await crypto.subtle.importKey('raw', asArrayBuffer(encoder.encode(secret)), 'PBKDF2', false, ['deriveKey'])
   return crypto.subtle.deriveKey(
-    { name: 'PBKDF2', hash: 'SHA-256', salt, iterations },
+    { name: 'PBKDF2', hash: 'SHA-256', salt: asArrayBuffer(salt), iterations },
     material,
     { name: 'AES-GCM', length: 256 },
     false,
@@ -82,15 +86,15 @@ export async function deriveSecretKey(secret: string, salt: Uint8Array, iteratio
 }
 
 export async function importRawAesKey(bytes: Uint8Array): Promise<CryptoKey> {
-  return crypto.subtle.importKey('raw', bytes, { name: 'AES-GCM' }, false, ['encrypt', 'decrypt'])
+  return crypto.subtle.importKey('raw', asArrayBuffer(bytes), { name: 'AES-GCM' }, false, ['encrypt', 'decrypt'])
 }
 
 async function aesEncrypt(key: CryptoKey, plaintext: Uint8Array, additionalData: string): Promise<EncryptedValue> {
   const iv = randomBytes(12)
   const ciphertext = await crypto.subtle.encrypt(
-    { name: 'AES-GCM', iv, additionalData: encoder.encode(additionalData), tagLength: 128 },
+    { name: 'AES-GCM', iv: asArrayBuffer(iv), additionalData: asArrayBuffer(encoder.encode(additionalData)), tagLength: 128 },
     key,
-    plaintext,
+    asArrayBuffer(plaintext),
   )
   return { iv: toBase64Url(iv), ciphertext: toBase64Url(new Uint8Array(ciphertext)) }
 }
@@ -99,12 +103,12 @@ async function aesDecrypt(key: CryptoKey, value: EncryptedValue, additionalData:
   const plaintext = await crypto.subtle.decrypt(
     {
       name: 'AES-GCM',
-      iv: fromBase64Url(value.iv),
-      additionalData: encoder.encode(additionalData),
+      iv: asArrayBuffer(fromBase64Url(value.iv)),
+      additionalData: asArrayBuffer(encoder.encode(additionalData)),
       tagLength: 128,
     },
     key,
-    fromBase64Url(value.ciphertext),
+    asArrayBuffer(fromBase64Url(value.ciphertext)),
   )
   return new Uint8Array(plaintext)
 }
@@ -116,7 +120,7 @@ export async function wrapDataKey(dataKey: CryptoKey, wrappingKey: CryptoKey, co
 
 export async function unwrapDataKey(wrapped: WrappedKey, wrappingKey: CryptoKey, context: string): Promise<CryptoKey> {
   const raw = await aesDecrypt(wrappingKey, wrapped, context)
-  return crypto.subtle.importKey('raw', raw, { name: 'AES-GCM' }, true, ['encrypt', 'decrypt'])
+  return crypto.subtle.importKey('raw', asArrayBuffer(raw), { name: 'AES-GCM' }, true, ['encrypt', 'decrypt'])
 }
 
 export async function encryptJson(key: CryptoKey, value: unknown, context: string): Promise<EncryptedValue> {
