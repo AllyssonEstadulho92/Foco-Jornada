@@ -38,3 +38,13 @@ pnpm-debug.log*
 *.temp
 
 .DS_Store
+
+# Artefactos de build/publicação legados (o build válido é dist/ via GitHub Actions)
+/site/
+/assets/
+/index.html
+/manifest.webmanifest
+/registerSW.js
+/sw.js
+/workbox-*.js
+/.nojekyll
