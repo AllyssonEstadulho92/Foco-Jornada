@@ -76,7 +76,7 @@ describe('App', () => {
     expect(within(panel).getByRole('status', { name: 'Tudo em dia. Sem notificações novas.' })).toBeInTheDocument()
     expect(within(panel).queryByText('Tudo em dia')).not.toBeInTheDocument()
     expect(within(panel).queryByText('Sem notificações novas.')).not.toBeInTheDocument()
-    expect(panel.querySelector('.notificationEmptyGlyph')).not.toBeNull()
+    expect(panel.querySelector('.appIcon--check.appIcon--motion-draw')).not.toBeNull()
     expect(screen.queryByText('Instala a app para receber alertas')).not.toBeInTheDocument()
     expect(screen.queryByRole('link', { name: 'Abrir centro completo' })).not.toBeInTheDocument()
 
