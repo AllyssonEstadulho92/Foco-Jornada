@@ -963,3 +963,46 @@
     animation:none;
   }
 }
+
+
+/* Arquitetura final da área Mais 1.3 */
+.moreToolsPage .moreSectionHeading > div {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.moreToolsPage .moreSectionHeading > div > small {
+  color: var(--muted);
+  font-size: var(--text-xs);
+  line-height: var(--line-height-normal);
+}
+
+.moreToolsPage .moreLocalInfoIcon .appIcon,
+.moreToolsPage .moreLocalShield .appIcon {
+  width: 22px;
+  height: 22px;
+}
+
+@media (max-width: 640px) {
+  .moreToolsPage .moreSectionHeading {
+    align-items: flex-start;
+  }
+
+  .moreToolsPage .moreSectionHeading h2 {
+    font-size: var(--text-lg);
+  }
+
+  .moreToolsPage .moreSectionHeading > div > small {
+    font-size: 12px;
+  }
+
+  .moreToolsPage .moreListGrouped .moreRowCopy strong {
+    font-size: 14px;
+  }
+
+  .moreToolsPage .moreListGrouped .moreRowCopy small,
+  .moreToolsPage .moreLocalCard p {
+    font-size: 12px;
+  }
+}
