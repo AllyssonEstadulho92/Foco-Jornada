@@ -316,12 +316,14 @@ export function AppTopBar({ onOpenMenu, menuButtonRef }: { onOpenMenu?: () => vo
 
               <div className="notificationList">
                 {notifications.length === 0 ? (
-                  <div className="notificationEmpty">
+                  <div
+                    className="notificationEmpty notificationEmptyIconOnly"
+                    role="status"
+                    aria-label="Tudo em dia. Sem notificações novas."
+                  >
                     <span className="notificationEmptyAnimatedIcon" aria-hidden="true">
                       <EmptyStateIcon />
                     </span>
-                    <strong>Tudo em dia</strong>
-                    <span>Sem notificações novas.</span>
                   </div>
                 ) : (
                   notifications.map((item) => {
