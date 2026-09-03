@@ -9,7 +9,7 @@ import type {
   StockEntity,
   StockMovement,
 } from '../../domain/personalStock/models'
-import type { SecurityProfile } from '../../security/profileStore'
+import { SecurityProfileStore, type SecurityProfile } from '../../security/profileStore'
 import type { SecureStorageBackend } from '../../security/secureStorage'
 import type { SecuritySession } from '../../security/SecurityManager'
 import {
@@ -295,6 +295,7 @@ export class AppDatabase implements SecureStorageBackend {
 
   private snapshot = emptySnapshot()
   private readonly vaultStore = new EncryptedVaultStore()
+  private readonly profileStore = new SecurityProfileStore()
   private readonly session: SecuritySession | null
   private revision = 0
   private readyPromise: Promise<void>
@@ -496,12 +497,15 @@ export class AppDatabase implements SecureStorageBackend {
     await this.flushStorage()
     const vault = await this.vaultStore.readRecord(this.session.profile.id)
     if (!vault) throw new Error('O cofre local não foi encontrado.')
+    const currentProfile = await this.profileStore.get(this.session.profile.id)
+    if (!currentProfile) throw new Error('O perfil de segurança atual não foi encontrado.')
+
     const payload: SecureBackupPackage = {
       format: 'foco-jornada-secure-backup',
       schemaVersion: 1,
       exportedAt: new Date().toISOString(),
       profile: {
-        ...this.session.profile,
+        ...currentProfile,
         failedAttempts: 0,
         lockedUntil: undefined,
       },
@@ -525,22 +529,24 @@ export class AppDatabase implements SecureStorageBackend {
       throw new Error('A cópia pertence a outro perfil. Usa o fluxo de recuperação no ecrã de acesso.')
     }
 
-    const validated = await this.vaultStore.load<AppDatabaseSnapshot>(
-      this.session.profile.id,
-      this.session.dataKey,
-    )
-    if (!validated) throw new Error('Não foi possível validar o cofre atual.')
-
-    await this.vaultStore.replace(this.session.profile.id, parsed.vault)
-    const restored = await this.vaultStore.load<AppDatabaseSnapshot>(
-      this.session.profile.id,
-      this.session.dataKey,
-    )
-    if (!restored || restored.value.schemaVersion !== 1) {
-      throw new Error('A cópia não pôde ser desencriptada com este perfil.')
+    let candidate: { value: AppDatabaseSnapshot; revision: number }
+    try {
+      candidate = await this.vaultStore.decryptRecord<AppDatabaseSnapshot>(
+        this.session.profile.id,
+        this.session.dataKey,
+        parsed.vault,
+      )
+    } catch {
+      throw new Error('A cópia não pôde ser desencriptada com este perfil ou está corrompida.')
     }
-    this.snapshot = restored.value
-    this.revision = restored.revision
+    if (candidate.value.schemaVersion !== 1) {
+      throw new Error('A versão dos dados desta cópia não é suportada.')
+    }
+
+    // A cópia só substitui o cofre persistente depois de ser desencriptada e validada em memória.
+    await this.vaultStore.replace(this.session.profile.id, parsed.vault)
+    this.snapshot = candidate.value
+    this.revision = candidate.revision
     return this.counts()
   }
 
