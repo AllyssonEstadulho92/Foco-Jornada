@@ -170,7 +170,7 @@ export function SettingsReferencePage() {
           </details>
 
           <div className="referenceSettingsStaticRow referenceThemeRow">
-            <SettingsIcon name="settings" />
+            <SettingsIcon name="theme" />
             <span><strong>Tema</strong><small>Escolhe o aspeto da aplicação</small></span>
             <div className="referenceThemeSwitch" aria-label="Tema da aplicação">
               <button type="button" className={theme === 'light' ? 'active' : ''} onClick={() => setTheme('light')}>Claro</button>
