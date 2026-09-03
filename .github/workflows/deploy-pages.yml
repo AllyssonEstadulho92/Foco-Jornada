@@ -6,9 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 concurrency:
   group: publicar-foco-jornada
@@ -16,10 +14,8 @@ concurrency:
 
 jobs:
   build-and-publish:
+    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Obter código
         uses: actions/checkout@v5
@@ -47,23 +43,30 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Validar publicação
+      - name: Validar build
         run: |
           test -f dist/index.html
           test -f dist/manifest.webmanifest
           test -f dist/registerSW.js
           test -f dist/sw.js
+          test -f dist/.nojekyll
 
-      - name: Configurar GitHub Pages
-        uses: actions/configure-pages@v5
-        with:
-          enablement: true
+      - name: Publicar build na raiz da branch
+        run: |
+          rm -rf assets site
+          rm -f index.html manifest.webmanifest registerSW.js sw.js 404.html notification-sw.js redirect.js report-qr.svg logo-mark.svg .nojekyll
+          rm -f workbox-*.js
+          cp -a dist/. .
+          rm -rf dist
 
-      - name: Carregar build para Pages
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./dist
-
-      - name: Publicar no GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Guardar publicação
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Sem alterações de publicação."
+            exit 0
+          fi
+          git commit -m "deploy: atualizar GitHub Pages [skip ci]"
+          git push
