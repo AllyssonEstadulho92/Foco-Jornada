@@ -40,17 +40,11 @@ describe('App', () => {
     expect(screen.getByRole('link', { name: 'Ver tudo' })).toHaveAttribute('href', '#/historico')
 
     const mobileNavigation = screen.getByRole('navigation', { name: 'Navegação móvel' })
-    const moreButton = within(mobileNavigation).getByRole('button', { name: 'Abrir menu Mais' })
-    expect(moreButton).toHaveTextContent('Mais')
-    expect(moreButton).toHaveAttribute('aria-expanded', 'false')
-
-    fireEvent.click(moreButton)
-
-    const closeMoreButton = within(mobileNavigation).getByRole('button', { name: 'Fechar menu Mais' })
-    expect(closeMoreButton).toHaveTextContent('Mais')
-    expect(closeMoreButton).not.toHaveTextContent('Fechar')
-    expect(closeMoreButton).toHaveAttribute('aria-expanded', 'true')
-    expect(screen.getByRole('navigation', { name: 'Acesso rápido' })).toBeInTheDocument()
+    expect(within(mobileNavigation).getByRole('link', { name: 'Início' })).toHaveAttribute('href', '#/')
+    expect(within(mobileNavigation).getByRole('link', { name: 'Jornada' })).toHaveAttribute('href', '#/calendario')
+    expect(within(mobileNavigation).getByRole('link', { name: 'Foco' })).toHaveAttribute('href', '#/foco')
+    expect(within(mobileNavigation).getByRole('link', { name: 'Notificações' })).toHaveAttribute('href', '#/notificacoes')
+    expect(within(mobileNavigation).getByRole('link', { name: 'Mais' })).toHaveAttribute('href', '#/mais')
 
     view.unmount()
   })
