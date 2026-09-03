@@ -9,7 +9,7 @@ function fingerprint(codes: string[]): string {
   return [...new Set(codes)].sort().join('|')
 }
 
-export function installDataIntegrityMonitoring(service: AppDataIntegrityService): void {
+export function installDataIntegrityMonitoring(service: AppDataIntegrityService): () => void {
   let running = false
   let lastAuditAt = 0
 
