@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { AppDataIntegrityService } from '../application/data/AppDataIntegrityService'
 import { ReleaseAppBackupService } from '../application/data/ReleaseAppBackupService'
 import { MedicationDataProtectionService } from '../application/personalStock/MedicationDataProtectionService'
@@ -76,6 +76,9 @@ export function SecureAppBootstrap() {
   const [session, setSession] = useState<SecuritySession | null>(null)
   const [runtime, setRuntime] = useState<Runtime | null>(null)
   const [runtimeError, setRuntimeError] = useState('')
+  const sessionRef = useRef<SecuritySession | null>(session)
+  sessionRef.current = session
+  const activeProfileId = session?.profile.id
 
   const refreshProfiles = useCallback(async () => {
     setProfiles(await securityManager.listProfiles())
@@ -87,7 +90,8 @@ export function SecureAppBootstrap() {
   }, [refreshProfiles])
 
   useEffect(() => {
-    if (!session) {
+    const activeSession = sessionRef.current
+    if (!activeSession) {
       setRuntime(null)
       return
     }
@@ -99,7 +103,7 @@ export function SecureAppBootstrap() {
     const start = async () => {
       try {
         setRuntimeError('')
-        db = new AppDatabase(session)
+        db = new AppDatabase(activeSession)
         await db.ensureReady()
         if (disposed) {
           db.close()
@@ -163,7 +167,7 @@ export function SecureAppBootstrap() {
       secureStorage.unbind()
       db?.close()
     }
-  }, [session?.profile.id])
+  }, [activeProfileId])
 
   const lock = useCallback(async () => {
     try {
