@@ -56,4 +56,10 @@ export function installDataIntegrityMonitoring(service: AppDataIntegrityService)
   document.addEventListener('visibilitychange', handleVisibility)
   window.addEventListener('focus', handleFocus)
   window.addEventListener('pageshow', handleFocus)
+
+  return () => {
+    document.removeEventListener('visibilitychange', handleVisibility)
+    window.removeEventListener('focus', handleFocus)
+    window.removeEventListener('pageshow', handleFocus)
+  }
 }
