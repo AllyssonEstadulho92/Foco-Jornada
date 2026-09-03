@@ -42,7 +42,7 @@ function syncGloSessionPrototype(): void {
   card.style.setProperty('--glo-session-progress-percent', `${progressPercent}%`)
 }
 
-export function installGloSessionPrototypeEnhancement(): void {
+export function installGloSessionPrototypeEnhancement(): () => void {
   let scheduled = false
 
   const scheduleSync = () => {
