@@ -6,26 +6,11 @@
     <meta name="color-scheme" content="light dark" />
     <meta name="theme-color" content="#f7f8f6" />
     <meta name="description" content="Foco & Jornada — produtividade pessoal e profissional." />
+    <meta name="referrer" content="no-referrer" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; worker-src 'self' blob:; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; upgrade-insecure-requests" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <script>
-      ;(() => {
-        const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false
-        let preference = 'system'
-        try {
-          const persisted = JSON.parse(localStorage.getItem('foco-jornada-ui-v2') || '{}')
-          const storedTheme = persisted?.state?.theme
-          if (storedTheme === 'light' || storedTheme === 'dark' || storedTheme === 'system') preference = storedTheme
-        } catch {}
-        const resolved = preference === 'system' ? (prefersDark ? 'dark' : 'light') : preference
-        const themeColor = resolved === 'dark' ? '#070a08' : '#f7f8f6'
-        document.documentElement.dataset.theme = resolved
-        document.documentElement.style.colorScheme = resolved
-        document.querySelector('meta[name="theme-color"]')?.setAttribute('content', themeColor)
-        document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]')?.setAttribute('content', resolved === 'dark' ? 'black-translucent' : 'default')
-      })()
-    </script>
     <style>
       html, body, #root { min-height: 100%; margin: 0; }
       body { background: #f7f8f6; }
@@ -52,21 +37,7 @@
         </div>
       </div>
     </div>
-    <script>
-      window.addEventListener('error', (event) => {
-        const detail = document.getElementById('app-boot-detail')
-        if (!detail) return
-        if (event.target instanceof HTMLScriptElement) detail.textContent = `Falha ao carregar script: ${event.target.src}`
-        else if (event.message) detail.textContent = event.message
-      }, true)
-      window.setTimeout(() => {
-        const fallback = document.getElementById('app-boot-fallback')
-        const message = document.getElementById('app-boot-message')
-        if (!fallback || !message) return
-        fallback.dataset.stalled = 'true'
-        message.textContent = 'A aplicação não iniciou. Atualiza a página para tentar novamente.'
-      }, 8000)
-    </script>
+    <script type="module" src="./boot.ts"></script>
     <script type="module" src="./main.tsx"></script>
   </body>
 </html>
