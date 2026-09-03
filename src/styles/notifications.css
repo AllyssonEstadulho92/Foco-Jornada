@@ -318,19 +318,6 @@
   padding: 16px;
 }
 
-.notificationEmpty::before {
-  content: '✓';
-  display: grid;
-  width: 34px;
-  height: 34px;
-  place-items: center;
-  margin-bottom: 2px;
-  border-radius: 50%;
-  background: var(--primary-soft);
-  color: var(--primary);
-  font-size: 15px;
-  font-weight: 900;
-}
 
 #deadline-mobile-notification-permission {
   flex: 0 0 auto;
@@ -342,24 +329,6 @@
   background: var(--surface-2) !important;
 }
 
-.notificationPanelFooter {
-  flex: 0 0 auto;
-  padding: 8px 14px 10px;
-  background: var(--surface);
-  border-top: 1px solid var(--line);
-  text-align: center;
-}
-
-.notificationPanelFooter a {
-  color: var(--primary);
-  font-size: 10.5px;
-  font-weight: 750;
-  text-decoration: none;
-}
-
-.notificationPanelFooter a:hover {
-  text-decoration: underline;
-}
 
 @media (max-width: 899px) {
   .notificationPanel {
@@ -390,7 +359,94 @@
     margin: 0 8px 8px !important;
   }
 
-  .notificationPanelFooter {
-    padding: 8px 12px 10px;
+  }
+
+
+/* Ícones animados locais: sem CDN, sem tracking e compatíveis com PWA/offline. */
+.notificationBellMotion {
+  display: inline-grid;
+  place-items: center;
+  transform-origin: 50% 16%;
+}
+
+.notificationButton:hover .notificationBellMotion,
+.notificationButtonActive .notificationBellMotion,
+.notificationButton:focus-visible .notificationBellMotion {
+  animation: notification-bell-ring 760ms cubic-bezier(.36,.07,.19,.97) both;
+}
+
+.notificationAnimatedCheck {
+  width: 72px;
+  height: 72px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 10px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--primary-soft) 78%, var(--surface));
+  color: var(--primary);
+  animation: notification-check-pulse 2.4s ease-in-out infinite;
+}
+
+.notificationAnimatedCheck svg {
+  width: 46px;
+  height: 46px;
+  overflow: visible;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.notificationAnimatedCheckRing {
+  stroke-width: 2;
+  opacity: .2;
+  transform-origin: 32px 32px;
+  animation: notification-ring-breathe 2.4s ease-in-out infinite;
+}
+
+.notificationAnimatedCheckPath {
+  stroke-width: 4;
+  stroke-dasharray: 34;
+  stroke-dashoffset: 34;
+  animation: notification-check-draw 2.4s ease-in-out infinite;
+}
+
+@keyframes notification-bell-ring {
+  0%, 100% { transform: rotate(0deg); }
+  15% { transform: rotate(13deg); }
+  30% { transform: rotate(-11deg); }
+  45% { transform: rotate(8deg); }
+  60% { transform: rotate(-6deg); }
+  75% { transform: rotate(3deg); }
+}
+
+@keyframes notification-check-pulse {
+  0%, 72%, 100% { transform: scale(1); }
+  82% { transform: scale(1.06); }
+  90% { transform: scale(.985); }
+}
+
+@keyframes notification-ring-breathe {
+  0%, 100% { opacity: .16; transform: scale(.92); }
+  38%, 72% { opacity: .32; transform: scale(1.04); }
+}
+
+@keyframes notification-check-draw {
+  0%, 10% { stroke-dashoffset: 34; opacity: 0; }
+  28%, 72% { stroke-dashoffset: 0; opacity: 1; }
+  88%, 100% { stroke-dashoffset: 0; opacity: .84; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .notificationBellMotion,
+  .notificationAnimatedCheck,
+  .notificationAnimatedCheckRing,
+  .notificationAnimatedCheckPath {
+    animation: none !important;
+  }
+
+  .notificationAnimatedCheckPath {
+    stroke-dashoffset: 0;
+    opacity: 1;
   }
 }
