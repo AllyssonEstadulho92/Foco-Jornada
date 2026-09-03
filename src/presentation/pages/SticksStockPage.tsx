@@ -1,3 +1,4 @@
+import { secureStorage } from '../../security/secureStorage'
 import { useCallback, useEffect, useMemo, useState, type CSSProperties } from 'react'
 import {
   GLO_DEVICE_OPTIONS,
@@ -123,10 +124,10 @@ function loadGloSessionTimer(): GloSessionTimerState {
   if (typeof window === 'undefined') return defaultGloSessionTimerState()
 
   try {
-    const current = window.localStorage.getItem(GLO_SESSION_TIMER_STORAGE_KEY)
+    const current = secureStorage.getItem(GLO_SESSION_TIMER_STORAGE_KEY)
     if (current) return parseGloSessionTimerState(current)
 
-    const legacy = window.localStorage.getItem(LEGACY_GLO_SESSION_TIMER_STORAGE_KEY)
+    const legacy = secureStorage.getItem(LEGACY_GLO_SESSION_TIMER_STORAGE_KEY)
     return parseGloSessionTimerState(legacy)
   } catch {
     return defaultGloSessionTimerState()
@@ -136,8 +137,8 @@ function loadGloSessionTimer(): GloSessionTimerState {
 function saveGloSessionTimer(state: GloSessionTimerState): void {
   if (typeof window === 'undefined') return
   try {
-    window.localStorage.setItem(GLO_SESSION_TIMER_STORAGE_KEY, serializeGloSessionTimerState(state))
-    window.localStorage.removeItem(LEGACY_GLO_SESSION_TIMER_STORAGE_KEY)
+    secureStorage.setItem(GLO_SESSION_TIMER_STORAGE_KEY, serializeGloSessionTimerState(state))
+    secureStorage.removeItem(LEGACY_GLO_SESSION_TIMER_STORAGE_KEY)
   } catch {
     // O relógio continua funcional durante esta abertura mesmo se o armazenamento local falhar.
   }

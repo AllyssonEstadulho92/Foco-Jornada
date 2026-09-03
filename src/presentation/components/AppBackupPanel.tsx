@@ -4,7 +4,7 @@ import { pushAppNotification } from '../store/useNotificationStore'
 
 function backupFileName(): string {
   const date = new Date().toISOString().slice(0, 10)
-  return `foco-jornada-backup-${date}.json`
+  return `foco-jornada-secure-backup-${date}.json`
 }
 
 function downloadText(content: string, fileName: string) {
@@ -95,10 +95,10 @@ export function AppBackupPanel() {
       }
       const content = await backupService.exportText()
       downloadText(content, backupFileName())
-      setMessage('Cópia integral criada com todos os dados locais, incluindo stock pessoal, notas e configurações guardadas na base de dados.')
+      setMessage('Cópia integral cifrada criada. Os dados pessoais permanecem protegidos no ficheiro e exigem a credencial ou o código de recuperação do perfil.')
       setIntegrityState('ok')
       setIntegrityDetail('Integridade verificada imediatamente antes da exportação.')
-      pushAppNotification('success', 'Cópia de segurança criada', 'O ficheiro integral foi validado e guardado no dispositivo.')
+      pushAppNotification('success', 'Cópia de segurança cifrada criada', 'O cofre foi validado e exportado sem expor os dados pessoais em texto simples.')
     } catch (error) {
       const detail = error instanceof Error ? error.message : 'Não foi possível criar a cópia de segurança.'
       setMessage(detail)
@@ -176,20 +176,20 @@ export function AppBackupPanel() {
       </div>
 
       <p>
-        A cópia inclui jornada, pausas, atividades, foco, café, definições, notas guardadas em metadata e as quatro tabelas do stock pessoal:
-        entidades, movimentos, horários de medicação e eventos de toma. A configuração de nicotina e respetivas notas também seguem no backup.
+        A cópia inclui o cofre integral deste perfil: jornada, pausas, atividades, foco, café, definições, notas e stock pessoal.
+        O conteúdo pessoal é exportado cifrado; o ficheiro não contém esses dados em texto simples.
       </p>
 
       <div className="stockMetricGrid appBackupMetrics">
         <article className="stockMetric">
           <span>Formato</span>
-          <strong>JSON versionado</strong>
-          <small>Preparado para validação antes do restauro.</small>
+          <strong>JSON cifrado</strong>
+          <small>AES-GCM, parâmetros do perfil e cofre versionado.</small>
         </article>
         <article className="stockMetric">
           <span>Restauro</span>
-          <strong>Transação única</strong>
-          <small>Ou restaura o conjunto completo, ou a operação falha.</small>
+          <strong>Validar antes de substituir</strong>
+          <small>O ciphertext é desencriptado e validado antes de substituir o cofre atual.</small>
         </article>
         <article className="stockMetric">
           <span>Integridade</span>
@@ -224,7 +224,7 @@ export function AppBackupPanel() {
       </div>
 
       {message ? <div className="stockMessage" role="status">{message}</div> : null}
-      <p><strong>Aviso:</strong> nenhum armazenamento apenas no navegador permite garantir perda zero. Para proteção máxima, mantém uma cópia integral externa atualizada antes de limpar dados do browser, trocar de dispositivo ou restaurar uma cópia antiga.</p>
+      <p><strong>Aviso:</strong> nenhum armazenamento apenas no navegador permite garantir perda zero. Guarda a cópia cifrada e o código de recuperação em locais separados; sem uma credencial válida ou o código de recuperação, o conteúdo do cofre não pode ser recuperado.</p>
     </section>
   )
 }

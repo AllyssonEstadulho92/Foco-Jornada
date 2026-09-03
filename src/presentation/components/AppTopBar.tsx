@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } from 'react'
+import { useSecurityOptional } from '../../security/SecurityContext'
 import { emitAppFeedback } from '../../shared/notifications/appFeedback'
 import { useNow } from '../hooks/useNow'
 import { useAppServices } from '../providers/AppServicesProvider'
@@ -17,6 +18,15 @@ function ClockIcon() {
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <circle cx="12" cy="12" r="8.5" />
       <path d="M12 7.5v5l3.5 2" />
+    </svg>
+  )
+}
+
+function LockIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="5.5" y="10" width="13" height="10" rx="2" />
+      <path d="M8.5 10V7a3.5 3.5 0 0 1 7 0v3" />
     </svg>
   )
 }
@@ -66,6 +76,7 @@ function formatNotificationTime(value: string) {
 
 export function AppTopBar({ onOpenMenu, menuButtonRef }: { onOpenMenu?: () => void; menuButtonRef?: RefObject<HTMLButtonElement | null> }) {
   const { journeyRepository, focusRepository } = useAppServices()
+  const security = useSecurityOptional()
   const now = useNow(1000)
   const [isOpen, setIsOpen] = useState(false)
   const [activeJourneyStartedAt, setActiveJourneyStartedAt] = useState<string | null>(null)
@@ -226,6 +237,18 @@ export function AppTopBar({ onOpenMenu, menuButtonRef }: { onOpenMenu?: () => vo
           <ClockIcon />
           <time dateTime={now.toISOString()}>{clock}</time>
         </div>
+
+        {security ? (
+          <button
+            type="button"
+            className="securityTopLock"
+            onClick={() => void security.lock()}
+            aria-label="Bloquear aplicação agora"
+            title="Bloquear agora"
+          >
+            <LockIcon />
+          </button>
+        ) : null}
 
         <div className="notificationCenter" ref={panelRef}>
           <button

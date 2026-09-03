@@ -1,3 +1,4 @@
+import { secureStorage } from '../../security/secureStorage'
 import { useEffect, useMemo, useState } from 'react'
 import { calculatePayroll } from '../../application/payroll/calculatePayroll'
 import {
@@ -67,7 +68,7 @@ function currentMonthKey() {
 
 function readStoredConfig(): PayrollConfig {
   try {
-    const raw = localStorage.getItem(CONFIG_KEY)
+    const raw = secureStorage.getItem(CONFIG_KEY)
     if (!raw) return defaultPayrollConfig
     return { ...defaultPayrollConfig, ...(JSON.parse(raw) as Partial<PayrollConfig>) }
   } catch {
@@ -77,7 +78,7 @@ function readStoredConfig(): PayrollConfig {
 
 function readStoredProfile(): ReceiptProfile {
   try {
-    const raw = localStorage.getItem(PROFILE_KEY)
+    const raw = secureStorage.getItem(PROFILE_KEY)
     if (!raw) return emptyReceiptProfile
     return { ...emptyReceiptProfile, ...(JSON.parse(raw) as Partial<ReceiptProfile>) }
   } catch {
@@ -104,7 +105,7 @@ function buildDefaultPlan(month: string): PayrollDayPlan[] {
 
 function readStoredPlan(month: string): PayrollDayPlan[] {
   try {
-    const raw = localStorage.getItem(`${PLAN_PREFIX}${month}`)
+    const raw = secureStorage.getItem(`${PLAN_PREFIX}${month}`)
     if (!raw) return buildDefaultPlan(month)
     const parsed = JSON.parse(raw) as PayrollDayPlan[]
     const defaults = buildDefaultPlan(month)
@@ -157,15 +158,15 @@ export function PayrollPage() {
   }, [month])
 
   useEffect(() => {
-    localStorage.setItem(CONFIG_KEY, JSON.stringify(config))
+    secureStorage.setItem(CONFIG_KEY, JSON.stringify(config))
   }, [config])
 
   useEffect(() => {
-    localStorage.setItem(PROFILE_KEY, JSON.stringify(profile))
+    secureStorage.setItem(PROFILE_KEY, JSON.stringify(profile))
   }, [profile])
 
   useEffect(() => {
-    localStorage.setItem(`${PLAN_PREFIX}${month}`, JSON.stringify(plans))
+    secureStorage.setItem(`${PLAN_PREFIX}${month}`, JSON.stringify(plans))
   }, [month, plans])
 
   const result = useMemo(() => calculatePayroll(config, plans), [config, plans])
@@ -263,9 +264,9 @@ export function PayrollPage() {
   }
 
   function savePlan() {
-    localStorage.setItem(CONFIG_KEY, JSON.stringify(config))
-    localStorage.setItem(PROFILE_KEY, JSON.stringify(profile))
-    localStorage.setItem(`${PLAN_PREFIX}${month}`, JSON.stringify(plans))
+    secureStorage.setItem(CONFIG_KEY, JSON.stringify(config))
+    secureStorage.setItem(PROFILE_KEY, JSON.stringify(profile))
+    secureStorage.setItem(`${PLAN_PREFIX}${month}`, JSON.stringify(plans))
     pushAppNotification(
       'success',
       'Planificação salarial guardada',

@@ -1,8 +1,20 @@
-/* global self, URL */
+/* global self, URL, caches */
 /* Foco Jornada — extensão do service worker para notificações.
  * É importada pelo Workbox. Suporta clique nas notificações atuais e deixa
  * preparada a receção Web Push padrão sem depender do React estar aberto.
  */
+
+const ACTIVE_NAVIGATION_CACHE = 'foco-jornada-navigation-v2'
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((names) => Promise.all(
+      names
+        .filter((name) => name.startsWith('foco-jornada-navigation-') && name !== ACTIVE_NAVIGATION_CACHE)
+        .map((name) => caches.delete(name)),
+    )),
+  )
+})
 
 function notificationTarget(data) {
   const value = data && typeof data.url === 'string' ? data.url : ''

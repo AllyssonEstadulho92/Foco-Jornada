@@ -1,3 +1,4 @@
+import { secureStorage } from '../../security/secureStorage'
 import type { AppDataIntegrityService } from '../../application/data/AppDataIntegrityService'
 import { pushAppNotification } from '../store/useNotificationStore'
 
@@ -8,7 +9,7 @@ function fingerprint(codes: string[]): string {
   return [...new Set(codes)].sort().join('|')
 }
 
-export function installDataIntegrityMonitoring(service: AppDataIntegrityService): void {
+export function installDataIntegrityMonitoring(service: AppDataIntegrityService): () => void {
   let running = false
   let lastAuditAt = 0
 
@@ -20,15 +21,15 @@ export function installDataIntegrityMonitoring(service: AppDataIntegrityService)
     try {
       const report = await service.audit()
       if (report.ok) {
-        window.localStorage.removeItem(STORAGE_KEY)
+        secureStorage.removeItem(STORAGE_KEY)
         return
       }
 
       const currentFingerprint = fingerprint(report.issues.map((item) => item.code))
-      const previousFingerprint = window.localStorage.getItem(STORAGE_KEY)
+      const previousFingerprint = secureStorage.getItem(STORAGE_KEY)
       if (currentFingerprint === previousFingerprint) return
 
-      window.localStorage.setItem(STORAGE_KEY, currentFingerprint)
+      secureStorage.setItem(STORAGE_KEY, currentFingerprint)
       pushAppNotification(
         'error',
         'Verificação de dados requer atenção',
@@ -55,4 +56,10 @@ export function installDataIntegrityMonitoring(service: AppDataIntegrityService)
   document.addEventListener('visibilitychange', handleVisibility)
   window.addEventListener('focus', handleFocus)
   window.addEventListener('pageshow', handleFocus)
+
+  return () => {
+    document.removeEventListener('visibilitychange', handleVisibility)
+    window.removeEventListener('focus', handleFocus)
+    window.removeEventListener('pageshow', handleFocus)
+  }
 }

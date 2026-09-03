@@ -61,12 +61,13 @@ Foco-Jornada/
 
 ## Persistência
 
-IndexedDB/Dexie é a fonte de verdade local. Timers são reconstruídos por timestamps persistidos, e não por contadores acumulados em memória.
+Os dados pessoais são guardados num cofre local cifrado com AES-GCM por perfil. A antiga base IndexedDB/Dexie é suportada apenas para migração segura. Timers continuam a ser reconstruídos por timestamps persistidos, e não por contadores acumulados em memória.
 
 ## Desenvolvimento
 
 ```bash
 npm install
+npm audit --audit-level=high
 npm run typecheck
 npm run lint
 npm test
@@ -76,6 +77,7 @@ npm run dev
 
 ## Documentação
 
+- `docs/security-architecture.md` — modelo de segurança, criptografia, migração, backups e limitações.
 - `project/PROJECT_SPEC.md` — especificação funcional e arquitetural.
 - `project/ROADMAP.md` — estado das fases.
 - `project/CHECKPOINT.md` — ponto oficial de continuidade.

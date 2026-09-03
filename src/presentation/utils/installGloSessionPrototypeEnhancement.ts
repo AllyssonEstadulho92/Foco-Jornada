@@ -42,7 +42,7 @@ function syncGloSessionPrototype(): void {
   card.style.setProperty('--glo-session-progress-percent', `${progressPercent}%`)
 }
 
-export function installGloSessionPrototypeEnhancement(): void {
+export function installGloSessionPrototypeEnhancement(): () => void {
   let scheduled = false
 
   const scheduleSync = () => {
@@ -63,4 +63,6 @@ export function installGloSessionPrototypeEnhancement(): void {
     attributes: true,
     attributeFilter: ['disabled', 'class', 'style'],
   })
+
+  return () => observer.disconnect()
 }

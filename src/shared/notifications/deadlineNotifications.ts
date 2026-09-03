@@ -1,3 +1,4 @@
+import { secureStorage } from '../../security/secureStorage'
 import { pushAppNotification, type NotificationTone } from '../../presentation/store/useNotificationStore'
 
 export type DeadlineNotificationPermission = NotificationPermission | 'unsupported'
@@ -32,7 +33,7 @@ const PERMISSION_EVENT = 'foco-jornada:notification-permission-changed'
 
 function loadDelivered(now = Date.now()): Record<string, number> {
   try {
-    const raw = window.localStorage.getItem(DELIVERED_STORAGE_KEY)
+    const raw = secureStorage.getItem(DELIVERED_STORAGE_KEY)
     if (!raw) return {}
     const parsed = JSON.parse(raw) as Record<string, unknown>
     const cutoff = now - MAX_DELIVERED_AGE_MS
@@ -46,7 +47,7 @@ function loadDelivered(now = Date.now()): Record<string, number> {
 
 function saveDelivered(delivered: Record<string, number>): void {
   try {
-    window.localStorage.setItem(DELIVERED_STORAGE_KEY, JSON.stringify(delivered))
+    secureStorage.setItem(DELIVERED_STORAGE_KEY, JSON.stringify(delivered))
   } catch {
     // O histórico local de entrega é auxiliar. A aplicação continua funcional sem armazenamento.
   }

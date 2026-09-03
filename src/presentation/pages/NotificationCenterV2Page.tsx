@@ -1,3 +1,4 @@
+import { secureStorage } from '../../security/secureStorage'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   getDeadlineNotificationCapability,
@@ -72,7 +73,7 @@ export function NotificationCenterV2Page() {
   const [activeFocus, setActiveFocus] = useState(false)
   const [testMessage, setTestMessage] = useState('')
   const [isTesting, setIsTesting] = useState(false)
-  const [lastTestAt, setLastTestAt] = useState<string | null>(() => window.localStorage.getItem('foco-jornada:last-notification-test'))
+  const [lastTestAt, setLastTestAt] = useState<string | null>(() => secureStorage.getItem('foco-jornada:last-notification-test'))
 
   const refreshRuntime = useCallback(async () => {
     try {
@@ -148,7 +149,7 @@ export function NotificationCenterV2Page() {
         return
       }
       const testedAt = new Date().toISOString()
-      window.localStorage.setItem('foco-jornada:last-notification-test', testedAt)
+      secureStorage.setItem('foco-jornada:last-notification-test', testedAt)
       setLastTestAt(testedAt)
       setTestMessage('Teste enviado com sucesso ao sistema operativo.')
     } finally {

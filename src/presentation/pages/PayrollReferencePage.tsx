@@ -1,3 +1,4 @@
+import { secureStorage } from '../../security/secureStorage'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { calculatePayroll } from '../../application/payroll/calculatePayroll'
@@ -25,7 +26,7 @@ function defaultPlan(month: string): PayrollDayPlan[] {
 
 function readConfig(): PayrollConfig {
   try {
-    const raw = localStorage.getItem(CONFIG_KEY)
+    const raw = secureStorage.getItem(CONFIG_KEY)
     return raw ? { ...defaultPayrollConfig, ...(JSON.parse(raw) as Partial<PayrollConfig>) } : defaultPayrollConfig
   } catch {
     return defaultPayrollConfig
@@ -34,7 +35,7 @@ function readConfig(): PayrollConfig {
 
 function readPlan(month: string): PayrollDayPlan[] {
   try {
-    const raw = localStorage.getItem(`${PLAN_PREFIX}${month}`)
+    const raw = secureStorage.getItem(`${PLAN_PREFIX}${month}`)
     return raw ? (JSON.parse(raw) as PayrollDayPlan[]) : defaultPlan(month)
   } catch {
     return defaultPlan(month)

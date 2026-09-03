@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
+import { SecuritySettingsPanel } from '../../security/SecuritySettingsPanel'
 import { AppTopBar } from '../components/AppTopBar'
 import { NavigationIcon } from '../navigation/NavigationIcon'
 import {
@@ -189,6 +190,7 @@ export function AppShell() {
         <AppTopBar onOpenMenu={openMobileMenu} menuButtonRef={mobileMenuButtonRef} />
         <main className="appContent" id="main-content" tabIndex={-1}>
           {location.pathname === '/definicoes' ? (
+            <>
             <section className="prototypeThemeCard" aria-label="Tema da aplicação">
               <div>
                 <span>TEMA</span>
@@ -222,6 +224,8 @@ export function AppShell() {
                 </button>
               </div>
             </section>
+            <SecuritySettingsPanel />
+            </>
           ) : null}
           <Outlet />
         </main>

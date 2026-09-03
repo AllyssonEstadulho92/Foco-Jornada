@@ -52,7 +52,9 @@ export class OperationalPersonalStockService extends PersonalStockService {
           )
         }
 
-        return super.confirmMedicationDose(input)
+        const result = await this.confirmMedicationDoseWithinTransaction(input)
+        const summary = await this.getMedicationSummary(input.medicationId)
+        return { ...result, stock: summary.stock }
       },
     )
   }

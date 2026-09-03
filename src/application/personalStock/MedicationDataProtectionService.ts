@@ -1,3 +1,4 @@
+import { secureStorage } from '../../security/secureStorage'
 import type { MedicationDoseEvent, MedicationSchedule, StockEntity, StockMovement } from '../../domain/personalStock/models'
 import type { AppDatabase, AppMetadataRecord } from '../../infrastructure/database/appDatabase'
 import { minorToDecimal } from './decimal'
@@ -414,7 +415,7 @@ function parseSnapshot(text: string): MedicationRedundantSnapshot {
 
 function localStorageValue(key: string): string | null {
   try {
-    return typeof globalThis.localStorage === 'undefined' ? null : globalThis.localStorage.getItem(key)
+    return secureStorage.getItem(key)
   } catch {
     return null
   }
@@ -422,8 +423,7 @@ function localStorageValue(key: string): string | null {
 
 function setLocalStorageValue(key: string, value: string): boolean {
   try {
-    if (typeof globalThis.localStorage === 'undefined') return false
-    globalThis.localStorage.setItem(key, value)
+    secureStorage.setItem(key, value)
     return true
   } catch {
     return false

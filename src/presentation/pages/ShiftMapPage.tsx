@@ -19,6 +19,7 @@ import {
   type ShiftMapDay,
 } from '../../domain/shifts/ShiftMap'
 import type { AppSettings } from '../../domain/settings/AppSettings'
+import { secureStorage } from '../../security/secureStorage'
 import { useSettingsController } from '../hooks/useSettingsController'
 import { pushAppNotification } from '../store/useNotificationStore'
 
@@ -77,7 +78,7 @@ function money(value: number) {
 
 function readPayrollConfig(): PayrollConfig {
   try {
-    const raw = localStorage.getItem(PAYROLL_CONFIG_KEY)
+    const raw = secureStorage.getItem(PAYROLL_CONFIG_KEY)
     if (!raw) return defaultPayrollConfig
     return { ...defaultPayrollConfig, ...(JSON.parse(raw) as Partial<PayrollConfig>) }
   } catch {
@@ -87,7 +88,7 @@ function readPayrollConfig(): PayrollConfig {
 
 function readPayrollPlan(month: string): PayrollDayPlan[] {
   try {
-    const raw = localStorage.getItem(`${PAYROLL_PLAN_PREFIX}${month}`)
+    const raw = secureStorage.getItem(`${PAYROLL_PLAN_PREFIX}${month}`)
     return raw ? (JSON.parse(raw) as PayrollDayPlan[]) : []
   } catch {
     return []
@@ -96,7 +97,7 @@ function readPayrollPlan(month: string): PayrollDayPlan[] {
 
 function readShiftMap(month: string): Partial<ShiftMapDay>[] {
   try {
-    const raw = localStorage.getItem(`${SHIFT_MAP_PREFIX}${month}`)
+    const raw = secureStorage.getItem(`${SHIFT_MAP_PREFIX}${month}`)
     return raw ? (JSON.parse(raw) as Partial<ShiftMapDay>[]) : []
   } catch {
     return []
@@ -262,8 +263,8 @@ export function ShiftMapPage() {
   }
 
   function saveMap() {
-    localStorage.setItem(`${SHIFT_MAP_PREFIX}${month}`, JSON.stringify(days))
-    localStorage.setItem(`${PAYROLL_PLAN_PREFIX}${month}`, JSON.stringify(payrollPlan))
+    secureStorage.setItem(`${SHIFT_MAP_PREFIX}${month}`, JSON.stringify(days))
+    secureStorage.setItem(`${PAYROLL_PLAN_PREFIX}${month}`, JSON.stringify(payrollPlan))
     const now = new Date()
     setLastSavedAt(now.toISOString())
     pushAppNotification(
