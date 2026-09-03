@@ -301,7 +301,6 @@
   min-height:44px;padding:8px var(--control-padding-inline);
   border-radius:var(--control-radius);font-size:var(--text-xs);font-weight:var(--weight-bold)
 }
-.notificationPanelFooter{padding:var(--space-3) var(--space-4);border-color:var(--line);font-size:var(--text-xs)}
 
 @media(min-width:900px){
   .appContent{
