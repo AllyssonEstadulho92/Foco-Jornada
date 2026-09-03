@@ -349,6 +349,102 @@ export class SecurityManager {
     return { ...session, profile: updated }
   }
 
+  async importSecureBackup(text: string): Promise<SecurityProfile> {
+    let parsed: unknown
+    try {
+      parsed = JSON.parse(text) as unknown
+    } catch {
+      throw new Error('A cópia segura não contém JSON válido.')
+    }
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+      throw new Error('Formato de cópia segura inválido.')
+    }
+
+    const payload = parsed as {
+      format?: unknown
+      schemaVersion?: unknown
+      profile?: Partial<SecurityProfile>
+      vault?: {
+        profileId?: unknown
+        revision?: unknown
+        schemaVersion?: unknown
+        updatedAt?: unknown
+        iv?: unknown
+        ciphertext?: unknown
+      }
+    }
+
+    if (payload.format !== 'foco-jornada-secure-backup' || payload.schemaVersion !== 1) {
+      throw new Error('Este ficheiro não é uma cópia segura suportada do Foco Jornada.')
+    }
+
+    const profile = payload.profile
+    const vault = payload.vault
+    if (
+      !profile
+      || typeof profile.id !== 'string'
+      || profile.id.length < 8
+      || profile.id.length > 128
+      || typeof profile.label !== 'string'
+      || typeof profile.createdAt !== 'string'
+      || typeof profile.updatedAt !== 'string'
+      || typeof profile.lastUsedAt !== 'string'
+      || (profile.secretType !== 'pin' && profile.secretType !== 'password')
+      || profile.kdf?.name !== 'PBKDF2'
+      || profile.kdf.hash !== 'SHA-256'
+      || !Number.isSafeInteger(profile.kdf.iterations)
+      || profile.kdf.iterations < 100_000
+      || profile.kdf.iterations > 2_000_000
+      || typeof profile.kdf.salt !== 'string'
+      || typeof profile.wrappedDataKey?.iv !== 'string'
+      || typeof profile.wrappedDataKey.ciphertext !== 'string'
+      || typeof profile.recoveryWrappedDataKey?.iv !== 'string'
+      || typeof profile.recoveryWrappedDataKey.ciphertext !== 'string'
+      || !Number.isSafeInteger(profile.autoLockMinutes)
+      || ![1, 5, 10, 15, 30].includes(profile.autoLockMinutes)
+      || !vault
+      || vault.profileId !== profile.id
+      || vault.schemaVersion !== 1
+      || !Number.isSafeInteger(vault.revision)
+      || Number(vault.revision) < 1
+      || typeof vault.updatedAt !== 'string'
+      || typeof vault.iv !== 'string'
+      || typeof vault.ciphertext !== 'string'
+    ) {
+      throw new Error('A cópia segura está incompleta ou contém parâmetros inválidos.')
+    }
+
+    if (await this.profiles.get(profile.id)) {
+      throw new Error('Já existe neste dispositivo um perfil com o mesmo identificador.')
+    }
+
+    const importedProfile: SecurityProfile = {
+      ...(profile as SecurityProfile),
+      failedAttempts: 0,
+      lockedUntil: undefined,
+      lastUsedAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    }
+
+    try {
+      await this.vaults.replace(profile.id, {
+        profileId: profile.id,
+        revision: Number(vault.revision),
+        schemaVersion: 1,
+        updatedAt: vault.updatedAt,
+        iv: vault.iv,
+        ciphertext: vault.ciphertext,
+      })
+      await this.profiles.put(importedProfile)
+    } catch (error) {
+      await this.vaults.delete(profile.id).catch(() => undefined)
+      throw error
+    }
+
+    this.setActiveProfileId(profile.id)
+    return importedProfile
+  }
+
   async deleteProfile(profileId: string): Promise<void> {
     await this.vaults.delete(profileId)
     await this.profiles.delete(profileId)
