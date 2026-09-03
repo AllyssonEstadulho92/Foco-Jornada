@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } from 'react'
-import { useSecurity } from '../../security/SecurityContext'
+import { useSecurityOptional } from '../../security/SecurityContext'
 import { emitAppFeedback } from '../../shared/notifications/appFeedback'
 import { useNow } from '../hooks/useNow'
 import { useAppServices } from '../providers/AppServicesProvider'
@@ -76,7 +76,7 @@ function formatNotificationTime(value: string) {
 
 export function AppTopBar({ onOpenMenu, menuButtonRef }: { onOpenMenu?: () => void; menuButtonRef?: RefObject<HTMLButtonElement | null> }) {
   const { journeyRepository, focusRepository } = useAppServices()
-  const security = useSecurity()
+  const security = useSecurityOptional()
   const now = useNow(1000)
   const [isOpen, setIsOpen] = useState(false)
   const [activeJourneyStartedAt, setActiveJourneyStartedAt] = useState<string | null>(null)
@@ -238,15 +238,17 @@ export function AppTopBar({ onOpenMenu, menuButtonRef }: { onOpenMenu?: () => vo
           <time dateTime={now.toISOString()}>{clock}</time>
         </div>
 
-        <button
-          type="button"
-          className="securityTopLock"
-          onClick={() => void security.lock()}
-          aria-label="Bloquear aplicação agora"
-          title="Bloquear agora"
-        >
-          <LockIcon />
-        </button>
+        {security ? (
+          <button
+            type="button"
+            className="securityTopLock"
+            onClick={() => void security.lock()}
+            aria-label="Bloquear aplicação agora"
+            title="Bloquear agora"
+          >
+            <LockIcon />
+          </button>
+        ) : null}
 
         <div className="notificationCenter" ref={panelRef}>
           <button
