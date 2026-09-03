@@ -92,6 +92,31 @@ describe('SecurityManager e cofre local', () => {
     expect(newPassword.ok).toBe(true)
   }, 20_000)
 
+  it('aplica bloqueio progressivo sem apagar o cofre após tentativas erradas', async () => {
+    const manager = new SecurityManager()
+    const created = await manager.createProfile('112233', 'pin')
+
+    for (let attempt = 1; attempt <= 4; attempt += 1) {
+      const result = await manager.unlockWithSecret(created.profile.id, '000000')
+      expect(result.ok).toBe(false)
+      if (!result.ok) expect(result.lockedUntil).toBeUndefined()
+    }
+
+    const fifth = await manager.unlockWithSecret(created.profile.id, '000000')
+    expect(fifth.ok).toBe(false)
+    if (fifth.ok) throw new Error('A quinta tentativa incorreta não foi bloqueada.')
+    expect(fifth.lockedUntil).toBeDefined()
+
+    const profiles = await manager.listProfiles()
+    const stored = profiles.find((profile) => profile.id === created.profile.id)
+    expect(stored?.failedAttempts).toBe(5)
+    expect(await new EncryptedVaultStore().readRecord(created.profile.id)).toBeDefined()
+
+    const blockedCorrectPin = await manager.unlockWithSecret(created.profile.id, '112233')
+    expect(blockedCorrectPin.ok).toBe(false)
+    if (!blockedCorrectPin.ok) expect(blockedCorrectPin.lockedUntil).toBeDefined()
+  }, 25_000)
+
   it('restaura uma cópia cifrada e mantém perfis locais isolados', async () => {
     const manager = new SecurityManager()
     const first = await manager.createProfile('135790', 'pin')
