@@ -2,14 +2,12 @@
    Esta camada não altera lógica, dados ou tempos; apenas consolida hierarquia e responsividade. */
 
 .opsPage,
-.notificationV3Page,
 .medicationsStockPage {
   width: min(100%, 1180px);
   margin: 0 auto;
 }
 
 .opsPageHeader,
-.notificationV3Header,
 .personalStockHeader.personalStockHeaderActions {
   align-items: flex-start;
   gap: var(--space-4);
@@ -17,7 +15,6 @@
 }
 
 .opsPageHeader h1,
-.notificationV3Header h1,
 .medicationsStockPage .personalStockHeader h1 {
   margin: 4px 0 6px;
   font-size: clamp(1.75rem, 3vw, 2.4rem);
@@ -26,7 +23,6 @@
 }
 
 .opsPageHeader p,
-.notificationV3Header p,
 .medicationsStockPage .personalStockHeader p {
   max-width: 720px;
   margin: 0;
@@ -36,12 +32,6 @@
 .opsCalendarCard,
 .opsDayPanel,
 .opsTableCard,
-.notificationInboxCard,
-.notificationHistoryCard,
-.notificationSystemCard,
-.notificationStatusCard,
-.notificationQuickCard,
-.notificationPrivacyCard,
 .medicationsStockPage .stockCard,
 .medicationsStockPage .medicationWorkspace,
 .medicationsStockPage .medicationLinearSection {
@@ -178,90 +168,6 @@
   background: var(--surface-2);
 }
 
-/* Centro de notificações */
-.notificationV3Page {
-  display: grid;
-  gap: var(--space-4);
-}
-
-.notificationV3Header {
-  display: flex;
-  justify-content: space-between;
-}
-
-.notificationV3TitleGroup {
-  align-items: flex-start !important;
-}
-
-.notificationV3Logo {
-  width: 44px !important;
-  height: 44px !important;
-  flex: 0 0 44px !important;
-  border-radius: var(--radius-md) !important;
-}
-
-.notificationV3FilterRow {
-  display: flex;
-  gap: var(--space-2);
-  overflow-x: auto;
-  padding: 2px 2px 8px;
-  scrollbar-width: thin;
-}
-
-.notificationV3FilterRow button {
-  flex: 0 0 auto;
-  min-height: 38px;
-  padding: 0 14px !important;
-  border-radius: var(--radius-pill) !important;
-  border: 1px solid var(--line) !important;
-  background: var(--surface) !important;
-  color: var(--muted);
-}
-
-.notificationV3FilterRow button.isActive {
-  border-color: rgba(31, 157, 99, 0.28) !important;
-  background: var(--primary-soft) !important;
-  color: var(--primary) !important;
-}
-
-.notificationV3Layout {
-  gap: var(--space-4) !important;
-  align-items: start;
-}
-
-.notificationV3MainColumn,
-.notificationV3SideColumn {
-  gap: var(--space-4) !important;
-}
-
-.notificationV3SideColumn {
-  position: sticky;
-  top: 20px;
-}
-
-.notificationHistoryItem {
-  border-radius: var(--radius-md) !important;
-}
-
-.notificationMarkRead,
-.notificationTestButton,
-.notificationSystemCard button,
-.notificationHistoryActions button {
-  min-height: var(--control-height-compact);
-  border-radius: var(--control-radius) !important;
-  font-weight: var(--weight-semibold);
-}
-
-.notificationTechnicalNote {
-  margin: 0;
-  padding: 12px 14px;
-  border: 1px dashed var(--line);
-  border-radius: var(--radius-md);
-  color: var(--muted);
-  font-size: var(--text-xs);
-  line-height: var(--line-height-relaxed);
-}
-
 /* Medicação: preserva a estrutura funcional, reduz ruído visual e melhora leitura. */
 .medicationsStockPage {
   display: grid;
@@ -308,13 +214,11 @@
 /* Tablet/mobile */
 @media (max-width: 899px) {
   .opsPage,
-  .notificationV3Page,
   .medicationsStockPage {
     width: 100%;
   }
 
   .opsPageHeader,
-  .notificationV3Header,
   .medicationsStockPage .personalStockHeaderActions {
     flex-direction: column;
     align-items: stretch;
@@ -330,20 +234,14 @@
     min-width: 0;
   }
 
-  .opsCalendarLayout,
-  .notificationV3Layout {
+  .opsCalendarLayout {
     grid-template-columns: minmax(0, 1fr) !important;
   }
 
-  .opsDayPanel,
-  .notificationV3SideColumn {
+  .opsDayPanel {
     position: static;
   }
 
-  .notificationV3HeaderActions {
-    width: 100%;
-    justify-content: space-between;
-  }
 
   .medicationsStockPage .personalStockHeaderActions > button {
     width: 100%;
@@ -352,12 +250,7 @@
 
 @media (max-width: 640px) {
   .opsDayPanel,
-  .notificationInboxCard,
-  .notificationHistoryCard,
-  .notificationSystemCard,
-  .notificationStatusCard,
-  .notificationQuickCard,
-  .notificationPrivacyCard {
+            .notificationPrivacyCard {
     border-radius: var(--radius-md) !important;
   }
 
@@ -440,19 +333,8 @@
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   }
 
-  .notificationV3HeaderActions {
-    align-items: stretch;
-    flex-direction: column;
-  }
 
-  .notificationUnreadCard,
-  .notificationMarkRead {
-    width: 100%;
-  }
 
-  .notificationPrivacyCard {
-    align-items: flex-start !important;
-  }
 }
 
 @media (max-width: 380px) {
