@@ -26,7 +26,7 @@ jobs:
           node-version: 22
 
       - name: Instalar dependências
-        run: npm install --no-audit --no-fund
+        run: npm install --no-audit --no-fund --no-package-lock
 
       - name: Gerar aplicação
         run: npm run build
@@ -46,15 +46,26 @@ jobs:
           rm -f workbox-*.js
           cp -a dist/. .
           rm -rf dist
+          rm -f package-lock.json tsconfig.app.tsbuildinfo
 
       - name: Guardar publicação
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
           git add -A
+          git add -f .nojekyll index.html manifest.webmanifest registerSW.js sw.js
+          git add -f assets/
+          git add -f 404.html icon.svg logo-mark.svg notification-sw.js redirect.js report-qr.svg
+          if [ -d site ]; then git add -f site/; fi
+          for file in workbox-*.js; do
+            if [ -f "$file" ]; then git add -f "$file"; fi
+          done
+
           if git diff --cached --quiet; then
             echo "Sem alterações de publicação."
             exit 0
           fi
+
           git commit -m "deploy: atualizar GitHub Pages [skip ci]"
           git push
