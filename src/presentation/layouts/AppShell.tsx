@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { SecuritySettingsPanel } from '../../security/SecuritySettingsPanel'
 import { AppTopBar } from '../components/AppTopBar'
+import { AppIcon } from '../components/ui/AppIcon'
 import { NavigationIcon } from '../navigation/NavigationIcon'
 import {
   mobileBottomNavigation,
@@ -242,7 +243,7 @@ export function AppShell() {
       <aside id="mobile-main-drawer" className={`mobileDrawer${mobileMenuOpen ? ' mobileDrawerOpen' : ''}`} aria-label="Menu móvel" aria-hidden={!mobileMenuOpen} inert={!mobileMenuOpen}>
         <header className="mobileDrawerHeader">
           <BrandLockup />
-          <button ref={mobileDrawerCloseRef} type="button" onClick={() => setMobileMenuOpen(false)} aria-label="Fechar menu">×</button>
+          <button ref={mobileDrawerCloseRef} type="button" onClick={() => setMobileMenuOpen(false)} aria-label="Fechar menu"><AppIcon name="close" /></button>
         </header>
         <p className="mobileDrawerTagline">Organiza tempo, foco, jornada e dados pessoais.</p>
 
