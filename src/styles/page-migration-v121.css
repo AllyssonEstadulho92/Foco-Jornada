@@ -249,8 +249,7 @@
 }
 
 @media (max-width: 640px) {
-  .opsDayPanel,
-            .notificationPrivacyCard {
+  .opsDayPanel {
     border-radius: var(--radius-md) !important;
   }
 
