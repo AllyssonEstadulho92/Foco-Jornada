@@ -171,16 +171,14 @@ body {
 
 .notificationPanel,
 .notificationItem,
-.notificationPanelHeader,
-.notificationPanelFooter {
+.notificationPanelHeader {
   background: var(--surface);
   border-color: var(--line);
   color: var(--text);
 }
 
 .notificationItem time,
-.notificationItem span,
-.notificationPanelFooter {
+.notificationItem span {
   color: var(--muted);
 }
 
