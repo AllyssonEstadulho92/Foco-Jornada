@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { AppIcon } from './ui/AppIcon'
 
 type VersionCheckState = 'idle' | 'checking' | 'current' | 'update' | 'unavailable' | 'error'
 
@@ -18,7 +19,7 @@ function formatBuildDate() {
 }
 
 function AboutChevron() {
-  return <span className="referenceChevron" aria-hidden="true">›</span>
+  return <span className="referenceChevron" aria-hidden="true"><AppIcon name="chevron-right" /></span>
 }
 
 async function waitForWorkerState(worker: ServiceWorker | null, timeoutMs = 4000) {
