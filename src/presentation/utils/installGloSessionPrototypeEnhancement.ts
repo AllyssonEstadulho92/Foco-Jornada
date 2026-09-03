@@ -63,4 +63,6 @@ export function installGloSessionPrototypeEnhancement(): () => void {
     attributes: true,
     attributeFilter: ['disabled', 'class', 'style'],
   })
+
+  return () => observer.disconnect()
 }
