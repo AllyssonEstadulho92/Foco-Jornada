@@ -233,8 +233,19 @@ select:disabled {
   gap: 6px;
 }
 
+.sidebarSectionLabel {
+  display: block;
+  margin: auto 8px -14px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: var(--weight-heavy);
+  line-height: 1.2;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
 .sidebarSecondary {
-  margin-top: auto;
+  margin-top: 0;
 }
 
 .navLink,
