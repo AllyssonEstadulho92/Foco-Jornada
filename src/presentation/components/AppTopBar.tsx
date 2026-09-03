@@ -4,85 +4,13 @@ import { emitAppFeedback } from '../../shared/notifications/appFeedback'
 import { useNow } from '../hooks/useNow'
 import { useAppServices } from '../providers/AppServicesProvider'
 import { useNotificationStore, type AppNotification } from '../store/useNotificationStore'
+import { AppIcon } from './ui/AppIcon'
 
 type StatusNotification = {
   id: string
   title: string
   detail: string
   tone: 'info' | 'success'
-}
-
-function ClockIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <circle cx="12" cy="12" r="8.5" />
-      <path d="M12 7.5v5l3.5 2" />
-    </svg>
-  )
-}
-
-function LockIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <rect x="5.5" y="10" width="13" height="10" rx="2" />
-      <path d="M8.5 10V7a3.5 3.5 0 0 1 7 0v3" />
-    </svg>
-  )
-}
-
-function BellIcon({ animated = false }: { animated?: boolean }) {
-  return (
-    <svg
-      className={animated ? 'notificationBellGlyph isAnimated' : 'notificationBellGlyph'}
-      viewBox="0 0 24 24"
-      aria-hidden="true"
-    >
-      <g className="notificationBellBody">
-        <path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 7h18s-3 0-3-7" />
-        <path d="M10 20h4" className="notificationBellClapper" />
-      </g>
-      <path d="M4.8 6.5c.45-.95 1.05-1.8 1.8-2.5" className="notificationBellWave notificationBellWaveLeft" />
-      <path d="M19.2 6.5c-.45-.95-1.05-1.8-1.8-2.5" className="notificationBellWave notificationBellWaveRight" />
-    </svg>
-  )
-}
-
-function EmptyStateIcon() {
-  return (
-    <svg className="notificationEmptyGlyph" viewBox="0 0 64 64" aria-hidden="true">
-      <circle className="notificationEmptyHalo" cx="32" cy="32" r="24" />
-      <circle className="notificationEmptyRing" cx="32" cy="32" r="18" />
-      <path className="notificationEmptyCheck" d="m23.5 32.5 6 6L41.5 25" />
-      <circle className="notificationEmptySpark notificationEmptySparkOne" cx="50" cy="18" r="1.8" />
-      <circle className="notificationEmptySpark notificationEmptySparkTwo" cx="16" cy="20" r="1.4" />
-      <circle className="notificationEmptySpark notificationEmptySparkThree" cx="47" cy="46" r="1.2" />
-    </svg>
-  )
-}
-
-function MenuIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M5 7h14M5 12h14M5 17h14" />
-    </svg>
-  )
-}
-
-function EditIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="m4 16-.5 4.5L8 20l10.2-10.2-4-4L4 16Z" />
-      <path d="m12.8 7.2 4 4" />
-    </svg>
-  )
-}
-
-function TrashIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M5 7h14M9 7V4h6v3M8 10v8M12 10v8M16 10v8M7 7l1 13h8l1-13" />
-    </svg>
-  )
 }
 
 function formatNotificationTime(value: string) {
@@ -247,14 +175,14 @@ export function AppTopBar({ onOpenMenu, menuButtonRef }: { onOpenMenu?: () => vo
     <div className="appTopBar" aria-label="Estado da aplicação">
       <div className="mobileAppIdentity">
         <button ref={menuButtonRef} className="mobileMenuButton" type="button" onClick={onOpenMenu} aria-label="Abrir menu principal" aria-controls="mobile-main-drawer">
-          <MenuIcon />
+          <AppIcon name="menu" />
         </button>
         <strong>Foco Jornada</strong>
       </div>
 
       <div className="topBarStatusGroup">
         <div className="appClock" aria-label={`Hora atual ${clock}`}>
-          <ClockIcon />
+          <AppIcon name="clock" />
           <time dateTime={now.toISOString()}>{clock}</time>
         </div>
 
@@ -266,7 +194,7 @@ export function AppTopBar({ onOpenMenu, menuButtonRef }: { onOpenMenu?: () => vo
             aria-label="Bloquear aplicação agora"
             title="Bloquear agora"
           >
-            <LockIcon />
+            <AppIcon name="lock" />
           </button>
         ) : null}
 
@@ -279,7 +207,7 @@ export function AppTopBar({ onOpenMenu, menuButtonRef }: { onOpenMenu?: () => vo
             aria-expanded={isOpen}
             aria-haspopup="dialog"
           >
-            <BellIcon animated={isOpen || unreadCount > 0} />
+            <AppIcon name="bell" motion={isOpen || unreadCount > 0 ? "ring" : "none"} />
             {unreadCount > 0 ? (
               <span className="notificationBadge">{unreadCount > 9 ? '9+' : unreadCount}</span>
             ) : null}
@@ -322,7 +250,7 @@ export function AppTopBar({ onOpenMenu, menuButtonRef }: { onOpenMenu?: () => vo
                     aria-label="Tudo em dia. Sem notificações novas."
                   >
                     <span className="notificationEmptyAnimatedIcon" aria-hidden="true">
-                      <EmptyStateIcon />
+                      <AppIcon name="check" motion="draw" />
                     </span>
                   </div>
                 ) : (
@@ -371,7 +299,7 @@ export function AppTopBar({ onOpenMenu, menuButtonRef }: { onOpenMenu?: () => vo
                                 aria-label={`Editar notificação: ${item.title}`}
                                 title="Editar"
                               >
-                                <EditIcon />
+                                <AppIcon name="edit" />
                               </button>
                               <button
                                 type="button"
@@ -380,7 +308,7 @@ export function AppTopBar({ onOpenMenu, menuButtonRef }: { onOpenMenu?: () => vo
                                 aria-label={`Eliminar notificação: ${item.title}`}
                                 title="Eliminar"
                               >
-                                <TrashIcon />
+                                <AppIcon name="trash" />
                               </button>
                             </div>
                           </>
