@@ -420,10 +420,27 @@ export class AppBackupService {
   }
 
   async exportText(): Promise<string> {
+    if (this.db.isSecure) return this.db.exportSecureBackupText()
     return JSON.stringify(await this.createPayload(), null, 2)
   }
 
   async restoreFromText(text: string): Promise<BackupRestoreSummary> {
+    if (this.db.isSecure) {
+      let format: unknown
+      try {
+        format = (JSON.parse(text) as { format?: unknown }).format
+      } catch {
+        format = undefined
+      }
+      if (format === 'foco-jornada-secure-backup') {
+        const tableCounts = await this.db.restoreSecureBackupText(text)
+        return {
+          restoredAt: new Date().toISOString(),
+          tableCounts,
+        }
+      }
+    }
+
     const incomingPayload = parseBackup(text)
 
     const [localEntities, localMovements, localSchedules, localDoseEvents, localMetadata] = await Promise.all([
