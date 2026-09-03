@@ -66,7 +66,6 @@ export function AppShell() {
   const toggleTheme = useUiStore((state) => state.toggleTheme)
   const location = useLocation()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [mobileQuickOpen, setMobileQuickOpen] = useState(false)
   const [deviceTheme, setDeviceTheme] = useState<ResolvedTheme>(systemTheme)
   const mobileMenuButtonRef = useRef<HTMLButtonElement | null>(null)
   const mobileDrawerCloseRef = useRef<HTMLButtonElement | null>(null)
@@ -75,7 +74,6 @@ export function AppShell() {
 
   useEffect(() => {
     setMobileMenuOpen(false)
-    setMobileQuickOpen(false)
   }, [location.pathname, location.search])
 
   useEffect(() => {
@@ -110,17 +108,16 @@ export function AppShell() {
   }, [resolvedTheme])
 
   useEffect(() => {
-    if (!mobileMenuOpen && !mobileQuickOpen) return
+    if (!mobileMenuOpen) return
 
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key !== 'Escape') return
       setMobileMenuOpen(false)
-      setMobileQuickOpen(false)
     }
 
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [mobileMenuOpen, mobileQuickOpen])
+  }, [mobileMenuOpen])
 
   useEffect(() => {
     if (!mobileMenuOpen) return
@@ -145,14 +142,9 @@ export function AppShell() {
   }, [mobileMenuOpen])
 
   const openMobileMenu = () => {
-    setMobileQuickOpen(false)
     setMobileMenuOpen(true)
   }
 
-  const toggleMobileQuickMenu = () => {
-    setMobileMenuOpen(false)
-    setMobileQuickOpen((open) => !open)
-  }
 
   return (
     <div className={`appShell${sidebarCollapsed ? ' appShellCollapsed' : ''}${mobileMenuOpen ? ' appShellMobileMenuOpen' : ''}`}>
@@ -170,7 +162,8 @@ export function AppShell() {
           ))}
         </nav>
 
-        <nav className="sidebarSecondary" aria-label="Navegação secundária">
+        {!sidebarCollapsed ? <span className="sidebarSectionLabel">Saúde, análise e sistema</span> : null}
+        <nav className="sidebarSecondary" aria-label="Saúde, análise e sistema">
           {secondaryNavigation.map((item) => (
             <NavigationLink key={item.path} item={item} compact={sidebarCollapsed} />
           ))}
@@ -182,7 +175,9 @@ export function AppShell() {
           onClick={toggleSidebar}
           aria-label={sidebarCollapsed ? 'Expandir menu lateral' : 'Recolher menu lateral'}
         >
-          <span className="sidebarToggleIcon" aria-hidden="true">{sidebarCollapsed ? '→' : '←'}</span>
+          <span className="sidebarToggleIcon" aria-hidden="true">
+            <AppIcon name={sidebarCollapsed ? 'chevron-right' : 'chevron-left'} />
+          </span>
           <span className="navLabel">Recolher</span>
         </button>
       </aside>
@@ -245,12 +240,12 @@ export function AppShell() {
           <BrandLockup />
           <button ref={mobileDrawerCloseRef} type="button" onClick={() => setMobileMenuOpen(false)} aria-label="Fechar menu"><AppIcon name="close" /></button>
         </header>
-        <p className="mobileDrawerTagline">Organiza tempo, foco, jornada e dados pessoais.</p>
+        <p className="mobileDrawerTagline">Tudo o que precisas, organizado por prioridade.</p>
 
         <section className="mobileDrawerQuickSection" aria-labelledby="mobile-quick-title">
           <div className="mobileDrawerSectionHeading">
             <span id="mobile-quick-title">Acesso rápido</span>
-            <small>Principais</small>
+            <small>Saúde e trabalho</small>
           </div>
           <nav className="mobileDrawerQuickAccess" aria-label="Acesso rápido aos menus principais">
             {mobileQuickNavigation.map((item) => (
@@ -260,8 +255,8 @@ export function AppShell() {
         </section>
 
         <div className="mobileDrawerSectionHeading mobileDrawerSectionHeadingSecondary">
-          <span>Menu</span>
-          <small>Outras áreas</small>
+          <span>Outras áreas</span>
+          <small>Consulta e análise</small>
         </div>
         <nav className="mobileDrawerNav" aria-label="Navegação da aplicação">
           {mobileMainNavigation.map((item) => (
@@ -271,7 +266,7 @@ export function AppShell() {
 
         <div className="mobileDrawerDivider" />
 
-        <nav className="mobileDrawerNav mobileDrawerTools" aria-label="Dados e ferramentas">
+        <nav className="mobileDrawerNav mobileDrawerTools" aria-label="Dados e segurança">
           {mobileDataNavigation.map((item) => (
             <StaticNavigationLink key={`${item.path}-${item.label}`} item={item} />
           ))}
@@ -299,74 +294,11 @@ export function AppShell() {
         </footer>
       </aside>
 
-      {mobileQuickOpen ? (
-        <>
-          <button
-            className="mobileQuickBackdrop"
-            type="button"
-            aria-label="Fechar acessos rápidos"
-            onClick={() => setMobileQuickOpen(false)}
-          />
-          <nav id="mobile-quick-panel" className="mobileQuickPanel" aria-labelledby="mobile-quick-panel-title">
-            <header className="mobileQuickPanelHeader">
-              <div className="mobileQuickPanelHeading">
-                <span className="mobileQuickPanelHeadingIcon" aria-hidden="true">
-                  <NavigationIcon name="more" />
-                </span>
-                <span className="mobileQuickPanelHeadingCopy">
-                  <strong id="mobile-quick-panel-title">Acesso rápido</strong>
-                  <span>Atalhos principais</span>
-                </span>
-              </div>
-              <button
-                className="mobileQuickPanelClose"
-                type="button"
-                onClick={() => setMobileQuickOpen(false)}
-                aria-label="Fechar menu Mais"
-              >
-                ×
-              </button>
-            </header>
-            {mobileQuickNavigation.map((item) => (
-              <NavLink
-                key={`panel-${item.path}-${item.label}`}
-                to={item.path}
-                className={({ isActive }) => `mobileQuickLink${isActive ? ' mobileQuickLinkActive' : ''}`}
-              >
-                <NavigationIcon name={item.icon} />
-                <span className="mobileQuickLinkCopy">
-                  <strong>{item.label}</strong>
-                  <small>{item.description}</small>
-                </span>
-              </NavLink>
-            ))}
-            <div className="mobileQuickPanelCallout">
-              <span className="mobileQuickPanelCalloutIcon" aria-hidden="true">↯</span>
-              <span>
-                <strong>Tudo o que precisas, num só lugar.</strong>
-                <small>Acede rapidamente às tuas ferramentas principais.</small>
-              </span>
-            </div>
-          </nav>
-        </>
-      ) : null}
 
       <nav className="bottomNav mobileBottomBar" aria-label="Navegação móvel">
-        <NavigationLink item={mobileBottomNavigation[0]} />
-        <NavigationLink item={mobileBottomNavigation[1]} />
-        <button
-          className={`mobileQuickButton${mobileQuickOpen ? ' mobileQuickButtonActive' : ''}`}
-          type="button"
-          onClick={toggleMobileQuickMenu}
-          aria-label={mobileQuickOpen ? 'Fechar menu Mais' : 'Abrir menu Mais'}
-          aria-expanded={mobileQuickOpen}
-          aria-controls="mobile-quick-panel"
-        >
-          <span className="mobileQuickButtonIcon" aria-hidden="true">+</span>
-          <span className="mobileQuickButtonLabel">Mais</span>
-        </button>
-        <NavigationLink item={mobileBottomNavigation[2]} />
-        <NavigationLink item={mobileBottomNavigation[3]} />
+        {mobileBottomNavigation.map((item) => (
+          <NavigationLink key={`bottom-${item.path}`} item={item} />
+        ))}
       </nav>
     </div>
   )
