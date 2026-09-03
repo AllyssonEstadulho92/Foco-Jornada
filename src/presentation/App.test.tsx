@@ -73,8 +73,9 @@ describe('App', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Abrir centro de notificações' }))
 
     const panel = screen.getByRole('dialog', { name: 'Centro de notificações' })
-    expect(within(panel).getByText('Tudo em dia')).toBeInTheDocument()
-    expect(within(panel).getByText('Sem notificações novas.')).toBeInTheDocument()
+    expect(within(panel).getByRole('status', { name: 'Tudo em dia. Sem notificações novas.' })).toBeInTheDocument()
+    expect(within(panel).queryByText('Tudo em dia')).not.toBeInTheDocument()
+    expect(within(panel).queryByText('Sem notificações novas.')).not.toBeInTheDocument()
     expect(panel.querySelector('.notificationEmptyGlyph')).not.toBeNull()
     expect(screen.queryByText('Instala a app para receber alertas')).not.toBeInTheDocument()
     expect(screen.queryByRole('link', { name: 'Abrir centro completo' })).not.toBeInTheDocument()
