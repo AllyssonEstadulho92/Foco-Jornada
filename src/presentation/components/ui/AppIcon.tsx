@@ -23,6 +23,7 @@ export type AppIconName =
   | 'medication'
   | 'close'
   | 'chevron-right'
+  | 'chevron-left'
   | 'chevron-down'
   | 'search'
   | 'info'
@@ -190,6 +191,7 @@ function iconContent(name: AppIconName) {
   }
   if (name === 'close') return <path d="m6 6 12 12M18 6 6 18" />
   if (name === 'chevron-right') return <path d="m9 5 7 7-7 7" />
+  if (name === 'chevron-left') return <path d="m15 5-7 7 7 7" />
   if (name === 'chevron-down') return <path d="m5 9 7 7 7-7" />
   if (name === 'search') {
     return <>
