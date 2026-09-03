@@ -51,13 +51,21 @@ export function randomToken(length = 32): string {
   return toBase64Url(randomBytes(length))
 }
 
-export function normalizeRecoveryCode(value: string): string {
-  return value.replace(/\s+/g, '').replace(/-/g, '').trim()
+export function formatRecoveryCode(bytes: Uint8Array): string {
+  const encoded = Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('').toUpperCase()
+  return encoded.match(/.{1,8}/g)?.join('-') ?? encoded
 }
 
-export function formatRecoveryCode(bytes: Uint8Array): string {
-  const encoded = toBase64Url(bytes)
-  return encoded.match(/.{1,5}/g)?.join('-') ?? encoded
+export function parseRecoveryCode(value: string): Uint8Array {
+  const normalized = value.replace(/[\s-]+/g, '').trim()
+  if (!/^[0-9a-fA-F]{64}$/.test(normalized)) {
+    throw new Error('Código de recuperação inválido.')
+  }
+  const bytes = new Uint8Array(32)
+  for (let index = 0; index < bytes.length; index += 1) {
+    bytes[index] = Number.parseInt(normalized.slice(index * 2, index * 2 + 2), 16)
+  }
+  return bytes
 }
 
 export function validateSecret(secret: string, type: 'pin' | 'password'): string | null {
