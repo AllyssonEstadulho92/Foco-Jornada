@@ -15,6 +15,7 @@ import {
   type NotificationPreferences,
   type NotificationScheduleMode,
 } from '../../shared/notifications/notificationPreferences'
+import { AppIcon } from '../components/ui/AppIcon'
 import { useNotificationStore } from '../store/useNotificationStore'
 
 type NotificationView =
@@ -61,32 +62,6 @@ const weekdays = [
   { value: 6, label: 'Sáb' },
   { value: 0, label: 'Dom' },
 ]
-
-function BellIcon({ checked = false }: { checked?: boolean }) {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M18 9a6 6 0 0 0-12 0c0 6.5-2.5 7-2.5 7h17S18 15.5 18 9Z" />
-      <path d="M9.8 20h4.4" />
-      {checked ? <path d="m15.2 13.2 1.5 1.5 3-3.1" /> : null}
-    </svg>
-  )
-}
-
-function CheckIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="m5 12.5 4.3 4.3L19 7" />
-    </svg>
-  )
-}
-
-function ChevronIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="m9 5 7 7-7 7" />
-    </svg>
-  )
-}
 
 function formatDateTime(value: string) {
   return new Intl.DateTimeFormat('pt-PT', {
@@ -314,7 +289,7 @@ export function NotificationCenterPage() {
         <div className="notificationPhoneCard">
           <SetupHeader view="help" title="Como funciona" onBack={() => setView('center')} />
           <div className="notificationHelpContent">
-            <div className="notificationHelpIcon"><BellIcon /></div>
+            <div className="notificationHelpIcon"><AppIcon name="bell" /></div>
             <h2>Notificações móveis no Foco Jornada</h2>
             <p>
               O centro local guarda os avisos dentro da aplicação. As notificações do dispositivo
@@ -575,7 +550,7 @@ export function NotificationCenterPage() {
         <div className="notificationPhoneCard">
           <SetupHeader view={view} title="Teste" onBack={() => setView('schedule')} />
           <div className="notificationTestStage">
-            <span className="notificationTestHero"><BellIcon checked /></span>
+            <span className="notificationTestHero"><AppIcon name="bell" motion="ring" /></span>
             <h2>Enviar notificação de teste</h2>
             <p>Vamos enviar uma notificação para verificar se está a funcionar corretamente.</p>
             <div className="notificationInfoCallout">
@@ -608,7 +583,7 @@ export function NotificationCenterPage() {
         <div className="notificationPhoneCard">
           <SetupHeader view={view} title="Resumo" onBack={() => setView('test')} />
           <div className="notificationSummaryStage">
-            <span className="notificationSummaryCheck"><CheckIcon /></span>
+            <span className="notificationSummaryCheck"><AppIcon name="check" motion="draw" /></span>
             <h2>Tudo pronto!</h2>
             <p>Revê a configuração e conclui para aplicar as preferências neste perfil.</p>
             <div className="notificationSummaryList">
@@ -644,7 +619,7 @@ export function NotificationCenterPage() {
 
       <section className="notificationCenterOverview">
         <div className="notificationCenterIdentity">
-          <span className="notificationCenterBell"><BellIcon /></span>
+          <span className="notificationCenterBell"><AppIcon name="bell" /></span>
           <div>
             <h2>Centro de notificações</h2>
             <p>As notificações ajudam a manter o foco e a não perder nada importante.</p>
@@ -658,7 +633,7 @@ export function NotificationCenterPage() {
               <span className={'notificationStatusDot state-' + permission.state}>{permission.state === 'good' ? '✓' : '!'}</span>
               <div><strong>Notificações do dispositivo</strong><small>Permissão do navegador / PWA</small></div>
               <b className={'state-' + permission.state}>{permission.label}</b>
-              <ChevronIcon />
+              <AppIcon name="chevron-right" />
             </div>
             <div>
               <span className={'notificationStatusDot ' + (capability.serviceWorkerRegistered ? 'state-good' : 'state-warning')}>✓</span>
@@ -666,7 +641,7 @@ export function NotificationCenterPage() {
               <b className={capability.serviceWorkerRegistered ? 'state-good' : 'state-warning'}>
                 {capability.serviceWorkerRegistered ? 'Pronto' : 'Verificar'}
               </b>
-              <ChevronIcon />
+              <AppIcon name="chevron-right" />
             </div>
             <div>
               <span className={'notificationStatusDot ' + (capability.pushSubscribed ? 'state-good' : 'state-muted')}>•</span>
@@ -674,7 +649,7 @@ export function NotificationCenterPage() {
               <b className={capability.pushSubscribed ? 'state-good' : 'state-muted'}>
                 {capability.pushSubscribed ? 'Ativo' : 'Inativo'}
               </b>
-              <ChevronIcon />
+              <AppIcon name="chevron-right" />
             </div>
           </div>
         </div>
@@ -699,7 +674,7 @@ export function NotificationCenterPage() {
 
         <div className="notificationCenterActions">
           <button className="notificationPrimaryAction" type="button" onClick={startSetup}>
-            <BellIcon />
+            <AppIcon name="bell" />
             {preferences.setupComplete ? 'Reconfigurar notificações' : 'Ativar notificações'}
           </button>
           <button className="notificationSecondaryAction" type="button" onClick={() => setView('help')}>
@@ -722,7 +697,7 @@ export function NotificationCenterPage() {
 
         {recent.length === 0 ? (
           <div className="notificationInboxEmpty">
-            <span><CheckIcon /></span>
+            <span><AppIcon name="check" motion="draw" /></span>
             <strong>Sem notificações por ler</strong>
             <p>As ações da aplicação passam a ficar guardadas aqui, sem popups no ecrã.</p>
           </div>
