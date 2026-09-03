@@ -1,7 +1,7 @@
 /* Notification UX V4 — acabamento profissional para o centro rápido e página completa. */
 .notificationPanel{
-  width:min(420px,calc(100vw - 28px));
-  max-height:min(680px,calc(100dvh - 92px));
+  width:min(390px,calc(100vw - 24px));
+  max-height:min(560px,calc(100dvh - 82px));
   display:flex;
   flex-direction:column;
   overflow:hidden;
@@ -12,12 +12,12 @@
 }
 .notificationPanelHeader{
   flex:0 0 auto;
-  padding:16px 16px 14px;
+  padding:13px 14px 12px;
   background:var(--surface);
 }
 .notificationPanelHeader>div:first-child{gap:3px}
 .notificationPanelHeader>div:first-child>span{font-size:9px;letter-spacing:.15em}
-.notificationPanelHeader strong{font-size:17px;letter-spacing:-.025em}
+.notificationPanelHeader strong{font-size:16px;letter-spacing:-.02em}
 .notificationHeaderActions{display:flex!important;flex-direction:row!important;align-items:center!important}
 .notificationCount{min-width:32px;height:32px;color:var(--primary);background:var(--primary-soft);border-color:color-mix(in srgb,var(--primary) 20%,var(--line))}
 .notificationHeaderActions>button{min-height:34px!important;height:34px!important;min-width:auto!important;padding:0 10px!important;border:0!important;background:transparent!important;color:var(--muted)!important;font-size:11px!important}
@@ -66,26 +66,26 @@
 .notificationItemActions button:hover{background:var(--surface)!important;color:var(--text)!important}
 .notificationItemActions svg{width:17px;height:17px}
 .notificationEmpty{
-  min-height:150px;
+  min-height:96px;
   justify-content:center;
-  gap:7px;
-  padding:24px 18px;
+  gap:5px;
+  padding:16px;
 }
 .notificationEmpty:before{
   content:'✓';
   display:grid;
-  width:42px;
-  height:42px;
+  width:34px;
+  height:34px;
   place-items:center;
-  margin-bottom:4px;
+  margin-bottom:2px;
   border-radius:50%;
   background:var(--primary-soft);
   color:var(--primary);
-  font-size:18px;
+  font-size:15px;
   font-weight:900;
 }
-.notificationEmpty strong{font-size:14px}
-.notificationEmpty span{max-width:280px;font-size:10.5px;line-height:1.5}
+.notificationEmpty strong{font-size:13px}
+.notificationEmpty span{max-width:260px;font-size:10px;line-height:1.4}
 #deadline-mobile-notification-permission{
   flex:0 0 auto;
   margin:0 10px 10px!important;
@@ -100,11 +100,21 @@
 #deadline-mobile-notification-permission button{min-height:34px!important;margin-top:3px!important;font-size:10px!important}
 .notificationPanelFooter{
   flex:0 0 auto;
-  padding:9px 14px 11px;
+  padding:8px 14px 10px;
   background:var(--surface);
-  color:var(--muted);
-  font-size:9.5px;
-  text-align:left;
+  border-top:1px solid var(--line);
+  text-align:center;
+}
+
+.notificationPanelFooter a{
+  color:var(--primary);
+  font-size:10.5px;
+  font-weight:750;
+  text-decoration:none;
+}
+
+.notificationPanelFooter a:hover{
+  text-decoration:underline;
 }
 
 /* Página completa: hierarquia mais compacta, evitando cartões excessivamente grandes. */
