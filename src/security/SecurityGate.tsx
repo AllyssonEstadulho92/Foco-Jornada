@@ -9,6 +9,17 @@ type View = 'unlock' | 'create' | 'recover' | 'recovery-code'
 
 const keypad = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
+const keypadLetters: Record<number, string> = {
+  2: 'ABC',
+  3: 'DEF',
+  4: 'GHI',
+  5: 'JKL',
+  6: 'MNO',
+  7: 'PQRS',
+  8: 'TUV',
+  9: 'WXYZ',
+}
+
 export function SecurityGate({
   profiles,
   onProfilesChanged,
@@ -477,6 +488,7 @@ export function SecurityGate({
                   onClick={() => appendPin(value)}
                 >
                   <strong>{value}</strong>
+                  {keypadLetters[value] ? <small>{keypadLetters[value]}</small> : <small aria-hidden="true">&nbsp;</small>}
                 </button>
               ))}
               <span className="securityKeypadSpacer" />
