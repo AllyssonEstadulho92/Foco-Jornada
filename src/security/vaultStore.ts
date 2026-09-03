@@ -57,11 +57,25 @@ export class EncryptedVaultStore {
     }
   }
 
+  async decryptRecord<T>(
+    profileId: string,
+    key: CryptoKey,
+    record: EncryptedVaultRecord,
+  ): Promise<{ value: T; revision: number }> {
+    if (record.profileId !== profileId || record.schemaVersion !== 1) {
+      throw new Error('O cofre encriptado não pertence a este perfil ou usa uma versão inválida.')
+    }
+    if (!Number.isSafeInteger(record.revision) || record.revision < 1) {
+      throw new Error('A revisão do cofre encriptado é inválida.')
+    }
+    const value = await decryptJson<T>(key, record, context(profileId))
+    return { value, revision: record.revision }
+  }
+
   async load<T>(profileId: string, key: CryptoKey): Promise<{ value: T; revision: number } | null> {
     const record = await this.readRecord(profileId)
     if (!record) return null
-    const value = await decryptJson<T>(key, record, context(profileId))
-    return { value, revision: record.revision }
+    return this.decryptRecord<T>(profileId, key, record)
   }
 
   async save<T>(profileId: string, key: CryptoKey, value: T, expectedRevision: number): Promise<number> {
