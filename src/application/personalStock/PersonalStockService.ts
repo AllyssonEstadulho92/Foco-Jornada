@@ -405,95 +405,97 @@ export class PersonalStockService {
     return events.sort((a, b) => a.scheduledAt.localeCompare(b.scheduledAt) || a.createdAt.localeCompare(b.createdAt))
   }
 
+  protected async confirmMedicationDoseWithinTransaction(input: {
+    medicationId: string
+    scheduleId: string
+    onDate: string
+    operationId: string
+  }): Promise<{ event: MedicationDoseEvent; duplicated: boolean }> {
+    if (!dateKey(input.onDate)) throw new Error('Data da toma inválida.')
+
+    const medication = await this.db.stockEntities.get(input.medicationId)
+    if (!medication || medication.kind !== 'medication') throw new Error('Medicamento não encontrado.')
+    const schedule = await this.db.medicationSchedules.get(input.scheduleId)
+    if (!schedule || schedule.medicationId !== input.medicationId) throw new Error('Horário não encontrado.')
+    if (schedule.effectiveFrom > input.onDate || (schedule.effectiveUntil && schedule.effectiveUntil < input.onDate)) {
+      throw new Error('O horário não está válido para esta data.')
+    }
+
+    const occurrenceKey = `${input.scheduleId}:${input.onDate}`
+    const operationDuplicate = await this.db.medicationDoseEvents.where('operationId').equals(input.operationId).first()
+    if (operationDuplicate) {
+      if (
+        operationDuplicate.medicationId !== input.medicationId
+        || operationDuplicate.scheduleId !== input.scheduleId
+        || operationDuplicate.occurrenceKey !== occurrenceKey
+      ) {
+        throw new Error('operationId já existe com um conteúdo diferente.')
+      }
+      return { event: operationDuplicate, duplicated: true }
+    }
+
+    const occurrenceEvents = await this.db.medicationDoseEvents.where('occurrenceKey').equals(occurrenceKey).toArray()
+    const correctedIds = new Set(
+      occurrenceEvents
+        .filter((event) => event.status === 'corrected' && event.correctionOf)
+        .map((event) => event.correctionOf),
+    )
+    const previousTaken = occurrenceEvents.find(
+      (event) => event.status === 'taken' && !correctedIds.has(event.id),
+    )
+    if (previousTaken) return { event: previousTaken, duplicated: true }
+
+    const scheduledAt = resolveZonedLocalDateTime(
+      input.onDate,
+      schedule.localTime,
+      medication.timezone,
+      schedule.fold,
+    )
+    const quantity = BigInt(schedule.quantityMinor)
+    const movementResult = await this.appendMovement(
+      medication,
+      input.operationId,
+      'consumption',
+      -quantity,
+      { effectiveAt: new Date() },
+    )
+    if (movementResult.duplicated) {
+      throw new Error('INCONSISTÊNCIA: movimento de toma existe sem evento correspondente.')
+    }
+
+    const event: MedicationDoseEvent = {
+      id: newId(),
+      operationId: input.operationId,
+      occurrenceKey,
+      medicationId: input.medicationId,
+      scheduleId: input.scheduleId,
+      scheduledAt: scheduledAt.toISOString(),
+      quantityMinor: quantity.toString(),
+      status: 'taken',
+      createdAt: new Date().toISOString(),
+      stockMovementId: movementResult.movement.id,
+    }
+    await this.db.medicationDoseEvents.add(event)
+    return { event, duplicated: false }
+  }
+
   async confirmMedicationDose(input: {
     medicationId: string
     scheduleId: string
     onDate: string
     operationId: string
   }): Promise<{ event: MedicationDoseEvent; duplicated: boolean; stock: string }> {
-    if (!dateKey(input.onDate)) throw new Error('Data da toma inválida.')
-    let resultEvent: MedicationDoseEvent | null = null
-    let duplicated = false
-
-    await this.db.transaction(
+    const result = await this.db.transaction(
       'rw',
       this.db.stockEntities,
       this.db.stockMovements,
       this.db.medicationSchedules,
       this.db.medicationDoseEvents,
-      async () => {
-        const medication = await this.db.stockEntities.get(input.medicationId)
-        if (!medication || medication.kind !== 'medication') throw new Error('Medicamento não encontrado.')
-        const schedule = await this.db.medicationSchedules.get(input.scheduleId)
-        if (!schedule || schedule.medicationId !== input.medicationId) throw new Error('Horário não encontrado.')
-        if (schedule.effectiveFrom > input.onDate || (schedule.effectiveUntil && schedule.effectiveUntil < input.onDate)) {
-          throw new Error('O horário não está válido para esta data.')
-        }
-
-        const operationDuplicate = await this.db.medicationDoseEvents.where('operationId').equals(input.operationId).first()
-        if (operationDuplicate) {
-          if (
-            operationDuplicate.medicationId !== input.medicationId
-            || operationDuplicate.scheduleId !== input.scheduleId
-            || operationDuplicate.occurrenceKey !== `${input.scheduleId}:${input.onDate}`
-          ) {
-            throw new Error('operationId já existe com um conteúdo diferente.')
-          }
-          resultEvent = operationDuplicate
-          duplicated = true
-          return
-        }
-
-        const occurrenceKey = `${input.scheduleId}:${input.onDate}`
-        const occurrenceEvents = await this.db.medicationDoseEvents.where('occurrenceKey').equals(occurrenceKey).toArray()
-        const correctedIds = new Set(
-          occurrenceEvents.filter((event) => event.status === 'corrected' && event.correctionOf).map((event) => event.correctionOf),
-        )
-        const previousTaken = occurrenceEvents.find((event) => event.status === 'taken' && !correctedIds.has(event.id))
-        if (previousTaken) {
-          resultEvent = previousTaken
-          duplicated = true
-          return
-        }
-
-        const scheduledAt = resolveZonedLocalDateTime(
-          input.onDate,
-          schedule.localTime,
-          medication.timezone,
-          schedule.fold,
-        )
-        const quantity = BigInt(schedule.quantityMinor)
-        const movementResult = await this.appendMovement(
-          medication,
-          input.operationId,
-          'consumption',
-          -quantity,
-          { effectiveAt: new Date() },
-        )
-        if (movementResult.duplicated) {
-          throw new Error('INCONSISTÊNCIA: movimento de toma existe sem evento correspondente.')
-        }
-
-        const event: MedicationDoseEvent = {
-          id: newId(),
-          operationId: input.operationId,
-          occurrenceKey,
-          medicationId: input.medicationId,
-          scheduleId: input.scheduleId,
-          scheduledAt: scheduledAt.toISOString(),
-          quantityMinor: quantity.toString(),
-          status: 'taken',
-          createdAt: new Date().toISOString(),
-          stockMovementId: movementResult.movement.id,
-        }
-        await this.db.medicationDoseEvents.add(event)
-        resultEvent = event
-      },
+      async () => this.confirmMedicationDoseWithinTransaction(input),
     )
 
-    if (!resultEvent) throw new Error('Não foi possível confirmar a toma.')
     const summary = await this.getMedicationSummary(input.medicationId)
-    return { event: resultEvent, duplicated, stock: summary.stock }
+    return { ...result, stock: summary.stock }
   }
 
   async undoMedicationDose(eventId: string, operationId: string): Promise<MedicationSummary> {
