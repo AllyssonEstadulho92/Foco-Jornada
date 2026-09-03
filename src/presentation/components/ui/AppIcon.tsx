@@ -47,6 +47,9 @@ export type AppIconName =
   | 'status'
   | 'break'
   | 'journey'
+  | 'phone'
+  | 'monitor'
+  | 'globe'
 
 export type AppIconMotion = 'none' | 'ring' | 'pulse' | 'draw' | 'float'
 
@@ -272,6 +275,24 @@ function iconContent(name: AppIconName) {
     return <>
       <circle cx="12" cy="12" r="8.5" />
       <path d="M12 7v5l4 2M6 4.5l1.5 2M18 4.5l-1.5 2" />
+    </>
+  }
+  if (name === 'phone') {
+    return <>
+      <rect x="7" y="2.5" width="10" height="19" rx="2.2" />
+      <path d="M10 5h4M11 18.5h2" />
+    </>
+  }
+  if (name === 'monitor') {
+    return <>
+      <rect x="3" y="4" width="18" height="13" rx="2.2" />
+      <path d="M8 21h8M12 17v4" />
+    </>
+  }
+  if (name === 'globe') {
+    return <>
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M3.8 12h16.4M12 3.5c2.3 2.4 3.5 5.2 3.5 8.5S14.3 18.1 12 20.5M12 3.5C9.7 5.9 8.5 8.7 8.5 12s1.2 6.1 3.5 8.5" />
     </>
   }
   return null
