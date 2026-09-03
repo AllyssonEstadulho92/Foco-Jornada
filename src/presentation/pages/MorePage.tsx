@@ -343,7 +343,7 @@ export function MorePage() {
               <h2 id="local-protection-title">Proteção dos dados</h2>
               <p>{protectionLoading ? 'A verificar…' : protectionSummary}</p>
             </div>
-            <button type="button" className="moreProtectionClose" onClick={() => setProtectionOpen(false)} aria-label="Fechar estado da aplicação">×</button>
+            <button type="button" className="moreProtectionClose" onClick={() => setProtectionOpen(false)} aria-label="Fechar estado da aplicação"><AppIcon name="close" /></button>
           </div>
 
           {protectionLoading ? (
