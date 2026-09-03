@@ -1,5 +1,40 @@
 node_modules
 dist
 .vite
+coverage
+playwright-report
+test-results
+
+# Ambiente e segredos
+.env
+.env.*
+!.env.example
 *.local
+*.pem
+*.key
+*.p12
+*.pfx
+*.keystore
+
+# Dados locais, exports e backups pessoais
+*.sqlite
+*.sqlite3
+*.db
+*.db-journal
+*.backup
+*.bak
+*foco-jornada-backup*.json
+*foco-jornada-secure-backup*.json
+exports/
+backups/
+
+# Logs e ficheiros temporários
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.tmp
+*.temp
+
 .DS_Store
