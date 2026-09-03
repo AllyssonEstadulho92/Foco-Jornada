@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { formatPlannedMinutes, getScheduleSummary } from '../../domain/journey/WorkSchedule'
 import { AppAboutSettings } from '../components/AppAboutSettings'
+import { AppIcon, type AppIconName } from '../components/ui/AppIcon'
 import { useSettingsController } from '../hooks/useSettingsController'
 import { useAppServices } from '../providers/AppServicesProvider'
 import { pushAppNotification } from '../store/useNotificationStore'
@@ -29,8 +30,12 @@ function weekendDatesForMonth(monthKey: string) {
     .filter((item): item is NonNullable<typeof item> => item !== null)
 }
 
-function SettingsIcon({ children }: { children: string }) {
-  return <span className="referenceSettingsIcon" aria-hidden="true">{children}</span>
+function SettingsIcon({ name }: { name: AppIconName }) {
+  return <span className="referenceSettingsIcon" aria-hidden="true"><AppIcon name={name} /></span>
+}
+
+function SettingsChevron() {
+  return <span className="referenceChevron" aria-hidden="true"><AppIcon name="chevron-right" /></span>
 }
 
 function breakSummary(enabled: boolean, startTime: string, endTime: string) {
@@ -85,9 +90,9 @@ export function SettingsReferencePage() {
         <section className="referenceSettingsCard" aria-label="Preferências principais">
           <details className="referenceSettingsRow referenceProfileRow">
             <summary>
-              <SettingsIcon>○</SettingsIcon>
+              <SettingsIcon name="user" />
               <span><strong>Perfil</strong><small>Consulta os dados guardados neste dispositivo</small></span>
-              <span className="referenceChevron">›</span>
+              <SettingsChevron />
             </summary>
             <div className="referenceSettingsExpanded referenceProfileExpanded">
               <div className="referenceProfileIntro">
@@ -113,9 +118,9 @@ export function SettingsReferencePage() {
 
           <details className="referenceSettingsRow">
             <summary>
-              <SettingsIcon>◷</SettingsIcon>
+              <SettingsIcon name="clock" />
               <span><strong>Horário base</strong><small>Define o teu horário habitual de trabalho</small></span>
-              <span className="referenceChevron">›</span>
+              <SettingsChevron />
             </summary>
             <div className="referenceSettingsExpanded">
               <div className="referenceSettingsGrid">
@@ -142,9 +147,9 @@ export function SettingsReferencePage() {
 
           <details className="referenceSettingsRow">
             <summary>
-              <SettingsIcon>☕</SettingsIcon>
+              <SettingsIcon name="break" />
               <span><strong>Pausas</strong><small>Configura os teus intervalos de trabalho</small></span>
-              <span className="referenceChevron">›</span>
+              <SettingsChevron />
             </summary>
             <div className="referenceSettingsExpanded">
               {[1, 2].map((number) => {
@@ -165,7 +170,7 @@ export function SettingsReferencePage() {
           </details>
 
           <div className="referenceSettingsStaticRow referenceThemeRow">
-            <SettingsIcon>◐</SettingsIcon>
+            <SettingsIcon name="settings" />
             <span><strong>Tema</strong><small>Escolhe o aspeto da aplicação</small></span>
             <div className="referenceThemeSwitch" aria-label="Tema da aplicação">
               <button type="button" className={theme === 'light' ? 'active' : ''} onClick={() => setTheme('light')}>Claro</button>
@@ -175,15 +180,15 @@ export function SettingsReferencePage() {
         </section>
 
         <section className="referenceSettingsCard">
-          <Link className="referenceSettingsLinkRow" to="/mais"><SettingsIcon>♢</SettingsIcon><span><strong>Notificações</strong><small>Gere os alertas que queres receber</small></span><span className="referenceChevron">›</span></Link>
+          <Link className="referenceSettingsLinkRow" to="/notificacoes"><SettingsIcon name="bell" /><span><strong>Notificações</strong><small>Gere os alertas que queres receber</small></span><SettingsChevron /></Link>
         </section>
 
         <section className="referenceSettingsCard">
-          <Link className="referenceSettingsLinkRow" to="/mais"><SettingsIcon>⌁</SettingsIcon><span><strong>Estado da aplicação</strong><small>Verifica se está tudo a funcionar</small></span><span className="referenceChevron">›</span></Link>
-          <Link className="referenceSettingsLinkRow" to="/relatorio"><SettingsIcon>▤</SettingsIcon><span><strong>Relatório A4</strong><small>Consulta e imprime apenas o relatório do dia</small></span><span className="referenceChevron">›</span></Link>
-          <button type="button" className="referenceSettingsLinkRow referenceSettingsButtonRow" onClick={() => void exportToday()}><SettingsIcon>⇧</SettingsIcon><span><strong>Exportar dados</strong><small>Guarda uma cópia técnica do dia no dispositivo</small></span><span className="referenceChevron">›</span></button>
-          <Link className="referenceSettingsLinkRow" to="/mais"><SettingsIcon>⇩</SettingsIcon><span><strong>Importar dados</strong><small>Recupera dados de outro dispositivo</small></span><span className="referenceChevron">›</span></Link>
-          <Link className="referenceSettingsLinkRow" to="/mais"><SettingsIcon>☁</SettingsIcon><span><strong>Cópia de segurança</strong><small>Protege e recupera os teus dados</small></span><span className="referenceChevron">›</span></Link>
+          <Link className="referenceSettingsLinkRow" to="/mais"><SettingsIcon name="status" /><span><strong>Estado da aplicação</strong><small>Verifica se está tudo a funcionar</small></span><SettingsChevron /></Link>
+          <Link className="referenceSettingsLinkRow" to="/relatorio"><SettingsIcon name="document" /><span><strong>Relatório A4</strong><small>Consulta e imprime apenas o relatório do dia</small></span><SettingsChevron /></Link>
+          <button type="button" className="referenceSettingsLinkRow referenceSettingsButtonRow" onClick={() => void exportToday()}><SettingsIcon name="upload" /><span><strong>Exportar dados</strong><small>Guarda uma cópia técnica do dia no dispositivo</small></span><SettingsChevron /></button>
+          <Link className="referenceSettingsLinkRow" to="/mais"><SettingsIcon name="download" /><span><strong>Importar dados</strong><small>Recupera dados de outro dispositivo</small></span><SettingsChevron /></Link>
+          <Link className="referenceSettingsLinkRow" to="/mais"><SettingsIcon name="cloud" /><span><strong>Cópia de segurança</strong><small>Protege e recupera os teus dados</small></span><SettingsChevron /></Link>
         </section>
 
         <AppAboutSettings />
