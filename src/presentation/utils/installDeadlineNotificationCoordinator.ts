@@ -304,7 +304,7 @@ async function collectDeadlines(
   return deadlines
 }
 
-export function installDeadlineNotificationCoordinator(services: DeadlineCoordinatorServices): void {
+export function installDeadlineNotificationCoordinator(services: DeadlineCoordinatorServices): () => void {
   let deadlines: DeadlineNotification[] = []
   let refreshTimer: number | null = null
   let wakeTimer: number | null = null
