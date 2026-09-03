@@ -296,7 +296,7 @@ export class AppDatabase implements SecureStorageBackend {
   private snapshot = emptySnapshot()
   private readonly vaultStore = new EncryptedVaultStore()
   private readonly profileStore = new SecurityProfileStore()
-  private readonly session: SecuritySession | null
+  private session: SecuritySession | null
   private revision = 0
   private readyPromise: Promise<void>
   private transactionQueue: Promise<void> = Promise.resolve()
@@ -553,15 +553,18 @@ export class AppDatabase implements SecureStorageBackend {
   close(): void {
     this.closed = true
     this.snapshot = emptySnapshot()
+    this.session = null
   }
 
   async delete(): Promise<void> {
-    if (this.session) {
-      await this.vaultStore.delete(this.session.profile.id)
+    const profileId = this.session?.profile.id
+    if (profileId) {
+      await this.vaultStore.delete(profileId)
     } else {
       testSnapshots.delete(this.name)
     }
     this.snapshot = emptySnapshot()
     this.closed = true
+    this.session = null
   }
 }
