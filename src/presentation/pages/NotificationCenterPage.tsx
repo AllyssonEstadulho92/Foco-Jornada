@@ -15,7 +15,7 @@ import {
   type NotificationPreferences,
   type NotificationScheduleMode,
 } from '../../shared/notifications/notificationPreferences'
-import { AppIcon } from '../components/ui/AppIcon'
+import { AppIcon, type AppIconName } from '../components/ui/AppIcon'
 import { useNotificationStore } from '../store/useNotificationStore'
 
 type NotificationView =
@@ -43,14 +43,14 @@ const categoryOptions: Array<{
   key: keyof NotificationCategoryPreferences
   title: string
   detail: string
-  symbol: string
+  icon: AppIconName
 }> = [
-  { key: 'journey', title: 'Jornada', detail: 'Início, fim, lembretes e turnos', symbol: 'J' },
-  { key: 'break', title: 'Pausas', detail: 'Lembretes e fim de pausa', symbol: 'P' },
-  { key: 'focus', title: 'Foco', detail: 'Sessões, objetivos e avisos', symbol: 'F' },
-  { key: 'medication', title: 'Medicação', detail: 'Horários e lembretes configurados', symbol: 'M' },
-  { key: 'glo', title: 'glo', detail: 'Alertas das sessões configuradas', symbol: 'g' },
-  { key: 'system', title: 'Geral', detail: 'Atualizações e avisos importantes', symbol: 'G' },
+  { key: 'journey', title: 'Jornada', detail: 'Início, fim, lembretes e turnos', icon: 'journey' },
+  { key: 'break', title: 'Pausas', detail: 'Lembretes e fim de pausa', icon: 'break' },
+  { key: 'focus', title: 'Foco', detail: 'Sessões, objetivos e avisos', icon: 'focus' },
+  { key: 'medication', title: 'Medicação', detail: 'Horários e lembretes configurados', icon: 'medication' },
+  { key: 'glo', title: 'glo', detail: 'Alertas das sessões configuradas', icon: 'status' },
+  { key: 'system', title: 'Geral', detail: 'Atualizações e avisos importantes', icon: 'bell' },
 ]
 
 const weekdays = [
@@ -77,6 +77,18 @@ function platformLabel(capability: DeadlineNotificationCapability): string {
   if (capability.platform === 'android') return 'Android'
   if (capability.platform === 'desktop') return 'Computador'
   return 'Web'
+}
+
+function platformIcon(capability: DeadlineNotificationCapability): AppIconName {
+  if (capability.platform === 'ios' || capability.platform === 'android') return 'phone'
+  if (capability.platform === 'desktop') return 'monitor'
+  return 'globe'
+}
+
+function statusIcon(state: 'good' | 'warning' | 'muted'): AppIconName {
+  if (state === 'good') return 'check'
+  if (state === 'warning') return 'warning'
+  return 'info'
 }
 
 function permissionStatus(capability: DeadlineNotificationCapability): {
@@ -111,7 +123,7 @@ function SetupProgress({ view }: { view: NotificationView }) {
             key={step}
             className={step < current ? 'isComplete' : step === current ? 'isCurrent' : ''}
           >
-            {step < current ? '✓' : step}
+            {step < current ? <AppIcon name="check" /> : step}
           </span>
         )
       })}
@@ -122,7 +134,7 @@ function SetupProgress({ view }: { view: NotificationView }) {
 function BackButton({ onClick }: { onClick: () => void }) {
   return (
     <button className="notificationBackButton" type="button" onClick={onClick} aria-label="Voltar">
-      ‹
+      <AppIcon name="chevron-left" />
     </button>
   )
 }
@@ -324,7 +336,7 @@ export function NotificationCenterPage() {
           <div className="notificationSetupSection">
             <div className="notificationPlatformHeading">
               <span className="notificationPlatformIcon" aria-hidden="true">
-                {capability.platform === 'ios' ? '●' : capability.platform === 'android' ? 'A' : 'W'}
+                <AppIcon name={platformIcon(capability)} />
               </span>
               <div>
                 <span>DISPOSITIVO</span>
@@ -354,7 +366,7 @@ export function NotificationCenterPage() {
             )}
 
             <div className="notificationInfoCallout">
-              <span aria-hidden="true">i</span>
+              <span aria-hidden="true"><AppIcon name="info" /></span>
               <p>No browser, o centro local da aplicação continua disponível mesmo sem notificações do sistema.</p>
             </div>
 
@@ -383,19 +395,19 @@ export function NotificationCenterPage() {
             <span className="notificationSectionLead">Confirma os canais disponíveis neste dispositivo.</span>
             <div className="notificationStatusList">
               <div>
-                <span className={'notificationStatusDot state-' + permission.state}>✓</span>
+                <span className={'notificationStatusDot state-' + permission.state}><AppIcon name={statusIcon(permission.state)} /></span>
                 <div><strong>Permissão do navegador</strong><small>Controla os avisos apresentados pelo sistema.</small></div>
                 <b className={'state-' + permission.state}>{permission.label}</b>
               </div>
               <div>
-                <span className={'notificationStatusDot ' + (capability.serviceWorkerRegistered ? 'state-good' : 'state-warning')}>✓</span>
+                <span className={'notificationStatusDot ' + (capability.serviceWorkerRegistered ? 'state-good' : 'state-warning')}><AppIcon name={capability.serviceWorkerRegistered ? 'check' : 'warning'} /></span>
                 <div><strong>Service Worker</strong><small>Canal PWA para notificações persistentes.</small></div>
                 <b className={capability.serviceWorkerRegistered ? 'state-good' : 'state-warning'}>
                   {capability.serviceWorkerRegistered ? 'Pronto' : capability.serviceWorkerSupported ? 'Pendente' : 'Indisponível'}
                 </b>
               </div>
               <div>
-                <span className={'notificationStatusDot ' + (capability.pushSubscribed ? 'state-good' : 'state-muted')}>•</span>
+                <span className={'notificationStatusDot ' + (capability.pushSubscribed ? 'state-good' : 'state-muted')}><AppIcon name={capability.pushSubscribed ? 'check' : 'info'} /></span>
                 <div><strong>Web Push</strong><small>Entrega remota com a aplicação fechada.</small></div>
                 <b className={capability.pushSubscribed ? 'state-good' : 'state-muted'}>
                   {capability.pushSubscribed ? 'Ativo' : capability.pushSupported ? 'Sem subscrição' : 'Indisponível'}
@@ -439,7 +451,7 @@ export function NotificationCenterPage() {
             <div className="notificationCategoryList">
               {categoryOptions.map((option) => (
                 <label key={option.key}>
-                  <span className={'notificationCategorySymbol category-' + option.key}>{option.symbol}</span>
+                  <span className={'notificationCategorySymbol category-' + option.key}><AppIcon name={option.icon} /></span>
                   <span>
                     <strong>{option.title}</strong>
                     <small>{option.detail}</small>
@@ -554,7 +566,7 @@ export function NotificationCenterPage() {
             <h2>Enviar notificação de teste</h2>
             <p>Vamos enviar uma notificação para verificar se está a funcionar corretamente.</p>
             <div className="notificationInfoCallout">
-              <span aria-hidden="true">i</span>
+              <span aria-hidden="true"><AppIcon name="info" /></span>
               <p>O teste ignora temporariamente as categorias e horários para validar apenas o canal do dispositivo.</p>
             </div>
             {lastTestAt ? <small>Último teste: {formatDateTime(lastTestAt)}</small> : null}
@@ -630,7 +642,7 @@ export function NotificationCenterPage() {
           <h3>Estado atual</h3>
           <div className="notificationStatusList">
             <div>
-              <span className={'notificationStatusDot state-' + permission.state}>{permission.state === 'good' ? '✓' : '!'}</span>
+              <span className={'notificationStatusDot state-' + permission.state}><AppIcon name={statusIcon(permission.state)} /></span>
               <div><strong>Notificações do dispositivo</strong><small>Permissão do navegador / PWA</small></div>
               <b className={'state-' + permission.state}>{permission.label}</b>
               <AppIcon name="chevron-right" />
