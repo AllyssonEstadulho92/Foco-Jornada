@@ -502,24 +502,22 @@
   .securityScreen {
     place-items: start center;
     overflow: auto;
+    padding-top: max(12px, env(safe-area-inset-top));
   }
 
   .securityUnlockCard {
-    width: min(100%, 560px);
-    grid-template-columns: 1fr 1fr;
+    width: min(100%, 430px);
+    gap: 10px;
   }
 
-  .securityUnlockCard > .securityBrandMark,
-  .securityUnlockCard > .securityEyebrow,
-  .securityUnlockCard > h1,
-  .securityUnlockCard > p,
-  .securityUnlockCard > .securityProfileSelect,
-  .securityUnlockCard > .securityPinDots,
-  .securityUnlockCard > .securityMessage,
-  .securityUnlockCard > .securityLockout,
-  .securityUnlockCard > .securityProtectedNote,
-  .securityUnlockCard > .securityTextAction {
-    grid-column: 1 / -1;
+  .securityBrandMark {
+    width: 48px;
+    height: 48px;
+    border-radius: 15px;
+  }
+
+  .securityKeypad button {
+    min-height: 44px;
   }
 }
 
