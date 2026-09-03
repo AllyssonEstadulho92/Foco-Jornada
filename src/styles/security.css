@@ -11,7 +11,7 @@
 }
 
 .securityCard {
-  width: min(100%, 390px);
+  width: min(100%, 430px);
   box-sizing: border-box;
   display: grid;
   gap: 16px;
@@ -27,17 +27,19 @@
 }
 
 .securityBrandMark {
-  width: 58px;
-  height: 58px;
+  width: 62px;
+  height: 62px;
   display: grid;
   place-items: center;
   margin: 0 auto 2px;
   border: 1px solid color-mix(in srgb, var(--primary, #2563eb) 22%, var(--line, #dde3df));
-  border-radius: 18px;
+  border-radius: 50%;
   background: color-mix(in srgb, var(--primary, #2563eb) 8%, var(--surface, #fff));
   color: var(--primary, #2563eb);
-  font-weight: 800;
-  letter-spacing: -0.04em;
+  font-family: var(--font-display, var(--font-sans));
+  font-size: 17px;
+  font-weight: 750;
+  letter-spacing: -0.03em;
 }
 
 .securityEyebrow {
@@ -91,15 +93,25 @@
 
 .securityKeypad {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 9px;
+  grid-template-columns: repeat(3, minmax(68px, 78px));
+  justify-content: space-between;
+  gap: 14px 18px;
+  padding: 2px 0 4px;
 }
 
 .securityKeypad button {
-  min-height: 54px;
-  border: 1px solid var(--line, #dde3df);
-  border-radius: 14px;
-  background: var(--surface, #fff);
+  width: clamp(68px, 19vw, 78px);
+  height: clamp(68px, 19vw, 78px);
+  min-height: 0;
+  display: grid;
+  justify-self: center;
+  place-items: center;
+  align-content: center;
+  gap: 2px;
+  padding: 0;
+  border: 1px solid color-mix(in srgb, var(--line, #dde3df) 92%, transparent);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--surface, #fff) 98%, transparent);
   color: var(--text, #17201b);
   font: inherit;
   box-shadow: 0 3px 10px rgba(20, 36, 27, 0.045);
@@ -114,12 +126,31 @@
 }
 
 .securityKeypad button strong {
-  font-size: 20px;
-  font-weight: 550;
+  font-family: var(--font-display, var(--font-sans));
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.securityKeypad button small {
+  min-height: 11px;
+  color: var(--muted, #68736d);
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: .18em;
 }
 
 .securityKeypadSpacer {
-  min-height: 54px;
+  width: clamp(68px, 19vw, 78px);
+  height: clamp(68px, 19vw, 78px);
+  justify-self: center;
+}
+
+.securityBackspaceIcon {
+  width: 24px;
+  height: 24px;
+  color: var(--muted, #68736d);
 }
 
 .securityPrimary,
@@ -484,8 +515,15 @@
     box-shadow: 0 12px 36px rgba(20, 36, 27, 0.08);
   }
 
-  .securityKeypad button {
-    min-height: clamp(49px, 13vw, 56px);
+  .securityKeypad {
+    grid-template-columns: repeat(3, minmax(64px, 74px));
+    gap: 13px 14px;
+  }
+
+  .securityKeypad button,
+  .securityKeypadSpacer {
+    width: clamp(64px, 19vw, 74px);
+    height: clamp(64px, 19vw, 74px);
   }
 
   .securitySettingsGrid,
@@ -513,11 +551,19 @@
   .securityBrandMark {
     width: 48px;
     height: 48px;
-    border-radius: 15px;
+    border-radius: 50%;
   }
 
-  .securityKeypad button {
-    min-height: 44px;
+  .securityKeypad {
+    grid-template-columns: repeat(3, 58px);
+    justify-content: center;
+    gap: 8px 18px;
+  }
+
+  .securityKeypad button,
+  .securityKeypadSpacer {
+    width: 58px;
+    height: 58px;
   }
 }
 

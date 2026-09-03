@@ -9,6 +9,17 @@ type View = 'unlock' | 'create' | 'recover' | 'recovery-code'
 
 const keypad = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
+const keypadLetters: Record<number, string> = {
+  2: 'ABC',
+  3: 'DEF',
+  4: 'GHI',
+  5: 'JKL',
+  6: 'MNO',
+  7: 'PQRS',
+  8: 'TUV',
+  9: 'WXYZ',
+}
+
 export function SecurityGate({
   profiles,
   onProfilesChanged,
@@ -477,6 +488,7 @@ export function SecurityGate({
                   onClick={() => appendPin(value)}
                 >
                   <strong>{value}</strong>
+                  {keypadLetters[value] ? <small>{keypadLetters[value]}</small> : <small aria-hidden="true">&nbsp;</small>}
                 </button>
               ))}
               <span className="securityKeypadSpacer" />
@@ -493,7 +505,10 @@ export function SecurityGate({
                 disabled={busy || !secret.length}
                 onClick={() => setSecret((current) => current.slice(0, -1))}
               >
-                ⌫
+                <svg className="securityBackspaceIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M10 6h9a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-9L3 12l7-6Z" />
+                  <path d="m13 10 4 4M17 10l-4 4" />
+                </svg>
               </button>
             </div>
           </>

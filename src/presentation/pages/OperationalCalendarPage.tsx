@@ -49,8 +49,8 @@ export function OperationalCalendarPage() {
     <section className="opsPage" aria-labelledby="calendar-title">
       <header className="opsPageHeader">
         <div>
-          <span className="opsEyebrow">CALENDÁRIO OPERACIONAL</span>
-          <h1 id="calendar-title">Plano e registos por dia</h1>
+          <span className="opsEyebrow">JORNADA</span>
+          <h1 id="calendar-title">Calendário e registos</h1>
           <p>O calendário usa o horário configurado como plano e os registos reais como histórico. Medicação mantém a própria agenda prescrita.</p>
         </div>
         <div className="opsControls">

@@ -71,7 +71,7 @@ export default defineConfig({
             urlPattern: ({ request }) => request.mode === 'navigate',
             handler: 'NetworkFirst',
             options: {
-              cacheName: 'foco-jornada-navigation-v3',
+              cacheName: 'foco-jornada-navigation-v4',
               networkTimeoutSeconds: 4,
               cacheableResponse: {
                 statuses: [0, 200],

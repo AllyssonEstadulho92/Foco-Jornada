@@ -1,8 +1,6 @@
 .mobileAppIdentity,
 .mobileDrawer,
-.mobileDrawerBackdrop,
-.mobileQuickPanel,
-.mobileQuickButton {
+.mobileDrawerBackdrop {
   display: none;
 }
 
@@ -414,116 +412,6 @@
     font-weight: var(--weight-semibold);
   }
 
-  .mobileQuickButton {
-    position: relative;
-    top: -8px;
-    display: grid;
-    width: 54px;
-    height: 54px;
-    place-self: center;
-    place-items: center;
-    padding: 0;
-    border: 0;
-    border-radius: 50%;
-    background: var(--primary);
-    color: #fff;
-    box-shadow: 0 8px 20px rgba(31, 157, 99, 0.22);
-    cursor: pointer;
-  }
-
-  .mobileQuickButtonIcon {
-    font-size: 30px;
-    font-weight: 300;
-    line-height: 1;
-  }
-
-  .mobileQuickButtonLabel {
-    position: absolute;
-    top: calc(100% + 3px);
-    color: var(--muted);
-    font-size: 10px;
-    font-weight: var(--weight-semibold);
-    white-space: nowrap;
-  }
-
-  .mobileQuickPanel {
-    position: fixed;
-    z-index: 119;
-    right: max(12px, env(safe-area-inset-right));
-    bottom: calc(76px + env(safe-area-inset-bottom));
-    left: max(12px, env(safe-area-inset-left));
-    display: grid;
-    gap: 6px;
-    max-height: min(58dvh, 430px);
-    padding: 10px;
-    overflow-y: auto;
-    border: 1px solid var(--line);
-    border-radius: 16px;
-    background: var(--surface);
-    box-shadow: var(--shadow-lg);
-  }
-
-  .mobileQuickPanelHeader,
-  .mobileQuickPanelCallout {
-    display: none;
-  }
-
-  .mobileQuickLink {
-    display: flex;
-    min-width: 0;
-    min-height: 50px;
-    align-items: center;
-    gap: 10px;
-    padding: 9px 10px;
-    border-radius: 11px;
-    background: transparent;
-    color: var(--text);
-    text-decoration: none;
-  }
-
-  .mobileQuickLink:hover,
-  .mobileQuickLinkActive {
-    background: var(--surface-2);
-  }
-
-  .mobileQuickLink svg {
-    width: 20px;
-    height: 20px;
-    flex: 0 0 20px;
-    color: var(--primary);
-  }
-
-  .mobileQuickLinkCopy {
-    display: grid;
-    min-width: 0;
-    gap: 2px;
-  }
-
-  .mobileQuickLinkCopy strong {
-    overflow: hidden;
-    font-size: 13px;
-    font-weight: var(--weight-semibold);
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .mobileQuickLinkCopy small {
-    overflow: hidden;
-    color: var(--muted);
-    font-size: 11px;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .mobileQuickBackdrop {
-    position: fixed;
-    z-index: 118;
-    inset: 0;
-    display: block;
-    padding: 0;
-    border: 0;
-    background: rgba(17, 23, 19, 0.18);
-  }
 }
 
 @media (max-width: 420px) {

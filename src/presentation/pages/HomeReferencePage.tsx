@@ -24,8 +24,8 @@ export function HomeReferencePage() {
         <nav aria-label="Acesso rápido do Início">
           <Link to="/calendario">
             <span className="homeQuickIcon"><QuickIcon type="calendar" /></span>
-            <strong>Calendário</strong>
-            <small>Plano + registos</small>
+            <strong>Jornada</strong>
+            <small>Calendário + registos</small>
           </Link>
           <Link to="/notificacoes">
             <span className="homeQuickIcon"><QuickIcon type="notifications" /></span>

@@ -73,6 +73,16 @@ export function MorePage() {
         : 'A ligação não é segura. Abre a aplicação através de HTTPS.',
     })
 
+    const webCryptoReady = Boolean(window.crypto?.subtle)
+    checks.push({
+      id: 'web-crypto',
+      label: 'Criptografia do navegador',
+      status: webCryptoReady ? 'ok' : 'error',
+      detail: webCryptoReady
+        ? 'A Web Crypto API está disponível para proteger o cofre local.'
+        : 'Este navegador não disponibiliza a Web Crypto API necessária ao cofre encriptado.',
+    })
+
     try {
       const date = toLocalDateKey(new Date())
       await Promise.all([
@@ -90,7 +100,7 @@ export function MorePage() {
         id: 'database',
         label: 'Dados locais',
         status: 'ok',
-        detail: 'Os dados guardados neste dispositivo estão acessíveis.',
+        detail: 'O cofre desbloqueado deste perfil está acessível através da camada local protegida.',
       })
     } catch {
       checks.push({
@@ -217,14 +227,14 @@ export function MorePage() {
       id: 'data-location',
       label: 'Onde ficam os dados',
       status: 'info',
-      detail: 'A versão atual guarda jornada, pausas, atividades, foco, café e definições neste dispositivo. Ainda não existe sincronização automática na cloud.',
+      detail: 'Os dados pessoais deste perfil ficam no cofre local encriptado deste dispositivo. Não existe sincronização automática na cloud.',
     })
 
     checks.push({
       id: 'backup',
       label: 'Cópia de segurança',
       status: 'info',
-      detail: 'Limpar os dados do navegador ou perder o dispositivo pode eliminar os registos. Exporta uma cópia quando precisares.',
+      detail: 'Limpar os dados do navegador ou perder o dispositivo pode eliminar os registos. Mantém uma cópia de segurança cifrada e o código de recuperação em locais separados.',
     })
 
     setProtectionChecks(checks)
@@ -247,76 +257,139 @@ export function MorePage() {
       <header className="reportHeader moreHeader moreToolsHeader">
         <div>
           <span className="eyebrow">MAIS</span>
-          <h1 id="more-title">Ferramentas</h1>
-          <p>Acede às funções complementares e aos dados da aplicação.</p>
+          <h1 id="more-title">Mais</h1>
+          <p>As restantes áreas da aplicação, organizadas por função.</p>
         </div>
       </header>
 
-      <section className="moreToolSection" aria-labelledby="more-quick-title">
+      <section className="moreToolSection" aria-labelledby="more-work-title">
         <div className="moreSectionHeading">
-          <span className="moreSectionHeadingIcon" aria-hidden="true"><SectionIcon type="quick" /></span>
-          <h2 id="more-quick-title">Acesso rápido</h2>
+          <span className="moreSectionHeadingIcon" aria-hidden="true"><NavigationIcon name="journey" /></span>
+          <div>
+            <h2 id="more-work-title">Dia e trabalho</h2>
+            <small>Planeamento, registos e acompanhamento diário</small>
+          </div>
         </div>
-
         <div className="moreList moreListGrouped">
-          <Link to="/guia" className="moreRow">
-            <span className="moreRowIcon" aria-hidden="true"><NavigationIcon name="guide" /></span>
-            <span className="moreRowCopy"><strong>Guia</strong><small>Aprende a usar a aplicação</small></span>
+          <Link to="/calendario" className="moreRow">
+            <span className="moreRowIcon" aria-hidden="true"><NavigationIcon name="calendar" /></span>
+            <span className="moreRowCopy"><strong>Jornada</strong><small>Calendário operacional e planeamento do dia</small></span>
             <RowArrow />
           </Link>
-
-          <Link to="/horas" className="moreRow">
-            <span className="moreRowIcon" aria-hidden="true"><NavigationIcon name="hours" /></span>
-            <span className="moreRowCopy"><strong>Horas & ausências</strong><small>Confere horas, faltas e saldo</small></span>
+          <Link to="/atividades" className="moreRow">
+            <span className="moreRowIcon" aria-hidden="true"><NavigationIcon name="activities" /></span>
+            <span className="moreRowCopy"><strong>Atividades</strong><small>Registos e tarefas da jornada</small></span>
             <RowArrow />
           </Link>
-
-          <Link to="/vencimento" className="moreRow">
-            <span className="moreRowIcon" aria-hidden="true"><NavigationIcon name="payroll" /></span>
-            <span className="moreRowCopy"><strong>Vencimento</strong><small>Consulta a estimativa do que vais receber</small></span>
+          <Link to="/historico" className="moreRow">
+            <span className="moreRowIcon" aria-hidden="true"><NavigationIcon name="history" /></span>
+            <span className="moreRowCopy"><strong>Histórico</strong><small>Consulta os registos anteriores</small></span>
+            <RowArrow />
+          </Link>
+          <Link to="/turnos" className="moreRow">
+            <span className="moreRowIcon" aria-hidden="true"><NavigationIcon name="calendar" /></span>
+            <span className="moreRowCopy"><strong>Mapa de turnos</strong><small>Turnos, escalas e organização mensal</small></span>
             <RowArrow />
           </Link>
         </div>
       </section>
 
-      <section className="moreToolSection" aria-labelledby="more-management-title">
+      <section className="moreToolSection" aria-labelledby="more-personal-title">
         <div className="moreSectionHeading">
-          <span className="moreSectionHeadingIcon" aria-hidden="true"><SectionIcon type="management" /></span>
-          <h2 id="more-management-title">Dados e aplicação</h2>
+          <span className="moreSectionHeadingIcon" aria-hidden="true"><NavigationIcon name="medication" /></span>
+          <div>
+            <h2 id="more-personal-title">Saúde e uso pessoal</h2>
+            <small>Medicação, glo e stock pessoal permanecem independentes</small>
+          </div>
         </div>
-
         <div className="moreList moreListGrouped">
+          <Link to="/medicamentos" className="moreRow">
+            <span className="moreRowIcon" aria-hidden="true"><NavigationIcon name="medication" /></span>
+            <span className="moreRowCopy"><strong>Medicação</strong><small>Tomas, horários, lembretes e stock</small></span>
+            <RowArrow />
+          </Link>
+          <Link to="/sticks" className="moreRow">
+            <span className="moreRowIcon" aria-hidden="true"><NavigationIcon name="status" /></span>
+            <span className="moreRowCopy"><strong>glo</strong><small>Sessões, ritmo, utilização e stock</small></span>
+            <RowArrow />
+          </Link>
+          <Link to="/stock" className="moreRow">
+            <span className="moreRowIcon" aria-hidden="true"><NavigationIcon name="list" /></span>
+            <span className="moreRowCopy"><strong>Stock pessoal</strong><small>Controlo central do stock guardado</small></span>
+            <RowArrow />
+          </Link>
+        </div>
+      </section>
+
+      <section className="moreToolSection" aria-labelledby="more-analysis-title">
+        <div className="moreSectionHeading">
+          <span className="moreSectionHeadingIcon" aria-hidden="true"><NavigationIcon name="stats" /></span>
+          <div>
+            <h2 id="more-analysis-title">Análise e finanças</h2>
+            <small>Resultados, horas e informação financeira</small>
+          </div>
+        </div>
+        <div className="moreList moreListGrouped">
+          <Link to="/relatorios" className="moreRow">
+            <span className="moreRowIcon" aria-hidden="true"><NavigationIcon name="stats" /></span>
+            <span className="moreRowCopy"><strong>Relatórios</strong><small>Visão consolidada do dia, semana e mês</small></span>
+            <RowArrow />
+          </Link>
           <Link to="/estatisticas" className="moreRow">
             <span className="moreRowIcon" aria-hidden="true"><NavigationIcon name="stats" /></span>
-            <span className="moreRowCopy"><strong>Relatórios</strong><small>Hoje, semana e mês</small></span>
+            <span className="moreRowCopy"><strong>Estatísticas</strong><small>Análise detalhada da utilização e jornada</small></span>
             <RowArrow />
           </Link>
-
+          <Link to="/horas" className="moreRow">
+            <span className="moreRowIcon" aria-hidden="true"><NavigationIcon name="hours" /></span>
+            <span className="moreRowCopy"><strong>Horas e ausências</strong><small>Saldo, faltas e cálculo de horas</small></span>
+            <RowArrow />
+          </Link>
+          <Link to="/vencimento" className="moreRow">
+            <span className="moreRowIcon" aria-hidden="true"><NavigationIcon name="payroll" /></span>
+            <span className="moreRowCopy"><strong>Vencimento</strong><small>Estimativa e configuração do vencimento</small></span>
+            <RowArrow />
+          </Link>
           <Link to="/relatorio" className="moreRow">
-            <span className="moreRowIcon" aria-hidden="true"><NavigationIcon name="stats" /></span>
-            <span className="moreRowCopy"><strong>Relatório A4</strong><small>Consulta e imprime apenas o relatório do dia</small></span>
+            <span className="moreRowIcon" aria-hidden="true"><NavigationIcon name="export" /></span>
+            <span className="moreRowCopy"><strong>Relatório A4</strong><small>Consulta, impressão e exportação do dia</small></span>
             <RowArrow />
           </Link>
+        </div>
+      </section>
 
+      <section className="moreToolSection" aria-labelledby="more-system-title">
+        <div className="moreSectionHeading">
+          <span className="moreSectionHeadingIcon" aria-hidden="true"><SectionIcon type="management" /></span>
+          <div>
+            <h2 id="more-system-title">Dados e sistema</h2>
+            <small>Preferências, ajuda, exportação e proteção local</small>
+          </div>
+        </div>
+        <div className="moreList moreListGrouped">
           <Link to="/definicoes" className="moreRow">
             <span className="moreRowIcon" aria-hidden="true"><NavigationIcon name="settings" /></span>
-            <span className="moreRowCopy"><strong>Definições</strong><small>Horário, pausas, tema e dados</small></span>
+            <span className="moreRowCopy"><strong>Definições e segurança</strong><small>Tema, acesso, bloqueio e preferências</small></span>
             <RowArrow />
           </Link>
-
+          <Link to="/guia" className="moreRow">
+            <span className="moreRowIcon" aria-hidden="true"><NavigationIcon name="guide" /></span>
+            <span className="moreRowCopy"><strong>Ajuda e guia</strong><small>Consulta como utilizar as principais funções</small></span>
+            <RowArrow />
+          </Link>
           <button type="button" className="moreRow moreRowButton" onClick={() => void exportToday()}>
             <span className="moreRowIcon" aria-hidden="true"><NavigationIcon name="export" /></span>
-            <span className="moreRowCopy"><strong>Exportar dados</strong><small>Guarda uma cópia técnica do dia no dispositivo</small></span>
+            <span className="moreRowCopy"><strong>Exportar dados do dia</strong><small>Guarda uma cópia técnica no dispositivo</small></span>
             <RowArrow />
           </button>
         </div>
       </section>
 
-      <aside className="moreLocalCard" aria-label="Dados guardados no dispositivo">
-        <span className="moreLocalInfoIcon" aria-hidden="true">i</span>
+      <aside className="moreLocalCard" aria-label="Cofre local encriptado">
+        <span className="moreLocalInfoIcon" aria-hidden="true"><AppIcon name="lock" /></span>
         <div>
-          <strong>Os teus dados ficam neste dispositivo</strong>
-          <p>A versão atual guarda os registos localmente.</p>
+          <strong>Cofre local encriptado</strong>
+          <p>Os dados deste perfil permanecem cifrados em repouso neste dispositivo.</p>
         </div>
         <button
           type="button"
@@ -327,11 +400,7 @@ export function MorePage() {
           onClick={() => void runProtectionCheck()}
           disabled={protectionLoading}
         >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <path d="M12 3 19 6v5c0 4.6-2.7 7.7-7 10-4.3-2.3-7-5.4-7-10V6z" />
-            <rect x="9.2" y="10.4" width="5.6" height="4.8" rx="1.1" />
-            <path d="M10.4 10.4V9.2a1.6 1.6 0 0 1 3.2 0v1.2" />
-          </svg>
+          <AppIcon name="shield" />
         </button>
       </aside>
 
@@ -349,7 +418,7 @@ export function MorePage() {
           {protectionLoading ? (
             <div className="moreProtectionLoading" role="status">
               <span className="moreProtectionSpinner" aria-hidden="true" />
-              <span>A verificar ligação, dados, modo offline e armazenamento…</span>
+              <span>A verificar ligação, cofre, modo offline e armazenamento…</span>
             </div>
           ) : (
             <>
@@ -367,7 +436,6 @@ export function MorePage() {
                   </article>
                 ))}
               </div>
-
               <div className="moreProtectionFooter">
                 <span>{protectionCheckedAt ? `Última verificação: ${protectionCheckedAt.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })}` : ''}</span>
                 <button type="button" className="button buttonSecondary" onClick={() => void runProtectionCheck()}>Verificar novamente</button>

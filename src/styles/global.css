@@ -13,6 +13,30 @@ html {
   touch-action: pan-x pan-y;
 }
 
+
+h1,
+h2,
+h3,
+h4,
+.brandLockupText,
+.navLabel {
+  font-family: var(--font-display);
+}
+
+h1,
+h2,
+h3,
+h4 {
+  text-wrap: balance;
+}
+
+p,
+li,
+small,
+label {
+  text-wrap: pretty;
+}
+
 body {
   margin: 0;
   width: 100%;
@@ -28,6 +52,8 @@ body {
   font-size: var(--text-base);
   line-height: var(--line-height-normal);
   text-rendering: optimizeLegibility;
+  font-kerning: normal;
+  font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -207,8 +233,19 @@ select:disabled {
   gap: 6px;
 }
 
+.sidebarSectionLabel {
+  display: block;
+  margin: auto 8px -14px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: var(--weight-heavy);
+  line-height: 1.2;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
 .sidebarSecondary {
-  margin-top: auto;
+  margin-top: 0;
 }
 
 .navLink,
