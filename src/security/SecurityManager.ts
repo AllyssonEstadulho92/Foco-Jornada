@@ -5,7 +5,7 @@ import {
   fromBase64Url,
   generateDataKey,
   importRawAesKey,
-  normalizeRecoveryCode,
+  parseRecoveryCode,
   randomBytes,
   randomToken,
   toBase64Url,
@@ -278,11 +278,10 @@ export class SecurityManager {
 
     let recoveryBytes: Uint8Array
     try {
-      recoveryBytes = fromBase64Url(normalizeRecoveryCode(recoveryCode))
+      recoveryBytes = parseRecoveryCode(recoveryCode)
     } catch {
       throw new Error('Código de recuperação inválido.')
     }
-    if (recoveryBytes.byteLength !== 32) throw new Error('Código de recuperação inválido.')
 
     try {
       const recoveryKey = await importRawAesKey(recoveryBytes)
