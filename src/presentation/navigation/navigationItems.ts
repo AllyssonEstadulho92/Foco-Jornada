@@ -23,14 +23,14 @@ export const primaryNavigation: NavigationItem[] = [
 
 export const secondaryNavigation: NavigationItem[] = [
   { label: 'Medicação', path: '/medicamentos', icon: 'medication' },
-  { label: 'glo', path: '/sticks', icon: 'status' },
+  { label: 'glo', path: '/sticks', icon: 'glo' },
   { label: 'Relatórios', path: '/relatorios', icon: 'stats' },
   { label: 'Definições', path: '/definicoes', icon: 'settings' },
 ]
 
 export const mobileQuickNavigation: QuickNavigationItem[] = [
   { label: 'Medicação', path: '/medicamentos', icon: 'medication', description: 'Tomas, horários e stock' },
-  { label: 'glo', path: '/sticks', icon: 'status', description: 'Sessões, ritmo e stock' },
+  { label: 'glo', path: '/sticks', icon: 'glo', description: 'Sessões, ritmo e stock' },
   { label: 'Mapa de turnos', path: '/turnos', icon: 'calendar', description: 'Ver e editar turnos' },
   { label: 'Stock pessoal', path: '/stock', icon: 'list', description: 'Gerir stock pessoal' },
   { label: 'Horas', path: '/horas', icon: 'hours', description: 'Calcular e consultar' },
