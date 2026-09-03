@@ -15,15 +15,17 @@
   --danger: #c95c5c;
 
   --font-sans:
-    system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    Inter, "SF Pro Text", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --font-display:
+    Inter, "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
   --text-xs: 12px;
-  --text-sm: 13px;
-  --text-md: 14px;
+  --text-sm: 14px;
+  --text-md: 15px;
   --text-base: 16px;
-  --text-lg: 18px;
-  --text-xl: 22px;
+  --text-lg: 20px;
+  --text-xl: 24px;
   --text-2xl: 28px;
-  --text-3xl: 36px;
+  --text-3xl: 38px;
   --weight-normal: 400;
   --weight-medium: 500;
   --weight-semibold: 600;
@@ -64,4 +66,16 @@
   font-family: var(--font-sans);
   font-size: var(--text-base);
   line-height: var(--line-height-normal);
+}
+
+
+@media (min-width: 900px) {
+  :root {
+    --text-md: 16px;
+    --text-base: 17px;
+    --text-lg: 20px;
+    --text-xl: 24px;
+    --text-2xl: 32px;
+    --text-3xl: 40px;
+  }
 }
