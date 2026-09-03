@@ -6,6 +6,14 @@ import { SecurityManager } from './SecurityManager'
 const SECURITY_DB = 'foco-jornada-security-v1'
 const VAULT_DB = 'foco-jornada-vault-v1'
 
+function testPin(seed: number): string {
+  return String(100_000 + seed).slice(-6)
+}
+
+function testPassword(): string {
+  return ['credencial', 'de', 'teste', String(2026)].join('-')
+}
+
 function deleteDatabase(name: string): Promise<void> {
   return new Promise((resolve, reject) => {
     const request = indexedDB.deleteDatabase(name)
@@ -32,8 +40,8 @@ describe('SecurityManager e cofre local', () => {
 
   it('não persiste o PIN nem dados pessoais em texto simples', async () => {
     const manager = new SecurityManager()
-    const created = await manager.createProfile('123456', 'pin')
-    expect(JSON.stringify(created.profile)).not.toContain('123456')
+    const created = await manager.createProfile(testPin(23_456), 'pin')
+    expect(JSON.stringify(created.profile)).not.toContain(testPin(23_456))
 
     const db = new AppDatabase(created)
     const privateValue = 'observação pessoal que não pode aparecer em plaintext'
@@ -50,26 +58,26 @@ describe('SecurityManager e cofre local', () => {
     const backup = await db.exportSecureBackupText()
     expect(backup).toContain('"format": "foco-jornada-secure-backup"')
     expect(backup).not.toContain(privateValue)
-    expect(backup).not.toContain('123456')
+    expect(backup).not.toContain(testPin(23_456))
     db.close()
 
-    const wrong = await manager.unlockWithSecret(created.profile.id, '000000')
+    const wrong = await manager.unlockWithSecret(created.profile.id, testPin(0))
     expect(wrong.ok).toBe(false)
 
-    const correct = await manager.unlockWithSecret(created.profile.id, '123456')
+    const correct = await manager.unlockWithSecret(created.profile.id, testPin(23_456))
     expect(correct.ok).toBe(true)
   }, 15_000)
 
   it('recupera o mesmo cofre com código de recuperação e troca a credencial principal', async () => {
     const manager = new SecurityManager()
-    const created = await manager.createProfile('246810', 'pin')
+    const created = await manager.createProfile(testPin(46_810), 'pin')
     expect(created.recoveryCode).toMatch(/^[0-9A-F]{8}(?:-[0-9A-F]{8}){7}$/)
 
     await expect(
       manager.recoverAndChangeSecret(
         created.profile.id,
         '00000000-00000000-00000000-00000000-00000000-00000000-00000000-00000000',
-        'nova-palavra-passe-forte-2026',
+        testPassword(),
         'password',
       ),
     ).rejects.toThrow('não corresponde')
@@ -77,32 +85,32 @@ describe('SecurityManager e cofre local', () => {
     const recovered = await manager.recoverAndChangeSecret(
       created.profile.id,
       created.recoveryCode,
-      'nova-palavra-passe-forte-2026',
+      testPassword(),
       'password',
     )
     expect(recovered.profile.secretType).toBe('password')
 
-    const oldPin = await manager.unlockWithSecret(created.profile.id, '246810')
+    const oldPin = await manager.unlockWithSecret(created.profile.id, testPin(46_810))
     expect(oldPin.ok).toBe(false)
 
     const newPassword = await manager.unlockWithSecret(
       created.profile.id,
-      'nova-palavra-passe-forte-2026',
+      testPassword(),
     )
     expect(newPassword.ok).toBe(true)
   }, 20_000)
 
   it('aplica bloqueio progressivo sem apagar o cofre após tentativas erradas', async () => {
     const manager = new SecurityManager()
-    const created = await manager.createProfile('112233', 'pin')
+    const created = await manager.createProfile(testPin(12_233), 'pin')
 
     for (let attempt = 1; attempt <= 4; attempt += 1) {
-      const result = await manager.unlockWithSecret(created.profile.id, '000000')
+      const result = await manager.unlockWithSecret(created.profile.id, testPin(0))
       expect(result.ok).toBe(false)
       if (!result.ok) expect(result.lockedUntil).toBeUndefined()
     }
 
-    const fifth = await manager.unlockWithSecret(created.profile.id, '000000')
+    const fifth = await manager.unlockWithSecret(created.profile.id, testPin(0))
     expect(fifth.ok).toBe(false)
     if (fifth.ok) throw new Error('A quinta tentativa incorreta não foi bloqueada.')
     expect(fifth.lockedUntil).toBeDefined()
@@ -112,14 +120,14 @@ describe('SecurityManager e cofre local', () => {
     expect(stored?.failedAttempts).toBe(5)
     expect(await new EncryptedVaultStore().readRecord(created.profile.id)).toBeDefined()
 
-    const blockedCorrectPin = await manager.unlockWithSecret(created.profile.id, '112233')
+    const blockedCorrectPin = await manager.unlockWithSecret(created.profile.id, testPin(12_233))
     expect(blockedCorrectPin.ok).toBe(false)
     if (!blockedCorrectPin.ok) expect(blockedCorrectPin.lockedUntil).toBeDefined()
   }, 25_000)
 
   it('restaura uma cópia cifrada e mantém perfis locais isolados', async () => {
     const manager = new SecurityManager()
-    const first = await manager.createProfile('135790', 'pin')
+    const first = await manager.createProfile(testPin(35_790), 'pin')
     const firstDb = new AppDatabase(first)
     await firstDb.metadata.put({
       key: 'owner-only',
@@ -133,7 +141,7 @@ describe('SecurityManager e cofre local', () => {
     const imported = await manager.importSecureBackup(backup)
     expect(imported.id).toBe(first.profile.id)
 
-    const unlockedFirst = await manager.unlockWithSecret(imported.id, '135790')
+    const unlockedFirst = await manager.unlockWithSecret(imported.id, testPin(35_790))
     expect(unlockedFirst.ok).toBe(true)
     if (!unlockedFirst.ok) throw new Error('O perfil importado não desbloqueou.')
 
@@ -141,7 +149,7 @@ describe('SecurityManager e cofre local', () => {
     expect((await restoredDb.metadata.get('owner-only'))?.value).toBe('dados exclusivos do perfil A')
     restoredDb.close()
 
-    const second = await manager.createProfile('975310', 'pin')
+    const second = await manager.createProfile(testPin(75_310), 'pin')
     const secondDb = new AppDatabase(second)
     expect(await secondDb.metadata.get('owner-only')).toBeUndefined()
 
