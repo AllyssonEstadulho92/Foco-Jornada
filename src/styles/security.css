@@ -1,0 +1,528 @@
+.securityScreen {
+  min-height: 100dvh;
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
+  padding: max(24px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+  background:
+    radial-gradient(circle at 50% 8%, color-mix(in srgb, var(--primary, #2563eb) 8%, transparent), transparent 32rem),
+    var(--bg, #f7f8f6);
+  color: var(--text, #17201b);
+}
+
+.securityCard {
+  width: min(100%, 390px);
+  box-sizing: border-box;
+  display: grid;
+  gap: 16px;
+  padding: clamp(22px, 6vw, 32px);
+  border: 1px solid var(--line, #dde3df);
+  border-radius: 24px;
+  background: color-mix(in srgb, var(--surface, #fff) 96%, transparent);
+  box-shadow: 0 24px 70px rgba(20, 36, 27, 0.10);
+}
+
+.securityUnlockCard {
+  gap: 14px;
+}
+
+.securityBrandMark {
+  width: 58px;
+  height: 58px;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 2px;
+  border: 1px solid color-mix(in srgb, var(--primary, #2563eb) 22%, var(--line, #dde3df));
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--primary, #2563eb) 8%, var(--surface, #fff));
+  color: var(--primary, #2563eb);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+
+.securityEyebrow {
+  display: block;
+  color: var(--muted, #68736d);
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 0.12em;
+  text-align: center;
+}
+
+.securityCard h1 {
+  margin: 0;
+  color: var(--text, #17201b);
+  font-size: clamp(27px, 8vw, 34px);
+  line-height: 1.06;
+  letter-spacing: -0.045em;
+  text-align: center;
+}
+
+.securityCard > p,
+.securityCreateForm label small {
+  margin: 0;
+  color: var(--muted, #68736d);
+  line-height: 1.55;
+  text-align: center;
+}
+
+.securityPinDots {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  padding: 10px 0 6px;
+}
+
+.securityPinDots span {
+  width: 10px;
+  height: 10px;
+  box-sizing: border-box;
+  border: 1.5px solid color-mix(in srgb, var(--text, #17201b) 55%, transparent);
+  border-radius: 999px;
+  background: transparent;
+  transition: transform 120ms ease, background 120ms ease;
+}
+
+.securityPinDots span.isFilled {
+  border-color: var(--primary, #2563eb);
+  background: var(--primary, #2563eb);
+  transform: scale(1.08);
+}
+
+.securityKeypad {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.securityKeypad button {
+  min-height: 54px;
+  border: 1px solid var(--line, #dde3df);
+  border-radius: 14px;
+  background: var(--surface, #fff);
+  color: var(--text, #17201b);
+  font: inherit;
+  box-shadow: 0 3px 10px rgba(20, 36, 27, 0.045);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.securityKeypad button:active:not(:disabled) {
+  transform: translateY(1px);
+  background: color-mix(in srgb, var(--primary, #2563eb) 7%, var(--surface, #fff));
+}
+
+.securityKeypad button strong {
+  font-size: 20px;
+  font-weight: 550;
+}
+
+.securityKeypadSpacer {
+  min-height: 54px;
+}
+
+.securityPrimary,
+.securitySecondary,
+.securityTextAction,
+.securityDangerAction,
+.securitySettingsCard button,
+.securityCreateForm button {
+  min-height: 46px;
+  border-radius: 13px;
+  font: inherit;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.securityPrimary {
+  width: 100%;
+  border: 1px solid var(--primary, #2563eb);
+  background: var(--primary, #2563eb);
+  color: #fff;
+  box-shadow: 0 8px 18px color-mix(in srgb, var(--primary, #2563eb) 22%, transparent);
+}
+
+.securitySecondary {
+  width: 100%;
+  border: 1px solid var(--line, #dde3df);
+  background: var(--surface, #fff);
+  color: var(--primary, #2563eb);
+}
+
+.securityPrimary:disabled,
+.securitySecondary:disabled,
+.securityKeypad button:disabled,
+.securitySettingsCard button:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+}
+
+.securityProtectedNote {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 0 8px;
+  color: var(--muted, #68736d);
+  font-size: 11px;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.securityTextAction,
+.securityDangerAction {
+  min-height: 36px;
+  border: 0;
+  background: transparent;
+}
+
+.securityTextAction {
+  color: var(--primary, #2563eb);
+}
+
+.securityDangerAction {
+  color: #a83b32;
+}
+
+.securityMessage,
+.securityLockout {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: color-mix(in srgb, #b45309 8%, var(--surface, #fff));
+  color: var(--text, #17201b);
+  font-size: 13px;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.securityCreateForm {
+  display: grid;
+  gap: 13px;
+}
+
+.securityCreateForm label,
+.securityPasswordField,
+.securityProfileSelect {
+  display: grid;
+  gap: 6px;
+  color: var(--text, #17201b);
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.securityCreateForm input,
+.securityCreateForm select,
+.securityPasswordField input,
+.securityProfileSelect select,
+.securitySettingsCard input,
+.securitySettingsCard select {
+  width: 100%;
+  min-height: 46px;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1px solid var(--line, #dde3df);
+  border-radius: 12px;
+  outline: none;
+  background: var(--surface, #fff);
+  color: var(--text, #17201b);
+  font: inherit;
+}
+
+.securityCreateForm input:focus,
+.securityCreateForm select:focus,
+.securityPasswordField input:focus,
+.securityProfileSelect select:focus,
+.securitySettingsCard input:focus,
+.securitySettingsCard select:focus {
+  border-color: var(--primary, #2563eb);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary, #2563eb) 14%, transparent);
+}
+
+.securitySegment {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--text, #17201b) 5%, transparent);
+}
+
+.securitySegment button {
+  min-height: 40px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--muted, #68736d);
+}
+
+.securitySegment button.isActive {
+  background: var(--surface, #fff);
+  color: var(--text, #17201b);
+  box-shadow: 0 2px 8px rgba(20, 36, 27, 0.07);
+}
+
+.securityPasskeyOption {
+  grid-template-columns: auto 1fr;
+  align-items: start;
+}
+
+.securityPasskeyOption input {
+  width: 18px;
+  min-height: 18px;
+  margin-top: 1px;
+}
+
+.securityRecoveryCode {
+  display: block;
+  overflow-wrap: anywhere;
+  padding: 14px;
+  border: 1px dashed color-mix(in srgb, var(--primary, #2563eb) 35%, var(--line, #dde3df));
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--primary, #2563eb) 5%, var(--surface, #fff));
+  color: var(--text, #17201b);
+  font-size: 14px;
+  line-height: 1.6;
+  text-align: center;
+  user-select: all;
+}
+
+.securityWarning {
+  padding: 12px;
+  border-radius: 12px;
+  background: color-mix(in srgb, #b45309 8%, var(--surface, #fff));
+  color: var(--muted, #68736d);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.securityLoadingCard {
+  justify-items: center;
+}
+
+.securityMigrationNotice {
+  position: fixed;
+  z-index: 10000;
+  top: max(12px, env(safe-area-inset-top));
+  left: 50%;
+  max-width: min(90vw, 620px);
+  transform: translateX(-50%);
+  padding: 10px 14px;
+  border: 1px solid color-mix(in srgb, #168b55 30%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, #168b55 9%, var(--surface, #fff));
+  color: var(--text, #17201b);
+  box-shadow: 0 10px 32px rgba(20, 36, 27, 0.13);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.securitySettingsCard {
+  display: grid;
+  gap: 16px;
+  margin-bottom: 22px;
+  padding: 20px;
+  border: 1px solid var(--line, #dde3df);
+  border-radius: 18px;
+  background: var(--surface, #fff);
+}
+
+.securitySettingsHeading {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.securitySettingsHeading span:first-child {
+  color: var(--muted, #68736d);
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 0.1em;
+}
+
+.securitySettingsHeading h2 {
+  margin: 4px 0 3px;
+  font-size: 20px;
+}
+
+.securitySettingsHeading p {
+  margin: 0;
+  color: var(--muted, #68736d);
+  font-size: 13px;
+}
+
+.securityStatusBadge {
+  flex: 0 0 auto;
+  padding: 6px 9px;
+  border-radius: 999px;
+  background: color-mix(in srgb, #168b55 10%, transparent);
+  color: #147247;
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.securitySettingsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.securitySettingsGrid label,
+.securitySettingAction {
+  display: grid;
+  gap: 7px;
+}
+
+.securitySettingsGrid label > span,
+.securitySettingAction > span {
+  color: var(--muted, #68736d);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.securitySettingAction button,
+.securitySettingsActions button,
+.securityChangeForm button,
+.securityRecoveryReveal button {
+  border: 1px solid var(--line, #dde3df);
+  background: var(--surface, #fff);
+  color: var(--text, #17201b);
+}
+
+.securitySettingsActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.securitySettingsActions button {
+  min-height: 42px;
+  padding: 0 13px;
+}
+
+.securitySettingsActions .securityLockNow {
+  border-color: color-mix(in srgb, var(--primary, #2563eb) 35%, var(--line, #dde3df));
+  color: var(--primary, #2563eb);
+}
+
+.securityChangeForm {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  padding-top: 4px;
+}
+
+.securityChangeForm label {
+  display: grid;
+  gap: 5px;
+  color: var(--muted, #68736d);
+  font-size: 12px;
+}
+
+.securityChangeForm button {
+  min-height: 44px;
+  align-self: end;
+}
+
+.securityRecoveryReveal {
+  display: grid;
+  gap: 8px;
+  padding: 14px;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--primary, #2563eb) 5%, transparent);
+}
+
+.securityRecoveryReveal code {
+  overflow-wrap: anywhere;
+  font-size: 13px;
+  user-select: all;
+}
+
+.securityRecoveryReveal p,
+.securitySettingsMessage {
+  margin: 0;
+  color: var(--muted, #68736d);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.securityTopLock {
+  width: 40px;
+  height: 40px;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid var(--line, #dde3df);
+  border-radius: 12px;
+  background: var(--surface, #fff);
+  color: var(--text, #17201b);
+  cursor: pointer;
+}
+
+.securityTopLock svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+@media (max-width: 640px) {
+  .securityScreen {
+    align-items: start;
+    padding-top: max(20px, env(safe-area-inset-top));
+  }
+
+  .securityCard {
+    width: 100%;
+    max-width: 410px;
+    padding: 20px;
+    border-radius: 20px;
+    box-shadow: 0 12px 36px rgba(20, 36, 27, 0.08);
+  }
+
+  .securityKeypad button {
+    min-height: clamp(49px, 13vw, 56px);
+  }
+
+  .securitySettingsGrid,
+  .securityChangeForm {
+    grid-template-columns: 1fr;
+  }
+
+  .securitySettingsHeading {
+    align-items: flex-start;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 560px) {
+  .securityScreen {
+    place-items: start center;
+    overflow: auto;
+  }
+
+  .securityUnlockCard {
+    width: min(100%, 560px);
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .securityUnlockCard > .securityBrandMark,
+  .securityUnlockCard > .securityEyebrow,
+  .securityUnlockCard > h1,
+  .securityUnlockCard > p,
+  .securityUnlockCard > .securityProfileSelect,
+  .securityUnlockCard > .securityPinDots,
+  .securityUnlockCard > .securityMessage,
+  .securityUnlockCard > .securityLockout,
+  .securityUnlockCard > .securityProtectedNote,
+  .securityUnlockCard > .securityTextAction {
+    grid-column: 1 / -1;
+  }
+}
+
+:root[data-theme='dark'] .securityStatusBadge {
+  color: #7ed5a8;
+}
