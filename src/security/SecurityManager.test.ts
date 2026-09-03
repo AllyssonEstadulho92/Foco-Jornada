@@ -103,6 +103,10 @@ describe('SecurityManager e cofre local', () => {
   it('aplica bloqueio progressivo sem apagar o cofre após tentativas erradas', async () => {
     const manager = new SecurityManager()
     const created = await manager.createProfile(testPin(12_233), 'pin')
+    const db = new AppDatabase(created)
+    await db.ensureReady()
+    expect(await new EncryptedVaultStore().readRecord(created.profile.id)).toBeDefined()
+    db.close()
 
     for (let attempt = 1; attempt <= 4; attempt += 1) {
       const result = await manager.unlockWithSecret(created.profile.id, testPin(0))
