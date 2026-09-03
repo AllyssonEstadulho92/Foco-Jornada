@@ -214,9 +214,9 @@ Escopo:
 
 Mesmo padrão do PR E, uma feature por vez se o diff crescer demais.
 
-### PR G — Notificações
+### Notificações
 
-Consolidar `notifications.css`, `notification-center-v3.css`, `notification-professional-v4.css` e regras da migração 1.2.1 em uma autoridade clara, preservando quick panel e centro completo.
+Consolidação concluída: `notifications.css` é a autoridade do painel rápido e `notification-center.css` contém o Centro de Notificações móvel. As implementações V2/V3 e os estilos `notification-center-v3.css` / `notification-professional-v4.css` foram removidos.
 
 ### PR H — Medicação/Stock
 
