@@ -1,3 +1,4 @@
+import { GloLogo } from '../components/brand/GloLogo'
 import { AppIcon, type AppIconName } from '../components/ui/AppIcon'
 
 export type NavigationIconName =
@@ -19,8 +20,10 @@ export type NavigationIconName =
   | 'shield'
   | 'calendar'
   | 'journey'
+  | 'glo'
 
 export function NavigationIcon({ name }: { name: NavigationIconName }) {
+  if (name === 'glo') return <GloLogo />
   return <AppIcon name={name as AppIconName} />
 }
 
