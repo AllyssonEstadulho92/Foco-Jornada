@@ -14,11 +14,25 @@ import {
   type WorkOccurrenceReason,
   type WorkProofType,
 } from '../../domain/work-hours/WorkHours'
+import { secureStorage } from '../../security/secureStorage'
 import { toLocalDateKey } from '../../shared/utils/dateTime'
+import { ConfirmDialog } from '../components/ui/UiPrimitives'
 import { useSettingsController } from '../hooks/useSettingsController'
 import { useAppServices } from '../providers/AppServicesProvider'
 import { pushAppNotification } from '../store/useNotificationStore'
 import { useWorkHoursStore } from '../store/useWorkHoursStore'
+
+const FULL_DAY_ABSENCE_REASONS = new Set<WorkOccurrenceReason>([
+  'falta_justificada',
+  'falta_injustificada',
+  'ferias',
+  'feriado',
+  'folga',
+])
+
+function isFullDayAbsence(reason: WorkOccurrenceReason) {
+  return FULL_DAY_ABSENCE_REASONS.has(reason)
+}
 
 function intervalMinutes(start: string, end: string) {
   if (!start || !end) return 0
@@ -55,12 +69,15 @@ export function WorkHoursCalculatorPage() {
   const [monthKey, setMonthKey] = useState(today.slice(0, 7))
   const [isImporting, setIsImporting] = useState(false)
   const [editingEntryId, setEditingEntryId] = useState<string | null>(null)
+  const [deleteEntryId, setDeleteEntryId] = useState<string | null>(null)
+  const [clearMonthRequested, setClearMonthRequested] = useState(false)
   const [form, setForm] = useState<WorkHoursEntryInput>({
     date: today,
     plannedStart: '08:00',
     plannedEnd: '17:00',
     plannedBreakMinutes: 15,
     plannedBreaks: [{ start: '12:00', end: '12:15' }],
+    plannedWorkingDay: true,
     actualStart: '08:00',
     actualEnd: '17:00',
     actualBreakMinutes: 15,
@@ -78,27 +95,95 @@ export function WorkHoursCalculatorPage() {
 
     const schedule = settings.workSchedule
     const resolvedSchedule = resolveWorkScheduleForDate(schedule, form.date)
-    const plannedBreaks: ClockInterval[] = [schedule.break1, schedule.break2]
-      .filter(
-        (item) =>
-          item.enabled &&
-          item.startTime >= resolvedSchedule.startTime &&
-          item.endTime <= resolvedSchedule.endTime,
-      )
-      .map((item) => ({ start: item.startTime, end: item.endTime }))
+    const plannedBreaks: ClockInterval[] = resolvedSchedule.isWorkingDay
+      ? [schedule.break1, schedule.break2]
+          .filter(
+            (item) =>
+              item.enabled &&
+              item.startTime >= resolvedSchedule.startTime &&
+              item.endTime <= resolvedSchedule.endTime,
+          )
+          .map((item) => ({ start: item.startTime, end: item.endTime }))
+      : []
     const breakMinutes = totalIntervalMinutes(plannedBreaks)
 
-    setForm((current) => ({
-      ...current,
-      plannedStart: resolvedSchedule.startTime,
-      plannedEnd: resolvedSchedule.endTime,
-      plannedBreakMinutes: breakMinutes,
-      plannedBreaks,
-      actualStart: current.source === 'manual' ? resolvedSchedule.startTime : current.actualStart,
-      actualEnd: current.source === 'manual' ? resolvedSchedule.endTime : current.actualEnd,
-      actualBreakMinutes: current.source === 'manual' ? breakMinutes : current.actualBreakMinutes,
-    }))
+    setForm((current) => {
+      const fullDayAbsence = isFullDayAbsence(current.reason)
+      const resetManualPresence = current.source === 'manual'
+      const actualStart = resetManualPresence
+        ? fullDayAbsence || !resolvedSchedule.isWorkingDay
+          ? ''
+          : resolvedSchedule.startTime
+        : current.actualStart
+      const actualEnd = resetManualPresence
+        ? fullDayAbsence || !resolvedSchedule.isWorkingDay
+          ? ''
+          : resolvedSchedule.endTime
+        : current.actualEnd
+
+      return {
+        ...current,
+        plannedStart: resolvedSchedule.startTime,
+        plannedEnd: resolvedSchedule.endTime,
+        plannedBreakMinutes: breakMinutes,
+        plannedBreaks,
+        plannedWorkingDay: resolvedSchedule.isWorkingDay,
+        actualStart,
+        actualEnd,
+        actualBreakMinutes: resetManualPresence && !fullDayAbsence && resolvedSchedule.isWorkingDay
+          ? breakMinutes
+          : resetManualPresence
+            ? 0
+            : current.actualBreakMinutes,
+        actualBreaks: resetManualPresence
+          ? fullDayAbsence || !resolvedSchedule.isWorkingDay
+            ? []
+            : plannedBreaks
+          : current.actualBreaks,
+        actualSegments: resetManualPresence ? undefined : current.actualSegments,
+        occurrenceStart: fullDayAbsence && resolvedSchedule.isWorkingDay
+          ? resolvedSchedule.startTime
+          : fullDayAbsence
+            ? ''
+            : current.occurrenceStart,
+        occurrenceEnd: fullDayAbsence && resolvedSchedule.isWorkingDay
+          ? resolvedSchedule.endTime
+          : fullDayAbsence
+            ? ''
+            : current.occurrenceEnd,
+      }
+    })
   }, [editingEntryId, form.date, settings.workSchedule])
+
+  function normalizeEntryForCurrentSchedule(entry: WorkHoursEntry): WorkHoursEntryInput {
+    const resolved = resolveWorkScheduleForDate(settings.workSchedule, entry.date)
+    const linkedToConfiguredSchedule =
+      entry.plannedStart === resolved.startTime && entry.plannedEnd === resolved.endTime
+    const plannedWorkingDay = entry.plannedWorkingDay ?? (
+      linkedToConfiguredSchedule ? resolved.isWorkingDay : true
+    )
+
+    const legacyFullDayAbsence =
+      isFullDayAbsence(entry.reason) &&
+      !entry.occurrenceStart &&
+      !entry.occurrenceEnd &&
+      entry.actualStart === entry.plannedStart &&
+      entry.actualEnd === entry.plannedEnd
+
+    if (!legacyFullDayAbsence) return { ...entry, plannedWorkingDay }
+
+    return {
+      ...entry,
+      plannedWorkingDay,
+      actualStart: '',
+      actualEnd: '',
+      actualBreakMinutes: 0,
+      actualBreaks: [],
+      actualSegments: undefined,
+      occurrenceStart: plannedWorkingDay ? entry.plannedStart : '',
+      occurrenceEnd: plannedWorkingDay ? entry.plannedEnd : '',
+    }
+  }
 
   const calculation = useMemo(() => calculateWorkHours(form), [form])
   const monthEntries = useMemo(
@@ -110,7 +195,7 @@ export function WorkHoursCalculatorPage() {
     () =>
       monthEntries.reduce(
         (total, entry) => {
-          const value = calculateWorkHours(entry)
+          const value = calculateWorkHours(normalizeEntryForCurrentSchedule(entry))
           total.planned += value.plannedMinutes
           total.worked += value.workedMinutes
           total.nonWorked += value.nonWorkedMinutes
@@ -121,7 +206,7 @@ export function WorkHoursCalculatorPage() {
         },
         { planned: 0, worked: 0, nonWorked: 0, overtime: 0, considered: 0, illness: 0 },
       ),
-    [monthEntries],
+    [monthEntries, settings.workSchedule],
   )
 
   function update<K extends keyof WorkHoursEntryInput>(key: K, value: WorkHoursEntryInput[K]) {
@@ -132,25 +217,83 @@ export function WorkHoursCalculatorPage() {
     key: 'plannedStart' | 'plannedEnd' | 'plannedBreakMinutes',
     value: string | number,
   ) {
-    setForm((current) => ({
-      ...current,
-      [key]: value,
-      plannedBreaks: undefined,
-      source: 'manual',
-    }))
+    setForm((current) => {
+      const next = {
+        ...current,
+        [key]: value,
+        plannedWorkingDay: true,
+        plannedBreaks: undefined,
+        source: 'manual' as const,
+      }
+
+      if (!isFullDayAbsence(current.reason)) return next
+      return {
+        ...next,
+        occurrenceStart: next.plannedStart,
+        occurrenceEnd: next.plannedEnd,
+      }
+    })
   }
 
   function updateActual(
     key: 'actualStart' | 'actualEnd' | 'actualBreakMinutes',
     value: string | number,
   ) {
-    setForm((current) => ({
-      ...current,
-      [key]: value,
-      actualSegments: undefined,
-      actualBreaks: undefined,
-      source: 'manual',
-    }))
+    setForm((current) => {
+      const editingPresence = key !== 'actualBreakMinutes' && Boolean(value)
+      return {
+        ...current,
+        [key]: value,
+        actualSegments: undefined,
+        actualBreaks: undefined,
+        source: 'manual',
+        occurrenceStart: isFullDayAbsence(current.reason) && editingPresence ? '' : current.occurrenceStart,
+        occurrenceEnd: isFullDayAbsence(current.reason) && editingPresence ? '' : current.occurrenceEnd,
+      }
+    })
+  }
+
+  function handleReasonChange(reason: WorkOccurrenceReason) {
+    setForm((current) => {
+      if (isFullDayAbsence(reason)) {
+        return {
+          ...current,
+          reason,
+          actualStart: '',
+          actualEnd: '',
+          actualBreakMinutes: 0,
+          actualBreaks: [],
+          actualSegments: undefined,
+          source: 'manual',
+          occurrenceStart: current.plannedWorkingDay === false ? '' : current.plannedStart,
+          occurrenceEnd: current.plannedWorkingDay === false ? '' : current.plannedEnd,
+        }
+      }
+
+      const leavingFullDayAbsence = isFullDayAbsence(current.reason)
+      return {
+        ...current,
+        reason,
+        actualStart:
+          leavingFullDayAbsence && current.source === 'manual' && current.plannedWorkingDay !== false
+            ? current.plannedStart
+            : current.actualStart,
+        actualEnd:
+          leavingFullDayAbsence && current.source === 'manual' && current.plannedWorkingDay !== false
+            ? current.plannedEnd
+            : current.actualEnd,
+        actualBreakMinutes:
+          leavingFullDayAbsence && current.source === 'manual' && current.plannedWorkingDay !== false
+            ? current.plannedBreakMinutes
+            : current.actualBreakMinutes,
+        actualBreaks:
+          leavingFullDayAbsence && current.source === 'manual' && current.plannedWorkingDay !== false
+            ? current.plannedBreaks
+            : current.actualBreaks,
+        occurrenceStart: reason === 'normal' || leavingFullDayAbsence ? '' : current.occurrenceStart,
+        occurrenceEnd: reason === 'normal' || leavingFullDayAbsence ? '' : current.occurrenceEnd,
+      }
+    })
   }
 
   function markSicknessFromActual() {
@@ -171,6 +314,7 @@ export function WorkHoursCalculatorPage() {
       return {
         ...current,
         date: today,
+        plannedWorkingDay: true,
         actualStart: current.plannedStart,
         actualEnd: '14:00',
         actualBreakMinutes: totalIntervalMinutes(actualBreaks),
@@ -258,8 +402,60 @@ export function WorkHoursCalculatorPage() {
     }
   }
 
+  function validationMessage(): string | null {
+    const plannedSpan = intervalMinutes(form.plannedStart, form.plannedEnd)
+    if (form.plannedWorkingDay !== false && plannedSpan === 0) {
+      return 'A entrada e a saída previstas não podem ser iguais num dia de trabalho.'
+    }
+    if (form.plannedWorkingDay !== false && form.plannedBreakMinutes > plannedSpan) {
+      return 'As pausas previstas não podem ser superiores ao período planeado.'
+    }
+
+    const hasActualStart = Boolean(form.actualStart)
+    const hasActualEnd = Boolean(form.actualEnd)
+    if (hasActualStart !== hasActualEnd) {
+      return 'Preenche a entrada e a saída reais em conjunto.'
+    }
+    if (form.reason === 'normal' && form.plannedWorkingDay !== false && !hasActualStart) {
+      return 'Num dia normal, indica as horas reais ou seleciona o motivo da ausência.'
+    }
+    if (!Array.isArray(form.actualBreaks) && form.actualBreakMinutes > calculation.presenceMinutes) {
+      return 'As pausas feitas não podem ser superiores ao tempo de presença.'
+    }
+
+    const hasOccurrenceStart = Boolean(form.occurrenceStart)
+    const hasOccurrenceEnd = Boolean(form.occurrenceEnd)
+    if (hasOccurrenceStart !== hasOccurrenceEnd) {
+      return 'Preenche o início e o fim da ausência em conjunto.'
+    }
+    if (
+      hasOccurrenceStart &&
+      hasOccurrenceEnd &&
+      form.plannedWorkingDay !== false &&
+      calculation.occurrenceMinutes === 0
+    ) {
+      return 'O período indicado como ausência não coincide com tempo de trabalho previsto.'
+    }
+    if (
+      form.reason !== 'normal' &&
+      form.plannedWorkingDay !== false &&
+      calculation.nonWorkedMinutes === 0 &&
+      calculation.occurrenceMinutes === 0
+    ) {
+      return 'O motivo de ausência não tem tempo associado. Confirma as horas reais ou o período da ausência.'
+    }
+
+    return null
+  }
+
   function saveEntry(event: React.FormEvent) {
     event.preventDefault()
+
+    const invalid = validationMessage()
+    if (invalid) {
+      pushAppNotification('error', 'Confirma as horas', invalid)
+      return
+    }
 
     if (editingEntryId) {
       updateEntry(editingEntryId, form)
@@ -282,11 +478,9 @@ export function WorkHoursCalculatorPage() {
   }
 
   function handleEdit(entry: WorkHoursEntry) {
-    const { id, createdAt, ...input } = entry
-    void id
-    void createdAt
+    const normalized = normalizeEntryForCurrentSchedule(entry)
     setEditingEntryId(entry.id)
-    setForm(input)
+    setForm(normalized)
     setMonthKey(entry.date.slice(0, 7))
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
@@ -295,19 +489,30 @@ export function WorkHoursCalculatorPage() {
     setEditingEntryId(null)
   }
 
-  function handleDelete(id: string) {
-    if (!window.confirm('Eliminar este registo de horas?')) return
+  async function confirmDeleteEntry() {
+    const id = deleteEntryId
+    if (!id) return
+    setDeleteEntryId(null)
     removeEntry(id)
     if (editingEntryId === id) setEditingEntryId(null)
-    pushAppNotification('info', 'Registo eliminado', 'O registo foi removido de Horas.')
+    try {
+      await secureStorage.flush()
+      pushAppNotification('info', 'Registo eliminado', 'O registo foi removido de Horas.')
+    } catch {
+      pushAppNotification('error', 'Falha ao guardar a eliminação', 'A interface foi atualizada, mas não foi possível confirmar a persistência no cofre local.')
+    }
   }
 
-  function handleClearMonth() {
-    if (!monthEntries.length) return
-    if (!window.confirm(`Eliminar todos os registos de ${monthKey}?`)) return
+  async function confirmClearMonth() {
+    setClearMonthRequested(false)
     clearMonth(monthKey)
     setEditingEntryId(null)
-    pushAppNotification('info', 'Mês limpo', `Foram removidos os registos de ${monthKey}.`)
+    try {
+      await secureStorage.flush()
+      pushAppNotification('info', 'Mês limpo', `Foram removidos os registos de ${monthKey}.`)
+    } catch {
+      pushAppNotification('error', 'Falha ao guardar a limpeza', 'Não foi possível confirmar a persistência da alteração no cofre local.')
+    }
   }
 
   const sourceLabel = form.source === 'jornada' ? 'Dados da jornada' : 'Preenchimento manual'
@@ -363,12 +568,21 @@ export function WorkHoursCalculatorPage() {
 
         <div className="workHoursPlanNote">
           <strong>Horário previsto</strong>
-          <span>{form.plannedStart} → {form.plannedEnd}</span>
-          <small>
-            {form.plannedBreaks?.length
-              ? `Pausas: ${form.plannedBreaks.map((item) => `${item.start}–${item.end}`).join(' · ')}`
-              : `${form.plannedBreakMinutes} min de pausa previstos`}
-          </small>
+          {form.plannedWorkingDay === false ? (
+            <>
+              <span>Folga planeada · 00:00 previstas</span>
+              <small>A configuração atual não marca este dia como trabalho. Se alterares manualmente o horário previsto, o dia passa a ser tratado como trabalho planeado.</small>
+            </>
+          ) : (
+            <>
+              <span>{form.plannedStart} → {form.plannedEnd}</span>
+              <small>
+                {form.plannedBreaks?.length
+                  ? `Pausas: ${form.plannedBreaks.map((item) => `${item.start}–${item.end}`).join(' · ')}`
+                  : `${form.plannedBreakMinutes} min de pausa previstos`}
+              </small>
+            </>
+          )}
         </div>
 
         <div className="workHoursFieldGrid">
@@ -380,7 +594,7 @@ export function WorkHoursCalculatorPage() {
           <label><span>Entrada real</span><input type="time" value={form.actualStart} onChange={(e) => updateActual('actualStart', e.target.value)} /></label>
           <label><span>Saída real</span><input type="time" value={form.actualEnd} onChange={(e) => updateActual('actualEnd', e.target.value)} /></label>
           <label><span>Pausas feitas</span><div className="inputWithSuffix"><input type="number" min="0" max="600" value={form.actualBreakMinutes} onChange={(e) => updateActual('actualBreakMinutes', Number(e.target.value))} /><span>min</span></div><small>Se saíste antes da pausa e não a fizeste, coloca 0.</small></label>
-          <label><span>Motivo</span><select value={form.reason} onChange={(e) => update('reason', e.target.value as WorkOccurrenceReason)}>{Object.entries(OCCURRENCE_LABELS).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
+          <label><span>Motivo</span><select value={form.reason} onChange={(e) => handleReasonChange(e.target.value as WorkOccurrenceReason)}>{Object.entries(OCCURRENCE_LABELS).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
 
           <label><span>Início da ausência</span><input type="time" value={form.occurrenceStart ?? ''} onChange={(e) => update('occurrenceStart', e.target.value)} /><small>Ex.: hora em que saíste por doença.</small></label>
           <label><span>Fim da ausência</span><input type="time" value={form.occurrenceEnd ?? ''} onChange={(e) => update('occurrenceEnd', e.target.value)} /><small>Se não regressaste, usa a saída prevista.</small></label>
@@ -414,7 +628,7 @@ export function WorkHoursCalculatorPage() {
       <section className="workHoursMonth" aria-labelledby="work-hours-month-title">
         <div className="workHoursSectionHeading">
           <div><span className="sectionKicker">MÊS</span><h2 id="work-hours-month-title">Resumo do mês</h2></div>
-          <div className="workHoursMonthActions"><input aria-label="Mês" type="month" value={monthKey} onChange={(e) => setMonthKey(e.target.value)} /><button type="button" onClick={handleClearMonth} disabled={!monthEntries.length}>Limpar mês</button></div>
+          <div className="workHoursMonthActions"><input aria-label="Mês" type="month" value={monthKey} onChange={(e) => setMonthKey(e.target.value)} /><button type="button" onClick={() => setClearMonthRequested(true)} disabled={!monthEntries.length}>Limpar mês</button></div>
         </div>
 
         <div className="workHoursMonthTotals">
@@ -429,7 +643,7 @@ export function WorkHoursCalculatorPage() {
         {monthEntries.length === 0 ? <p className="workHoursEmpty">Ainda não há registos neste mês.</p> : (
           <div className="workHoursEntries">
             {monthEntries.map((entry) => {
-              const item = calculateWorkHours(entry)
+              const item = calculateWorkHours(normalizeEntryForCurrentSchedule(entry))
               return <article key={entry.id} className={editingEntryId === entry.id ? 'workHoursEntryEditing' : undefined}>
                 <div className="workHoursEntryDate"><strong>{entry.date}</strong><span>{OCCURRENCE_LABELS[entry.reason]} · {entry.source === 'jornada' ? 'importado' : 'manual'}</span></div>
                 <div><span>Trabalhadas</span><strong>{formatHoursMinutes(item.workedMinutes)}</strong></div>
@@ -438,7 +652,7 @@ export function WorkHoursCalculatorPage() {
                 <div><span>Saldo</span><strong>{formatHoursMinutes(item.balanceMinutes)}</strong></div>
                 <div className="workHoursEntryActions">
                   <button type="button" onClick={() => handleEdit(entry)} aria-label={`Editar registo de ${entry.date}`}>Editar</button>
-                  <button type="button" className="workHoursDeleteButton" onClick={() => handleDelete(entry.id)} aria-label={`Eliminar registo de ${entry.date}`}>Eliminar</button>
+                  <button type="button" className="workHoursDeleteButton" onClick={() => setDeleteEntryId(entry.id)} aria-label={`Eliminar registo de ${entry.date}`}>Eliminar</button>
                 </div>
                 {entry.notes ? <p>{entry.notes}</p> : null}
               </article>
@@ -446,6 +660,26 @@ export function WorkHoursCalculatorPage() {
           </div>
         )}
       </section>
+
+      <ConfirmDialog
+        open={deleteEntryId !== null}
+        title="Eliminar registo?"
+        description="Esta ação remove o registo de horas deste perfil. Não elimina jornadas nem outros dados da aplicação."
+        confirmLabel="Eliminar"
+        destructive
+        onConfirm={() => void confirmDeleteEntry()}
+        onCancel={() => setDeleteEntryId(null)}
+      />
+
+      <ConfirmDialog
+        open={clearMonthRequested}
+        title={`Limpar ${monthKey}?`}
+        description="Todos os registos da calculadora de horas deste mês serão removidos."
+        confirmLabel="Limpar mês"
+        destructive
+        onConfirm={() => void confirmClearMonth()}
+        onCancel={() => setClearMonthRequested(false)}
+      />
     </section>
   )
 }
