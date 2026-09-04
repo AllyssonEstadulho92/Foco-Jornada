@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { buildDayReport } from '../../application/reports/buildDayReport'
 import { resolveWorkScheduleForDate } from '../../domain/journey/WorkSchedule'
 import {
@@ -155,7 +155,7 @@ export function WorkHoursCalculatorPage() {
     })
   }, [editingEntryId, form.date, settings.workSchedule])
 
-  function normalizeEntryForCurrentSchedule(entry: WorkHoursEntry): WorkHoursEntryInput {
+  const normalizeEntryForCurrentSchedule = useCallback((entry: WorkHoursEntry): WorkHoursEntryInput => {
     const resolved = resolveWorkScheduleForDate(settings.workSchedule, entry.date)
     const linkedToConfiguredSchedule =
       entry.plannedStart === resolved.startTime && entry.plannedEnd === resolved.endTime
@@ -183,7 +183,7 @@ export function WorkHoursCalculatorPage() {
       occurrenceStart: plannedWorkingDay ? entry.plannedStart : '',
       occurrenceEnd: plannedWorkingDay ? entry.plannedEnd : '',
     }
-  }
+  }, [settings.workSchedule])
 
   const calculation = useMemo(() => calculateWorkHours(form), [form])
   const monthEntries = useMemo(
@@ -206,7 +206,7 @@ export function WorkHoursCalculatorPage() {
         },
         { planned: 0, worked: 0, nonWorked: 0, overtime: 0, considered: 0, illness: 0 },
       ),
-    [monthEntries, settings.workSchedule],
+    [monthEntries, normalizeEntryForCurrentSchedule],
   )
 
   function update<K extends keyof WorkHoursEntryInput>(key: K, value: WorkHoursEntryInput[K]) {
