@@ -2,7 +2,7 @@ name: Qualidade
 
 on:
   push:
-    branches: [main]
+    branches: [main, audit-hardening-1-2-final]
   pull_request:
 
 permissions:
