@@ -7,6 +7,7 @@ const base: WorkHoursEntryInput = {
   plannedEnd: '17:00',
   plannedBreakMinutes: 15,
   plannedBreaks: [{ start: '12:00', end: '12:15' }],
+  plannedWorkingDay: true,
   actualStart: '08:00',
   actualEnd: '17:00',
   actualBreakMinutes: 15,
@@ -150,5 +151,80 @@ describe('calculateWorkHours', () => {
     expect(result.occurrenceMinutes).toBe(15)
     expect(result.nonWorkedMinutes).toBe(15)
     expect(result.workedMinutes).toBe(510)
+  })
+
+  it('considera uma folga configurada como zero horas previstas', () => {
+    const result = calculateWorkHours({
+      ...base,
+      date: '2026-08-22',
+      plannedWorkingDay: false,
+      actualStart: '',
+      actualEnd: '',
+      actualBreakMinutes: 0,
+      actualBreaks: [],
+    })
+
+    expect(result.plannedMinutes).toBe(0)
+    expect(result.workedMinutes).toBe(0)
+    expect(result.nonWorkedMinutes).toBe(0)
+    expect(result.overtimeMinutes).toBe(0)
+    expect(result.balanceMinutes).toBe(0)
+  })
+
+  it('conta trabalho feito numa folga como extra sem criar horas não trabalhadas', () => {
+    const result = calculateWorkHours({
+      ...base,
+      date: '2026-08-22',
+      plannedWorkingDay: false,
+      actualStart: '09:00',
+      actualEnd: '13:00',
+      actualBreakMinutes: 0,
+      actualBreaks: [],
+    })
+
+    expect(result.plannedMinutes).toBe(0)
+    expect(result.workedMinutes).toBe(240)
+    expect(result.scheduledWorkedMinutes).toBe(0)
+    expect(result.nonWorkedMinutes).toBe(0)
+    expect(result.overtimeMinutes).toBe(240)
+    expect(result.balanceMinutes).toBe(240)
+  })
+
+  it('trata uma falta justificada de dia inteiro como ausência total sem horas trabalhadas', () => {
+    const result = calculateWorkHours({
+      ...base,
+      reason: 'falta_justificada',
+      actualStart: '',
+      actualEnd: '',
+      actualBreakMinutes: 0,
+      actualBreaks: [],
+      occurrenceStart: '08:00',
+      occurrenceEnd: '17:00',
+    })
+
+    expect(result.plannedMinutes).toBe(525)
+    expect(result.workedMinutes).toBe(0)
+    expect(result.nonWorkedMinutes).toBe(525)
+    expect(result.occurrenceMinutes).toBe(525)
+    expect(result.balanceMinutes).toBe(-525)
+  })
+
+  it('não transforma horas iguais numa jornada de 24 horas', () => {
+    const result = calculateWorkHours({
+      ...base,
+      plannedStart: '08:00',
+      plannedEnd: '08:00',
+      plannedBreakMinutes: 0,
+      plannedBreaks: [],
+      actualStart: '08:00',
+      actualEnd: '08:00',
+      actualBreakMinutes: 0,
+      actualBreaks: [],
+    })
+
+    expect(result.plannedMinutes).toBe(0)
+    expect(result.presenceMinutes).toBe(0)
+    expect(result.workedMinutes).toBe(0)
+    expect(result.overtimeMinutes).toBe(0)
   })
 })

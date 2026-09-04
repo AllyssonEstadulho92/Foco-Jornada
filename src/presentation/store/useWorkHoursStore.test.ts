@@ -8,6 +8,7 @@ const input: WorkHoursEntryInput = {
   plannedEnd: '17:00',
   plannedBreakMinutes: 15,
   plannedBreaks: [{ start: '12:00', end: '12:15' }],
+  plannedWorkingDay: true,
   actualStart: '08:00',
   actualEnd: '17:00',
   actualBreakMinutes: 15,
@@ -51,5 +52,25 @@ describe('useWorkHoursStore', () => {
     expect(entries[0].date).toBe(input.date)
     expect(entries[0].actualEnd).toBe('16:00')
     expect(entries[0].notes).toBe('Apuramento corrigido.')
+  })
+
+  it('elimina apenas o registo indicado pelo id', () => {
+    const first = useWorkHoursStore.getState().add(input)
+    const second = useWorkHoursStore.getState().add({
+      ...input,
+      date: '2026-08-22',
+      plannedWorkingDay: false,
+      actualStart: '',
+      actualEnd: '',
+      actualBreakMinutes: 0,
+      actualBreaks: [],
+    })
+
+    useWorkHoursStore.getState().remove(first.id)
+
+    const entries = useWorkHoursStore.getState().entries
+    expect(entries).toHaveLength(1)
+    expect(entries[0].id).toBe(second.id)
+    expect(entries[0].date).toBe('2026-08-22')
   })
 })

@@ -54,11 +54,43 @@ Validação automática da PR #39:
 - Build PWA: **PASS** — gera `manifest.webmanifest`, `registerSW.js`, `sw.js` e Workbox.
 - Publicação: **atualizada** — a cópia compilada em `site/` contém manifest, registo de service worker, service worker e Workbox.
 
+## Correção de consistência — Horas & Ausências (2026-09-04)
+
+A revisão da calculadora identificou três causas concretas de divergência:
+
+1. Um dia configurado como folga mantinha visualmente o horário-base 08:00–17:00 e podia ser apurado como 08:45 não trabalhadas, apesar de `resolveWorkScheduleForDate` indicar `isWorkingDay: false`.
+2. Motivos de ausência de dia inteiro podiam conservar horas reais do formulário e produzir uma combinação contraditória entre motivo, presença e ausência.
+3. A eliminação dependia de `window.confirm`; a ação foi substituída pelo diálogo interno da aplicação e a persistência passa a ser confirmada no cofre local com `secureStorage.flush()`.
+
+Correções aplicadas na PR #183:
+
+- o cálculo distingue explicitamente dia planeado de trabalho e folga;
+- trabalho realizado numa folga é contabilizado como extra, sem inventar horas não trabalhadas;
+- faltas justificadas/injustificadas, férias, feriado e folga podem representar corretamente ausência integral;
+- pares entrada/saída e início/fim da ausência são validados antes de guardar;
+- hora inicial igual à hora final deixa de ser interpretada como uma jornada de 24 horas;
+- turnos que atravessam a meia-noite continuam suportados quando a saída é realmente anterior à entrada;
+- registos legados apresentados na calculadora são reconciliados com a configuração atual quando o horário guardado coincide com o horário configurado;
+- eliminar um registo e limpar o mês usam confirmação interna e aguardam persistência no cofre cifrado.
+
+Validação automática da PR #183 no commit `a121f9494e3dca4a9f5077e9ac76967bc55be08f`:
+
+- Auditoria de dependências: **PASS — 0 vulnerabilidades**
+- Typecheck: **PASS**
+- Lint: **PASS — 0 warnings introduzidos por esta alteração**
+- Testes: **PASS — 220/220 em 54 ficheiros**
+- Testes específicos `WorkHours`: **PASS — 14/14**
+- Testes do store de horas: **PASS — 3/3**, incluindo eliminação por ID
+- Build: **PASS**
+- Build PWA: **PASS**
+- Smoke test no Chromium: **PASS**
+
 ## Pontos não bloqueantes para evolução
 
 - validar manualmente a apresentação final em Safari/iPhone, Android, tablet e monitores largos;
-- eliminar o warning de `useMemo` do ecrã Hoje quando esse ficheiro voltar a ser alterado;
+- eliminar avisos de testes já existentes, nomeadamente a atualização de estado durante renderização assinalada em `AppTopBar`;
 - considerar code splitting/lazy loading para reduzir o bundle principal, atualmente acima do aviso de 500 kB do Vite;
+- acompanhar a atualização das GitHub Actions que ainda originam avisos de runtime Node;
 - manter as limitações do simulador de vencimento claramente identificadas quando existam regimes fiscais, contributivos ou convencionais específicos.
 
-`main` representa agora a V1 funcional auditada. Autenticação, sincronização cloud, backups online, CSV/PDF e publicação nativa permanecem para V2.
+`main` representa a linha estável do projeto; alterações relevantes continuam sujeitas aos quality gates antes do merge.

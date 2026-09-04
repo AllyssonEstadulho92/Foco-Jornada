@@ -30,6 +30,8 @@ export interface WorkHoursEntryInput {
   plannedEnd: string
   plannedBreakMinutes: number
   plannedBreaks?: ClockInterval[]
+  /** False quando a configuração do calendário define o dia como folga/sem trabalho planeado. */
+  plannedWorkingDay?: boolean
   actualStart: string
   actualEnd: string
   actualBreakMinutes: number
@@ -171,7 +173,8 @@ function normalizeClockInterval(
   let end = endRaw
   if (overnightShift && start < plannedStartMinutes) start += 24 * 60
   if (overnightShift && end < plannedStartMinutes) end += 24 * 60
-  if (end <= start) end += 24 * 60
+  // Horas iguais representam duração zero. Só uma saída realmente anterior à entrada atravessa a meia-noite.
+  if (end < start) end += 24 * 60
   return { start, end }
 }
 
@@ -219,9 +222,12 @@ export function calculateWorkHours(input: WorkHoursEntryInput): WorkHoursCalcula
     }
   }
 
-  const overnightShift = plannedEndRaw <= plannedStartRaw
+  const plannedWorkingDay = input.plannedWorkingDay !== false
+  const overnightShift = plannedWorkingDay && plannedEndRaw < plannedStartRaw
   const plannedEnd = overnightShift ? plannedEndRaw + 24 * 60 : plannedEndRaw
-  const plannedShift: NumericInterval[] = [{ start: plannedStartRaw, end: plannedEnd }]
+  const plannedShift: NumericInterval[] = plannedWorkingDay && plannedEnd > plannedStartRaw
+    ? [{ start: plannedStartRaw, end: plannedEnd }]
+    : []
   const exactPlannedBreaks = normalizeIntervals(input.plannedBreaks, plannedStartRaw, overnightShift)
   const hasExactPlannedBreaks = Array.isArray(input.plannedBreaks)
   const plannedWorkIntervals = hasExactPlannedBreaks
@@ -253,7 +259,9 @@ export function calculateWorkHours(input: WorkHoursEntryInput): WorkHoursCalcula
     : Math.max(0, totalDuration(presenceWithoutOccurrence) - safeMinutes(input.actualBreakMinutes))
 
   let scheduledWorkedMinutes: number
-  if (hasExactPlannedBreaks && hasExactActualBreaks) {
+  if (!plannedWorkingDay) {
+    scheduledWorkedMinutes = 0
+  } else if (hasExactPlannedBreaks && hasExactActualBreaks) {
     scheduledWorkedMinutes = intersectionDuration(exactWorkIntervals, plannedWorkIntervals)
   } else {
     const outsideScheduledShift = Math.max(
