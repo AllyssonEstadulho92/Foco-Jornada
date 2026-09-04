@@ -15,4 +15,12 @@ describe('estabilidade da navegação móvel', () => {
     expect(stabilityCss).toContain('font-size: 11px !important')
     expect(stabilityCss).toContain('.mobileBottomBar .navLinkActive::before')
   })
+
+  it('reserva largura suficiente para apresentar Foco Jornada completo no topo', () => {
+    expect(stabilityCss).toContain('.mobileAppIdentity > strong {')
+    expect(stabilityCss).toContain('width: 170px !important')
+    expect(stabilityCss).toContain('flex: 0 0 170px !important')
+    expect(stabilityCss).toContain('width: 148px !important')
+    expect(stabilityCss).toContain('width: 138px !important')
+  })
 })

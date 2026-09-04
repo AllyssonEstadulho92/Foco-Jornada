@@ -1,9 +1,16 @@
 /*
- * Barra inferior móvel 1.3.
- * Cinco destinos estáveis: Início · Jornada · Foco · Notificações · Mais.
+ * Estabilidade móvel 1.3.
+ * Mantém a marca completa na barra superior e cinco destinos estáveis na barra inferior:
+ * Início · Jornada · Foco · Notificações · Mais.
  * Sem botão central flutuante nem painel paralelo: "Mais" é uma área normal da aplicação.
  */
 @media (max-width: 899px) {
+  .mobileAppIdentity > strong {
+    width: 170px !important;
+    max-width: 170px !important;
+    flex: 0 0 170px !important;
+  }
+
   .bottomNav.mobileBottomBar {
     grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
     min-height: calc(66px + env(safe-area-inset-bottom)) !important;
@@ -92,7 +99,51 @@
   }
 }
 
+@media (max-width: 420px) {
+  .appTopBar {
+    gap: 8px !important;
+  }
+
+  .mobileAppIdentity {
+    gap: 6px !important;
+  }
+
+  .mobileAppIdentity > strong {
+    width: 148px !important;
+    max-width: 148px !important;
+    flex-basis: 148px !important;
+  }
+
+  .topBarStatusGroup {
+    gap: 2px !important;
+  }
+
+  .appClock {
+    gap: 5px !important;
+    font-size: 14px !important;
+  }
+}
+
 @media (max-width: 380px) {
+  .appTopBar {
+    gap: 6px !important;
+    padding-inline: max(10px, env(safe-area-inset-left)) max(10px, env(safe-area-inset-right)) !important;
+  }
+
+  .mobileAppIdentity {
+    gap: 4px !important;
+  }
+
+  .mobileAppIdentity > strong {
+    width: 138px !important;
+    max-width: 138px !important;
+    flex-basis: 138px !important;
+  }
+
+  .appClock {
+    font-size: 13px !important;
+  }
+
   .mobileBottomBar .navLabel {
     font-size: 10px !important;
   }
