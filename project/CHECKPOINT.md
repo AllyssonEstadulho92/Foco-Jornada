@@ -85,6 +85,28 @@ Validação automática da PR #183 no commit `a121f9494e3dca4a9f5077e9ac76967bc5
 - Build PWA: **PASS**
 - Smoke test no Chromium: **PASS**
 
+## Correção visual — marca completa no topo móvel (2026-09-04)
+
+Na PR #184 foi corrigido o corte do nome **Foco Jornada** na barra superior móvel. A causa era a combinação de compressão do item flex com limites de largura demasiado pequenos aplicados pelas camadas finais de CSS, o que cortava o texto desenhado no bloco da marca.
+
+A correção:
+
+- reserva largura suficiente para a marca em mobile;
+- aplica variantes compactas para ecrãs até 420 px e 380 px sem truncar o nome;
+- ajusta apenas os espaçamentos necessários no topo em ecrãs estreitos;
+- mantém intactos os comportamentos de navegação, segurança, dados e regras de negócio;
+- acrescenta cobertura de regressão ao teste de estabilidade móvel.
+
+Validação da PR #184:
+
+- Auditoria de dependências: **PASS**
+- Typecheck: **PASS**
+- Lint: **PASS**
+- Testes: **PASS**
+- Build: **PASS**
+- Smoke test desktop/mobile: **PASS**
+- GitHub Pages: **deploy concluído com sucesso**
+
 ## Pontos não bloqueantes para evolução
 
 - validar manualmente a apresentação final em Safari/iPhone, Android, tablet e monitores largos;
