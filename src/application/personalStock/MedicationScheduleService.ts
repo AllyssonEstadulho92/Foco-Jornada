@@ -42,23 +42,27 @@ export class MedicationScheduleService {
       }
 
       const schedules = await this.db.medicationSchedules.where('medicationId').equals(input.medicationId).toArray()
-      const existingReplacement = schedules.find((schedule) => (
+      const successor = schedules.find((schedule) => (
         schedule.id !== current.id
         && schedule.order === current.order
         && schedule.effectiveFrom === input.effectiveFrom
-        && schedule.localTime === input.localTime
-        && schedule.quantityMinor === quantityMinor
-        && schedule.fold === current.fold
       ))
+      const sameReplacement = successor
+        && successor.localTime === input.localTime
+        && successor.quantityMinor === quantityMinor
+        && successor.fold === current.fold
 
-      if (current.effectiveUntil === effectiveUntil && existingReplacement) {
-        return { previous: current, replacement: existingReplacement, changed: false }
+      if (current.effectiveUntil === effectiveUntil && sameReplacement) {
+        return { previous: current, replacement: successor, changed: false }
+      }
+      if (successor) {
+        throw new Error('Já existe uma nova definição deste horário para essa data.')
       }
       if (current.effectiveUntil && current.effectiveUntil < effectiveUntil) {
         throw new Error('Este horário já terminou antes da nova data definida.')
       }
 
-      const replacement: MedicationSchedule = existingReplacement ?? {
+      const replacement: MedicationSchedule = {
         id: newId(),
         medicationId: current.medicationId,
         localTime: input.localTime,
@@ -70,7 +74,7 @@ export class MedicationScheduleService {
       }
 
       await this.db.medicationSchedules.update(current.id, { effectiveUntil })
-      if (!existingReplacement) await this.db.medicationSchedules.add(replacement)
+      await this.db.medicationSchedules.add(replacement)
 
       return {
         previous: { ...current, effectiveUntil },
