@@ -287,7 +287,7 @@ export function MedicationScheduleActionDialog({
         ) : (
           <div className="medDoseActionDeleteBody">
             <p>
-              O horário termina hoje e deixa de gerar tomas a partir de amanhã. As tomas, correções e movimentos de stock já registados não são apagados.
+              Este horário será removido imediatamente da lista de tomas e deixará de gerar novas ocorrências. As tomas, correções e movimentos de stock já registados mantêm-se no histórico protegido.
             </p>
             <div className="medDoseActionButtons">
               <button type="button" disabled={busy} onClick={onCancel}>Cancelar</button>
