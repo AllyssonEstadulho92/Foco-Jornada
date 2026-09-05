@@ -1,4 +1,4 @@
-import type { MedicationDoseEvent } from '../../domain/personalStock/models'
+import type { MedicationDoseEvent, MedicationSchedule } from '../../domain/personalStock/models'
 import type { AppDatabase } from '../../infrastructure/database/appDatabase'
 import { MedicationScheduleService } from './MedicationScheduleService'
 import { PersonalStockService } from './PersonalStockService'
@@ -46,6 +46,18 @@ export class OperationalPersonalStockService extends PersonalStockService {
     effectiveUntil: string
   }) {
     return this.medicationScheduleService.endOnDate(input)
+  }
+
+  async listMedicationScheduleHistory(medicationId: string): Promise<MedicationSchedule[]> {
+    const medication = await this.operationalDb.stockEntities.get(medicationId)
+    if (!medication || medication.kind !== 'medication') throw new Error('Medicamento não encontrado.')
+    return (await this.operationalDb.medicationSchedules.where('medicationId').equals(medicationId).toArray())
+      .sort((left, right) => (
+        left.effectiveFrom.localeCompare(right.effectiveFrom)
+        || left.order - right.order
+        || left.createdAt.localeCompare(right.createdAt)
+        || left.id.localeCompare(right.id)
+      ))
   }
 
   override async confirmMedicationDose(input: {

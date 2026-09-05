@@ -37,6 +37,7 @@ export class MedicationScheduleService {
 
       const current = await this.db.medicationSchedules.get(input.scheduleId)
       if (!current || current.medicationId !== input.medicationId) throw new Error('Horário não encontrado.')
+      if (current.deletedAt) throw new Error('Este horário foi eliminado e já não pode ser alterado.')
       if (current.effectiveFrom > effectiveUntil) {
         throw new Error('A nova definição tem de começar depois do início do horário atual.')
       }
@@ -44,6 +45,7 @@ export class MedicationScheduleService {
       const schedules = await this.db.medicationSchedules.where('medicationId').equals(input.medicationId).toArray()
       const successor = schedules.find((schedule) => (
         schedule.id !== current.id
+        && !schedule.deletedAt
         && schedule.order === current.order
         && schedule.effectiveFrom === input.effectiveFrom
       ))
@@ -86,12 +88,12 @@ export class MedicationScheduleService {
     })
   }
 
-  async endOnDate(input: {
+  async deleteSchedule(input: {
     medicationId: string
     scheduleId: string
-    effectiveUntil: string
-  }): Promise<{ schedule: MedicationSchedule; changed: boolean }> {
-    if (!isDateKey(input.effectiveUntil)) throw new Error('Data final inválida.')
+    deletedOnDate: string
+  }): Promise<{ schedule: MedicationSchedule; changed: boolean; removedCount: number }> {
+    if (!isDateKey(input.deletedOnDate)) throw new Error('Data de eliminação inválida.')
 
     return this.db.transaction('rw', this.db.stockEntities, this.db.medicationSchedules, async () => {
       const medication = await this.db.stockEntities.get(input.medicationId)
@@ -99,18 +101,38 @@ export class MedicationScheduleService {
 
       const current = await this.db.medicationSchedules.get(input.scheduleId)
       if (!current || current.medicationId !== input.medicationId) throw new Error('Horário não encontrado.')
-      if (input.effectiveUntil < current.effectiveFrom) {
-        throw new Error('A data final não pode ser anterior ao início do horário.')
-      }
-      if (current.effectiveUntil && current.effectiveUntil <= input.effectiveUntil) {
-        return { schedule: current, changed: false }
+      if (current.deletedAt) return { schedule: current, changed: false, removedCount: 0 }
+
+      const deletedAt = new Date().toISOString()
+      const effectiveUntil = addCalendarDays(input.deletedOnDate, -1)
+      const schedules = await this.db.medicationSchedules.where('medicationId').equals(input.medicationId).toArray()
+      const targets = schedules.filter((schedule) => (
+        schedule.order === current.order
+        && !schedule.deletedAt
+        && schedule.effectiveFrom >= current.effectiveFrom
+      ))
+
+      for (const target of targets) {
+        await this.db.medicationSchedules.update(target.id, { effectiveUntil, deletedAt })
       }
 
-      await this.db.medicationSchedules.update(current.id, { effectiveUntil: input.effectiveUntil })
       return {
-        schedule: { ...current, effectiveUntil: input.effectiveUntil },
-        changed: true,
+        schedule: { ...current, effectiveUntil, deletedAt },
+        changed: targets.length > 0,
+        removedCount: targets.length,
       }
+    })
+  }
+
+  async endOnDate(input: {
+    medicationId: string
+    scheduleId: string
+    effectiveUntil: string
+  }): Promise<{ schedule: MedicationSchedule; changed: boolean; removedCount: number }> {
+    return this.deleteSchedule({
+      medicationId: input.medicationId,
+      scheduleId: input.scheduleId,
+      deletedOnDate: input.effectiveUntil,
     })
   }
 }

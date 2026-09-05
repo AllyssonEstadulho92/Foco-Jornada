@@ -8,11 +8,13 @@ import type {
 } from '../../application/personalStock/MedicationDataProtectionService'
 import { minorToDecimal } from '../../application/personalStock/decimal'
 import type { MedicationDoseEvent, MedicationSchedule, MedicationSummary } from '../../domain/personalStock/models'
+import '../../styles/medication-history-compact.css'
 import { AppIcon, type AppIconName } from './ui/AppIcon'
 import { useAppServices } from '../providers/AppServicesProvider'
 
 type WorkspaceTab = 'history' | 'evolution' | 'information'
 type StatusFilter = 'all' | MedicationLifecycleStatus
+type HistoryView = 'summary' | 'technical'
 
 interface MedicationPrototypeWorkspaceProps {
   medications: MedicationSummary[]
@@ -22,6 +24,7 @@ interface MedicationPrototypeWorkspaceProps {
   onDataChanged: () => Promise<void>
 }
 
+const HISTORY_STEP = 5
 const EMPTY_DASHBOARD: MedicationDashboardSummary = {
   medicationCount: 0,
   scheduledDoseCount: 0,
@@ -65,7 +68,6 @@ function formatDate(value?: string): string {
   }).format(parsed)
 }
 
-
 function timelineIcon(kind: MedicationTimelineItem['kind']): AppIconName {
   if (kind === 'dose') return 'check'
   if (kind === 'schedule') return 'clock'
@@ -74,6 +76,10 @@ function timelineIcon(kind: MedicationTimelineItem['kind']): AppIconName {
   if (kind === 'profile') return 'user'
   if (kind === 'protection') return 'shield'
   return 'plus'
+}
+
+function timelineItemIcon(item: MedicationTimelineItem): AppIconName {
+  return item.title === 'Horário eliminado' ? 'trash' : timelineIcon(item.kind)
 }
 
 export function MedicationPrototypeWorkspace({
@@ -92,6 +98,7 @@ export function MedicationPrototypeWorkspace({
   const [protection, setProtection] = useState<MedicationProtectionSummary | null>(null)
   const [timeline, setTimeline] = useState<MedicationTimelineItem[]>([])
   const [schedules, setSchedules] = useState<MedicationSchedule[]>([])
+  const [scheduleHistory, setScheduleHistory] = useState<MedicationSchedule[]>([])
   const [doseEvents, setDoseEvents] = useState<MedicationDoseEvent[]>([])
   const [profileForm, setProfileForm] = useState({
     status: 'active' as MedicationLifecycleStatus,
@@ -101,6 +108,8 @@ export function MedicationPrototypeWorkspace({
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState<StatusFilter>('all')
   const [tab, setTab] = useState<WorkspaceTab>('history')
+  const [historyView, setHistoryView] = useState<HistoryView>('summary')
+  const [historyVisible, setHistoryVisible] = useState(HISTORY_STEP)
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState('')
 
@@ -122,20 +131,23 @@ export function MedicationPrototypeWorkspace({
       setProtection(null)
       setTimeline([])
       setSchedules([])
+      setScheduleHistory([])
       setDoseEvents([])
       return
     }
 
-    const [nextProtection, nextTimeline, nextSchedules, nextDoseEvents, profile] = await Promise.all([
+    const [nextProtection, nextTimeline, nextSchedules, nextScheduleHistory, nextDoseEvents, profile] = await Promise.all([
       medicationDataProtectionService.verifyMedication(selectedId),
       medicationDataProtectionService.getMedicationTimeline(selectedId),
       personalStockService.schedulesForDate(selectedId, today),
+      personalStockService.listMedicationScheduleHistory(selectedId),
       personalStockService.listDoseEvents(selectedId),
       medicationDataProtectionService.getProfile(selectedId),
     ])
     setProtection(nextProtection)
     setTimeline(nextTimeline)
     setSchedules(nextSchedules)
+    setScheduleHistory(nextScheduleHistory)
     setDoseEvents(nextDoseEvents)
     setProfileForm({
       status: profile.status,
@@ -149,6 +161,11 @@ export function MedicationPrototypeWorkspace({
       setMessage(error instanceof Error ? error.message : 'Não foi possível carregar o centro de medicação.')
     })
   }, [loadWorkspace])
+
+  useEffect(() => {
+    setHistoryView('summary')
+    setHistoryVisible(HISTORY_STEP)
+  }, [selectedId])
 
   const filteredMedications = useMemo(() => {
     const normalizedSearch = search.trim().toLocaleLowerCase('pt-PT')
@@ -173,7 +190,55 @@ export function MedicationPrototypeWorkspace({
     ? `${minorToDecimal(schedules[0].quantityMinor)} ${selected.medication.unit}`
     : '—'
 
+  const combinedTimeline = useMemo(() => {
+    const firstScheduleIdByOrder = new Map<number, string>()
+    for (const schedule of scheduleHistory) {
+      if (!firstScheduleIdByOrder.has(schedule.order)) firstScheduleIdByOrder.set(schedule.order, schedule.id)
+    }
 
+    const scheduleById = new Map(scheduleHistory.map((schedule) => [schedule.id, schedule]))
+    const functionalItems = timeline.map((item) => {
+      if (item.kind !== 'schedule' || !item.id.startsWith('schedule:')) return item
+      const schedule = scheduleById.get(item.id.slice('schedule:'.length))
+      if (!schedule || firstScheduleIdByOrder.get(schedule.order) === schedule.id) return item
+      return {
+        ...item,
+        title: 'Horário alterado',
+        description: `${schedule.localTime} · ${minorToDecimal(schedule.quantityMinor)} ${selected?.medication.unit ?? ''} · válido desde ${schedule.effectiveFrom}.`,
+      }
+    })
+
+    const deletionKeys = new Set<string>()
+    const deletionItems: MedicationTimelineItem[] = []
+    for (const schedule of scheduleHistory) {
+      if (!schedule.deletedAt) continue
+      const key = `${schedule.order}:${schedule.deletedAt}`
+      if (deletionKeys.has(key)) continue
+      deletionKeys.add(key)
+      deletionItems.push({
+        id: `schedule-deleted:${key}`,
+        medicationId: schedule.medicationId,
+        kind: 'schedule',
+        title: 'Horário eliminado',
+        description: `${schedule.localTime} · ${minorToDecimal(schedule.quantityMinor)} ${selected?.medication.unit ?? ''} · removido da lista de tomas; registos anteriores preservados.`,
+        createdAt: schedule.deletedAt,
+      })
+    }
+
+    return [...functionalItems, ...deletionItems]
+      .sort((left, right) => right.createdAt.localeCompare(left.createdAt) || right.id.localeCompare(left.id))
+  }, [scheduleHistory, selected?.medication.unit, timeline])
+
+  const summaryTimeline = useMemo(
+    () => combinedTimeline.filter((item) => item.kind !== 'protection'),
+    [combinedTimeline],
+  )
+  const technicalTimeline = useMemo(
+    () => combinedTimeline.filter((item) => item.kind === 'protection'),
+    [combinedTimeline],
+  )
+  const activeTimeline = historyView === 'summary' ? summaryTimeline : technicalTimeline
+  const visibleTimeline = activeTimeline.slice(0, historyVisible)
 
   const lastSevenDays = useMemo(() => {
     const now = new Date()
@@ -209,8 +274,18 @@ export function MedicationPrototypeWorkspace({
     await medicationDataProtectionService.recordCheckpoint(selectedId, 'informação protegida atualizada')
   }
 
+  function selectHistoryView(view: HistoryView) {
+    setHistoryView(view)
+    setHistoryVisible(HISTORY_STEP)
+  }
 
-
+  function toggleHistorySize() {
+    if (historyVisible >= activeTimeline.length) {
+      setHistoryVisible(HISTORY_STEP)
+      return
+    }
+    setHistoryVisible((current) => Math.min(current + HISTORY_STEP, activeTimeline.length))
+  }
 
   return (
     <section className="medProtoWorkspace" aria-label="Resumo e detalhes dos medicamentos">
@@ -305,17 +380,49 @@ export function MedicationPrototypeWorkspace({
 
             {tab === 'history' ? (
               <div className="medProtoTimeline">
-                <div className="medProtoTimelineNotice">Nada é apagado. Alterações, correções e configurações permanecem auditáveis.</div>
-                {timeline.length ? timeline.slice(0, 80).map((item) => (
-                  <div className="medProtoTimelineRow" key={item.id}>
-                    <span className="medProtoTimelineIcon" aria-hidden="true"><AppIcon name={timelineIcon(item.kind)} /></span>
+                <div className="medProtoHistorySwitch" role="group" aria-label="Tipo de histórico">
+                  <button
+                    type="button"
+                    className={historyView === 'summary' ? 'active' : ''}
+                    aria-pressed={historyView === 'summary'}
+                    onClick={() => selectHistoryView('summary')}
+                  >
+                    Resumo
+                  </button>
+                  <button
+                    type="button"
+                    className={historyView === 'technical' ? 'active' : ''}
+                    aria-pressed={historyView === 'technical'}
+                    onClick={() => selectHistoryView('technical')}
+                  >
+                    Detalhes técnicos
+                  </button>
+                </div>
+                <div className="medProtoTimelineNotice">
+                  {historyView === 'summary'
+                    ? 'Mostramos apenas acontecimentos relevantes. Os registos técnicos continuam guardados.'
+                    : 'Pontos de proteção automáticos e verificações técnicas. Estes registos ficam ocultos no resumo.'}
+                </div>
+                {activeTimeline.length ? visibleTimeline.map((item) => (
+                  <div className={`medProtoTimelineRow${item.title === 'Horário eliminado' ? ' isDeleted' : ''}`} key={item.id}>
+                    <span className="medProtoTimelineIcon" aria-hidden="true"><AppIcon name={timelineItemIcon(item)} /></span>
                     <div>
                       <strong>{item.title}</strong>
                       <span>{item.description}</span>
                       <small>{formatDateTime(item.createdAt)}</small>
                     </div>
                   </div>
-                )) : <p className="medProtoEmptyInline">Ainda não existe histórico protegido.</p>}
+                )) : (
+                  <p className="medProtoEmptyInline">
+                    {historyView === 'summary' ? 'Ainda não existem acontecimentos para mostrar.' : 'Ainda não existem detalhes técnicos.'}
+                  </p>
+                )}
+                {activeTimeline.length > HISTORY_STEP ? (
+                  <button type="button" className="medProtoHistoryMore" onClick={toggleHistorySize}>
+                    {historyVisible < activeTimeline.length ? 'Ver mais eventos' : 'Mostrar menos'}
+                    <AppIcon name={historyVisible < activeTimeline.length ? 'chevron-down' : 'chevron-left'} aria-hidden="true" />
+                  </button>
+                ) : null}
               </div>
             ) : null}
 

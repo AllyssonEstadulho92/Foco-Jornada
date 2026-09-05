@@ -1,0 +1,95 @@
+.medProtoHistorySwitch{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:6px;
+  margin-bottom:8px;
+  padding:3px;
+  border-radius:13px;
+  background:var(--surface-soft,#f3f6f4);
+}
+
+.medProtoHistorySwitch button,
+.medProtoHistoryMore{
+  min-height:42px;
+  border:1px solid transparent;
+  border-radius:10px;
+  background:transparent;
+  color:var(--text-muted,#66706a);
+  padding:9px 12px;
+  font:inherit;
+  font-weight:750;
+  cursor:pointer;
+}
+
+.medProtoHistorySwitch button.active{
+  border-color:var(--border-subtle,#dfe4df);
+  background:var(--surface,#fff);
+  color:var(--accent,#1d6f5f);
+  box-shadow:0 1px 3px rgb(20 31 25/.07), inset 0 -2px 0 var(--accent,#1d6f5f);
+}
+
+.medProtoHistorySwitch button:focus-visible,
+.medProtoHistoryMore:focus-visible{
+  outline:2px solid var(--accent,#1d6f5f);
+  outline-offset:2px;
+}
+
+.medProtoHistoryMore{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  width:100%;
+  margin-top:8px;
+  border-color:var(--border-subtle,#dfe4df);
+  background:var(--surface,#fff);
+  color:inherit;
+}
+
+.medProtoHistoryMore .appIcon{
+  width:18px;
+  height:18px;
+}
+
+.medProtoTimelineRow.isDeleted .medProtoTimelineIcon{
+  background:#fff0f1;
+  color:#c51f32;
+}
+
+.medProtoTimelineRow.isDeleted strong{
+  color:#a7192b;
+}
+
+[data-theme="dark"] .medProtoHistorySwitch{
+  background:#151d19;
+}
+
+[data-theme="dark"] .medProtoHistorySwitch button.active,
+[data-theme="dark"] .medProtoHistoryMore{
+  background:#0f1512;
+  border-color:#29352f;
+}
+
+[data-theme="dark"] .medProtoTimelineRow.isDeleted .medProtoTimelineIcon{
+  background:#3a171b;
+  color:#ff9aa5;
+}
+
+[data-theme="dark"] .medProtoTimelineRow.isDeleted strong{
+  color:#ffb1b9;
+}
+
+@media(max-width:620px){
+  .medProtoHistorySwitch button,
+  .medProtoHistoryMore{
+    min-height:44px;
+  }
+}
+
+@media(forced-colors:active){
+  .medProtoHistorySwitch button.active,
+  .medProtoHistoryMore,
+  .medProtoTimelineRow.isDeleted .medProtoTimelineIcon{
+    border:1px solid ButtonText;
+  }
+}
