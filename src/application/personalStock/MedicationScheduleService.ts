@@ -47,12 +47,14 @@ export class MedicationScheduleService {
         && schedule.order === current.order
         && schedule.effectiveFrom === input.effectiveFrom
       ))
-      const sameReplacement = successor
+
+      if (
+        current.effectiveUntil === effectiveUntil
+        && successor
         && successor.localTime === input.localTime
         && successor.quantityMinor === quantityMinor
         && successor.fold === current.fold
-
-      if (current.effectiveUntil === effectiveUntil && sameReplacement) {
+      ) {
         return { previous: current, replacement: successor, changed: false }
       }
       if (successor) {
