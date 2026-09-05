@@ -2,14 +2,15 @@
 
 Atualizado em: 2026-09-05
 
-## P0 — Antes de integrar
+## P0 — Integração concluída
 
-- [ ] Confirmar workflow **Qualidade**: auditoria de dependências, typecheck, lint, testes, build e smoke test.
-- [ ] Corrigir qualquer erro introduzido pela interação de deslize.
-- [ ] Confirmar que `Definir` preserva o horário atual e cria apenas um sucessor.
-- [ ] Confirmar que `Eliminar` termina o horário sem remover o registo da base de dados.
+- [x] Confirmar workflow **Qualidade**: auditoria de dependências, typecheck, lint, testes, build e smoke test.
+- [x] Corrigir a falha inicial dos testes da interação de deslize no ambiente JSDOM.
+- [x] Confirmar por teste que `Definir` preserva o horário atual e cria apenas um sucessor.
+- [x] Confirmar por teste que `Eliminar` termina o horário sem remover o registo da base de dados.
+- [x] Integrar o PR #185 em `main`.
 
-## P1 — Validação de interface
+## P1 — Validação de interface em dispositivo real
 
 - [ ] Testar o deslize num iPhone real, incluindo scroll vertical da página.
 - [ ] Testar em Android/Chrome e tablet.
