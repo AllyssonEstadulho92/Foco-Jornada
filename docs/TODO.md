@@ -2,17 +2,23 @@
 
 Atualizado em: 2026-09-05
 
-## P0 — Integração concluída
+## P0 — Alteração atual
 
-- [x] Confirmar workflow **Qualidade**: auditoria de dependências, typecheck, lint, testes, build e smoke test.
-- [x] Corrigir a falha inicial dos testes da interação de deslize no ambiente JSDOM.
-- [x] Confirmar por teste que `Definir` preserva o horário atual e cria apenas um sucessor.
-- [x] Confirmar por teste que `Eliminar` termina o horário sem remover o registo da base de dados.
-- [x] Integrar o PR #185 em `main`.
+- [x] Alterar **Eliminar** para retirar o horário da lista ativa imediatamente.
+- [x] Preservar o registo técnico com tombstone em vez de apagar referências usadas por tomas anteriores.
+- [x] Eliminar também sucessores futuros da mesma cadeia de horário.
+- [x] Criar testes para remoção imediata, horário criado no próprio dia e sucessor futuro.
+- [x] Separar histórico em **Resumo** e **Detalhes técnicos**.
+- [x] Ocultar pontos de proteção automáticos no resumo.
+- [x] Limitar o número inicial de eventos e adicionar **Ver mais / Mostrar menos**.
+- [ ] Confirmar workflow **Qualidade**: auditoria, typecheck, lint, testes, build e smoke test.
+- [ ] Integrar em `main` apenas após validação automática aprovada.
 
 ## P1 — Validação de interface em dispositivo real
 
 - [ ] Testar o deslize num iPhone real, incluindo scroll vertical da página.
+- [ ] Confirmar que um horário eliminado desaparece imediatamente sem apresentar **Termina hoje**.
+- [ ] Confirmar o seletor **Resumo / Detalhes técnicos** e a paginação do histórico em ecrã pequeno.
 - [ ] Testar em Android/Chrome e tablet.
 - [ ] Verificar VoiceOver/TalkBack e navegação por teclado através do menu `···`.
 - [ ] Confirmar contraste no modo claro/escuro e em `forced-colors`.
@@ -20,4 +26,4 @@ Atualizado em: 2026-09-05
 ## P2 — Melhoria futura
 
 - [ ] Avaliar um indicador discreto de que a linha admite deslize sem aumentar ruído visual.
-- [ ] Considerar um fluxo explícito para reativar um horário terminado, se existir necessidade funcional confirmada.
+- [ ] Avaliar um filtro adicional por tipo de evento apenas se o volume de histórico funcional justificar.
