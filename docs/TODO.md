@@ -11,8 +11,9 @@ Atualizado em: 2026-09-05
 - [x] Separar histórico em **Resumo** e **Detalhes técnicos**.
 - [x] Ocultar pontos de proteção automáticos no resumo.
 - [x] Limitar o número inicial de eventos e adicionar **Ver mais / Mostrar menos**.
-- [ ] Confirmar workflow **Qualidade**: auditoria, typecheck, lint, testes, build e smoke test.
-- [ ] Integrar em `main` apenas após validação automática aprovada.
+- [x] Confirmar workflow **Qualidade**: auditoria, typecheck, lint, testes, build e smoke test.
+- [ ] Integrar em `main`.
+- [ ] Confirmar publicação no GitHub Pages.
 
 ## P1 — Validação de interface em dispositivo real
 
