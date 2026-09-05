@@ -40,6 +40,7 @@ export interface MedicationSchedule {
   quantityMinor: string
   effectiveFrom: string
   effectiveUntil?: string
+  deletedAt?: string
   order: number
   fold?: 0 | 1
   createdAt: string
