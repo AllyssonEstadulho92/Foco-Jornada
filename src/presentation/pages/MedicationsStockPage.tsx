@@ -932,7 +932,7 @@ export function MedicationsStockPage() {
           )}
           onDelete={() => void run(
             async () => { await deleteSchedule(scheduleAction.schedule) },
-            'Horário eliminado para os próximos dias. A ocorrência de hoje e o histórico foram preservados.',
+            'Horário eliminado. Foi removido imediatamente da lista de tomas; os registos anteriores permanecem no histórico protegido.',
           )}
         />
       ) : null}
