@@ -6,9 +6,9 @@ Atualizado em: 2026-09-05
 
 A área **Medicamentos > Tomas programadas** possui interação de deslize horizontal inspirada nos padrões iOS/Outlook. Cada toma pode revelar as ações **Definir** e **Eliminar**.
 
-A melhoria atual transforma **Eliminar** numa remoção imediata da lista ativa e simplifica o histórico visível ao utilizador. O workflow **Qualidade** concluiu com sucesso auditoria de dependências, typecheck, lint, testes, build e smoke test.
+A melhoria de eliminação imediata e histórico simplificado foi integrada em `main` através do PR #186 e publicada no GitHub Pages.
 
-## Comportamento implementado nesta alteração
+## Comportamento implementado
 
 - Deslizar a linha para a esquerda continua a revelar **Definir** e **Eliminar**.
 - **Definir** mantém o comportamento anterior: a nova hora/quantidade entra em vigor no dia seguinte.
@@ -19,7 +19,7 @@ A melhoria atual transforma **Eliminar** numa remoção imediata da lista ativa 
 - O histórico abre por defeito em **Resumo**, ocultando pontos de proteção automáticos.
 - **Detalhes técnicos** continua disponível para consultar checkpoints e auditoria técnica.
 - O resumo apresenta eventos funcionais como **Horário adicionado**, **Horário alterado**, **Horário eliminado** e eventos de toma.
-- O histórico é paginado com **Ver mais eventos / Mostrar menos** para evitar listas extensas.
+- O histórico mostra inicialmente cinco eventos e permite **Ver mais eventos / Mostrar menos** para evitar listas extensas.
 
 ## Segurança e integridade
 
@@ -34,6 +34,9 @@ A eliminação não executa `delete()` físico em `medicationSchedules`. Os even
 - Build: aprovado.
 - Smoke test de arranque no browser: aprovado.
 - Testes específicos cobrem remoção imediata, preservação do registo técnico, horário criado no próprio dia e eliminação de sucessores futuros do mesmo horário.
+- Workflow **Qualidade** após integração em `main`: aprovado.
+- Workflow de publicação: aprovado.
+- GitHub Pages para o build publicado: aprovado.
 
 ## Limitação de validação
 
@@ -41,10 +44,12 @@ A validação física do gesto e da apresentação do histórico continua penden
 
 ## Última alteração
 
-Eliminação imediata de horários com tombstone auditável e histórico visual dividido entre resumo funcional e detalhes técnicos.
+Eliminação imediata de horários com tombstone auditável e histórico visual dividido entre resumo funcional e detalhes técnicos, integrada e publicada.
 
 ## Próximo passo
 
-1. Integrar o PR da alteração em `main`.
-2. Confirmar publicação no GitHub Pages.
-3. Validar o gesto e a nova apresentação do histórico num dispositivo real.
+Validar num dispositivo real que:
+
+1. o deslize horizontal não interfere com o scroll vertical;
+2. um horário eliminado desaparece imediatamente sem apresentar **Termina hoje**;
+3. o seletor **Resumo / Detalhes técnicos** e **Ver mais eventos** permanecem confortáveis em ecrã pequeno.
