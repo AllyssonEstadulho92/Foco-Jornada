@@ -33,10 +33,10 @@ async function createMedicationAndSchedule(db: AppDatabase) {
 }
 
 describe('MedicationScheduleService', () => {
-  it('ends a schedule without deleting the original record', async () => {
+  it('removes a schedule immediately while preserving its audit record', async () => {
     const db = makeDatabase()
     try {
-      const { medicationId, schedule } = await createMedicationAndSchedule(db)
+      const { stock, medicationId, schedule } = await createMedicationAndSchedule(db)
       const service = new MedicationScheduleService(db)
 
       const result = await service.endOnDate({
@@ -45,9 +45,83 @@ describe('MedicationScheduleService', () => {
         effectiveUntil: '2026-09-05',
       })
 
+      const stored = await db.medicationSchedules.get(schedule.id)
       expect(result.changed).toBe(true)
-      expect((await db.medicationSchedules.get(schedule.id))?.effectiveUntil).toBe('2026-09-05')
+      expect(result.removedCount).toBe(1)
+      expect(stored?.effectiveUntil).toBe('2026-09-04')
+      expect(stored?.deletedAt).toBeTruthy()
+      expect(await stock.schedulesForDate(medicationId, '2026-09-05')).toEqual([])
       expect(await db.medicationSchedules.count()).toBe(1)
+    } finally {
+      await db.delete()
+    }
+  })
+
+  it('removes the current schedule and its already-planned successor as one schedule chain', async () => {
+    const db = makeDatabase()
+    try {
+      const { stock, medicationId, schedule } = await createMedicationAndSchedule(db)
+      const service = new MedicationScheduleService(db)
+      const defined = await service.defineFromDate({
+        medicationId,
+        scheduleId: schedule.id,
+        localTime: '09:15',
+        quantity: '1.5',
+        effectiveFrom: '2026-09-06',
+      })
+
+      const result = await service.endOnDate({
+        medicationId,
+        scheduleId: schedule.id,
+        effectiveUntil: '2026-09-05',
+      })
+
+      const previous = await db.medicationSchedules.get(schedule.id)
+      const successor = await db.medicationSchedules.get(defined.replacement.id)
+      expect(result.changed).toBe(true)
+      expect(result.removedCount).toBe(2)
+      expect(previous?.deletedAt).toBeTruthy()
+      expect(successor?.deletedAt).toBe(previous?.deletedAt)
+      expect(await stock.schedulesForDate(medicationId, '2026-09-05')).toEqual([])
+      expect(await stock.schedulesForDate(medicationId, '2026-09-06')).toEqual([])
+      expect(await db.medicationSchedules.count()).toBe(2)
+    } finally {
+      await db.delete()
+    }
+  })
+
+  it('removes a schedule created on the same day without exposing a terminal row', async () => {
+    const db = makeDatabase()
+    try {
+      const stock = new PersonalStockService(db)
+      const medicationId = id()
+      await stock.createMedication({
+        medicationId,
+        operationId: id(),
+        name: 'Medicamento do próprio dia',
+        dosage: '20 mg',
+        unit: 'comprimidos',
+        initialStock: '10',
+        startDate: '2026-09-05',
+      })
+      const schedule = await stock.addMedicationSchedule({
+        medicationId,
+        localTime: '15:37',
+        quantity: '2',
+        effectiveFrom: '2026-09-05',
+      })
+      const service = new MedicationScheduleService(db)
+
+      await service.endOnDate({
+        medicationId,
+        scheduleId: schedule.id,
+        effectiveUntil: '2026-09-05',
+      })
+
+      const stored = await db.medicationSchedules.get(schedule.id)
+      expect(stored?.effectiveUntil).toBe('2026-09-04')
+      expect(stored?.deletedAt).toBeTruthy()
+      expect(await stock.schedulesForDate(medicationId, '2026-09-05')).toEqual([])
     } finally {
       await db.delete()
     }
