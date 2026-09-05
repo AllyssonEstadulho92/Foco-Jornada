@@ -1,5 +1,6 @@
 import type { MedicationDoseEvent } from '../../domain/personalStock/models'
 import type { AppDatabase } from '../../infrastructure/database/appDatabase'
+import { MedicationScheduleService } from './MedicationScheduleService'
 import { PersonalStockService } from './PersonalStockService'
 
 function activeEvent(events: MedicationDoseEvent[]): MedicationDoseEvent | undefined {
@@ -22,8 +23,29 @@ function statusDescription(status: MedicationDoseEvent['status']): string {
 }
 
 export class OperationalPersonalStockService extends PersonalStockService {
+  private readonly medicationScheduleService: MedicationScheduleService
+
   constructor(private readonly operationalDb: AppDatabase) {
     super(operationalDb)
+    this.medicationScheduleService = new MedicationScheduleService(operationalDb)
+  }
+
+  async defineMedicationScheduleFromDate(input: {
+    medicationId: string
+    scheduleId: string
+    localTime: string
+    quantity: string
+    effectiveFrom: string
+  }) {
+    return this.medicationScheduleService.defineFromDate(input)
+  }
+
+  async endMedicationScheduleOnDate(input: {
+    medicationId: string
+    scheduleId: string
+    effectiveUntil: string
+  }) {
+    return this.medicationScheduleService.endOnDate(input)
   }
 
   override async confirmMedicationDose(input: {
