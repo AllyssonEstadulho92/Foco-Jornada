@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { minorToDecimal } from '../../application/personalStock/decimal'
-import { dateKeyInZone, resolveZonedLocalDateTime } from '../../application/personalStock/time'
+import { addCalendarDays, dateKeyInZone, resolveZonedLocalDateTime } from '../../application/personalStock/time'
 import type {
   MedicationDoseEvent,
   MedicationForecast,
@@ -8,6 +8,11 @@ import type {
   MedicationSummary,
   PhysicalStockCheck,
 } from '../../domain/personalStock/models'
+import {
+  MedicationDoseSwipeActions,
+  MedicationScheduleActionDialog,
+  type MedicationScheduleActionMode,
+} from '../components/MedicationDoseSwipeActions'
 import { MedicationPrototypeWorkspace } from '../components/MedicationPrototypeWorkspace'
 import { useAppServices } from '../providers/AppServicesProvider'
 
@@ -87,7 +92,6 @@ function doseStatusClass(status: MedicationDoseEvent['status']): string {
   return 'stockStatusNeutral'
 }
 
-
 function signed(value?: string): string {
   if (!value) return '—'
   if (value === '0' || value.startsWith('-')) return value
@@ -97,6 +101,11 @@ function signed(value?: string): string {
 interface TodayDose {
   schedule: MedicationSchedule
   event?: MedicationDoseEvent
+}
+
+interface ScheduleActionState {
+  mode: MedicationScheduleActionMode
+  schedule: MedicationSchedule
 }
 
 export function MedicationsStockPage() {
@@ -127,6 +136,8 @@ export function MedicationsStockPage() {
   const [postponeTime, setPostponeTime] = useState('')
   const [openMenuScheduleId, setOpenMenuScheduleId] = useState<string | null>(null)
   const [detailScheduleId, setDetailScheduleId] = useState<string | null>(null)
+  const [openSwipeScheduleId, setOpenSwipeScheduleId] = useState<string | null>(null)
+  const [scheduleAction, setScheduleAction] = useState<ScheduleActionState | null>(null)
 
   const today = useMemo(() => dateKeyInZone(new Date(), TIMEZONE), [])
   const selected = medications.find((item) => item.medication.id === selectedId) ?? null
@@ -193,6 +204,8 @@ export function MedicationsStockPage() {
     setPostponeTime('')
     setOpenMenuScheduleId(null)
     setDetailScheduleId(null)
+    setOpenSwipeScheduleId(null)
+    setScheduleAction(null)
     if (!selectedId) {
       setSchedules([])
       setEvents([])
@@ -317,6 +330,7 @@ export function MedicationsStockPage() {
 
   function openPostponeEditor(schedule: MedicationSchedule, event?: MedicationDoseEvent) {
     setOpenMenuScheduleId(null)
+    setOpenSwipeScheduleId(null)
     setPostponeScheduleId(schedule.id)
     setPostponeEventId(event?.status === 'postponed' ? event.id : null)
     setPostponeTime(event?.status === 'postponed' && event.postponedTo ? formatTime(event.postponedTo) : '')
@@ -371,7 +385,36 @@ export function MedicationsStockPage() {
 
   function toggleDetails(scheduleId: string) {
     setOpenMenuScheduleId(null)
+    setOpenSwipeScheduleId(null)
     setDetailScheduleId((current) => current === scheduleId ? null : scheduleId)
+  }
+
+  function openScheduleAction(mode: MedicationScheduleActionMode, schedule: MedicationSchedule) {
+    setOpenMenuScheduleId(null)
+    setOpenSwipeScheduleId(null)
+    setScheduleAction({ mode, schedule })
+  }
+
+  async function defineSchedule(schedule: MedicationSchedule, localTime: string, quantity: string) {
+    if (!selected) return
+    await personalStockService.defineMedicationScheduleFromDate({
+      medicationId: selected.medication.id,
+      scheduleId: schedule.id,
+      localTime,
+      quantity,
+      effectiveFrom: addCalendarDays(today, 1),
+    })
+    setScheduleAction(null)
+  }
+
+  async function deleteSchedule(schedule: MedicationSchedule) {
+    if (!selected) return
+    await personalStockService.endMedicationScheduleOnDate({
+      medicationId: selected.medication.id,
+      scheduleId: schedule.id,
+      effectiveUntil: today,
+    })
+    setScheduleAction(null)
   }
 
   return (
@@ -493,138 +536,135 @@ export function MedicationsStockPage() {
                   const quick60 = quickPostponeTime(schedule, event, 60)
                   const menuOpen = openMenuScheduleId === schedule.id
                   const detailsOpen = detailScheduleId === schedule.id
+                  const swipeOpen = openSwipeScheduleId === schedule.id
+                  const scheduleEndingToday = schedule.effectiveUntil === today
 
                   return (
-                    <article className="stockDoseCard" key={schedule.id}>
-                      <div className="stockDoseRow stockDoseRowMain">
-                        <div className="stockDoseIdentity">
-                          <strong>{schedule.localTime}</strong>
-                          <small>{minorToDecimal(schedule.quantityMinor)} {selected.medication.unit}</small>
-                          {event?.status === 'postponed' ? (
-                            <span className="stockDosePostponedTime">
-                              {event.postponedTo ? `Adiada para ${formatTime(event.postponedTo)}` : 'Adiada sem nova hora definida'}
-                            </span>
-                          ) : null}
-                        </div>
-
-                        {postponeScheduleId === schedule.id ? (
-                          <div className="stockPostponeEditor">
-                            <div className="stockPostponeTitle">
-                              <strong>{postponeEventId ? 'Alterar nova hora' : 'Adiar toma'}</strong>
-                              <span>O stock não muda até a toma ser confirmada.</span>
-                            </div>
-                            <div className="stockPostponePresets" aria-label="Atalhos para nova hora">
-                              <button type="button" disabled={busy || !quick15} onClick={() => quick15 && setPostponeTime(quick15)}>+15 min</button>
-                              <button type="button" disabled={busy || !quick30} onClick={() => quick30 && setPostponeTime(quick30)}>+30 min</button>
-                              <button type="button" disabled={busy || !quick60} onClick={() => quick60 && setPostponeTime(quick60)}>+1 h</button>
-                            </div>
-                            <label>
-                              Nova hora
-                              <input type="time" value={postponeTime} onChange={(changeEvent) => setPostponeTime(changeEvent.target.value)} />
-                            </label>
-                            <span className="stockPostponeHint">Os atalhos são ferramentas de agenda, não indicação clínica.</span>
-                            <div className="stockPostponeButtons">
-                              <button type="button" disabled={busy} onClick={closePostponeEditor}>Cancelar</button>
-                              <button
-                                type="button"
-                                className="stockPrimaryAction"
-                                disabled={busy || !postponeTime}
-                                onClick={() => void run(
-                                  async () => { await savePostpone(schedule) },
-                                  postponeEventId
-                                    ? 'Nova hora guardada. O adiamento anterior ficou no histórico.'
-                                    : 'Toma adiada. O stock não foi alterado.',
-                                )}
-                              >
-                                Guardar hora
-                              </button>
-                            </div>
+                    <MedicationDoseSwipeActions
+                      key={schedule.id}
+                      label={schedule.localTime}
+                      open={swipeOpen}
+                      disabled={busy || postponeScheduleId === schedule.id}
+                      onOpenChange={(nextOpen) => setOpenSwipeScheduleId(nextOpen ? schedule.id : null)}
+                      onDefine={() => openScheduleAction('define', schedule)}
+                      onDelete={() => openScheduleAction('delete', schedule)}
+                    >
+                      <article className="stockDoseCard">
+                        <div className="stockDoseRow stockDoseRowMain">
+                          <div className="stockDoseIdentity">
+                            <strong>{schedule.localTime}</strong>
+                            <small>{minorToDecimal(schedule.quantityMinor)} {selected.medication.unit}</small>
+                            {scheduleEndingToday ? <span className="medDoseScheduleEnding">Termina hoje</span> : null}
+                            {event?.status === 'postponed' ? (
+                              <span className="stockDosePostponedTime">
+                                {event.postponedTo ? `Adiada para ${formatTime(event.postponedTo)}` : 'Adiada sem nova hora definida'}
+                              </span>
+                            ) : null}
                           </div>
-                        ) : (
-                          <div className="stockDoseActionCluster">
-                            <div className="stockDoseStateLine">
-                              {event ? (
-                                <span className={doseStatusClass(event.status)}>{doseStatusLabel(event.status)}</span>
-                              ) : isLate ? (
-                                <span className="stockStatusLate">ATRASADA · {formatDelay(originalAt, now)}</span>
-                              ) : (
-                                <span className="stockStatusPending">PENDENTE</span>
-                              )}
-                            </div>
 
-                            <div className="stockDoseQuickActions">
-                              {!event ? (
-                                <>
-                                  <button
-                                    className="stockPrimaryAction"
-                                    type="button"
-                                    disabled={busy}
-                                    onClick={() => void run(
-                                      async () => {
-                                        await personalStockService.confirmMedicationDose({
-                                          medicationId: selected.medication.id,
-                                          scheduleId: schedule.id,
-                                          onDate: today,
-                                          operationId: operationId(),
-                                        })
-                                      },
-                                      'Toma confirmada. O stock foi descontado exatamente uma vez.',
-                                    )}
-                                  >
-                                    {isLate ? 'Tomada agora' : 'Tomada'}
-                                  </button>
-                                  <button type="button" disabled={busy} onClick={() => openPostponeEditor(schedule)}>Adiar</button>
-                                </>
-                              ) : event.status === 'postponed' ? (
-                                <>
-                                  <button
-                                    type="button"
-                                    className="stockPrimaryAction"
-                                    disabled={busy}
-                                    onClick={() => void run(
-                                      async () => {
-                                        await medicationDoseStatusService.confirmPostponedMedicationDose(event.id, operationId())
-                                      },
-                                      'Toma adiada confirmada. O stock foi descontado uma única vez.',
-                                    )}
-                                  >
-                                    Tomada agora
-                                  </button>
-                                  <button type="button" disabled={busy} onClick={() => openPostponeEditor(schedule, event)}>Alterar hora</button>
-                                </>
-                              ) : null}
-
-                              <div className="stockDoseMenuRoot" data-dose-menu-root>
+                          {postponeScheduleId === schedule.id ? (
+                            <div className="stockPostponeEditor">
+                              <div className="stockPostponeTitle">
+                                <strong>{postponeEventId ? 'Alterar nova hora' : 'Adiar toma'}</strong>
+                                <span>O stock não muda até a toma ser confirmada.</span>
+                              </div>
+                              <div className="stockPostponePresets" aria-label="Atalhos para nova hora">
+                                <button type="button" disabled={busy || !quick15} onClick={() => quick15 && setPostponeTime(quick15)}>+15 min</button>
+                                <button type="button" disabled={busy || !quick30} onClick={() => quick30 && setPostponeTime(quick30)}>+30 min</button>
+                                <button type="button" disabled={busy || !quick60} onClick={() => quick60 && setPostponeTime(quick60)}>+1 h</button>
+                              </div>
+                              <label>
+                                Nova hora
+                                <input type="time" value={postponeTime} onChange={(changeEvent) => setPostponeTime(changeEvent.target.value)} />
+                              </label>
+                              <span className="stockPostponeHint">Os atalhos são ferramentas de agenda, não indicação clínica.</span>
+                              <div className="stockPostponeButtons">
+                                <button type="button" disabled={busy} onClick={closePostponeEditor}>Cancelar</button>
                                 <button
                                   type="button"
-                                  className="stockDoseMenuButton"
-                                  aria-label={`Mais ações para a toma das ${schedule.localTime}`}
-                                  aria-expanded={menuOpen}
-                                  onClick={() => setOpenMenuScheduleId((current) => current === schedule.id ? null : schedule.id)}
+                                  className="stockPrimaryAction"
+                                  disabled={busy || !postponeTime}
+                                  onClick={() => void run(
+                                    async () => { await savePostpone(schedule) },
+                                    postponeEventId
+                                      ? 'Nova hora guardada. O adiamento anterior ficou no histórico.'
+                                      : 'Toma adiada. O stock não foi alterado.',
+                                  )}
                                 >
-                                  ···
+                                  Guardar hora
                                 </button>
-                                {menuOpen ? (
-                                  <div className="stockDoseMenu" role="menu">
-                                    {!event ? (
-                                      <button
-                                        type="button"
-                                        role="menuitem"
-                                        disabled={busy}
-                                        onClick={() => {
-                                          setOpenMenuScheduleId(null)
-                                          void run(
-                                            async () => { await markNotTaken(schedule) },
-                                            'Toma marcada como não tomada. O stock não foi alterado.',
-                                          )
-                                        }}
-                                      >
-                                        Não tomada
-                                      </button>
-                                    ) : null}
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="stockDoseActionCluster">
+                              <div className="stockDoseStateLine">
+                                {event ? (
+                                  <span className={doseStatusClass(event.status)}>{doseStatusLabel(event.status)}</span>
+                                ) : isLate ? (
+                                  <span className="stockStatusLate">ATRASADA · {formatDelay(originalAt, now)}</span>
+                                ) : (
+                                  <span className="stockStatusPending">PENDENTE</span>
+                                )}
+                              </div>
 
-                                    {event?.status === 'postponed' ? (
-                                      <>
+                              <div className="stockDoseQuickActions">
+                                {!event ? (
+                                  <>
+                                    <button
+                                      className="stockPrimaryAction"
+                                      type="button"
+                                      disabled={busy}
+                                      onClick={() => void run(
+                                        async () => {
+                                          await personalStockService.confirmMedicationDose({
+                                            medicationId: selected.medication.id,
+                                            scheduleId: schedule.id,
+                                            onDate: today,
+                                            operationId: operationId(),
+                                          })
+                                        },
+                                        'Toma confirmada. O stock foi descontado exatamente uma vez.',
+                                      )}
+                                    >
+                                      {isLate ? 'Tomada agora' : 'Tomada'}
+                                    </button>
+                                    <button type="button" disabled={busy} onClick={() => openPostponeEditor(schedule)}>Adiar</button>
+                                  </>
+                                ) : event.status === 'postponed' ? (
+                                  <>
+                                    <button
+                                      type="button"
+                                      className="stockPrimaryAction"
+                                      disabled={busy}
+                                      onClick={() => void run(
+                                        async () => {
+                                          await medicationDoseStatusService.confirmPostponedMedicationDose(event.id, operationId())
+                                        },
+                                        'Toma adiada confirmada. O stock foi descontado uma única vez.',
+                                      )}
+                                    >
+                                      Tomada agora
+                                    </button>
+                                    <button type="button" disabled={busy} onClick={() => openPostponeEditor(schedule, event)}>Alterar hora</button>
+                                  </>
+                                ) : null}
+
+                                <div className="stockDoseMenuRoot" data-dose-menu-root>
+                                  <button
+                                    type="button"
+                                    className="stockDoseMenuButton"
+                                    aria-label={`Mais ações para a toma das ${schedule.localTime}`}
+                                    aria-expanded={menuOpen}
+                                    onClick={() => {
+                                      setOpenSwipeScheduleId(null)
+                                      setOpenMenuScheduleId((current) => current === schedule.id ? null : schedule.id)
+                                    }}
+                                  >
+                                    ···
+                                  </button>
+                                  {menuOpen ? (
+                                    <div className="stockDoseMenu" role="menu">
+                                      {!event ? (
                                         <button
                                           type="button"
                                           role="menuitem"
@@ -632,13 +672,49 @@ export function MedicationsStockPage() {
                                           onClick={() => {
                                             setOpenMenuScheduleId(null)
                                             void run(
-                                              async () => { await markNotTaken(schedule, event) },
-                                              'A toma adiada foi marcada como não tomada. O histórico foi preservado.',
+                                              async () => { await markNotTaken(schedule) },
+                                              'Toma marcada como não tomada. O stock não foi alterado.',
                                             )
                                           }}
                                         >
                                           Não tomada
                                         </button>
+                                      ) : null}
+
+                                      {event?.status === 'postponed' ? (
+                                        <>
+                                          <button
+                                            type="button"
+                                            role="menuitem"
+                                            disabled={busy}
+                                            onClick={() => {
+                                              setOpenMenuScheduleId(null)
+                                              void run(
+                                                async () => { await markNotTaken(schedule, event) },
+                                                'A toma adiada foi marcada como não tomada. O histórico foi preservado.',
+                                              )
+                                            }}
+                                          >
+                                            Não tomada
+                                          </button>
+                                          <button
+                                            type="button"
+                                            role="menuitem"
+                                            disabled={busy}
+                                            onClick={() => {
+                                              setOpenMenuScheduleId(null)
+                                              void run(
+                                                async () => { await correctDoseEvent(event) },
+                                                'Adiamento corrigido. O evento original permanece no histórico.',
+                                              )
+                                            }}
+                                          >
+                                            Corrigir adiamento
+                                          </button>
+                                        </>
+                                      ) : null}
+
+                                      {event?.status === 'taken' ? (
                                         <button
                                           type="button"
                                           role="menuitem"
@@ -647,97 +723,80 @@ export function MedicationsStockPage() {
                                             setOpenMenuScheduleId(null)
                                             void run(
                                               async () => { await correctDoseEvent(event) },
-                                              'Adiamento corrigido. O evento original permanece no histórico.',
+                                              'Toma corrigida. O stock foi reposto por movimento de correção.',
                                             )
                                           }}
                                         >
-                                          Corrigir adiamento
+                                          Corrigir toma
                                         </button>
-                                      </>
-                                    ) : null}
+                                      ) : null}
 
-                                    {event?.status === 'taken' ? (
-                                      <button
-                                        type="button"
-                                        role="menuitem"
-                                        disabled={busy}
-                                        onClick={() => {
-                                          setOpenMenuScheduleId(null)
-                                          void run(
-                                            async () => { await correctDoseEvent(event) },
-                                            'Toma corrigida. O stock foi reposto por movimento de correção.',
-                                          )
-                                        }}
-                                      >
-                                        Corrigir toma
+                                      {event?.status === 'not_taken' ? (
+                                        <button
+                                          type="button"
+                                          role="menuitem"
+                                          disabled={busy}
+                                          onClick={() => {
+                                            setOpenMenuScheduleId(null)
+                                            void run(
+                                              async () => { await correctDoseEvent(event) },
+                                              'Estado corrigido. O evento original permanece no histórico.',
+                                            )
+                                          }}
+                                        >
+                                          Corrigir estado
+                                        </button>
+                                      ) : null}
+
+                                      <button type="button" role="menuitem" onClick={() => toggleDetails(schedule.id)}>
+                                        {detailsOpen ? 'Fechar histórico' : 'Ver histórico desta toma'}
                                       </button>
-                                    ) : null}
-
-                                    {event?.status === 'not_taken' ? (
-                                      <button
-                                        type="button"
-                                        role="menuitem"
-                                        disabled={busy}
-                                        onClick={() => {
-                                          setOpenMenuScheduleId(null)
-                                          void run(
-                                            async () => { await correctDoseEvent(event) },
-                                            'Estado corrigido. O evento original permanece no histórico.',
-                                          )
-                                        }}
-                                      >
-                                        Corrigir estado
-                                      </button>
-                                    ) : null}
-
-                                    <button type="button" role="menuitem" onClick={() => toggleDetails(schedule.id)}>
-                                      {detailsOpen ? 'Fechar histórico' : 'Ver histórico desta toma'}
-                                    </button>
-                                  </div>
-                                ) : null}
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-
-                      {detailsOpen ? (
-                        <div className="stockDoseDetails" id={`dose-details-${schedule.id}`}>
-                          <div className="stockDoseDetailsGrid">
-                            <div><span>Estado atual</span><strong>{event ? doseStatusLabel(event.status) : isLate ? 'ATRASADA' : 'PENDENTE'}</strong></div>
-                            <div><span>Hora original</span><strong>{schedule.localTime}</strong></div>
-                            <div><span>Quantidade</span><strong>{minorToDecimal(schedule.quantityMinor)} {selected.medication.unit}</strong></div>
-                            <div>
-                              <span>Efeito atual no stock</span>
-                              <strong>{event?.status === 'taken' ? `−${minorToDecimal(schedule.quantityMinor)} ${selected.medication.unit}` : 'Sem alteração'}</strong>
-                            </div>
-                          </div>
-                          {event?.status === 'postponed' && event.postponedTo ? (
-                            <p className="stockDoseDetailNote">Nova hora ativa: <strong>{formatTime(event.postponedTo)}</strong>.</p>
-                          ) : null}
-                          <div className="stockDoseHistory">
-                            <strong>Histórico desta ocorrência</strong>
-                            {history.length ? history.map((historyEvent) => (
-                              <div className="stockDoseHistoryRow" key={historyEvent.id}>
-                                <span className={doseStatusClass(historyEvent.status)}>{historyStatusLabel(historyEvent)}</span>
-                                <div>
-                                  <strong>{formatDateTime(historyEvent.createdAt)}</strong>
-                                  <small>
-                                    {historyEvent.status === 'postponed' && historyEvent.postponedTo
-                                      ? `Nova hora: ${formatTime(historyEvent.postponedTo)}`
-                                      : historyEvent.status === 'taken'
-                                        ? `Stock: −${minorToDecimal(historyEvent.quantityMinor)} ${selected.medication.unit}`
-                                        : historyEvent.status === 'corrected'
-                                          ? 'O registo original foi mantido e corrigido por um novo evento.'
-                                          : 'Sem alteração de stock.'}
-                                  </small>
+                                    </div>
+                                  ) : null}
                                 </div>
                               </div>
-                            )) : <p>Ainda não existem eventos para esta toma.</p>}
-                          </div>
+                            </div>
+                          )}
                         </div>
-                      ) : null}
-                    </article>
+
+                        {detailsOpen ? (
+                          <div className="stockDoseDetails" id={`dose-details-${schedule.id}`}>
+                            <div className="stockDoseDetailsGrid">
+                              <div><span>Estado atual</span><strong>{event ? doseStatusLabel(event.status) : isLate ? 'ATRASADA' : 'PENDENTE'}</strong></div>
+                              <div><span>Hora original</span><strong>{schedule.localTime}</strong></div>
+                              <div><span>Quantidade</span><strong>{minorToDecimal(schedule.quantityMinor)} {selected.medication.unit}</strong></div>
+                              <div>
+                                <span>Efeito atual no stock</span>
+                                <strong>{event?.status === 'taken' ? `−${minorToDecimal(schedule.quantityMinor)} ${selected.medication.unit}` : 'Sem alteração'}</strong>
+                              </div>
+                            </div>
+                            {event?.status === 'postponed' && event.postponedTo ? (
+                              <p className="stockDoseDetailNote">Nova hora ativa: <strong>{formatTime(event.postponedTo)}</strong>.</p>
+                            ) : null}
+                            <div className="stockDoseHistory">
+                              <strong>Histórico desta ocorrência</strong>
+                              {history.length ? history.map((historyEvent) => (
+                                <div className="stockDoseHistoryRow" key={historyEvent.id}>
+                                  <span className={doseStatusClass(historyEvent.status)}>{historyStatusLabel(historyEvent)}</span>
+                                  <div>
+                                    <strong>{formatDateTime(historyEvent.createdAt)}</strong>
+                                    <small>
+                                      {historyEvent.status === 'postponed' && historyEvent.postponedTo
+                                        ? `Nova hora: ${formatTime(historyEvent.postponedTo)}`
+                                        : historyEvent.status === 'taken'
+                                          ? `Stock: −${minorToDecimal(historyEvent.quantityMinor)} ${selected.medication.unit}`
+                                          : historyEvent.status === 'corrected'
+                                            ? 'O registo original foi mantido e corrigido por um novo evento.'
+                                            : 'Sem alteração de stock.'}
+                                    </small>
+                                  </div>
+                                </div>
+                              )) : <p>Ainda não existem eventos para esta toma.</p>}
+                            </div>
+                          </div>
+                        ) : null}
+                      </article>
+                    </MedicationDoseSwipeActions>
                   )
                 })}
               </div>
@@ -858,6 +917,24 @@ export function MedicationsStockPage() {
             </span>
           </section>
         </>
+      ) : null}
+
+      {selected && scheduleAction ? (
+        <MedicationScheduleActionDialog
+          mode={scheduleAction.mode}
+          schedule={scheduleAction.schedule}
+          unit={selected.medication.unit}
+          busy={busy}
+          onCancel={() => setScheduleAction(null)}
+          onDefine={(localTime, quantity) => void run(
+            async () => { await defineSchedule(scheduleAction.schedule, localTime, quantity) },
+            'Definição guardada. O horário atual termina hoje e a nova configuração entra em vigor amanhã.',
+          )}
+          onDelete={() => void run(
+            async () => { await deleteSchedule(scheduleAction.schedule) },
+            'Horário eliminado para os próximos dias. A ocorrência de hoje e o histórico foram preservados.',
+          )}
+        />
       ) : null}
     </section>
   )

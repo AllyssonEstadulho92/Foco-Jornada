@@ -10,7 +10,7 @@ import type { JourneyRepository } from '../../application/journey/JourneyReposit
 import type { MedicationDataProtectionService } from '../../application/personalStock/MedicationDataProtectionService'
 import type { MedicationDoseStatusService } from '../../application/personalStock/MedicationDoseStatusService'
 import type { NicotineAwarenessService } from '../../application/personalStock/NicotineAwarenessService'
-import type { PersonalStockService } from '../../application/personalStock/PersonalStockService'
+import type { OperationalPersonalStockService } from '../../application/personalStock/OperationalPersonalStockService'
 import type { StickDataProtectionService } from '../../application/personalStock/StickDataProtectionService'
 import type { StickPackPlannerService } from '../../application/personalStock/StickPackPlannerService'
 import type { StickUsageAnalyticsService } from '../../application/personalStock/StickUsageAnalyticsService'
@@ -24,7 +24,7 @@ export interface AppServices {
   focusRepository: FocusRepository
   coffeeRepository: CoffeeRepository
   settingsRepository: SettingsRepository
-  personalStockService?: PersonalStockService
+  personalStockService?: OperationalPersonalStockService
   medicationDoseStatusService?: MedicationDoseStatusService
   medicationDataProtectionService?: MedicationDataProtectionService
   stockReconciliationService?: StockReconciliationService
@@ -37,7 +37,7 @@ export interface AppServices {
 }
 
 type RuntimeAppServices = AppServices & {
-  personalStockService: PersonalStockService
+  personalStockService: OperationalPersonalStockService
   medicationDoseStatusService: MedicationDoseStatusService
   medicationDataProtectionService: MedicationDataProtectionService
   stockReconciliationService: StockReconciliationService

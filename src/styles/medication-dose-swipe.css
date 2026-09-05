@@ -1,0 +1,279 @@
+.medDoseSwipeRow {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  background: var(--surface-2, #f2f2f7);
+  isolation: isolate;
+}
+
+.medDoseSwipeRow + .medDoseSwipeRow {
+  border-top: 1px solid var(--line);
+}
+
+.medDoseSwipeActions {
+  position: absolute;
+  z-index: 0;
+  inset: 0 0 0 auto;
+  display: grid;
+  width: 184px;
+  grid-template-columns: repeat(2, 92px);
+  align-items: stretch;
+}
+
+.medDoseSwipeAction {
+  display: grid;
+  min-width: 0;
+  min-height: 100%;
+  place-content: center;
+  justify-items: center;
+  gap: 8px;
+  padding: 10px 6px;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  font: inherit;
+  font-size: .78rem !important;
+  font-weight: 800 !important;
+  line-height: 1.1;
+  cursor: pointer;
+}
+
+.medDoseSwipeAction svg {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+}
+
+.medDoseSwipeDefine {
+  background: #e9e9ed !important;
+  color: #2c2c2e !important;
+}
+
+.medDoseSwipeDelete {
+  background: #ff3b30 !important;
+  color: #fff !important;
+}
+
+.medDoseSwipeAction:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--primary) 55%, transparent);
+  outline-offset: -4px;
+}
+
+.medDoseSwipeAction:disabled {
+  cursor: default;
+  opacity: .52;
+}
+
+.medDoseSwipeContent {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  min-width: 0;
+  background: var(--surface);
+  touch-action: pan-y;
+  will-change: transform;
+  transition: transform 220ms cubic-bezier(.22, .61, .36, 1);
+}
+
+.medDoseSwipeContent:active {
+  cursor: grabbing;
+}
+
+.medDoseSwipeRow.isDisabled .medDoseSwipeContent {
+  touch-action: auto;
+}
+
+.medDoseScheduleEnding {
+  display: block;
+  margin-top: 7px;
+  color: var(--muted);
+  font-size: .69rem;
+  font-weight: 750;
+  letter-spacing: .035em;
+  text-transform: uppercase;
+}
+
+.medDoseActionBackdrop {
+  position: fixed;
+  z-index: 2500;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: max(18px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-right)) max(18px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
+  background: rgba(0, 0, 0, .28);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+.medDoseActionDialog {
+  box-sizing: border-box;
+  width: min(460px, 100%);
+  max-height: min(680px, calc(100dvh - 36px));
+  overflow: auto;
+  border: 1px solid var(--line-strong);
+  border-radius: 22px;
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, .24);
+}
+
+.medDoseActionHeader {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 18px 14px;
+  border-bottom: 1px solid var(--line);
+}
+
+.medDoseActionIcon {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 13px;
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.medDoseActionDialog.isDanger .medDoseActionIcon {
+  background: color-mix(in srgb, #ff3b30 12%, var(--surface));
+  color: #d70015;
+}
+
+.medDoseActionIcon svg,
+.medDoseActionClose svg {
+  width: 21px;
+  height: 21px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+}
+
+.medDoseActionHeader h3,
+.medDoseActionHeader p {
+  margin: 0;
+}
+
+.medDoseActionHeader h3 {
+  font-size: 1.05rem;
+  line-height: 1.25;
+}
+
+.medDoseActionHeader p {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: .82rem;
+}
+
+.medDoseActionClose {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  padding: 0 !important;
+  border-radius: 50% !important;
+}
+
+.medDoseActionForm,
+.medDoseActionDeleteBody {
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+}
+
+.medDoseActionNotice,
+.medDoseActionDeleteBody > p {
+  margin: 0;
+  padding: 12px 13px;
+  border-radius: 13px;
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: .84rem;
+  line-height: 1.5;
+}
+
+.medDoseActionFields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.medDoseActionFields label {
+  display: grid;
+  gap: 7px;
+  color: var(--muted);
+  font-size: .78rem;
+  font-weight: 750;
+}
+
+.medDoseActionFields input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 46px;
+}
+
+.medDoseActionButtons {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.medDoseActionButtons > button {
+  min-height: 46px;
+}
+
+.medDoseActionPrimary {
+  background: var(--primary) !important;
+  border-color: var(--primary) !important;
+  color: #fff !important;
+}
+
+.medDoseActionDanger {
+  background: #ff3b30 !important;
+  border-color: #ff3b30 !important;
+  color: #fff !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .medDoseSwipeContent {
+    transition: none;
+  }
+}
+
+@media (max-width: 620px) {
+  .medDoseActionBackdrop {
+    align-items: end;
+    padding: 0;
+    background: rgba(0, 0, 0, .24);
+  }
+
+  .medDoseActionDialog {
+    width: 100%;
+    max-height: min(82dvh, 720px);
+    border-right: 0;
+    border-bottom: 0;
+    border-left: 0;
+    border-radius: 24px 24px 0 0;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .medDoseActionFields,
+  .medDoseActionButtons {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (forced-colors: active) {
+  .medDoseSwipeDefine,
+  .medDoseSwipeDelete,
+  .medDoseActionPrimary,
+  .medDoseActionDanger {
+    border: 1px solid ButtonText !important;
+    background: ButtonFace !important;
+    color: ButtonText !important;
+  }
+}
