@@ -4,9 +4,9 @@ Atualizado em: 2026-09-05
 
 ## Estado atual
 
-A área **Medicamentos > Tomas programadas** recebeu uma interação de deslize horizontal inspirada nos padrões iOS/Outlook. Cada toma pode revelar duas ações ocultas: **Definir** e **Eliminar**.
+A área **Medicamentos > Tomas programadas** possui agora uma interação de deslize horizontal inspirada nos padrões iOS/Outlook. Cada toma pode revelar duas ações ocultas: **Definir** e **Eliminar**.
 
-A implementação está isolada na branch `feature/medication-swipe-actions` enquanto decorre a validação automática antes da integração em `main`.
+A implementação foi integrada em `main` através do PR #185 depois de o workflow **Qualidade** concluir com sucesso a auditoria de dependências, verificação de tipos, lint, testes, build e smoke test de arranque no browser.
 
 ## Comportamento implementado
 
@@ -17,17 +17,26 @@ A implementação está isolada na branch `feature/medication-swipe-actions` enq
 - O menu `···` existente continua disponível como alternativa para teclado, rato e ações de correção/histórico.
 - A operação continua a passar pelo fluxo `run(...)` da página, que recarrega os dados e atualiza os mecanismos de proteção existentes.
 
-## Problemas conhecidos
+## Validação concluída
 
-Nenhum problema funcional confirmado nesta alteração. Antes de considerar a tarefa concluída é obrigatório confirmar o workflow de qualidade e validar o gesto num dispositivo tátil real.
+- Auditoria de dependências: aprovada, sem vulnerabilidades reportadas pelo workflow.
+- TypeScript/typecheck: aprovado.
+- Lint: aprovado.
+- Testes automatizados: aprovados.
+- Build: aprovado.
+- Smoke test de arranque no browser: aprovado.
+- Testes específicos confirmam que a definição cria um sucessor sem apagar o horário anterior e que a eliminação termina a validade sem remover o registo.
+
+## Limitação de validação
+
+O gesto ainda deve ser confirmado manualmente num dispositivo tátil real para avaliar sensação do deslize, coexistência com o scroll vertical e ergonomia em iPhone/iPad e Android. Esta validação física não pode ser substituída pelo ambiente automatizado do GitHub Actions.
 
 ## Última alteração
 
-Implementação das ações por deslize, diálogo de definição/eliminação e serviço de versionamento de horários.
+Integração em `main` das ações por deslize, diálogo de definição/eliminação, serviço de versionamento de horários e respetivos testes.
 
 ## Próximo passo
 
-1. Confirmar `typecheck`, lint, testes, build e smoke test no GitHub Actions.
-2. Corrigir qualquer regressão encontrada.
-3. Integrar em `main` apenas com a validação automática aprovada.
-4. Confirmar o comportamento de deslize em iPhone/iPad e Android.
+1. Confirmar o comportamento do gesto num iPhone/iPad real.
+2. Confirmar Android/Chrome e tablet.
+3. Validar VoiceOver/TalkBack e contraste em condições reais de utilização.
