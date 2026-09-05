@@ -6,7 +6,7 @@ Atualizado em: 2026-09-05
 
 A área **Medicamentos > Tomas programadas** possui interação de deslize horizontal inspirada nos padrões iOS/Outlook. Cada toma pode revelar as ações **Definir** e **Eliminar**.
 
-Está em validação a melhoria que transforma **Eliminar** numa remoção imediata da lista ativa e simplifica o histórico visível ao utilizador.
+A melhoria atual transforma **Eliminar** numa remoção imediata da lista ativa e simplifica o histórico visível ao utilizador. O workflow **Qualidade** concluiu com sucesso auditoria de dependências, typecheck, lint, testes, build e smoke test.
 
 ## Comportamento implementado nesta alteração
 
@@ -25,11 +25,19 @@ Está em validação a melhoria que transforma **Eliminar** numa remoção imedi
 
 A eliminação não executa `delete()` físico em `medicationSchedules`. Os eventos antigos continuam a referir um `scheduleId` existente, preservando integridade, backups, correções e auditoria. O estado eliminado é representado por um tombstone lógico (`deletedAt`) e por uma validade encerrada antes do dia da eliminação para reutilizar os filtros existentes de agenda e previsão.
 
-## Validação
+## Validação concluída
 
-- Testes específicos cobrem remoção imediata, preservação do registo técnico e eliminação de sucessores futuros do mesmo horário.
-- A validação completa do workflow **Qualidade** deve ser confirmada antes da integração desta alteração em `main`.
-- A validação física do gesto continua pendente em iPhone/iPad e Android.
+- Auditoria de dependências: aprovada.
+- TypeScript/typecheck: aprovado.
+- Lint: aprovado.
+- Testes automatizados: aprovados.
+- Build: aprovado.
+- Smoke test de arranque no browser: aprovado.
+- Testes específicos cobrem remoção imediata, preservação do registo técnico, horário criado no próprio dia e eliminação de sucessores futuros do mesmo horário.
+
+## Limitação de validação
+
+A validação física do gesto e da apresentação do histórico continua pendente em iPhone/iPad e Android. O ambiente automatizado não substitui a avaliação tátil real.
 
 ## Última alteração
 
@@ -37,7 +45,6 @@ Eliminação imediata de horários com tombstone auditável e histórico visual 
 
 ## Próximo passo
 
-1. Confirmar typecheck, lint, testes, build e smoke test no GitHub Actions.
-2. Corrigir qualquer regressão antes da integração.
-3. Integrar em `main` apenas com o workflow aprovado.
-4. Validar o gesto e a nova apresentação do histórico num dispositivo real.
+1. Integrar o PR da alteração em `main`.
+2. Confirmar publicação no GitHub Pages.
+3. Validar o gesto e a nova apresentação do histórico num dispositivo real.
