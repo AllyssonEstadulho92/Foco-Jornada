@@ -33,19 +33,16 @@ struct TimerBridgePayload: Decodable {
 
 enum TimerBridgeError: Error {
     case invalidPayload
-    case unsupportedContract
-    case invalidIdentifier
-    case invalidTimestamp
-    case invalidDuration
 }
 
 enum TimerBridgeDates {
-    private static let fractional = ISO8601DateFormatter()
-    private static let basic = ISO8601DateFormatter()
-
     static func parse(_ value: String) -> Date? {
+        let fractional = ISO8601DateFormatter()
         fractional.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        if let date = fractional.date(from: value) { return date }
+
+        let basic = ISO8601DateFormatter()
         basic.formatOptions = [.withInternetDateTime]
-        return fractional.date(from: value) ?? basic.date(from: value)
+        return basic.date(from: value)
     }
 }
