@@ -15,6 +15,8 @@ test-results
 *.p12
 *.pfx
 *.keystore
+*.mobileprovision
+*.cer
 
 # Dados locais, exports e backups pessoais
 *.sqlite
@@ -38,6 +40,14 @@ pnpm-debug.log*
 *.temp
 
 .DS_Store
+
+# Artefactos iOS gerados/localmente assinados
+/ios/FocoJornadaIOS.xcodeproj/
+/ios/Archives/
+/ios/DerivedData/
+/ios/build/
+*.xcarchive
+*.ipa
 
 # Artefactos de build/publicação legados (o build válido é dist/ via GitHub Actions)
 /site/
