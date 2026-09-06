@@ -8,7 +8,6 @@ import UserNotifications
 final class NativeTimerCoordinator {
     static let shared = NativeTimerCoordinator()
 
-    private let alarmManager = AlarmManager.shared
     private let defaults = UserDefaults.standard
     private let alarmPhaseKey = "foco-jornada.native-alarm.phase-id"
     private let alarmUUIDKey = "foco-jornada.native-alarm.uuid"
@@ -202,7 +201,7 @@ final class NativeTimerCoordinator {
 
     private func cancelCurrentAlarm() async {
         if #available(iOS 26.0, *), let id = currentAlarmID() {
-            try? alarmManager.cancel(id: id)
+            try? AlarmManager.shared.cancel(id: id)
         }
         defaults.removeObject(forKey: alarmPhaseKey)
         defaults.removeObject(forKey: alarmUUIDKey)
@@ -211,6 +210,7 @@ final class NativeTimerCoordinator {
 
     private func scheduleSystemCountdown(phase: ValidatedPhase, deadline: Date) async -> Bool {
         guard #available(iOS 26.0, *) else { return false }
+        let alarmManager = AlarmManager.shared
 
         let deadlineKey = ISO8601DateFormatter().string(from: deadline)
         if defaults.string(forKey: alarmPhaseKey) == phase.id,
