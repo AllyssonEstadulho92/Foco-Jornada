@@ -1,13 +1,114 @@
 # Arquitetura
 
-Atualizado em: 2026-09-05
+Atualizado em: 2026-09-06
 
 ## Stack confirmada
 
+### Web/PWA
+
 - React 19 + TypeScript.
 - Vite para desenvolvimento e build.
-- Dexie/IndexedDB para persistência local.
+- Dexie/IndexedDB e cofre local cifrado para persistência.
 - Vitest para testes automatizados.
+
+### iOS nativo
+
+- SwiftUI para a shell nativa.
+- WebKit/`WKWebView` para executar a aplicação Web sem duplicar as regras de negócio.
+- `WKScriptMessageHandler` para o bridge Web -> Swift.
+- ActivityKit + WidgetKit para Live Activities.
+- AlarmKit em iOS 26+ para countdowns de pausa e foco.
+- UserNotifications apenas como fallback quando já existe autorização em iOS 18–25.
+- XcodeGen para gerar de forma reproduzível o projeto Xcode a partir de `ios/project.yml`.
+
+## Fonte de verdade temporal
+
+Continua a aplicar-se a arquitetura existente: timers não acumulam segundos como fonte de verdade.
+
+```text
+Jornada: elapsed = now - startedAt
+Pausa:   elapsed = now - startedAt
+Foco:    elapsed = now - startedAt - pausas acumuladas
+```
+
+A camada nativa recebe timestamps absolutos e apresenta-os. Não substitui nem reinterpreta os cálculos do domínio Web.
+
+## Fluxo — integração iPhone
+
+```text
+Domínio e repositórios Web
+  ├─ JourneyRepository.getActive()
+  ├─ BreakRepository.getActiveForJourney()
+  └─ FocusRepository.getOpenForJourney()
+          │
+          ▼
+createNativeTimerSnapshot()
+          │
+          ▼
+installIOSNativeTimerCoordinator
+          │
+          ▼
+window.webkit.messageHandlers.focoJornadaTimer
+          │
+          ▼
+WKScriptMessageHandler
+          │
+          ▼
+NativeTimerCoordinator (Swift)
+  ├─ ActivityKit -> jornada / estados contínuos
+  ├─ AlarmKit -> countdowns iOS 26+
+  └─ UserNotifications -> fallback previamente autorizado
+          │
+          ▼
+Lock Screen / Dynamic Island
+```
+
+### Contrato do bridge
+
+O contrato é versionado (`version: 1`, `command: "sync"`) e contém apenas o estado necessário à apresentação nativa:
+
+- jornada ativa: `id`, `startedAt`;
+- fase ativa: `kind`, `id`, `title`, `startedAt`, estado e, quando existe, `deadlineAt` ou `remainingSeconds`.
+
+Pausa tem prioridade visual sobre uma sessão de foco aberta porque a regra atual pode pausar o foco antes de iniciar a pausa da jornada.
+
+### ActivityKit
+
+É usado quando:
+
+- existe jornada ativa sem countdown prioritário;
+- a pausa não tem duração definida;
+- o foco está pausado;
+- AlarmKit não está disponível/autorizado.
+
+A Live Activity é reconstruída por timestamps e pode apresentar tempo decorrido ou countdown, consoante o estado recebido.
+
+### AlarmKit
+
+Em iOS 26+, quando existe fase `running` com deadline futuro:
+
+1. valida-se autorização AlarmKit;
+2. cancela-se um countdown anterior se o ID/deadline mudou;
+3. agenda-se um novo countdown com o tempo restante;
+4. a Live Activity própria da jornada é encerrada temporariamente para evitar duas superfícies concorrentes;
+5. o Widget Extension fornece a apresentação da contagem decrescente.
+
+O fim do countdown não termina automaticamente a pausa nem a sessão no domínio Web. O registo persistido continua a depender das regras atuais da aplicação.
+
+## Segurança da shell iOS
+
+- A `WKWebView` carrega apenas a origem HTTPS oficial `allyssonestadulho92.github.io` como navegação interna.
+- Links HTTP/HTTPS externos são abertos fora da WebView.
+- O bridge aceita mensagens apenas do frame principal e da origem autorizada.
+- Payloads são limitados por versão, IDs, estados, timestamps, texto e duração máxima.
+- Não existem segredos no código iOS.
+- Ao fechar/bloquear o runtime seguro, a apresentação nativa é limpa sem modificar os dados da jornada.
+
+## Persistência e migração iOS
+
+O armazenamento de uma `WKWebView` nativa pertence ao sandbox da aplicação e não deve ser confundido com o armazenamento Safari/PWA. Os dados existentes na PWA não são copiados automaticamente.
+
+Por isso, a arquitetura atual **não executa migração implícita**. Um fluxo explícito de exportação/importação do cofre deve ser especificado, testado e auditado antes de a aplicação nativa substituir a PWA existente num dispositivo com dados reais.
 
 ## Fluxo relevante — medicação
 
@@ -26,54 +127,8 @@ MedicationPrototypeWorkspace
   └─ auditoria técnica (Detalhes técnicos)
 ```
 
-## Responsabilidades
-
-### `MedicationsStockPage`
-
-Mantém o estado visual da lista de tomas, abre/fecha a linha deslizada e coordena os diálogos de definição e eliminação. As alterações continuam a usar o fluxo `run(...)` existente para recarregar dados e atualizar os mecanismos de proteção da medicação.
-
-### `MedicationDoseSwipeActions`
-
-Controla o gesto horizontal por Pointer Events, limita o deslocamento à largura das ações e mantém `touch-action: pan-y` para preservar o scroll vertical. O menu `···` permanece como alternativa acessível ao gesto.
-
-### `MedicationScheduleActionDialog`
-
-Apresenta edição e confirmação destrutiva. O diálogo de eliminação informa que o horário desaparece imediatamente da lista, enquanto tomas e correções anteriores permanecem protegidas.
-
-### `MedicationScheduleService`
-
-Aplica o ciclo de vida dos horários sem quebrar referências históricas:
-
-- **Definir:** encerra a versão atual no dia anterior à nova configuração e cria um sucessor com o mesmo `order`.
-- **Eliminar:** grava `deletedAt` e torna a versão inválida a partir do próprio dia da eliminação, definindo `effectiveUntil` para o dia anterior.
-- Ao eliminar uma versão ativa, versões futuras não eliminadas do mesmo `order` são também tombstonadas para evitar reaparecimento posterior.
-- O registo não é removido fisicamente da tabela.
-- Repetir a eliminação é idempotente.
-- Uma versão com `deletedAt` já não pode ser redefinida.
-
-### `MedicationPrototypeWorkspace`
-
-Carrega os horários ativos e o histórico completo de versões. O histórico é apresentado em duas vistas:
-
-- **Resumo:** eventos funcionais e compreensíveis para o utilizador; exclui `protection`.
-- **Detalhes técnicos:** checkpoints automáticos e registos de proteção.
-
-Versões posteriores do mesmo `order` são apresentadas como **Horário alterado**. Um tombstone gera um único evento visual **Horário eliminado**, mesmo quando a eliminação afeta mais de uma versão futura da mesma cadeia.
-
-## Dados e auditoria
-
-`MedicationSchedule` inclui o campo opcional `deletedAt`. A combinação `deletedAt` + `effectiveUntil` funciona como tombstone lógico. Os filtros existentes baseados em `effectiveFrom/effectiveUntil` deixam automaticamente de devolver o horário eliminado no dia da operação e nas previsões futuras.
-
-A tabela `medicationSchedules` mantém todas as versões necessárias para que `MedicationDoseEvent.scheduleId` continue a apontar para um registo existente. Não é feito `delete()` físico nesta funcionalidade.
-
-Depois de operações iniciadas pela página, o mecanismo existente continua a criar checkpoints quando a assinatura dos dados muda e tenta sincronizar a cópia redundante local.
+A eliminação de horários de medicação continua lógica (`deletedAt` + `effectiveUntil`), preservando referências históricas e auditoria. Esta integração iOS não altera esse fluxo.
 
 ## Acessibilidade e responsividade
 
-- Alvos compatíveis com toque.
-- Ações destrutivas têm texto e ícone e não dependem apenas da cor.
-- Histórico compacto usa botões reais com `aria-pressed` para alternar resumo/detalhes técnicos.
-- Paginação do histórico reduz comprimento vertical sem remover informação.
-- `prefers-reduced-motion` mantém-se aplicado ao deslize.
-- `forced-colors` mantém os novos controlos distinguíveis.
-- O menu `···` continua disponível para teclado, rato e tecnologias de apoio.
+A aplicação Web mantém as regras atuais de acessibilidade. Na camada Apple, a apresentação usa componentes nativos de Live Activities/AlarmKit e texto legível no Lock Screen/Dynamic Island; a validação física com Dynamic Type, VoiceOver, dispositivos sem Dynamic Island e diferentes tamanhos de ecrã permanece obrigatória.
