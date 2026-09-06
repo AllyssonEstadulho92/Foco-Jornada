@@ -1,6 +1,6 @@
 # Decisões Técnicas
 
-Atualizado em: 2026-09-06
+Atualizado em: 2026-09-07
 
 ## D-001 — Manter o menu `···` além do gesto de deslize
 
@@ -85,3 +85,15 @@ Atualizado em: 2026-09-06
 **Decisão:** o cleanup do runtime seguro cancela o estado nativo visível, mas não encerra nem modifica a jornada persistida.
 
 **Motivo:** reduz exposição de informação no Lock Screen quando a aplicação é bloqueada, mantendo simultaneamente o registo real intacto para reconstrução após novo desbloqueio.
+
+## D-015 — Assinatura Apple fora do repositório
+
+**Decisão:** `DEVELOPMENT_TEAM`, certificados, perfis de provisioning, ficheiros `.p12`, `.mobileprovision`, `.ipa` e `.xcarchive` não são versionados. A primeira assinatura de distribuição é feita localmente no Xcode com gestão automática.
+
+**Motivo:** minimiza exposição de credenciais e material criptográfico, reduz risco operacional e mantém o repositório reproduzível sem incorporar identidade Apple pessoal.
+
+## D-016 — Primeiro TestFlight manual pelo Xcode Organizer
+
+**Decisão:** o primeiro upload para TestFlight será feito manualmente pelo Xcode Organizer após teste físico e `Validate App`; CI/CD de distribuição fica para uma fase posterior.
+
+**Motivo:** evita introduzir simultaneamente certificados, App Store Connect API keys e automação de release antes de a integração nativa estar validada num aparelho real. Depois da primeira build estável, a automação poderá usar secrets com privilégio mínimo.
