@@ -9,6 +9,8 @@ settings:
     SWIFT_VERSION: "6.0"
     CODE_SIGN_STYLE: Automatic
     TARGETED_DEVICE_FAMILY: "1,2"
+    MARKETING_VERSION: "1.0.0"
+    CURRENT_PROJECT_VERSION: "1"
 
 schemes:
   FocoJornadaIOS:
@@ -36,8 +38,8 @@ targets:
       path: Config/FocoJornadaIOS-Info.plist
       properties:
         CFBundleDisplayName: Foco & Jornada
-        CFBundleShortVersionString: "1.0"
-        CFBundleVersion: "1"
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
         LSRequiresIPhoneOS: true
         NSAlarmKitUsageDescription: O Foco & Jornada usa temporizadores do sistema para avisar o fim de pausas e sessões de foco que iniciares na aplicação.
         NSSupportsLiveActivities: true
@@ -70,7 +72,7 @@ targets:
       path: Config/FocoJornadaWidgets-Info.plist
       properties:
         CFBundleDisplayName: Foco & Jornada
-        CFBundleShortVersionString: "1.0"
-        CFBundleVersion: "1"
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
         NSExtension:
           NSExtensionPointIdentifier: com.apple.widgetkit-extension
