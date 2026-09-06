@@ -1,5 +1,28 @@
 # Changelog
 
+## 2026-09-07
+
+### Adicionado — preparação de assinatura e TestFlight
+
+- `docs/IOS-DISTRIBUTION.md` com procedimento de instalação física, assinatura, archive, validação e TestFlight.
+- `ios/scripts/archive.sh` para gerar um archive Release assinado sem guardar o Team ID no repositório.
+- `PrivacyInfo.xcprivacy` no target iOS para declarar a utilização de `UserDefaults` com a razão Apple `CA92.1`.
+- Regras de `.gitignore` para impedir versionamento de `.mobileprovision`, certificados, `.ipa`, `.xcarchive` e outros artefactos locais de distribuição.
+
+### Alterado
+
+- `ios/project.yml` passa a usar `MARKETING_VERSION` e `CURRENT_PROJECT_VERSION` para manter versão e build coerentes entre a aplicação e a Widget Extension.
+- `ios/README.md` passa a documentar assinatura local, archive, privacidade e pré-requisitos de TestFlight.
+- A primeira distribuição TestFlight fica definida como manual pelo Xcode Organizer antes de qualquer automação CI/CD de release.
+
+### Pendente
+
+- Nova execução completa dos workflows após estas alterações.
+- Configuração da equipa Apple real e App Store Connect.
+- Ícone final de distribuição.
+- Instalação e testes num iPhone físico.
+- Validação do archive e primeiro upload para testers internos.
+
 ## 2026-09-06
 
 ### Adicionado — integração nativa iPhone
