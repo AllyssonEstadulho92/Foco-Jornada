@@ -1,55 +1,65 @@
 # Estado do Projeto
 
-Atualizado em: 2026-09-05
+Atualizado em: 2026-09-06
 
 ## Estado atual
 
-A área **Medicamentos > Tomas programadas** possui interação de deslize horizontal inspirada nos padrões iOS/Outlook. Cada toma pode revelar as ações **Definir** e **Eliminar**.
+Está em implementação na branch `feat/ios-native-timer-bridge` a integração nativa do **Foco & Jornada** com iPhone.
 
-A melhoria de eliminação imediata e histórico simplificado foi integrada em `main` através do PR #186 e publicada no GitHub Pages.
+A aplicação Web/PWA continua a ser a fonte funcional e de dados. Foi adicionada uma ponte opcional para uma shell SwiftUI/WKWebView, permitindo que o estado real de jornada, pausa e foco seja apresentado pelo iOS através de ActivityKit e, em iOS 26 ou posterior, AlarmKit.
 
-## Comportamento implementado
+A melhoria anterior de **Medicamentos > Tomas programadas** — eliminação imediata com tombstone auditável e histórico simplificado — permanece integrada em `main` através do PR #186 e publicada no GitHub Pages.
 
-- Deslizar a linha para a esquerda continua a revelar **Definir** e **Eliminar**.
-- **Definir** mantém o comportamento anterior: a nova hora/quantidade entra em vigor no dia seguinte.
-- **Eliminar** remove imediatamente o horário da lista de tomas e impede novas ocorrências desse horário.
-- A eliminação é lógica: o registo técnico permanece guardado com `deletedAt` para manter as referências históricas de tomas e correções.
-- Se já existir uma definição futura do mesmo horário, a eliminação remove também essa cadeia futura para impedir que o horário reapareça no dia seguinte.
-- O texto **“Termina hoje”** deixa de ser consequência da ação **Eliminar** porque o horário eliminado já não é devolvido como ativo no próprio dia.
-- O histórico abre por defeito em **Resumo**, ocultando pontos de proteção automáticos.
-- **Detalhes técnicos** continua disponível para consultar checkpoints e auditoria técnica.
-- O resumo apresenta eventos funcionais como **Horário adicionado**, **Horário alterado**, **Horário eliminado** e eventos de toma.
-- O histórico mostra inicialmente cinco eventos e permite **Ver mais eventos / Mostrar menos** para evitar listas extensas.
+## Integração iOS implementada na branch
+
+- Contrato Web -> iOS versão 1 com snapshots baseados em timestamps persistidos.
+- Bridge `window.webkit.messageHandlers.focoJornadaTimer.postMessage(...)` sem dependência obrigatória para a PWA.
+- Coordenador Web que lê jornada, pausa e foco ativos a partir dos repositórios existentes.
+- Shell SwiftUI com `WKWebView` restrita ao domínio oficial `allyssonestadulho92.github.io`.
+- ActivityKit para jornada contínua e estados sem countdown AlarmKit.
+- AlarmKit em iOS 26+ para foco/Pomodoro e pausas com duração definida.
+- Widget Extension com apresentação para Lock Screen e Dynamic Island.
+- Fallback para ActivityKit e notificação local previamente autorizada em iOS 18–25.
+- Ao bloquear o cofre da aplicação, a apresentação nativa é limpa sem alterar os registos persistidos.
+- Testes unitários adicionados para o contrato temporal Web -> iOS.
 
 ## Segurança e integridade
 
-A eliminação não executa `delete()` físico em `medicationSchedules`. Os eventos antigos continuam a referir um `scheduleId` existente, preservando integridade, backups, correções e auditoria. O estado eliminado é representado por um tombstone lógico (`deletedAt`) e por uma validade encerrada antes do dia da eliminação para reutilizar os filtros existentes de agenda e previsão.
+- A integração não tenta controlar a aplicação Relógio da Apple.
+- O domínio Web continua a ser a fonte de verdade; o lado nativo não altera cálculos de jornada, pausa ou foco.
+- Mensagens nativas são aceites apenas do frame principal e da origem HTTPS autorizada.
+- IDs, timestamps, estados e durações recebidos no bridge são validados.
+- Não foram adicionados tokens, chaves, passwords ou segredos ao código.
+- A PWA continua funcional quando `window.webkit` não existe.
 
 ## Validação concluída
 
-- Auditoria de dependências: aprovada.
-- TypeScript/typecheck: aprovado.
-- Lint: aprovado.
-- Testes automatizados: aprovados.
-- Build: aprovado.
-- Smoke test de arranque no browser: aprovado.
-- Testes específicos cobrem remoção imediata, preservação do registo técnico, horário criado no próprio dia e eliminação de sucessores futuros do mesmo horário.
-- Workflow **Qualidade** após integração em `main`: aprovado.
-- Workflow de publicação: aprovado.
-- GitHub Pages para o build publicado: aprovado.
+Da funcionalidade anterior em `main`:
 
-## Limitação de validação
+- auditoria de dependências, typecheck, lint, testes, build e smoke test aprovados;
+- workflow de qualidade e publicação aprovados.
 
-A validação física do gesto e da apresentação do histórico continua pendente em iPhone/iPad e Android. O ambiente automatizado não substitui a avaliação tátil real.
+Da integração iOS atual:
+
+- revisão estrutural do código e das APIs oficiais Apple concluída;
+- testes TypeScript do snapshot temporal adicionados;
+- validação CI da branch ainda depende da abertura/execução do Pull Request;
+- compilação Swift/Xcode e teste em iPhone físico ainda não foram concluídos neste ambiente.
+
+## Limitações de validação
+
+1. O código AlarmKit exige um Xcode com SDK iOS 26 para compilação final.
+2. Lock Screen, Dynamic Island, permissões AlarmKit e comportamento em background exigem validação num iPhone real.
+3. `WKWebView` e Safari/PWA não partilham automaticamente o mesmo armazenamento local. A migração do cofre existente deve ser tratada explicitamente antes de substituir a PWA instalada pela aplicação nativa.
+4. Nesta primeira fase, ações feitas diretamente no Lock Screen/Dynamic Island não escrevem no domínio Web, evitando divergência entre estado nativo e registo persistido.
 
 ## Última alteração
 
-Eliminação imediata de horários com tombstone auditável e histórico visual dividido entre resumo funcional e detalhes técnicos, integrada e publicada.
+Preparada a integração nativa iOS com bridge WebKit, ActivityKit, AlarmKit, widget de Live Activities e projeto reproduzível por XcodeGen, sem alterar as regras de negócio existentes.
 
 ## Próximo passo
 
-Validar num dispositivo real que:
-
-1. o deslize horizontal não interfere com o scroll vertical;
-2. um horário eliminado desaparece imediatamente sem apresentar **Termina hoje**;
-3. o seletor **Resumo / Detalhes técnicos** e **Ver mais eventos** permanecem confortáveis em ecrã pequeno.
+1. Executar os quality gates Web no Pull Request.
+2. Gerar o projeto iOS com XcodeGen e compilar com SDK iOS 26.
+3. Instalar num iPhone de teste e validar jornada, pausa, Pomodoro, Lock Screen e Dynamic Island.
+4. Definir e testar uma migração segura dos dados da PWA para o armazenamento da `WKWebView` antes de usar a app nativa como substituição da PWA.
