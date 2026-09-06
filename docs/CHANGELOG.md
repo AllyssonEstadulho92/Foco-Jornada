@@ -14,6 +14,7 @@
 - Widget Extension para Lock Screen e Dynamic Island.
 - Fallback de notificação local já autorizada para sistemas sem AlarmKit.
 - Projeto iOS reproduzível por XcodeGen em `ios/project.yml`.
+- Workflow `Qualidade iOS` para gerar e compilar automaticamente app + Widget Extension com Xcode 26.
 - Documentação de instalação, assinatura, segurança, testes físicos e limitação de migração em `ios/README.md`.
 - Testes unitários TypeScript para deadlines, pausas acumuladas, foco pausado e prioridade da pausa.
 
@@ -21,6 +22,16 @@
 
 - O runtime seguro passa a instalar o coordenador iOS apenas quando o bridge nativo está disponível.
 - Ao terminar/bloquear o runtime seguro, a apresentação nativa é limpa sem modificar os registos persistidos.
+- Ajustado o isolamento de concorrência para Swift 6 nas operações ActivityKit/UserNotifications.
+- Atualizada a assinatura do delegate `WKNavigationDelegate` para o contrato de concorrência do SDK atual.
+
+### Validado
+
+- Auditoria de dependências Web aprovada.
+- Typecheck, lint e testes automatizados aprovados.
+- Build Web e smoke test de arranque no browser aprovados.
+- Geração do projeto iOS por XcodeGen aprovada.
+- Compilação da app SwiftUI e Widget Extension aprovada em CI com Xcode 26.6 e SDK iOS 26.
 
 ### Preservado
 
@@ -32,9 +43,9 @@
 
 ### Pendente de validação
 
-- CI Web do Pull Request.
-- Compilação Swift num Mac com Xcode/SDK iOS 26.
-- Teste físico de Lock Screen, Dynamic Island, AlarmKit e permissões.
+- Instalação e assinatura num iPhone físico.
+- Teste físico de Lock Screen, Dynamic Island, AlarmKit, permissões e background.
+- Teste do fallback em versões anteriores ao iOS 26.
 - Fluxo explícito e auditado de migração do cofre PWA para a aplicação nativa.
 
 ## 2026-09-05
