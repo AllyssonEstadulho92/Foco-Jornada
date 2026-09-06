@@ -1,69 +1,64 @@
 # Estado do Projeto
 
-Atualizado em: 2026-09-06
+Atualizado em: 2026-09-07
 
 ## Estado atual
 
-Está preparada na branch `feat/ios-native-timer-bridge` a integração nativa do **Foco & Jornada** com iPhone, em revisão no PR #187.
+A integração nativa do **Foco & Jornada** com iPhone continua isolada na branch `feat/ios-native-timer-bridge` e no PR #187, ainda em draft.
 
-A aplicação Web/PWA continua a ser a fonte funcional e de dados. Foi adicionada uma ponte opcional para uma shell SwiftUI/WKWebView, permitindo que o estado real de jornada, pausa e foco seja apresentado pelo iOS através de ActivityKit e, em iOS 26 ou posterior, AlarmKit.
+A aplicação Web/PWA permanece a fonte funcional e de dados. A camada iOS usa SwiftUI/WKWebView, ActivityKit, WidgetKit e AlarmKit para apresentar jornada, pausas e foco no sistema Apple sem duplicar as regras de negócio.
 
-A melhoria anterior de **Medicamentos > Tomas programadas** — eliminação imediata com tombstone auditável e histórico simplificado — permanece integrada em `main` através do PR #186 e publicada no GitHub Pages.
+## Integração iOS implementada
 
-## Integração iOS implementada na branch
-
-- Contrato Web -> iOS versão 1 com snapshots baseados em timestamps persistidos.
-- Bridge `window.webkit.messageHandlers.focoJornadaTimer.postMessage(...)` sem dependência obrigatória para a PWA.
-- Coordenador Web que lê jornada, pausa e foco ativos a partir dos repositórios existentes.
-- Shell SwiftUI com `WKWebView` restrita ao domínio oficial `allyssonestadulho92.github.io`.
-- ActivityKit para jornada contínua e estados sem countdown AlarmKit.
+- Contrato Web -> iOS versão 1 baseado em timestamps persistidos.
+- Bridge `window.webkit.messageHandlers.focoJornadaTimer.postMessage(...)` limitado à origem oficial.
+- Shell SwiftUI/WKWebView.
+- ActivityKit para jornada e estados contínuos.
 - AlarmKit em iOS 26+ para foco/Pomodoro e pausas com duração definida.
-- Widget Extension com apresentação para Lock Screen e Dynamic Island.
-- Fallback para ActivityKit e notificação local previamente autorizada em iOS 18–25.
-- Ao bloquear o cofre da aplicação, a apresentação nativa é limpa sem alterar os registos persistidos.
-- Testes unitários adicionados para o contrato temporal Web -> iOS.
-- Workflow dedicado `Qualidade iOS` que gera o projeto por XcodeGen e compila app + Widget Extension no simulador iOS sem assinatura.
+- Widget Extension para Lock Screen e Dynamic Island.
+- Fallback para iOS 18–25.
+- Testes unitários do contrato temporal.
+- Privacy manifest para a utilização nativa de `UserDefaults` com razão Apple `CA92.1`.
+
+## Preparação de assinatura/TestFlight
+
+- `MARKETING_VERSION` e `CURRENT_PROJECT_VERSION` passam a controlar a versão da app e da extensão.
+- Foi criado `ios/scripts/archive.sh` para gerar um archive Release assinado, recebendo `DEVELOPMENT_TEAM` apenas por ambiente local.
+- Certificados, perfis de provisioning, `.ipa`, `.xcarchive` e materiais de assinatura estão excluídos do Git.
+- Foi criada a documentação `docs/IOS-DISTRIBUTION.md` com o procedimento de instalação física, archive, validação e TestFlight.
+- A primeira distribuição será manual pelo Xcode Organizer; automação de upload fica para uma fase posterior.
 
 ## Segurança e integridade
 
-- A integração não tenta controlar a aplicação Relógio da Apple.
-- O domínio Web continua a ser a fonte de verdade; o lado nativo não altera cálculos de jornada, pausa ou foco.
+- A integração não controla a aplicação Relógio da Apple.
+- O domínio Web continua a ser a fonte de verdade.
 - Mensagens nativas são aceites apenas do frame principal e da origem HTTPS autorizada.
-- IDs, timestamps, estados e durações recebidos no bridge são validados.
-- Não foram adicionados tokens, chaves, passwords ou segredos ao código.
-- A PWA continua funcional quando `window.webkit` não existe.
+- IDs, timestamps, estados e durações são validados.
+- Não foram adicionados tokens, passwords, certificados ou chaves ao repositório.
+- A PWA continua funcional sem bridge nativo.
 
 ## Validação concluída
 
-Da integração iOS no PR #187:
+Antes desta preparação de distribuição, os workflows **Qualidade** e **Qualidade iOS** do PR #187 terminaram com sucesso, incluindo compilação Swift/Xcode com Xcode 26.6 e SDK iOS 26.
 
-- auditoria de dependências Web aprovada;
-- TypeScript/typecheck aprovado;
-- lint aprovado;
-- testes automatizados aprovados, incluindo o contrato temporal Web -> iOS;
-- build Web aprovado;
-- smoke test de arranque no browser aprovado;
-- projeto iOS gerado com XcodeGen em CI;
-- app SwiftUI + Widget Extension compiladas com **Xcode 26.6 / Swift 6 / SDK iOS 26** no simulador;
-- erros iniciais de isolamento Swift 6 e assinatura do delegate WebKit detetados pela CI e corrigidos;
-- workflow `Qualidade iOS` concluído com sucesso no commit `87edd0e`.
+As novas alterações de distribuição ainda devem passar novamente pelos workflows do PR antes de serem consideradas validadas.
 
-## Limitações de validação
+## Limitações e bloqueadores
 
-1. A compilação automatizada confirma compatibilidade do código com Xcode/SDK iOS 26, mas não substitui instalação e teste num iPhone físico.
-2. Lock Screen, Dynamic Island, autorização AlarmKit e comportamento real com o aparelho bloqueado ainda exigem validação num iPhone.
-3. `WKWebView` e Safari/PWA não partilham automaticamente o mesmo armazenamento local. A migração do cofre existente deve ser tratada explicitamente antes de substituir a PWA instalada pela aplicação nativa.
-4. Nesta primeira fase, ações feitas diretamente no Lock Screen/Dynamic Island não escrevem no domínio Web, evitando divergência entre estado nativo e registo persistido.
-5. A assinatura Apple e instalação física dependem de uma equipa/Apple ID configurados no Xcode.
+1. Assinatura final exige uma equipa Apple Developer real configurada no Xcode.
+2. O registo da app deve existir no App Store Connect antes do upload.
+3. Falta confirmar/adicionar o ícone final da aplicação para distribuição.
+4. Lock Screen, Dynamic Island, AlarmKit e permissões exigem teste num iPhone físico.
+5. `WKWebView` e Safari/PWA não partilham automaticamente o mesmo armazenamento local; a migração do cofre continua pendente.
 
 ## Última alteração
 
-A integração iOS passou os quality gates Web e a compilação Xcode 26 em CI. A branch permanece em PR draft porque falta a validação física no iPhone e a estratégia de migração do cofre da PWA.
+Preparada a fase de instalação assinada e TestFlight sem incorporar identidade Apple ou segredos no código: versionamento de build, privacy manifest, archive script, regras de `.gitignore` e documentação de distribuição.
 
 ## Próximo passo
 
-1. Configurar a assinatura Apple no Xcode e instalar o target `FocoJornadaIOS` num iPhone de teste.
-2. Validar jornada, pausa, Pomodoro, Lock Screen, Dynamic Island e permissões AlarmKit no equipamento real.
-3. Testar num equipamento sem Dynamic Island e, quando aplicável, em iOS anterior a 26 para o fallback.
-4. Definir e testar uma migração segura dos dados da PWA para o armazenamento da `WKWebView` antes de usar a app nativa como substituição da PWA.
-5. Só depois retirar o PR #187 de draft e integrar em `main`.
+1. Confirmar os workflows da branch após estas alterações.
+2. Num Mac, configurar a equipa Apple no Xcode e gerar o primeiro archive assinado.
+3. Instalar num iPhone real e executar a matriz de testes físicos.
+4. Criar/confirmar o registo no App Store Connect e validar o archive no Organizer.
+5. Só depois disponibilizar a build a testers internos via TestFlight e retirar o PR #187 de draft.
