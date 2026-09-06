@@ -1,6 +1,6 @@
 # Arquitetura
 
-Atualizado em: 2026-09-06
+Atualizado em: 2026-09-07
 
 ## Stack confirmada
 
@@ -20,6 +20,7 @@ Atualizado em: 2026-09-06
 - AlarmKit em iOS 26+ para countdowns de pausa e foco.
 - UserNotifications apenas como fallback quando já existe autorização em iOS 18–25.
 - XcodeGen para gerar de forma reproduzível o projeto Xcode a partir de `ios/project.yml`.
+- `PrivacyInfo.xcprivacy` no target da aplicação para declarar a utilização de `UserDefaults` com razão `CA92.1`.
 
 ## Fonte de verdade temporal
 
@@ -109,6 +110,30 @@ O fim do countdown não termina automaticamente a pausa nem a sessão no domíni
 O armazenamento de uma `WKWebView` nativa pertence ao sandbox da aplicação e não deve ser confundido com o armazenamento Safari/PWA. Os dados existentes na PWA não são copiados automaticamente.
 
 Por isso, a arquitetura atual **não executa migração implícita**. Um fluxo explícito de exportação/importação do cofre deve ser especificado, testado e auditado antes de a aplicação nativa substituir a PWA existente num dispositivo com dados reais.
+
+## Distribuição, assinatura e versionamento
+
+A distribuição iOS é preparada sem guardar identidade Apple no repositório:
+
+```text
+ios/project.yml
+  ├─ CODE_SIGN_STYLE = Automatic
+  ├─ MARKETING_VERSION
+  └─ CURRENT_PROJECT_VERSION
+          │
+          ▼
+ios/scripts/archive.sh
+          │  recebe DEVELOPMENT_TEAM por ambiente
+          ▼
+xcodebuild archive (Release / generic iOS device)
+          │
+          ▼
+Xcode Organizer
+  ├─ Validate App
+  └─ Upload -> App Store Connect / TestFlight
+```
+
+O `DEVELOPMENT_TEAM`, certificados, perfis de provisioning e artefactos assinados permanecem fora do Git. A primeira distribuição é manual para permitir inspeção dos entitlements, assinatura, assets e mensagens de validação da Apple antes de automatizar CI/CD.
 
 ## Fluxo relevante — medicação
 
