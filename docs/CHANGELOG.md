@@ -1,5 +1,42 @@
 # Changelog
 
+## 2026-09-06
+
+### Adicionado — integração nativa iPhone
+
+- Especificação `docs/IOS-NATIVE-TIMERS.md` para jornada, pausa e foco no iOS.
+- Contrato temporal Web -> iOS baseado em timestamps persistidos.
+- Bridge opcional `focoJornadaTimer` através de `WKScriptMessageHandler`.
+- Coordenador Web que sincroniza jornada, pausa e foco ativos sem alterar o domínio.
+- Shell SwiftUI com `WKWebView` restrita à origem oficial do projeto.
+- ActivityKit para Live Activities da jornada e estados contínuos.
+- AlarmKit em iOS 26+ para countdowns de Pomodoro/foco e pausas planeadas.
+- Widget Extension para Lock Screen e Dynamic Island.
+- Fallback de notificação local já autorizada para sistemas sem AlarmKit.
+- Projeto iOS reproduzível por XcodeGen em `ios/project.yml`.
+- Documentação de instalação, assinatura, segurança, testes físicos e limitação de migração em `ios/README.md`.
+- Testes unitários TypeScript para deadlines, pausas acumuladas, foco pausado e prioridade da pausa.
+
+### Alterado
+
+- O runtime seguro passa a instalar o coordenador iOS apenas quando o bridge nativo está disponível.
+- Ao terminar/bloquear o runtime seguro, a apresentação nativa é limpa sem modificar os registos persistidos.
+
+### Preservado
+
+- A PWA permanece funcional em browsers sem bridge nativo.
+- Jornada, pausa e foco continuam a usar os repositórios e regras existentes como fonte de verdade.
+- Não foi introduzida dependência de Firebase/backend para esta integração.
+- Não foi alterado o cálculo de tempo efetivamente trabalhado.
+- Os dados existentes da PWA não são apagados nem migrados implicitamente para a `WKWebView`.
+
+### Pendente de validação
+
+- CI Web do Pull Request.
+- Compilação Swift num Mac com Xcode/SDK iOS 26.
+- Teste físico de Lock Screen, Dynamic Island, AlarmKit e permissões.
+- Fluxo explícito e auditado de migração do cofre PWA para a aplicação nativa.
+
 ## 2026-09-05
 
 ### Adicionado
