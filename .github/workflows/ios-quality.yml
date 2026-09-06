@@ -1,0 +1,49 @@
+name: Qualidade iOS
+
+on:
+  pull_request:
+    paths:
+      - 'ios/**'
+      - 'src/application/native/**'
+      - 'src/infrastructure/native/**'
+      - 'src/presentation/utils/installIOSNativeTimerCoordinator.ts'
+      - 'src/security/SecureAppBootstrap.tsx'
+      - '.github/workflows/ios-quality.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  compile-ios:
+    runs-on: macos-26
+    steps:
+      - name: Obter código
+        uses: actions/checkout@v5
+
+      - name: Confirmar Xcode
+        run: xcodebuild -version
+
+      - name: Instalar XcodeGen
+        run: |
+          if ! command -v xcodegen >/dev/null 2>&1; then
+            brew install xcodegen
+          fi
+          xcodegen --version
+
+      - name: Gerar projeto
+        working-directory: ios
+        run: xcodegen generate
+
+      - name: Compilar sem assinatura
+        working-directory: ios
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -project FocoJornadaIOS.xcodeproj \
+            -scheme FocoJornadaIOS \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            CODE_SIGNING_ALLOWED=NO \
+            build

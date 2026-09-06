@@ -1,6 +1,6 @@
 # Decisões Técnicas
 
-Atualizado em: 2026-09-05
+Atualizado em: 2026-09-07
 
 ## D-001 — Manter o menu `···` além do gesto de deslize
 
@@ -43,3 +43,57 @@ Atualizado em: 2026-09-05
 **Decisão:** ao eliminar uma versão ativa, todas as versões futuras não eliminadas com o mesmo `order` também recebem o tombstone.
 
 **Motivo:** uma definição futura já criada representa a continuação do mesmo horário. Preservá-la faria o horário eliminado reaparecer automaticamente no dia seguinte, contrariando a ação explícita do utilizador.
+
+## D-008 — Não controlar o Timer da aplicação Relógio
+
+**Decisão:** a integração iOS usa ActivityKit e AlarmKit para temporizadores pertencentes ao Foco & Jornada; não tenta iniciar, alterar ou assumir o Timer da aplicação Relógio da Apple.
+
+**Motivo:** mantém propriedade clara do estado, usa APIs suportadas e evita depender de comportamentos de outra aplicação que não constituem uma API de integração do projeto.
+
+## D-009 — Manter o domínio Web como fonte de verdade
+
+**Decisão:** jornada, pausa e foco continuam a ser persistidos e calculados pelas entidades/repositórios atuais. O iOS recebe snapshots temporais e atua como camada de apresentação/sistema.
+
+**Motivo:** evita duplicação de regras, preserva o comportamento já testado e mantém a regra arquitetural de derivar timers a partir de timestamps persistidos.
+
+## D-010 — Bridge WebKit opcional e versionado
+
+**Decisão:** a comunicação usa `window.webkit.messageHandlers.focoJornadaTimer` com contrato `version: 1`. Na ausência do handler, a PWA continua sem erro.
+
+**Motivo:** permite evolução nativa sem quebrar browser, Android, desktop ou a PWA já publicada.
+
+## D-011 — AlarmKit apenas para fases com deadline real
+
+**Decisão:** AlarmKit é usado em iOS 26+ apenas quando foco/pausa está em execução e existe um deadline derivado dos dados persistidos. Jornada aberta, pausa sem duração e foco pausado usam ActivityKit.
+
+**Motivo:** não inventar duração onde a regra de negócio não a definiu e usar cada API para o tipo de estado que representa corretamente.
+
+## D-012 — Sem ações bidirecionais no Lock Screen nesta fase
+
+**Decisão:** esta primeira integração não permite que um botão nativo de pausa/retoma/terminar altere diretamente os registos Web.
+
+**Motivo:** sem um canal transacional bidirecional, uma ação nativa poderia alterar o AlarmKit sem atualizar IndexedDB, criando divergência. A leitura/apresentação nativa é segura; escrita nativa exige uma fase própria com App Intents, sincronização e testes.
+
+## D-013 — Não migrar implicitamente o armazenamento Safari/PWA
+
+**Decisão:** a shell nativa não tenta copiar automaticamente IndexedDB, cookies ou storage da PWA instalada no Safari para o sandbox da `WKWebView`.
+
+**Motivo:** os contentores são distintos e uma migração implícita colocaria em risco o cofre e a integridade dos dados. A transferência deve ser explícita, verificável e reversível.
+
+## D-014 — Limpar apresentação nativa ao bloquear o cofre
+
+**Decisão:** o cleanup do runtime seguro cancela o estado nativo visível, mas não encerra nem modifica a jornada persistida.
+
+**Motivo:** reduz exposição de informação no Lock Screen quando a aplicação é bloqueada, mantendo simultaneamente o registo real intacto para reconstrução após novo desbloqueio.
+
+## D-015 — Assinatura Apple fora do repositório
+
+**Decisão:** `DEVELOPMENT_TEAM`, certificados, perfis de provisioning, ficheiros `.p12`, `.mobileprovision`, `.ipa` e `.xcarchive` não são versionados. A primeira assinatura de distribuição é feita localmente no Xcode com gestão automática.
+
+**Motivo:** minimiza exposição de credenciais e material criptográfico, reduz risco operacional e mantém o repositório reproduzível sem incorporar identidade Apple pessoal.
+
+## D-016 — Primeiro TestFlight manual pelo Xcode Organizer
+
+**Decisão:** o primeiro upload para TestFlight será feito manualmente pelo Xcode Organizer após teste físico e `Validate App`; CI/CD de distribuição fica para uma fase posterior.
+
+**Motivo:** evita introduzir simultaneamente certificados, App Store Connect API keys e automação de release antes de a integração nativa estar validada num aparelho real. Depois da primeira build estável, a automação poderá usar secrets com privilégio mínimo.

@@ -23,6 +23,7 @@ import { useWorkHoursStore } from '../presentation/store/useWorkHoursStore'
 import { installDataIntegrityMonitoring } from '../presentation/utils/installDataIntegrityMonitoring'
 import { installDeadlineNotificationCoordinator } from '../presentation/utils/installDeadlineNotificationCoordinator'
 import { installGloSessionPrototypeEnhancement } from '../presentation/utils/installGloSessionPrototypeEnhancement'
+import { installIOSNativeTimerCoordinator } from '../presentation/utils/installIOSNativeTimerCoordinator'
 import { installMedicationNextDoseTimerEnhancement } from '../presentation/utils/installMedicationNextDoseTimerEnhancement'
 import {
   migrateLegacyDataIfNeeded,
@@ -127,6 +128,11 @@ export function SecureAppBootstrap() {
           medicationDoseStatusService: runtimeServices.medicationDoseStatusService,
           medicationDataProtectionService: runtimeServices.medicationDataProtectionService,
         })
+        const cleanupIOSTimers = installIOSNativeTimerCoordinator({
+          journeyRepository: runtimeServices.journeyRepository,
+          breakRepository: runtimeServices.breakRepository,
+          focusRepository: runtimeServices.focusRepository,
+        })
         const cleanupMedication = installMedicationNextDoseTimerEnhancement({
           personalStockService: runtimeServices.personalStockService,
           medicationDoseStatusService: runtimeServices.medicationDoseStatusService,
@@ -137,6 +143,7 @@ export function SecureAppBootstrap() {
         cleanup = () => {
           cleanupIntegrity()
           cleanupDeadlines()
+          cleanupIOSTimers()
           cleanupMedication()
           cleanupGlo()
         }

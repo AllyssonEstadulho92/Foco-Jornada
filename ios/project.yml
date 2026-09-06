@@ -1,0 +1,78 @@
+name: FocoJornadaIOS
+options:
+  bundleIdPrefix: pt.allyssonestadulho92
+  deploymentTarget:
+    iOS: "18.0"
+
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    CODE_SIGN_STYLE: Automatic
+    TARGETED_DEVICE_FAMILY: "1,2"
+    MARKETING_VERSION: "1.0.0"
+    CURRENT_PROJECT_VERSION: "1"
+
+schemes:
+  FocoJornadaIOS:
+    build:
+      targets:
+        FocoJornadaIOS: all
+        FocoJornadaWidgets: all
+    run:
+      config: Debug
+    archive:
+      config: Release
+
+targets:
+  FocoJornadaIOS:
+    type: application
+    platform: iOS
+    sources:
+      - path: Sources/App
+      - path: Sources/Shared
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: pt.allyssonestadulho92.focojornada
+        GENERATE_INFOPLIST_FILE: NO
+    info:
+      path: Config/FocoJornadaIOS-Info.plist
+      properties:
+        CFBundleDisplayName: Foco & Jornada
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
+        LSRequiresIPhoneOS: true
+        NSAlarmKitUsageDescription: O Foco & Jornada usa temporizadores do sistema para avisar o fim de pausas e sessões de foco que iniciares na aplicação.
+        NSSupportsLiveActivities: true
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+    dependencies:
+      - target: FocoJornadaWidgets
+
+  FocoJornadaWidgets:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: Sources/Widget
+      - path: Sources/Shared
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: pt.allyssonestadulho92.focojornada.widgets
+        GENERATE_INFOPLIST_FILE: NO
+        SKIP_INSTALL: YES
+        APPLICATION_EXTENSION_API_ONLY: YES
+    info:
+      path: Config/FocoJornadaWidgets-Info.plist
+      properties:
+        CFBundleDisplayName: Foco & Jornada
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension

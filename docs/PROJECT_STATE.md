@@ -1,55 +1,64 @@
 # Estado do Projeto
 
-Atualizado em: 2026-09-05
+Atualizado em: 2026-09-07
 
 ## Estado atual
 
-A área **Medicamentos > Tomas programadas** possui interação de deslize horizontal inspirada nos padrões iOS/Outlook. Cada toma pode revelar as ações **Definir** e **Eliminar**.
+A integração nativa do **Foco & Jornada** com iPhone continua isolada na branch `feat/ios-native-timer-bridge` e no PR #187, ainda em draft.
 
-A melhoria de eliminação imediata e histórico simplificado foi integrada em `main` através do PR #186 e publicada no GitHub Pages.
+A aplicação Web/PWA permanece a fonte funcional e de dados. A camada iOS usa SwiftUI/WKWebView, ActivityKit, WidgetKit e AlarmKit para apresentar jornada, pausas e foco no sistema Apple sem duplicar as regras de negócio.
 
-## Comportamento implementado
+## Integração iOS implementada
 
-- Deslizar a linha para a esquerda continua a revelar **Definir** e **Eliminar**.
-- **Definir** mantém o comportamento anterior: a nova hora/quantidade entra em vigor no dia seguinte.
-- **Eliminar** remove imediatamente o horário da lista de tomas e impede novas ocorrências desse horário.
-- A eliminação é lógica: o registo técnico permanece guardado com `deletedAt` para manter as referências históricas de tomas e correções.
-- Se já existir uma definição futura do mesmo horário, a eliminação remove também essa cadeia futura para impedir que o horário reapareça no dia seguinte.
-- O texto **“Termina hoje”** deixa de ser consequência da ação **Eliminar** porque o horário eliminado já não é devolvido como ativo no próprio dia.
-- O histórico abre por defeito em **Resumo**, ocultando pontos de proteção automáticos.
-- **Detalhes técnicos** continua disponível para consultar checkpoints e auditoria técnica.
-- O resumo apresenta eventos funcionais como **Horário adicionado**, **Horário alterado**, **Horário eliminado** e eventos de toma.
-- O histórico mostra inicialmente cinco eventos e permite **Ver mais eventos / Mostrar menos** para evitar listas extensas.
+- Contrato Web -> iOS versão 1 baseado em timestamps persistidos.
+- Bridge `window.webkit.messageHandlers.focoJornadaTimer.postMessage(...)` limitado à origem oficial.
+- Shell SwiftUI/WKWebView.
+- ActivityKit para jornada e estados contínuos.
+- AlarmKit em iOS 26+ para foco/Pomodoro e pausas com duração definida.
+- Widget Extension para Lock Screen e Dynamic Island.
+- Fallback para iOS 18–25.
+- Testes unitários do contrato temporal.
+- Privacy manifest para a utilização nativa de `UserDefaults` com razão Apple `CA92.1`.
+
+## Preparação de assinatura/TestFlight
+
+- `MARKETING_VERSION` e `CURRENT_PROJECT_VERSION` passam a controlar a versão da app e da extensão.
+- Foi criado `ios/scripts/archive.sh` para gerar um archive Release assinado, recebendo `DEVELOPMENT_TEAM` apenas por ambiente local.
+- Certificados, perfis de provisioning, `.ipa`, `.xcarchive` e materiais de assinatura estão excluídos do Git.
+- Foi criada a documentação `docs/IOS-DISTRIBUTION.md` com o procedimento de instalação física, archive, validação e TestFlight.
+- A primeira distribuição será manual pelo Xcode Organizer; automação de upload fica para uma fase posterior.
 
 ## Segurança e integridade
 
-A eliminação não executa `delete()` físico em `medicationSchedules`. Os eventos antigos continuam a referir um `scheduleId` existente, preservando integridade, backups, correções e auditoria. O estado eliminado é representado por um tombstone lógico (`deletedAt`) e por uma validade encerrada antes do dia da eliminação para reutilizar os filtros existentes de agenda e previsão.
+- A integração não controla a aplicação Relógio da Apple.
+- O domínio Web continua a ser a fonte de verdade.
+- Mensagens nativas são aceites apenas do frame principal e da origem HTTPS autorizada.
+- IDs, timestamps, estados e durações são validados.
+- Não foram adicionados tokens, passwords, certificados ou chaves ao repositório.
+- A PWA continua funcional sem bridge nativo.
 
 ## Validação concluída
 
-- Auditoria de dependências: aprovada.
-- TypeScript/typecheck: aprovado.
-- Lint: aprovado.
-- Testes automatizados: aprovados.
-- Build: aprovado.
-- Smoke test de arranque no browser: aprovado.
-- Testes específicos cobrem remoção imediata, preservação do registo técnico, horário criado no próprio dia e eliminação de sucessores futuros do mesmo horário.
-- Workflow **Qualidade** após integração em `main`: aprovado.
-- Workflow de publicação: aprovado.
-- GitHub Pages para o build publicado: aprovado.
+Antes desta preparação de distribuição, os workflows **Qualidade** e **Qualidade iOS** do PR #187 terminaram com sucesso, incluindo compilação Swift/Xcode com Xcode 26.6 e SDK iOS 26.
 
-## Limitação de validação
+As novas alterações de distribuição ainda devem passar novamente pelos workflows do PR antes de serem consideradas validadas.
 
-A validação física do gesto e da apresentação do histórico continua pendente em iPhone/iPad e Android. O ambiente automatizado não substitui a avaliação tátil real.
+## Limitações e bloqueadores
+
+1. Assinatura final exige uma equipa Apple Developer real configurada no Xcode.
+2. O registo da app deve existir no App Store Connect antes do upload.
+3. Falta confirmar/adicionar o ícone final da aplicação para distribuição.
+4. Lock Screen, Dynamic Island, AlarmKit e permissões exigem teste num iPhone físico.
+5. `WKWebView` e Safari/PWA não partilham automaticamente o mesmo armazenamento local; a migração do cofre continua pendente.
 
 ## Última alteração
 
-Eliminação imediata de horários com tombstone auditável e histórico visual dividido entre resumo funcional e detalhes técnicos, integrada e publicada.
+Preparada a fase de instalação assinada e TestFlight sem incorporar identidade Apple ou segredos no código: versionamento de build, privacy manifest, archive script, regras de `.gitignore` e documentação de distribuição.
 
 ## Próximo passo
 
-Validar num dispositivo real que:
-
-1. o deslize horizontal não interfere com o scroll vertical;
-2. um horário eliminado desaparece imediatamente sem apresentar **Termina hoje**;
-3. o seletor **Resumo / Detalhes técnicos** e **Ver mais eventos** permanecem confortáveis em ecrã pequeno.
+1. Confirmar os workflows da branch após estas alterações.
+2. Num Mac, configurar a equipa Apple no Xcode e gerar o primeiro archive assinado.
+3. Instalar num iPhone real e executar a matriz de testes físicos.
+4. Criar/confirmar o registo no App Store Connect e validar o archive no Organizer.
+5. Só depois disponibilizar a build a testers internos via TestFlight e retirar o PR #187 de draft.

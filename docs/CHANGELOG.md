@@ -1,5 +1,76 @@
 # Changelog
 
+## 2026-09-07
+
+### Adicionado — preparação de assinatura e TestFlight
+
+- `docs/IOS-DISTRIBUTION.md` com procedimento de instalação física, assinatura, archive, validação e TestFlight.
+- `ios/scripts/archive.sh` para gerar um archive Release assinado sem guardar o Team ID no repositório.
+- `PrivacyInfo.xcprivacy` no target iOS para declarar a utilização de `UserDefaults` com a razão Apple `CA92.1`.
+- Regras de `.gitignore` para impedir versionamento de `.mobileprovision`, certificados, `.ipa`, `.xcarchive` e outros artefactos locais de distribuição.
+
+### Alterado
+
+- `ios/project.yml` passa a usar `MARKETING_VERSION` e `CURRENT_PROJECT_VERSION` para manter versão e build coerentes entre a aplicação e a Widget Extension.
+- `ios/README.md` passa a documentar assinatura local, archive, privacidade e pré-requisitos de TestFlight.
+- A primeira distribuição TestFlight fica definida como manual pelo Xcode Organizer antes de qualquer automação CI/CD de release.
+
+### Pendente
+
+- Nova execução completa dos workflows após estas alterações.
+- Configuração da equipa Apple real e App Store Connect.
+- Ícone final de distribuição.
+- Instalação e testes num iPhone físico.
+- Validação do archive e primeiro upload para testers internos.
+
+## 2026-09-06
+
+### Adicionado — integração nativa iPhone
+
+- Especificação `docs/IOS-NATIVE-TIMERS.md` para jornada, pausa e foco no iOS.
+- Contrato temporal Web -> iOS baseado em timestamps persistidos.
+- Bridge opcional `focoJornadaTimer` através de `WKScriptMessageHandler`.
+- Coordenador Web que sincroniza jornada, pausa e foco ativos sem alterar o domínio.
+- Shell SwiftUI com `WKWebView` restrita à origem oficial do projeto.
+- ActivityKit para Live Activities da jornada e estados contínuos.
+- AlarmKit em iOS 26+ para countdowns de Pomodoro/foco e pausas planeadas.
+- Widget Extension para Lock Screen e Dynamic Island.
+- Fallback de notificação local já autorizada para sistemas sem AlarmKit.
+- Projeto iOS reproduzível por XcodeGen em `ios/project.yml`.
+- Workflow `Qualidade iOS` para gerar e compilar automaticamente app + Widget Extension com Xcode 26.
+- Documentação de instalação, assinatura, segurança, testes físicos e limitação de migração em `ios/README.md`.
+- Testes unitários TypeScript para deadlines, pausas acumuladas, foco pausado e prioridade da pausa.
+
+### Alterado
+
+- O runtime seguro passa a instalar o coordenador iOS apenas quando o bridge nativo está disponível.
+- Ao terminar/bloquear o runtime seguro, a apresentação nativa é limpa sem modificar os registos persistidos.
+- Ajustado o isolamento de concorrência para Swift 6 nas operações ActivityKit/UserNotifications.
+- Atualizada a assinatura do delegate `WKNavigationDelegate` para o contrato de concorrência do SDK atual.
+
+### Validado
+
+- Auditoria de dependências Web aprovada.
+- Typecheck, lint e testes automatizados aprovados.
+- Build Web e smoke test de arranque no browser aprovados.
+- Geração do projeto iOS por XcodeGen aprovada.
+- Compilação da app SwiftUI e Widget Extension aprovada em CI com Xcode 26.6 e SDK iOS 26.
+
+### Preservado
+
+- A PWA permanece funcional em browsers sem bridge nativo.
+- Jornada, pausa e foco continuam a usar os repositórios e regras existentes como fonte de verdade.
+- Não foi introduzida dependência de Firebase/backend para esta integração.
+- Não foi alterado o cálculo de tempo efetivamente trabalhado.
+- Os dados existentes da PWA não são apagados nem migrados implicitamente para a `WKWebView`.
+
+### Pendente de validação
+
+- Instalação e assinatura num iPhone físico.
+- Teste físico de Lock Screen, Dynamic Island, AlarmKit, permissões e background.
+- Teste do fallback em versões anteriores ao iOS 26.
+- Fluxo explícito e auditado de migração do cofre PWA para a aplicação nativa.
+
 ## 2026-09-05
 
 ### Adicionado
