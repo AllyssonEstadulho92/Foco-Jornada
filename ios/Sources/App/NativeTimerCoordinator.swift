@@ -38,7 +38,7 @@ final class NativeTimerCoordinator {
            deadline > Date() {
             let scheduled = await scheduleSystemCountdown(phase: phase, deadline: deadline)
             if scheduled {
-                await endJourneyLiveActivities()
+                await Self.endJourneyLiveActivities()
                 return
             }
 
@@ -48,14 +48,14 @@ final class NativeTimerCoordinator {
             cancelFallbackNotification()
         }
 
-        await showJourneyLiveActivity(
+        await Self.showJourneyLiveActivity(
             journeyID: journey.id,
             journeyStartedAt: journeyStartedAt,
             phase: validatedPhase
         )
     }
 
-    private struct ValidatedPhase {
+    private struct ValidatedPhase: Sendable {
         let kind: String
         let id: String
         let title: String
@@ -107,7 +107,7 @@ final class NativeTimerCoordinator {
         }
     }
 
-    private func showJourneyLiveActivity(
+    private nonisolated static func showJourneyLiveActivity(
         journeyID: String,
         journeyStartedAt: Date,
         phase: ValidatedPhase?
@@ -149,7 +149,7 @@ final class NativeTimerCoordinator {
         }
     }
 
-    private func endJourneyLiveActivities() async {
+    private nonisolated static func endJourneyLiveActivities() async {
         for activity in Activity<JourneyTimerAttributes>.activities {
             await activity.end(nil, dismissalPolicy: .immediate)
         }
@@ -158,7 +158,7 @@ final class NativeTimerCoordinator {
     private func clearNativePresentation() async {
         await cancelCurrentAlarm()
         cancelFallbackNotification()
-        await endJourneyLiveActivities()
+        await Self.endJourneyLiveActivities()
     }
 
     private func cancelFallbackNotification() {
@@ -169,12 +169,14 @@ final class NativeTimerCoordinator {
 
     private func scheduleFallbackNotification(phase: ValidatedPhase, deadline: Date) async {
         let center = UNUserNotificationCenter.current()
-        let settings = await withCheckedContinuation { continuation in
-            center.getNotificationSettings { continuation.resume(returning: $0) }
+        let authorizationStatus = await withCheckedContinuation {
+            (continuation: CheckedContinuation<UNAuthorizationStatus, Never>) in
+            center.getNotificationSettings { settings in
+                continuation.resume(returning: settings.authorizationStatus)
+            }
         }
 
-        guard settings.authorizationStatus == .authorized ||
-                settings.authorizationStatus == .provisional else {
+        guard authorizationStatus == .authorized || authorizationStatus == .provisional else {
             return
         }
 
