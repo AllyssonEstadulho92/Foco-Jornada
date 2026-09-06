@@ -15,12 +15,12 @@ Atualizado em: 2026-09-06
 - [x] Adicionar fallback para iOS 18–25 sem forçar nova permissão de notificações.
 - [x] Adicionar testes TypeScript para o contrato temporal.
 - [x] Documentar segurança, arquitetura, limitações e instalação iOS.
-- [ ] Confirmar quality gates Web no Pull Request.
-- [ ] Compilar a camada Swift num Mac com Xcode/SDK iOS 26.
+- [x] Confirmar quality gates Web no Pull Request.
+- [x] Compilar a camada Swift com Xcode 26 / SDK iOS 26 em CI.
 
 ## P1 — Validação em iPhone real
 
-- [ ] Gerar o projeto com XcodeGen e configurar assinatura Apple.
+- [ ] Gerar/abrir o projeto no Xcode local e configurar assinatura Apple.
 - [ ] Instalar num iPhone físico.
 - [ ] Validar **Iniciar jornada** -> Live Activity.
 - [ ] Validar pausa planeada -> countdown AlarmKit.
