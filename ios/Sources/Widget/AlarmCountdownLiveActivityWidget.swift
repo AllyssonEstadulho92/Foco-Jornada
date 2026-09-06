@@ -71,6 +71,8 @@ struct AlarmCountdownLiveActivityWidget: Widget {
             return "Em pausa"
         case .alert:
             return "Tempo concluído"
+        @unknown default:
+            return "Foco & Jornada"
         }
     }
 
@@ -83,6 +85,8 @@ struct AlarmCountdownLiveActivityWidget: Widget {
             Text("Pausa")
         case .alert:
             Text("00:00")
+        @unknown default:
+            Text("—")
         }
     }
 }
