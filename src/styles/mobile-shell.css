@@ -22,7 +22,7 @@
 
 @media (max-width: 899px) {
   .appShell {
-    --mobile-menu-toggle-zone: calc(max(14px, env(safe-area-inset-left)) + 52px);
+    --mobile-menu-toggle-zone: calc(max(14px, env(safe-area-inset-left)) + 44px);
     min-height: 100dvh;
     background: var(--bg);
   }
@@ -101,6 +101,15 @@
     content: none !important;
   }
 
+  .appShellMobileMenuOpen .mobileAppIdentity > strong {
+    visibility: hidden;
+  }
+
+  /*
+   * O alvo continua a ter 44 × 44 px, mas o controlo deixa de parecer um botão.
+   * A hierarquia visual fica no próprio glifo: três traços quando fechado e X
+   * quando aberto, sem cápsula, fundo ou moldura persistente.
+   */
   .mobileMenuButton {
     position: relative;
     display: grid;
@@ -108,21 +117,22 @@
     height: 44px;
     flex: 0 0 44px;
     place-items: center;
-    overflow: hidden;
+    overflow: visible;
     padding: 0;
-    border: 1px solid var(--line);
-    border-radius: 12px;
-    background-color: var(--surface) !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background-color: transparent !important;
     background-image: linear-gradient(currentColor, currentColor) !important;
     background-repeat: no-repeat !important;
     background-position: center !important;
     background-size: 20px 2px !important;
     color: var(--text);
-    box-shadow: none;
+    box-shadow: none !important;
     cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
     transition:
-      border-color 160ms ease,
-      background-color 160ms ease,
+      color 160ms ease,
+      opacity 160ms ease,
       background-size 160ms ease;
   }
 
@@ -162,31 +172,33 @@
     pointer-events: none;
   }
 
-  /* Evita o hover/focus verde persistente do iOS e preserva a terceira linha. */
   .mobileMenuButton:hover,
   .mobileMenuButton:focus-visible {
-    border-color: var(--line-strong) !important;
-    background-color: var(--surface) !important;
+    border: 0 !important;
+    background-color: transparent !important;
     background-image: linear-gradient(currentColor, currentColor) !important;
     background-repeat: no-repeat !important;
     background-position: center !important;
     background-size: 20px 2px !important;
     color: var(--text) !important;
+    box-shadow: none !important;
   }
 
   .mobileMenuButton:focus-visible {
-    outline: 3px solid color-mix(in srgb, var(--primary) 24%, transparent);
+    outline: 2px solid color-mix(in srgb, var(--text) 42%, transparent);
     outline-offset: 2px;
+    border-radius: 8px !important;
   }
 
   .appShellMobileMenuOpen .mobileMenuButton,
   .appShellMobileMenuOpen .mobileMenuButton:hover,
   .appShellMobileMenuOpen .mobileMenuButton:focus-visible {
-    border-color: var(--line-strong) !important;
-    background-color: var(--surface) !important;
+    border: 0 !important;
+    background-color: transparent !important;
     background-image: none !important;
     background-size: 0 2px !important;
     color: var(--text) !important;
+    box-shadow: none !important;
   }
 
   .appShellMobileMenuOpen .mobileMenuButton::before,
@@ -520,6 +532,12 @@
   }
 }
 
+@media (hover: hover) and (pointer: fine) and (max-width: 899px) {
+  .mobileMenuButton:hover {
+    opacity: 0.72;
+  }
+}
+
 @media (max-width: 480px) {
   .mobileAppIdentity > strong {
     max-width: 92px;
@@ -575,7 +593,8 @@
   .mobileMenuButton,
   .mobileMenuButton:hover,
   .mobileMenuButton:focus-visible {
-    background-color: ButtonFace !important;
+    border: 0 !important;
+    background-color: transparent !important;
     background-image: linear-gradient(ButtonText, ButtonText) !important;
     color: ButtonText !important;
   }
@@ -589,6 +608,10 @@
   .mobileMenuButton::before,
   .mobileMenuButton::after {
     background: ButtonText;
+  }
+
+  .mobileMenuButton:focus-visible {
+    outline-color: Highlight;
   }
 }
 
