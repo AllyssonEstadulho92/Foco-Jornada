@@ -15,7 +15,9 @@ A causa principal da inconsistência de dados foi confirmada como identidade/per
 5. PR #192 tornou o endpoint `workers.dev` configurável e validável no perfil;
 6. PR #193 adicionou associação segura de outro navegador sem recriar PIN/palavra-passe;
 7. PR #194 auditou e reforçou a consistência móvel ↔ web e está integrado em `main`;
-8. PR #195 introduziu a transformação hambúrguer ↔ X e foi integrado/publicado.
+8. PR #195 introduziu a transformação hambúrguer ↔ X e foi integrado/publicado;
+9. PR #196 removeu o X duplicado, corrigiu o orçamento de largura do top bar móvel e foi integrado/publicado;
+10. PR #197 refina a hierarquia visual do controlo do menu para apresentar apenas o glifo, sem caixa, fundo ou moldura persistente.
 
 A associação física dos dispositivos reais do utilizador continua a ser um critério obrigatório antes de declarar o problema operacional de sincronização totalmente encerrado.
 
@@ -89,6 +91,23 @@ Implementado no PR #196:
 - o relógio reduz densidade em ecrãs estreitos, ocultando apenas o ícone e mantendo a hora;
 - o drawer mantém safe-area, backdrop, fecho por `Escape` e mudança de rota.
 
+O PR #196 passou nos quality gates, foi integrado em `main` e a publicação GitHub Pages concluiu com sucesso.
+
+## Hierarquia minimalista do controlo móvel — PR #197
+
+A validação física após o PR #196 confirmou que o único X continuava visualmente dentro de uma superfície branca. O pedido atual é manter a área funcional de toque, mas remover a aparência de botão/cartão.
+
+Implementado no branch `ui/minimal-mobile-menu-icon` / PR #197:
+
+- alvo funcional permanece `44 × 44 px`;
+- `border`, fundo, cápsula e sombra deixam de ser visíveis no estado hambúrguer e no estado X;
+- apenas os traços do glifo ficam visíveis, mantendo três comprimentos no estado fechado e X no estado aberto;
+- `-webkit-tap-highlight-color: transparent` evita realce residual no iOS;
+- `focus-visible` continua disponível com contorno discreto apenas para navegação por teclado;
+- a zona recortada do top bar passa a corresponder ao tamanho real do controlo, sem reservar o `gap` da identidade;
+- o texto da identidade fica oculto enquanto o drawer está aberto, evitando qualquer fragmento visual junto ao X;
+- `forced-colors` e `prefers-reduced-motion` continuam suportados.
+
 ## Segurança e integridade
 
 - nenhum PIN, palavra-passe, código de recuperação ou `dataKey` é enviado ao Worker;
@@ -98,16 +117,17 @@ Implementado no PR #196:
 - conflito bilateral continua sem `last-write-wins` silencioso;
 - CORS e CSP continuam limitados ao endpoint suportado;
 - o service worker não cacheia a API de sincronização;
-- PR #195 e PR #196 são alterações de navegação/apresentação e não alteram persistência nem sincronização.
+- PR #195, PR #196 e PR #197 são alterações de navegação/apresentação e não alteram persistência nem sincronização.
 
 ## Riscos/limitações ainda abertas
 
 1. **Validação física de sincronização:** testes automáticos não substituem telemóvel e computador reais. É necessário associar os dois browsers e confirmar os registos reais.
-2. **Validação visual do PR #196:** confirmar no iPhone que existe apenas um X, que o X não fica verde e que `Foco Jornada`, hora, sync, bloqueio e sino não se sobrepõem.
+2. **Validação visual do PR #197:** confirmar no iPhone que o hambúrguer/X aparece sem caixa branca, sem moldura e sem fragmentos da identidade junto ao controlo.
 3. **Android/tablet:** confirmar o mesmo comportamento entre 360 e 899 px, incluindo orientação horizontal e safe-area quando aplicável.
-4. **Timezone geral:** a jornada/relatórios gerais usam o timezone do browser em vários utilitários. Se os sistemas tiverem timezones diferentes, o mesmo timestamp pode ser apresentado noutro dia/hora.
-5. **Edição simultânea:** o cofre é sincronizado como snapshot cifrado. Alterações independentes em dois dispositivos geram conflito conservador; não existe fusão granular automática.
-6. **Permissões de dispositivo:** notificações do sistema e WebAuthn/passkeys são capacidades locais e não devem ser forçadas a ser idênticas entre browsers.
+4. **Acessibilidade:** confirmar `focus-visible`, `forced-colors` e redução de movimento em navegação por teclado/tecnologia de apoio.
+5. **Timezone geral:** a jornada/relatórios gerais usam o timezone do browser em vários utilitários. Se os sistemas tiverem timezones diferentes, o mesmo timestamp pode ser apresentado noutro dia/hora.
+6. **Edição simultânea:** o cofre é sincronizado como snapshot cifrado. Alterações independentes em dois dispositivos geram conflito conservador; não existe fusão granular automática.
+7. **Permissões de dispositivo:** notificações do sistema e WebAuthn/passkeys são capacidades locais e não devem ser forçadas a ser idênticas entre browsers.
 
 ## Estado anterior preservado
 
@@ -115,14 +135,14 @@ A correção de turnos noturnos do PR #189 permanece integrada. A área de medic
 
 ## Última alteração
 
-Aberto o PR #196 para remover o segundo X, neutralizar o estado verde persistente do controlo e reorganizar o top bar móvel sem tocar em dados ou regras de negócio.
+Aberto o PR #197 para tornar o controlo hambúrguer/X visualmente minimalista: apenas o ícone fica visível, mantendo área de toque, estados ARIA, safe-area e mecanismos de fecho existentes.
 
 ## Próximo passo
 
-1. concluir os quality gates do head final do PR #196;
+1. concluir os quality gates do PR #197;
 2. corrigir qualquer regressão de typecheck, lint, testes, build ou smoke test antes de integrar;
-3. integrar o PR #196 apenas com CI verde;
+3. integrar o PR #197 apenas com CI verde;
 4. confirmar publicação GitHub Pages;
-5. validar no iPhone as duas capturas reportadas: menu fechado e menu aberto;
+5. validar no iPhone o estado fechado e aberto sem caixa branca/moldura;
 6. validar Android/tablet e viewport web abaixo de 900 px;
 7. continuar a validação física da sincronização móvel ↔ computador com o mesmo perfil/cofre.
