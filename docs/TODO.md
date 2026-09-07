@@ -89,7 +89,7 @@ Atualizado em: 2026-09-07
 - [x] Preservar leitura das linhas em `forced-colors`.
 - [x] Confirmar typecheck, lint, testes, build, Worker dry-run e smoke test no head final do PR #195.
 - [x] Integrar PR #195 e confirmar publicação GitHub Pages.
-- [ ] Revalidar o comportamento visual do PR #195 através da correção do PR #196, porque a publicação real revelou X duplicado e competição de largura no top bar.
+- [x] Revalidar o comportamento visual do PR #195 através da correção do PR #196.
 
 ## P0 — Correção do shell móvel (PR #196)
 
@@ -105,14 +105,32 @@ Atualizado em: 2026-09-07
 - [x] Garantir que o grupo relógio/sync/bloqueio/notificações não encolhe por causa da marca.
 - [x] Compactar o relógio em ecrãs estreitos sem ocultar a hora.
 - [x] Preservar safe-area, backdrop, `Escape`, mudança de rota, `forced-colors` e `prefers-reduced-motion`.
-- [ ] Confirmar quality gates no head final do PR #196.
-- [ ] Validar no iPhone: três linhas no hambúrguer fechado.
-- [ ] Validar no iPhone: apenas um X, neutro, quando o drawer abre.
-- [ ] Validar no iPhone: `Foco Jornada`, hora, nuvem, cadeado e sino sem sobreposição.
+- [x] Confirmar quality gates no head final do PR #196.
+- [x] Integrar PR #196 e confirmar publicação GitHub Pages.
+- [x] Validar no iPhone que existe apenas um X e que o top bar já não apresenta o X duplicado.
+- [ ] Revalidar no iPhone a aparência final do controlo através do PR #197, removendo a superfície branca ainda visível.
 - [ ] Validar Android/Chrome entre 360 e 480 px.
 - [ ] Validar tablet/viewport web entre 481 e 899 px.
 - [ ] Validar orientação horizontal/safe-area quando aplicável.
-- [ ] Integrar PR #196 e confirmar publicação GitHub Pages.
+
+## P0 — Hierarquia minimalista do menu móvel (PR #197)
+
+- [x] Confirmar pela captura física que o único X ainda aparece dentro de uma superfície branca independente.
+- [x] Manter o alvo funcional de toque em `44 × 44 px`.
+- [x] Remover `border`, fundo, cápsula e sombra visíveis do controlo hambúrguer/X.
+- [x] Manter as três linhas do hambúrguer e a transformação para X sem alterar `mobileMenuOpen`.
+- [x] Remover o realce de toque do iOS com `-webkit-tap-highlight-color: transparent`.
+- [x] Manter `focus-visible` discreto e explícito para teclado.
+- [x] Reduzir a zona recortada do top bar à safe-area esquerda + 44 px do controlo.
+- [x] Ocultar a identidade textual enquanto o drawer está aberto para evitar fragmentos junto ao X.
+- [x] Preservar `forced-colors` e `prefers-reduced-motion`.
+- [ ] Confirmar auditoria de dependências, typecheck, lint, testes, build, Worker dry-run e smoke test no head final do PR #197.
+- [ ] Validar no iPhone: hambúrguer sem caixa branca/moldura.
+- [ ] Validar no iPhone: X sem caixa branca/moldura e sem fragmento de texto ao lado.
+- [ ] Validar toque repetido abrir ↔ fechar sem estado verde residual.
+- [ ] Validar navegação por teclado e `focus-visible` em viewport responsiva.
+- [ ] Validar Android/Chrome e tablet.
+- [ ] Integrar PR #197 apenas com CI verde e confirmar publicação GitHub Pages.
 
 ## P0 — Correção de turnos noturnos
 
