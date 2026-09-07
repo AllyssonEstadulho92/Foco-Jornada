@@ -229,6 +229,7 @@ export function SecureAppBootstrap() {
 
     window.addEventListener(CLOUD_SYNC_VAULT_SAVED_EVENT, handleVaultSaved)
     window.addEventListener('online', scheduleSync)
+    window.addEventListener('focus', scheduleSync)
     document.addEventListener('visibilitychange', handleVisibility)
     const interval = window.setInterval(scheduleSync, 30_000)
     scheduleSync()
@@ -238,6 +239,7 @@ export function SecureAppBootstrap() {
       window.clearInterval(interval)
       window.removeEventListener(CLOUD_SYNC_VAULT_SAVED_EVENT, handleVaultSaved)
       window.removeEventListener('online', scheduleSync)
+      window.removeEventListener('focus', scheduleSync)
       document.removeEventListener('visibilitychange', handleVisibility)
     }
   }, [activeProfileId, runCloudSync, runtime, syncEnabled])

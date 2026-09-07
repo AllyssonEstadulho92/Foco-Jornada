@@ -100,7 +100,7 @@ O endpoint runtime só é aceite se for HTTPS em `workers.dev` (ou localhost em 
 
 ## D-013 — Browser novo associa-se ao perfil existente por canal temporário cifrado
 
-**Estado:** proposto/implementado no PR #193, pendente de integração e validação física.
+**Estado:** aceite, integrada no PR #193 e publicada.
 
 **Decisão:** um browser sem `SecurityProfile` não deve criar automaticamente outra credencial quando o utilizador já possui um perfil noutro dispositivo. O fluxo principal passa a ser **Associar outro navegador**.
 
@@ -123,3 +123,23 @@ O canal temporário não transporta o cofre operacional. Depois de importar o pe
 - é necessária pelo menos uma sincronização remota concluída antes de gerar a ligação;
 - a importação de cópia segura permanece como fallback;
 - não existe fusão automática entre perfis independentes.
+
+## D-014 — Uma aplicação responsiva, um modelo de dados, sincronização proporcional
+
+**Estado:** aceite no PR #194 após auditoria móvel ↔ web.
+
+**Decisão:** tratar telemóvel e computador como duas réplicas da mesma PWA e do mesmo perfil, não como produtos com regras ou APIs separadas. A unidade lógica cross-device continua a ser o cofre cifrado; a revisão remota do Worker coordena a convergência e o cofre IndexedDB permanece réplica de trabalho offline.
+
+Não é introduzido WebSocket/realtime. A reconciliação existente é suficiente e passa também a ser agendada quando a janela recupera `focus`, além de gravações locais, `online`, `visibilitychange`, desbloqueio e intervalo periódico.
+
+O estado de sincronização passa a ser visível no top bar a partir de `SecurityProfile.cloudSync`; não é criado um segundo estado de sync. `CloudSyncManager` aceita dependências injetáveis apenas para tornar testável, de forma isolada, a convergência entre duas réplicas.
+
+**Motivo:** a auditoria confirmou que mobile e desktop já partilham rotas, componentes, repositories, regras e schema. O problema não exige reconstrução nem API por entidade; exige garantir que ambos usam o mesmo perfil/cofre e tornar a convergência verificável e observável.
+
+**Consequências:**
+
+- nenhuma alteração de framework, schema operacional, base de dados ou cifragem;
+- nenhum reset ou migração destrutiva;
+- estados de `Sincronizado`, `Pendente`, `Pausada`, `Erro` e `Conflito` ficam observáveis na navegação normal;
+- edições simultâneas continuam a parar em conflito em vez de usar `last-write-wins` silencioso;
+- timezone geral continua dependente do ambiente do browser e fica registado como risco a validar separadamente antes de qualquer migração temporal.

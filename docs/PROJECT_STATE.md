@@ -4,44 +4,48 @@ Atualizado em: 2026-09-07
 
 ## Estado atual
 
-A sincronização cifrada móvel ↔ computador está integrada e publicada. O PR #191 introduziu o backend Cloudflare Workers/Durable Objects, o PR #192 permitiu configurar o endpoint `workers.dev` diretamente no perfil e o PR #193 corrigiu o bootstrap de browsers novos sem recriar PIN/palavra-passe.
+A aplicação móvel e a versão aberta no computador são a mesma PWA React/TypeScript publicada pelo GitHub Pages. Não existem dois frontends funcionais independentes nem duas implementações de regras de negócio.
 
-O problema confirmado era duplo:
+A causa principal da inconsistência de dados foi confirmada como identidade/persistência por instalação:
 
-1. cada instalação mantinha um cofre local independente antes da sincronização remota;
-2. mesmo com o cofre remoto disponível, um browser novo não possuía o `SecurityProfile` local necessário para derivar a `dataKey`, autenticar-se perante o Worker e desencriptar o cofre.
+1. cada browser/dispositivo possui `SecurityProfile` e cofre IndexedDB locais;
+2. antes da sincronização remota, esses cofres eram independentes;
+3. mesmo depois de existir um cofre remoto, um browser novo não conseguia abrir a mesma cópia sem receber o perfil criptográfico correspondente;
+4. PR #191 introduziu Cloudflare Workers/Durable Objects para sincronização cifrada;
+5. PR #192 tornou o endpoint `workers.dev` configurável e validável no perfil;
+6. PR #193 adicionou associação segura de outro navegador sem recriar PIN/palavra-passe.
 
-O PR #193 foi integrado em `main` no commit `4e879e6d0abf578981ae09d212f25f43d17232cb`.
+O PR #193 está integrado e publicado. A associação física dos dispositivos reais do utilizador continua a ser um critério obrigatório antes de declarar o problema operacional totalmente encerrado.
 
-## Fluxo publicado — associar outro navegador
+## Auditoria móvel ↔ web — PR #194
 
-1. O dispositivo/navegador de referência tem de possuir sincronização ativa e pelo menos uma revisão remota confirmada.
-2. Em **Privacidade e acesso → Sincronização móvel ↔ computador**, escolhe-se **Associar outro navegador**.
-3. O cliente cria um segredo aleatório de 256 bits e uma ligação temporária válida por 10 minutos.
-4. O `SecurityProfile` necessário ao bootstrap é cifrado no cliente e guardado temporariamente no Worker.
-5. O novo navegador abre a ligação. A aplicação interceta `#pair=...` antes de iniciar o runtime, inclusive se esse browser já tiver criado por engano outro perfil local.
-6. O perfil associado é importado/selecionado localmente.
-7. O utilizador introduz o **mesmo PIN/palavra-passe já existente**.
-8. Depois do desbloqueio, `CloudSyncManager` obtém, autentica e valida o cofre remoto cifrado e a aplicação abre os mesmos dados.
-9. O payload de associação é eliminado depois da redenção e também expira por alarme do Durable Object.
+Foi criada `docs/MOBILE-WEB-CONSISTENCY-AUDIT.md` antes das alterações desta auditoria. A matriz confirma:
 
-A importação de cópia segura continua disponível como fallback.
+- mesmas rotas e mesmas páginas em mobile/desktop;
+- mesmo `AppServicesProvider`, repositories e regras de domínio;
+- mesmo `AppDatabaseSnapshot` cifrado para jornadas, pausas, atividades, foco, café, stock e medicação;
+- `useWorkHoursStore` e `useNotificationStore` persistidos no `secureStorage` do mesmo cofre;
+- preferências de tema/sidebar permanecem locais por serem apenas apresentação;
+- sem `sessionStorage` operacional;
+- sem API de negócio alternativa, endpoint antigo ou mock exclusivo por plataforma;
+- API de sync usa `GET/PUT /v1/vault/:profileId` com revisão remota e `cache: no-store`;
+- associação usa `PUT/GET/DELETE /v1/pair/:pairingId`;
+- não foi encontrado CSS capaz de explicar `Jornada ativa` num dispositivo e `Pronto para começar` noutro: essa diferença representa estado/cofre diferente.
 
-## Segurança e integridade
+## Alterações implementadas no PR #194
 
-- PIN, palavra-passe, código de recuperação e `dataKey` não são enviados ao Worker.
-- O segredo raiz da associação permanece no fragmento da ligação e não é enviado como parte do pedido HTTP normal da página.
-- Chave AES de associação e token HTTP são derivados com contextos distintos.
-- O Worker guarda apenas ciphertext, hash do token e validade temporária.
-- A ligação expira em 10 minutos e deve ser tratada como segredo temporário.
-- O cofre operacional não é duplicado no canal de associação; continua a usar o protocolo normal de sincronização cifrada.
-- Alterações concorrentes continuam a gerar conflito sem sobrescrita automática.
-- Perfis independentes não são fundidos automaticamente.
+- `SecureAppBootstrap` agenda reconciliação também em `window.focus`, reduzindo o tempo para refletir uma alteração quando o utilizador regressa à janela do computador.
+- `AppTopBar` mostra o estado derivado do próprio `SecurityProfile.cloudSync`: **Sincronizado**, **Pendente**, **Pausada**, **Erro** ou **Conflito**.
+- O indicador é textual/acessível e adapta a densidade no mobile sem criar outro estado de sincronização.
+- `CloudSyncManager` mantém a mesma implementação de produção, mas passou a aceitar stores/cliente injetáveis para testes isolados.
+- Foi adicionado teste com duas réplicas lógicas do mesmo perfil que valida criação mobile → web, edição web → mobile, eliminação mobile → web e conflito simultâneo sem sobrescrita.
+- O teste inclui `secureStorage`, cobrindo a unidade persistente que contém horas/notificações.
 
-## Validação concluída
+## Qualidade do PR #194
 
-PR #193 e integração em `main`:
+Na execução `Qualidade` do head funcional `c9cbf54a7848d5fcda3f7b85825f8a2b230f1370`:
 
+- instalação de dependências: aprovada;
 - auditoria de dependências: aprovada;
 - TypeScript/typecheck: aprovado;
 - lint: aprovado;
@@ -49,23 +53,27 @@ PR #193 e integração em `main`:
 - build do frontend: aprovado;
 - `wrangler deploy --dry-run`: aprovado;
 - smoke test de browser: aprovado;
-- Workers Builds do PR: aprovado;
-- PR #193 integrado em `main`;
-- Workers Builds de produção: aprovado;
-- GitHub Pages: publicado com sucesso;
-- workflow **Qualidade** de produção: aprovado.
+- artefacto de build: criado;
+- Workers Builds do PR: aprovado.
 
-## Validação física ainda pendente
+As alterações documentais posteriores não alteram runtime e voltam a passar pela mesma pipeline antes de integração.
 
-Não é possível confirmar a sincronização real nos dispositivos do utilizador apenas pelos testes automáticos. Falta validar em hardware/browser real:
+## Segurança e integridade
 
-1. no telemóvel com os dados, confirmar que a sincronização mostra uma última sincronização concluída;
-2. criar **Associar outro navegador**;
-3. abrir a ligação temporária no computador;
-4. introduzir o mesmo PIN/palavra-passe;
-5. confirmar que os dados do telemóvel aparecem no computador;
-6. confirmar alterações computador → telemóvel e telemóvel → computador;
-7. validar offline/reconexão e conflito controlado.
+- nenhum PIN, palavra-passe, código de recuperação ou `dataKey` é enviado ao Worker;
+- o backend continua a guardar apenas o cofre cifrado e metadados técnicos;
+- não houve alteração do schema operacional, cifragem, framework ou base de dados;
+- não houve reset, limpeza ou migração dos dados existentes;
+- conflito bilateral continua sem `last-write-wins` silencioso;
+- CORS e CSP continuam limitados ao endpoint suportado;
+- o service worker não cacheia a API de sincronização.
+
+## Riscos/limitações ainda abertas
+
+1. **Validação física:** testes automáticos não substituem telemóvel e computador reais. É necessário associar os dois browsers e confirmar os registos reais.
+2. **Timezone geral:** a jornada/relatórios gerais usam o timezone do browser em vários utilitários. Se os sistemas tiverem timezones diferentes, o mesmo timestamp pode ser apresentado noutro dia/hora. Não foi feita migração temporal nesta auditoria porque poderia alterar semântica histórica.
+3. **Edição simultânea:** o cofre é sincronizado como snapshot cifrado. Alterações independentes em dois dispositivos geram conflito conservador; não existe fusão granular automática.
+4. **Permissões de dispositivo:** notificações do sistema e WebAuthn/passkeys são capacidades locais e não devem ser forçadas a ser idênticas entre browsers.
 
 ## Estado anterior preservado
 
@@ -73,8 +81,15 @@ A correção de turnos noturnos do PR #189 permanece integrada. A área de medic
 
 ## Última alteração
 
-Foi publicado o fluxo de associação temporária de browsers e adicionada uma interceção de ligações de associação antes do runtime, permitindo recuperar o perfil correto mesmo quando o computador já possui um perfil local vazio criado por engano.
+Foi concluída a auditoria técnica de consistência móvel ↔ web e implementada a alteração mínima para melhorar convergência/observabilidade sem reconstruir a arquitetura.
 
 ## Próximo passo
 
-Executar a associação real do telemóvel para o computador e validar o critério de aceitação: depois de introduzir a mesma credencial, os registos existentes aparecem no segundo browser sem criar novo perfil, sem duplicação e sem perda de dados.
+1. integrar o PR #194 após os quality gates do head final;
+2. confirmar publicação GitHub Pages/Workers de produção;
+3. no telemóvel com os dados, confirmar estado **Sincronizado**;
+4. usar **Associar outro navegador** e abrir a ligação no computador;
+5. introduzir o mesmo PIN/palavra-passe;
+6. validar criar, editar e eliminar nos dois sentidos;
+7. testar refresh, cache limpa, fechar/reabrir, offline → reconexão e diferentes resoluções;
+8. confirmar que ambos os dispositivos usam o mesmo timezone do sistema durante a validação.
