@@ -143,3 +143,21 @@ O estado de sincronização passa a ser visível no top bar a partir de `Securit
 - estados de `Sincronizado`, `Pendente`, `Pausada`, `Erro` e `Conflito` ficam observáveis na navegação normal;
 - edições simultâneas continuam a parar em conflito em vez de usar `last-write-wins` silencioso;
 - timezone geral continua dependente do ambiente do browser e fica registado como risco a validar separadamente antes de qualquer migração temporal.
+
+## D-015 — O mesmo controlo móvel abre e fecha o drawer com animação CSS
+
+**Estado:** proposta implementada no PR #195.
+
+**Decisão:** o botão hambúrguer do top bar móvel deve representar o estado real do drawer. Quando fechado, apresenta três linhas; ao abrir, as linhas transformam-se num **X** e o mesmo controlo passa a fechar o drawer. React/TypeScript mantém apenas `mobileMenuOpen`; a transformação visual é executada em CSS.
+
+O controlo usa alvo de toque `44 × 44 px`, atualiza `aria-expanded` e `aria-label`, mantém o botão visível acima do backdrop e reserva lateralmente a zona necessária para que o drawer não o cubra. O resto do top bar é recortado enquanto o drawer está aberto. `prefers-reduced-motion` elimina a transição e `forced-colors` mantém contraste funcional.
+
+**Motivo:** o estado aberto/fechado deve ser imediatamente legível e reversível no mesmo ponto de interação, sem criar dois comportamentos visuais diferentes entre a PWA instalada e a versão web responsiva. CSS é suficiente para o movimento e evita dependência adicional de animação.
+
+**Consequências:**
+
+- não existe novo store, persistência ou regra de negócio;
+- sidebar desktop continua inalterada;
+- backdrop, `Escape`, mudança de rota e botão interno continuam caminhos válidos de fecho;
+- qualquer caminho de fecho repõe `mobileMenuOpen = false`, o hambúrguer e o estado ARIA;
+- o efeito deve ser validado em telemóvel/tablet, safe-area, modo escuro, `forced-colors` e redução de movimento antes de ser considerado concluído.
