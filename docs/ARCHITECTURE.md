@@ -44,8 +44,9 @@ O botão do top bar representa diretamente esse estado:
 hambúrguer
    └─ click/tap
        └─ mobileMenuOpen = true
-            ├─ drawer entra
-            ├─ backdrop ativa
+            ├─ drawer entra abaixo do top bar
+            ├─ backdrop ativa abaixo do top bar
+            ├─ top bar permanece visível
             ├─ aria-expanded = true
             └─ CSS transforma as três linhas em X
 
@@ -60,11 +61,9 @@ X
 
 Após o PR #196, existe **um único X visível**: o próprio controlo hambúrguer transformado. O cabeçalho do drawer mantém apenas o `BrandLockup`; não possui um segundo botão de fecho. Fecho por backdrop, `Escape` e mudança de rota continua a convergir para `mobileMenuOpen = false`.
 
-O top bar é recortado enquanto o drawer está aberto para manter apenas a zona do botão acima do backdrop; o drawer respeita essa zona através de `max-width` e `safe-area`, evitando sobreposição do X.
+Os PR #197 e #198 procuraram remover a superfície branca residual do controlo mantendo apenas a zona do X acima do backdrop. A validação física posterior mostrou um efeito estrutural indesejado: o recorte do top bar fazia desaparecer identidade, relógio, sincronização, bloqueio e notificações durante o estado aberto.
 
-No PR #197, a zona reservada passa a corresponder exatamente à safe-area esquerda mais os `44px` do alvo do controlo. O texto da identidade é ocultado durante o estado aberto para que nenhum fragmento fique visível junto ao X.
-
-No PR #198, a superfície recortada do próprio top bar deixa de ser pintada quando o drawer está aberto. O elemento continua com `z-index` acima do backdrop para manter o X interativo, mas nesse estado usa fundo transparente, sem linha inferior, sombra ou `backdrop-filter`. Assim, a camada elevada contém funcionalmente o controlo sem criar um cartão branco visível atrás dele.
+A hierarquia atual corrige esse ponto: o top bar é uma camada persistente com `z-index` superior ao drawer/backdrop; não é recortado nem torna a identidade invisível. Drawer e backdrop começam abaixo da altura do top bar (`64px`), pelo que a navegação lateral deixa de competir pela mesma faixa vertical. O menu continua modal em relação ao conteúdo e bottom navigation, mas não substitui a barra superior da aplicação.
 
 A animação é responsabilidade de `src/styles/mobile-shell.css`: React/TypeScript controla o estado, CSS controla movimento e geometria. Não foi criada biblioteca de animação nem novo componente de estado.
 
@@ -91,6 +90,8 @@ grid-template-columns: minmax(0, 1fr) auto;
 - coluna 2: relógio + indicador de sincronização + bloqueio + notificações.
 
 O grupo operacional usa largura intrínseca (`auto`/`max-content`) e não é comprimido pela marca. A identidade pode encolher e aplicar ellipsis. Em ecrãs estreitos, o relógio mantém a hora e pode ocultar apenas o ícone.
+
+O estado aberto preserva esta mesma grelha: não existe `clip-path` que reduza a barra ao botão, nem `visibility: hidden` aplicado à identidade. A hierarquia entre as camadas é feita por `z-index` e pela posição vertical do drawer/backdrop, não pela remoção de conteúdo do top bar.
 
 `prototype-v2.css` mantém regras históricas que desenham um pseudo-logo/wordmark em `.mobileAppIdentity > strong`. A camada final `mobile-shell.css` neutraliza esses pseudo-elementos apenas no top bar móvel. O wordmark completo continua disponível no cabeçalho do drawer e na sidebar desktop.
 
@@ -249,7 +250,7 @@ Não existe uma API REST alternativa por entidade para mobile ou desktop.
 - `src/security/SecurityContext.tsx`: sessão e operações de segurança/sync para UI.
 - `src/presentation/components/AppTopBar.tsx`: estado operacional, indicador de sync e botão físico do menu móvel.
 - `src/presentation/layouts/AppShell.tsx`: estado do drawer, alternância abrir/fechar, reposição de foco e atributos ARIA do botão móvel.
-- `src/styles/mobile-shell.css`: camada final de geometria do shell móvel, orçamento de largura, hierarquia visual do controlo, superfície transparente no estado aberto, drawer/backdrop e transformação hambúrguer ↔ X.
+- `src/styles/mobile-shell.css`: camada final de geometria do shell móvel, top bar persistente, orçamento de largura, hierarquia visual do controlo, drawer/backdrop abaixo da barra e transformação hambúrguer ↔ X.
 - `src/presentation/providers/AppServicesProvider.tsx`: fonte única dos services/repositories usados por todas as páginas.
 - `cloudflare/sync-worker.js`: CORS, autenticação, validação, Durable Object, vault/pairing.
 - `wrangler.toml`: configuração versionada do Worker/Durable Object/origem autorizada.
@@ -294,7 +295,7 @@ Além dos testes existentes de endpoint/token/envelope, `cloudSyncReplication.te
 
 Quality gates obrigatórios continuam a ser auditoria de dependências, typecheck, lint, testes, build frontend, `wrangler deploy --dry-run` e smoke test de browser.
 
-Para alterações do shell móvel, acrescentar validação manual de abertura/fecho por toque, rato, teclado, `Escape`, backdrop, safe-area, estados de foco/hover e breakpoints antes de declarar a UX concluída.
+Para alterações do shell móvel, acrescentar validação manual de abertura/fecho por toque, rato, teclado, `Escape`, backdrop, safe-area, estados de foco/hover e breakpoints antes de declarar a UX concluída. Em particular, o estado aberto deve preservar integralmente o top bar e posicionar drawer/backdrop abaixo dele.
 
 ## Distribuição
 
@@ -306,10 +307,11 @@ GitHub Pages continua a distribuir o frontend. Cloudflare Workers serve apenas a
 - navegação adapta-se entre sidebar e bottom nav/drawer;
 - o controlo hambúrguer/X tem alvo funcional de `44 × 44 px`, mas sem superfície visual persistente;
 - existe um único X visível quando o drawer abre;
-- a zona elevada do top bar no estado aberto é transparente e não cria superfície branca atrás do X;
+- o top bar permanece integralmente visível no estado aberto: identidade, hora, sync, bloqueio e notificações não são removidos nem recortados;
+- drawer e backdrop começam abaixo da barra superior, mantendo uma hierarquia previsível entre navegação global e conteúdo modal;
 - `aria-expanded` e `aria-label` refletem o estado do drawer, independentemente do efeito visual;
 - fechar por `Escape`, backdrop e o próprio X continua suportado;
-- a identidade textual pode encolher sem empurrar relógio/sync/bloqueio/notificações e fica oculta enquanto o drawer está aberto;
+- a identidade textual pode encolher sem empurrar relógio/sync/bloqueio/notificações;
 - `focus-visible` mantém indicação de foco para teclado sem reintroduzir uma caixa branca permanente;
 - `prefers-reduced-motion` elimina as transições do ícone/drawer sem remover funcionalidade;
 - `forced-colors` mantém as linhas do controlo através de cores de sistema;
