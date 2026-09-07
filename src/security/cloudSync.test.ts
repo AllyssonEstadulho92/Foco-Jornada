@@ -26,6 +26,20 @@ describe('cloud sync', () => {
     expect(fetcher).toHaveBeenCalledOnce()
   })
 
+  it('rejeita uma resposta remota que não contém um cofre válido para o perfil', async () => {
+    const fetcher = vi.fn(async () => new Response(JSON.stringify({
+      revision: 2,
+      updatedAt: '2026-09-07T10:00:00.000Z',
+      vault: { profileId: 'outro-perfil' },
+    }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    })) as unknown as typeof fetch
+    const client = new CloudSyncClient('https://sync.example.test', fetcher)
+
+    await expect(client.getVault('profile-a-12345678', 'token')).rejects.toThrow('estrutura inválida')
+  })
+
   it('envia o cofre cifrado com revisão remota esperada', async () => {
     const vault: EncryptedVaultRecord = {
       profileId: 'profile-a-12345678',
