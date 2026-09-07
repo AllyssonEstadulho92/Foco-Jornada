@@ -146,7 +146,7 @@ O estado de sincronização passa a ser visível no top bar a partir de `Securit
 
 ## D-015 — O mesmo controlo móvel abre e fecha o drawer com animação CSS
 
-**Estado:** proposta implementada no PR #195.
+**Estado:** aceite no PR #195 e publicada.
 
 **Decisão:** o botão hambúrguer do top bar móvel deve representar o estado real do drawer. Quando fechado, apresenta três linhas; ao abrir, as linhas transformam-se num **X** e o mesmo controlo passa a fechar o drawer. React/TypeScript mantém apenas `mobileMenuOpen`; a transformação visual é executada em CSS.
 
@@ -158,6 +158,25 @@ O controlo usa alvo de toque `44 × 44 px`, atualiza `aria-expanded` e `aria-lab
 
 - não existe novo store, persistência ou regra de negócio;
 - sidebar desktop continua inalterada;
-- backdrop, `Escape`, mudança de rota e botão interno continuam caminhos válidos de fecho;
-- qualquer caminho de fecho repõe `mobileMenuOpen = false`, o hambúrguer e o estado ARIA;
-- o efeito deve ser validado em telemóvel/tablet, safe-area, modo escuro, `forced-colors` e redução de movimento antes de ser considerado concluído.
+- backdrop, `Escape` e mudança de rota continuam caminhos válidos de fecho;
+- qualquer caminho de fecho repõe `mobileMenuOpen = false`, o hambúrguer e o estado ARIA.
+
+## D-016 — Um único X e orçamento explícito de largura no top bar móvel
+
+**Estado:** implementada no PR #196.
+
+**Decisão:** quando o drawer está aberto, não deve existir um segundo botão **Fechar** dentro do cabeçalho. O único X visível é o próprio botão hambúrguer transformado, que continua a alternar `mobileMenuOpen`.
+
+No top bar móvel, a identidade e o grupo operacional passam a ocupar duas colunas explícitas: `minmax(0, 1fr)` para a identidade e `auto` para relógio/sync/bloqueio/notificações. O pseudo-logo/wordmark legado de `prototype-v2.css` é neutralizado no top bar; o wordmark completo permanece no drawer. Em ecrãs estreitos, o relógio pode ocultar o ícone mas não a hora.
+
+O estado visual do menu não deve depender de `hover` verde persistente. As regras finais de `mobile-shell.css` preservam as três linhas do hambúrguer e mantêm o X em cor neutra, inclusive quando regras históricas usam `!important`.
+
+**Motivo:** as capturas reais mostraram dois X simultâneos, um X com aparência de selecionado e competição de largura entre marca e estado operacional. A correção deve reduzir ruído sem criar outro estado ou remover informação funcional.
+
+**Consequências:**
+
+- o drawer mantém o wordmark completo, mas deixa de ter um segundo X;
+- o top bar usa uma identidade textual compacta e previsível;
+- relógio, sync, bloqueio e sino ficam isolados do crescimento da marca;
+- nenhum dado, regra de negócio, persistência, API ou mecanismo de sincronização é alterado;
+- validação física em iPhone/Android continua obrigatória antes de considerar a correção visual encerrada.
