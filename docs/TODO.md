@@ -14,20 +14,22 @@ Atualizado em: 2026-09-07
 - [x] Interromper sincronização sem sobrescrita quando local e remoto divergem em simultâneo.
 - [x] Validar a estrutura do envelope remoto antes de o aceitar.
 - [x] Autenticar/desencriptar e validar o snapshot remoto antes de substituir o cofre local.
+- [x] Reabrir o runtime após receber uma cópia remota para refletir os dados na interface.
 - [x] Disparar sincronização após gravações locais, regresso ao primeiro plano, recuperação de rede e por intervalo.
 - [x] Adicionar controlo **Ativar/Desativar sincronização** nas definições de segurança.
 - [x] Integrar `VITE_SYNC_API_URL` no build GitHub Pages.
 - [x] Restringir CSP do frontend a Workers HTTPS para a ligação remota.
 - [x] Confirmar typecheck, lint, testes, build e smoke test no PR #191.
-- [ ] Abrir os logs privados do build Cloudflare `21d899d0-3e66-4e45-9a42-3c0efef5127b` e identificar a primeira causa concreta da falha.
-- [ ] Rever no Cloudflare **Settings > Builds** root directory, build command, deploy command e token de build.
-- [ ] Confirmar que **Workers Builds: foco-jornada** passa com a configuração corrigida.
-- [ ] Obter o URL real do Worker publicado e configurar a variável GitHub `VITE_SYNC_API_URL`.
+- [x] Adicionar `npm run worker:check` e validar `wrangler deploy --dry-run` no workflow **Qualidade**.
+- [x] Identificar que o check Cloudflare de PR usa `wrangler versions upload` e não pode aplicar a criação inicial de `SyncVault`.
+- [ ] Integrar o PR #191 em `main` para executar o bootstrap de produção com `wrangler deploy`.
+- [ ] Confirmar que **Workers Builds: foco-jornada** passa no branch de produção e cria `SyncVault`.
+- [ ] Obter o URL real do Worker publicado e ligar o frontend ao endpoint.
+- [ ] Confirmar nova publicação GitHub Pages com o endpoint de sincronização.
 - [ ] Emparelhar o segundo dispositivo através de cópia segura do perfil de referência.
 - [ ] Validar móvel → computador e computador → móvel com dados reais.
 - [ ] Validar funcionamento offline seguido de sincronização após recuperar ligação.
 - [ ] Validar conflito simultâneo sem perda de nenhuma cópia.
-- [ ] Integrar o PR #191 em `main` depois dos bloqueios operacionais acima estarem resolvidos.
 
 ## P0 — Correção de turnos noturnos
 
