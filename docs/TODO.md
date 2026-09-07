@@ -17,14 +17,15 @@ Atualizado em: 2026-09-07
 - [x] Disparar sincronização após gravações locais, regresso ao primeiro plano, recuperação de rede e por intervalo.
 - [x] Integrar PR #191 em `main`.
 - [x] Confirmar **Workers Builds: foco-jornada** com sucesso no branch de produção.
-- [x] Confirmar nova publicação GitHub Pages após a integração.
+- [x] Confirmar publicação GitHub Pages após a integração.
 - [x] Criar fallback de configuração do endpoint no próprio perfil para não depender exclusivamente de `VITE_SYNC_API_URL`.
 - [x] Validar endpoint runtime como HTTPS `workers.dev`, sem credenciais/query/hash.
 - [x] Validar `/health` e a identidade `foco-jornada-sync` antes de guardar/ativar a ligação.
 - [x] Fazer o endpoint acompanhar a cópia segura do perfil para o segundo dispositivo.
-- [ ] Confirmar quality gates do PR #192.
-- [ ] Integrar PR #192 em `main` e confirmar nova publicação GitHub Pages.
-- [ ] Introduzir uma vez o endpoint `workers.dev` real do Worker no dispositivo de referência, caso a variável de build continue vazia.
+- [x] Confirmar quality gates do PR #192.
+- [x] Integrar PR #192 em `main`.
+- [x] Confirmar Workers Builds e publicação GitHub Pages após PR #192.
+- [ ] Introduzir uma vez o endpoint `workers.dev` real do Worker no dispositivo de referência, caso `VITE_SYNC_API_URL` continue vazio.
 - [ ] Emparelhar o segundo dispositivo através de cópia segura do perfil de referência.
 - [ ] Validar móvel → computador e computador → móvel com dados reais.
 - [ ] Validar funcionamento offline seguido de sincronização após recuperar ligação.
