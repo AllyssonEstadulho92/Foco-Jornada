@@ -1,5 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import '@fontsource-variable/inter/wght.css'
 import { SecureAppBootstrap } from './security/SecureAppBootstrap'
 import { installNumberInputNormalization } from './shared/utils/numberInput'
 import './styles/tokens.css'
