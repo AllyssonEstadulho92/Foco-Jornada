@@ -84,17 +84,35 @@ Atualizado em: 2026-09-07
 - [x] Ajustar o alvo de toque para `44 × 44 px`.
 - [x] Reservar uma zona lateral para o botão enquanto o drawer está aberto, incluindo `safe-area`.
 - [x] Manter apenas a zona do botão acima do backdrop, sem expor o resto do top bar.
-- [x] Preservar fecho por backdrop, `Escape`, mudança de rota e botão interno.
+- [x] Preservar fecho por backdrop, `Escape` e mudança de rota.
 - [x] Preservar `prefers-reduced-motion` sem perder funcionalidade.
 - [x] Preservar leitura das linhas em `forced-colors`.
-- [ ] Confirmar typecheck, lint, testes, build, Worker dry-run e smoke test no head final do PR #195.
-- [ ] Validar manualmente hambúrguer → X → hambúrguer por toque num iPhone.
-- [ ] Validar manualmente hambúrguer → X → hambúrguer por toque em Android/Chrome.
-- [ ] Validar tablet e viewport web entre 421 e 899 px.
-- [ ] Validar `Escape`, backdrop e botão interno e confirmar reposição do hambúrguer/ARIA.
-- [ ] Validar safe-area em dispositivo com notch/Dynamic Island e orientação horizontal quando aplicável.
-- [ ] Validar modo claro/escuro, `forced-colors` e `prefers-reduced-motion`.
-- [ ] Integrar PR #195 e confirmar publicação GitHub Pages.
+- [x] Confirmar typecheck, lint, testes, build, Worker dry-run e smoke test no head final do PR #195.
+- [x] Integrar PR #195 e confirmar publicação GitHub Pages.
+- [ ] Revalidar o comportamento visual do PR #195 através da correção do PR #196, porque a publicação real revelou X duplicado e competição de largura no top bar.
+
+## P0 — Correção do shell móvel (PR #196)
+
+- [x] Confirmar pelas capturas que aparecem dois X simultâneos com o drawer aberto.
+- [x] Confirmar no código que o segundo X vinha do botão interno do `mobileDrawerHeader`.
+- [x] Remover o botão interno duplicado e manter o próprio hambúrguer transformado como único X.
+- [x] Confirmar conflito de `hover/focus-visible` verde com `!important` em `mobile-quick-access.css`.
+- [x] Neutralizar o estado verde persistente sem perder `focus-visible` acessível.
+- [x] Preservar explicitamente a linha central do hambúrguer contra shorthands `background` legados.
+- [x] Confirmar pseudo-logo/wordmark legado em `prototype-v2.css` como causa de consumo excessivo de largura.
+- [x] Neutralizar os pseudo-elementos no top bar móvel, mantendo o wordmark completo no drawer.
+- [x] Reestruturar o top bar para `grid-template-columns: minmax(0, 1fr) auto`.
+- [x] Garantir que o grupo relógio/sync/bloqueio/notificações não encolhe por causa da marca.
+- [x] Compactar o relógio em ecrãs estreitos sem ocultar a hora.
+- [x] Preservar safe-area, backdrop, `Escape`, mudança de rota, `forced-colors` e `prefers-reduced-motion`.
+- [ ] Confirmar quality gates no head final do PR #196.
+- [ ] Validar no iPhone: três linhas no hambúrguer fechado.
+- [ ] Validar no iPhone: apenas um X, neutro, quando o drawer abre.
+- [ ] Validar no iPhone: `Foco Jornada`, hora, nuvem, cadeado e sino sem sobreposição.
+- [ ] Validar Android/Chrome entre 360 e 480 px.
+- [ ] Validar tablet/viewport web entre 481 e 899 px.
+- [ ] Validar orientação horizontal/safe-area quando aplicável.
+- [ ] Integrar PR #196 e confirmar publicação GitHub Pages.
 
 ## P0 — Correção de turnos noturnos
 
