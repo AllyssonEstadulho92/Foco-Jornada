@@ -1,5 +1,34 @@
 # Changelog
 
+## 2026-09-07 — menu móvel hambúrguer ↔ X (PR #195)
+
+### Alterado
+
+- O botão do menu no top bar móvel passa a alternar o mesmo estado `mobileMenuOpen`, permitindo abrir e fechar o drawer no mesmo ponto de interação.
+- O hambúrguer passa a ser desenhado em CSS com três linhas de comprimentos progressivos e transforma-se num **X** através de `transform` e `transition`.
+- O alvo de toque do controlo passa a `44 × 44 px`.
+- Enquanto o drawer está aberto, apenas a zona do botão permanece acima do backdrop; o restante top bar fica recortado para não escapar ao escurecimento.
+- O drawer passa a respeitar uma zona lateral reservada ao botão, incluindo `safe-area`, evitando que cubra o **X** em ecrãs pequenos.
+- `aria-expanded` e `aria-label` passam a acompanhar o estado real do drawer.
+
+### Acessibilidade e interação
+
+- Mantido fecho por backdrop, tecla `Escape`, mudança de rota e botão interno do drawer.
+- Qualquer caminho de fecho repõe o hambúrguer e o estado ARIA correspondente.
+- `prefers-reduced-motion` remove as transições do drawer e do ícone sem remover funcionalidade.
+- `forced-colors` mantém as linhas do hambúrguer/**X** através de cores de sistema.
+
+### Preservado
+
+- Sidebar e controlo de recolher/expandir no desktop acima de 899 px.
+- Rotas, dados, repositories, regras de negócio, sincronização móvel ↔ computador e segurança.
+- Sem nova biblioteca de animação, store, persistência ou alteração de schema.
+
+### Validação pendente
+
+- Quality gates do head final do PR #195.
+- Validação manual em iPhone, Android/Chrome, tablet e viewport web inferior a 900 px, incluindo safe-area, modo claro/escuro, `forced-colors` e redução de movimento.
+
 ## 2026-09-07 — auditoria de consistência móvel ↔ web
 
 ### Auditado

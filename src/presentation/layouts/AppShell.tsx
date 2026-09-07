@@ -141,8 +141,15 @@ export function AppShell() {
     }
   }, [mobileMenuOpen])
 
-  const openMobileMenu = () => {
-    setMobileMenuOpen(true)
+  useEffect(() => {
+    const menuButton = mobileMenuButtonRef.current
+    if (!menuButton) return
+    menuButton.setAttribute('aria-expanded', String(mobileMenuOpen))
+    menuButton.setAttribute('aria-label', mobileMenuOpen ? 'Fechar menu principal' : 'Abrir menu principal')
+  }, [mobileMenuOpen])
+
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen((current) => !current)
   }
 
 
@@ -183,7 +190,7 @@ export function AppShell() {
       </aside>
 
       <div className="appMainArea">
-        <AppTopBar onOpenMenu={openMobileMenu} menuButtonRef={mobileMenuButtonRef} />
+        <AppTopBar onOpenMenu={toggleMobileMenu} menuButtonRef={mobileMenuButtonRef} />
         <main className="appContent" id="main-content" tabIndex={-1}>
           {location.pathname === '/definicoes' ? (
             <>
