@@ -29,6 +29,39 @@ GitHub Pages / mesma PWA
 
 Diferenças permitidas são de densidade, navegação, gesto e capacidades do dispositivo. Dados e regras partilháveis não têm uma implementação alternativa por breakpoint.
 
+## Navegação responsiva
+
+`AppShell` mantém uma única árvore de navegação com duas apresentações:
+
+- acima de 899 px: sidebar desktop, com controlo próprio de recolher/expandir;
+- até 899 px: top bar + bottom navigation + drawer móvel.
+
+No drawer móvel, `mobileMenuOpen` continua a ser estado local de `AppShell`; não é persistido nem sincronizado porque é apenas estado efémero de apresentação.
+
+No PR #195, o botão do top bar deixa de ser apenas “abrir menu” e passa a alternar o mesmo estado:
+
+```text
+hambúrguer
+   └─ click/tap
+       └─ mobileMenuOpen = true
+            ├─ drawer entra
+            ├─ backdrop ativa
+            ├─ aria-expanded = true
+            └─ CSS transforma as três linhas em X
+
+X
+   └─ click/tap
+       └─ mobileMenuOpen = false
+            ├─ drawer sai
+            ├─ backdrop desativa
+            ├─ aria-expanded = false
+            └─ CSS repõe o hambúrguer
+```
+
+Fecho por backdrop, `Escape`, mudança de rota e botão interno do drawer continua a convergir para `mobileMenuOpen = false`. O top bar é recortado enquanto o drawer está aberto para manter apenas a zona do botão acima do backdrop; o drawer respeita essa zona através de `max-width` e `safe-area`, evitando sobreposição do X.
+
+A animação é responsabilidade de `src/styles/mobile-shell.css`: React/TypeScript controla o estado, CSS controla movimento e geometria. Não foi criada biblioteca de animação nem novo componente de estado.
+
 ## Dados e persistência
 
 ### Snapshot operacional
@@ -180,7 +213,9 @@ Não existe uma API REST alternativa por entidade para mobile ou desktop.
 - `src/security/SecurityGate.tsx` / `BrowserPairingBootstrap.tsx`: bootstrap de browser vazio/associação.
 - `src/security/SecureAppBootstrap.tsx`: abertura do runtime, rehydrate e agendamento de sync.
 - `src/security/SecurityContext.tsx`: sessão e operações de segurança/sync para UI.
-- `src/presentation/components/AppTopBar.tsx`: estado operacional e indicador de sync.
+- `src/presentation/components/AppTopBar.tsx`: estado operacional, indicador de sync e botão físico do menu móvel.
+- `src/presentation/layouts/AppShell.tsx`: estado do drawer, alternância abrir/fechar, foco e sincronização dos atributos ARIA do botão móvel.
+- `src/styles/mobile-shell.css`: geometria do shell móvel, drawer/backdrop e transformação visual hambúrguer ↔ X.
 - `src/presentation/providers/AppServicesProvider.tsx`: fonte única dos services/repositories usados por todas as páginas.
 - `cloudflare/sync-worker.js`: CORS, autenticação, validação, Durable Object, vault/pairing.
 - `wrangler.toml`: configuração versionada do Worker/Durable Object/origem autorizada.
@@ -225,6 +260,8 @@ Além dos testes existentes de endpoint/token/envelope, `cloudSyncReplication.te
 
 Quality gates obrigatórios continuam a ser auditoria de dependências, typecheck, lint, testes, build frontend, `wrangler deploy --dry-run` e smoke test de browser.
 
+Para alterações do shell móvel, acrescentar validação manual de abertura/fecho por toque, rato, teclado, `Escape`, backdrop, safe-area e breakpoints antes de declarar a UX concluída.
+
 ## Distribuição
 
 GitHub Pages continua a distribuir o frontend. Cloudflare Workers serve apenas a API remota de sync/pairing. A arquitetura principal permanece local-first com réplica remota cifrada para convergência cross-device.
@@ -233,7 +270,11 @@ GitHub Pages continua a distribuir o frontend. Cloudflare Workers serve apenas a
 
 - mesmas rotas e conteúdo funcional em todos os breakpoints;
 - navegação adapta-se entre sidebar e bottom nav/drawer;
+- o controlo hambúrguer/X tem alvo de `44 × 44 px` e continua disponível por toque, rato e teclado;
+- `aria-expanded` e `aria-label` refletem o estado do drawer, independentemente do efeito visual;
+- fechar por `Escape`, backdrop e botão interno continua suportado;
+- `prefers-reduced-motion` elimina as transições do ícone/drawer sem remover funcionalidade;
+- `forced-colors` mantém as linhas do controlo através de cores de sistema;
 - estado de sync tem `aria-label`/texto e não depende apenas de cor;
-- `forced-colors` é preservado no indicador/fluxo de associação;
 - dados compactados em células móveis permanecem acessíveis em editores/rotas funcionais;
 - ações essenciais continuam disponíveis por toque, rato e teclado.
