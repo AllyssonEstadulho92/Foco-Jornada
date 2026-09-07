@@ -2,75 +2,65 @@
 
 Atualizado em: 2026-09-07
 
-## Auditoria atual — horas de trabalho em turnos noturnos
+## Estado atual
 
-Foi identificado um erro no motor `calculateWorkHours` quando um turno planeado atravessa a meia-noite e o período real começa antes da hora planeada ou termina depois da hora planeada.
+A correção do cálculo de horas em turnos noturnos foi integrada em `main` através do PR #189 no commit `90d19791f7892e51c5baf2c27967d53e7b464b8c`.
 
-Exemplo confirmado: num turno planeado **22:00–06:00**, uma entrada real às **21:00** era deslocada para o dia seguinte pela normalização anterior. O tempo total de presença continuava a poder parecer plausível, mas a interseção com o turno planeado ficava errada, podendo classificar trabalho normal como horas extra e criar horas não trabalhadas inexistentes.
+O problema confirmado ocorria quando um turno planeado atravessava a meia-noite e o período real começava antes da hora planeada ou terminava depois dela. Num turno **22:00–06:00**, por exemplo, uma entrada real às **21:00** podia ser deslocada para o dia seguinte pela normalização anterior. A duração total podia parecer plausível, mas a interseção com o turno planeado ficava errada, podendo classificar trabalho normal como horas extra e criar horas não trabalhadas inexistentes.
 
-A branch `fix/overnight-work-hours-audit` altera a normalização para escolher, em turnos noturnos, a representação temporal de cada hora mais próxima do intervalo planeado. Assim:
+A normalização passa a escolher, para turnos noturnos, a representação temporal de cada hora civil mais próxima do intervalo planeado. Assim:
 
-- **21:00–06:00** é interpretado como uma hora de entrada antecipada no próprio dia;
-- **22:00–07:00** é interpretado como uma hora de saída adicional na manhã seguinte;
-- pausas após a meia-noite continuam associadas ao dia seguinte;
-- turnos diurnos mantêm a regra anterior.
+- **21:00–06:00** representa uma hora de entrada antecipada no próprio dia;
+- **22:00–07:00** representa uma hora adicional na manhã seguinte;
+- pausas e ocorrências após a meia-noite continuam associadas ao dia seguinte;
+- turnos diurnos mantêm o comportamento anterior.
 
-Foram adicionados testes de regressão específicos para entrada antecipada e saída tardia em turno noturno.
+Foram adicionados testes de regressão para entrada antecipada e saída tardia.
 
-## Estado anterior preservado
+## Estado anterior preservado — medicação
 
-A área **Medicamentos > Tomas programadas** possui interação de deslize horizontal inspirada nos padrões iOS/Outlook. Cada toma pode revelar as ações **Definir** e **Eliminar**.
-
-A melhoria de eliminação imediata e histórico simplificado foi integrada em `main` através do PR #186 e publicada no GitHub Pages.
-
-## Comportamento implementado — medicação
-
-- Deslizar a linha para a esquerda continua a revelar **Definir** e **Eliminar**.
-- **Definir** mantém o comportamento anterior: a nova hora/quantidade entra em vigor no dia seguinte.
-- **Eliminar** remove imediatamente o horário da lista de tomas e impede novas ocorrências desse horário.
-- A eliminação é lógica: o registo técnico permanece guardado com `deletedAt` para manter as referências históricas de tomas e correções.
-- Se já existir uma definição futura do mesmo horário, a eliminação remove também essa cadeia futura para impedir que o horário reapareça no dia seguinte.
-- O texto **“Termina hoje”** deixa de ser consequência da ação **Eliminar** porque o horário eliminado já não é devolvido como ativo no próprio dia.
-- O histórico abre por defeito em **Resumo**, ocultando pontos de proteção automáticos.
-- **Detalhes técnicos** continua disponível para consultar checkpoints e auditoria técnica.
-- O resumo apresenta eventos funcionais como **Horário adicionado**, **Horário alterado**, **Horário eliminado** e eventos de toma.
-- O histórico mostra inicialmente cinco eventos e permite **Ver mais eventos / Mostrar menos** para evitar listas extensas.
+A área **Medicamentos > Tomas programadas** mantém o gesto de deslize horizontal, as ações **Definir** e **Eliminar**, eliminação lógica com `deletedAt`, preservação do histórico e separação entre **Resumo** e **Detalhes técnicos**. A melhoria correspondente continua integrada desde o PR #186.
 
 ## Segurança e integridade
 
-A correção de turnos noturnos altera apenas a normalização temporal usada nos cálculos de horas; não altera o schema, a persistência nem os registos já guardados.
+A correção de turnos noturnos altera apenas a normalização temporal usada no cálculo. Não altera schema, IndexedDB, registos já guardados, autenticação, medicação ou referências históricas.
 
-Na medicação, a eliminação não executa `delete()` físico em `medicationSchedules`. Os eventos antigos continuam a referir um `scheduleId` existente, preservando integridade, backups, correções e auditoria.
+Na medicação, a eliminação continua sem `delete()` físico em `medicationSchedules`; os eventos antigos mantêm referências válidas para auditoria e correções.
 
-## Validação
+## Validação concluída
 
-### Concluída anteriormente
+Para o PR #189 e respetivo `main`:
 
-- Auditoria de dependências: aprovada.
-- TypeScript/typecheck: aprovado.
-- Lint: aprovado.
-- Testes automatizados: aprovados.
-- Build: aprovado.
-- Smoke test de arranque no browser: aprovado.
-- Workflow **Qualidade** do PR #186: aprovado.
+- auditoria de dependências: aprovada;
+- TypeScript/typecheck: aprovado;
+- lint: aprovado;
+- testes automatizados: aprovados;
+- build: aprovado;
+- smoke test de arranque no browser: aprovado;
+- workflow **Qualidade** de `main`: aprovado;
+- workflow **Publicar Foco & Jornada** / GitHub Pages: aprovado.
 
-### Pendente para esta correção
+A distribuição oficial documentada permanece GitHub Pages.
 
-- Workflow **Qualidade** da branch `fix/overnight-work-hours-audit`.
-- Confirmação de que os novos testes passam juntamente com toda a suite existente.
-- Validação manual de um registo real de turno noturno com entrada antecipada e/ou saída após o fim planeado.
+## Observação operacional — Cloudflare Workers
 
-## Limitação de validação
+O check externo **Workers Builds: foco-jornada**, fornecido pela integração Cloudflare, terminou com falha no commit do PR e novamente no commit integrado em `main`. O GitHub não expõe neste repositório a causa detalhada desse build externo; por isso não é possível confirmar se existe configuração incorreta, projeto Cloudflare obsoleto ou outra causa fora do código.
 
-A validação física do gesto de medicação continua pendente em iPhone/iPad e Android. Para horas de trabalho, os testes automatizados cobrem agora os dois casos de regressão identificados, mas não substituem a confirmação com dados reais do utilizador.
+Este erro não bloqueou nem invalidou a distribuição oficial por GitHub Pages, que terminou com sucesso. Deve ser revisto separadamente: se Cloudflare não fizer parte da arquitetura pretendida, a integração deve ser removida/desativada no serviço; se fizer parte, é necessário consultar os logs do Cloudflare e definir explicitamente o respetivo pipeline.
+
+## Validação física ainda pendente
+
+- confirmar pelo menos um turno noturno real com entrada antes da hora planeada;
+- confirmar pelo menos um turno noturno real com saída depois da hora planeada;
+- testar o deslize de medicação em iPhone/iPad e Android;
+- confirmar scroll vertical, histórico e acessibilidade em dispositivo real.
 
 ## Última alteração
 
-Correção da associação de horas ao dia correto em turnos que atravessam a meia-noite, com testes de regressão para entrada antecipada e saída tardia.
+Correção do alinhamento temporal de turnos que atravessam a meia-noite, integrada e publicada, com testes de regressão e documentação sincronizada com o estado real de `main`.
 
 ## Próximo passo
 
-1. Executar o workflow **Qualidade** da correção de turnos noturnos.
-2. Rever o diff e integrar apenas se typecheck, lint, testes, build e smoke test ficarem verdes.
-3. Validar no uso real pelo menos um turno noturno com entrada antes da hora e um com saída depois da hora.
-4. Manter as validações físicas de medicação já pendentes.
+1. validar em uso real os dois cenários noturnos corrigidos;
+2. validar fisicamente a interação de medicação ainda pendente;
+3. decidir se a integração Cloudflare Workers é necessária e, consoante essa decisão, corrigir a configuração no Cloudflare ou removê-la para eliminar checks externos falhados sem utilidade.
