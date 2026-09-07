@@ -38,7 +38,7 @@ Diferenças permitidas são de densidade, navegação, gesto e capacidades do di
 
 No drawer móvel, `mobileMenuOpen` continua a ser estado local de `AppShell`; não é persistido nem sincronizado porque é apenas estado efémero de apresentação.
 
-No PR #195, o botão do top bar deixa de ser apenas “abrir menu” e passa a alternar o mesmo estado:
+O botão do top bar representa diretamente esse estado:
 
 ```text
 hambúrguer
@@ -58,9 +58,28 @@ X
             └─ CSS repõe o hambúrguer
 ```
 
-Fecho por backdrop, `Escape`, mudança de rota e botão interno do drawer continua a convergir para `mobileMenuOpen = false`. O top bar é recortado enquanto o drawer está aberto para manter apenas a zona do botão acima do backdrop; o drawer respeita essa zona através de `max-width` e `safe-area`, evitando sobreposição do X.
+Após o PR #196, existe **um único X visível**: o próprio controlo hambúrguer transformado. O cabeçalho do drawer mantém apenas o `BrandLockup`; não possui um segundo botão de fecho. Fecho por backdrop, `Escape` e mudança de rota continua a convergir para `mobileMenuOpen = false`.
+
+O top bar é recortado enquanto o drawer está aberto para manter apenas a zona do botão acima do backdrop; o drawer respeita essa zona através de `max-width` e `safe-area`, evitando sobreposição do X.
 
 A animação é responsabilidade de `src/styles/mobile-shell.css`: React/TypeScript controla o estado, CSS controla movimento e geometria. Não foi criada biblioteca de animação nem novo componente de estado.
+
+### Orçamento de largura do top bar móvel
+
+Em mobile, o top bar usa duas colunas:
+
+```css
+grid-template-columns: minmax(0, 1fr) auto;
+```
+
+- coluna 1: botão menu + identidade textual compacta;
+- coluna 2: relógio + indicador de sincronização + bloqueio + notificações.
+
+O grupo operacional usa largura intrínseca (`auto`/`max-content`) e não é comprimido pela marca. A identidade pode encolher e aplicar ellipsis. Em ecrãs estreitos, o relógio mantém a hora e pode ocultar apenas o ícone.
+
+`prototype-v2.css` mantém regras históricas que desenham um pseudo-logo/wordmark em `.mobileAppIdentity > strong`. A camada final `mobile-shell.css` neutraliza esses pseudo-elementos apenas no top bar móvel. O wordmark completo continua disponível no cabeçalho do drawer e na sidebar desktop.
+
+`mobile-quick-access.css` contém regras históricas de `hover/focus-visible` com `!important`. Para evitar estados verdes persistentes em browsers móveis e impedir que o shorthand `background` remova a linha central do hambúrguer, `mobile-shell.css` redefine explicitamente `background-color`, `background-image`, `background-position`, `background-repeat` e `background-size` com prioridade final no controlo móvel.
 
 ## Dados e persistência
 
@@ -214,8 +233,8 @@ Não existe uma API REST alternativa por entidade para mobile ou desktop.
 - `src/security/SecureAppBootstrap.tsx`: abertura do runtime, rehydrate e agendamento de sync.
 - `src/security/SecurityContext.tsx`: sessão e operações de segurança/sync para UI.
 - `src/presentation/components/AppTopBar.tsx`: estado operacional, indicador de sync e botão físico do menu móvel.
-- `src/presentation/layouts/AppShell.tsx`: estado do drawer, alternância abrir/fechar, foco e sincronização dos atributos ARIA do botão móvel.
-- `src/styles/mobile-shell.css`: geometria do shell móvel, drawer/backdrop e transformação visual hambúrguer ↔ X.
+- `src/presentation/layouts/AppShell.tsx`: estado do drawer, alternância abrir/fechar, reposição de foco e atributos ARIA do botão móvel.
+- `src/styles/mobile-shell.css`: camada final de geometria do shell móvel, orçamento de largura, drawer/backdrop e transformação hambúrguer ↔ X.
 - `src/presentation/providers/AppServicesProvider.tsx`: fonte única dos services/repositories usados por todas as páginas.
 - `cloudflare/sync-worker.js`: CORS, autenticação, validação, Durable Object, vault/pairing.
 - `wrangler.toml`: configuração versionada do Worker/Durable Object/origem autorizada.
@@ -260,7 +279,7 @@ Além dos testes existentes de endpoint/token/envelope, `cloudSyncReplication.te
 
 Quality gates obrigatórios continuam a ser auditoria de dependências, typecheck, lint, testes, build frontend, `wrangler deploy --dry-run` e smoke test de browser.
 
-Para alterações do shell móvel, acrescentar validação manual de abertura/fecho por toque, rato, teclado, `Escape`, backdrop, safe-area e breakpoints antes de declarar a UX concluída.
+Para alterações do shell móvel, acrescentar validação manual de abertura/fecho por toque, rato, teclado, `Escape`, backdrop, safe-area, estados de foco/hover e breakpoints antes de declarar a UX concluída.
 
 ## Distribuição
 
@@ -271,8 +290,10 @@ GitHub Pages continua a distribuir o frontend. Cloudflare Workers serve apenas a
 - mesmas rotas e conteúdo funcional em todos os breakpoints;
 - navegação adapta-se entre sidebar e bottom nav/drawer;
 - o controlo hambúrguer/X tem alvo de `44 × 44 px` e continua disponível por toque, rato e teclado;
+- existe um único X visível quando o drawer abre;
 - `aria-expanded` e `aria-label` refletem o estado do drawer, independentemente do efeito visual;
-- fechar por `Escape`, backdrop e botão interno continua suportado;
+- fechar por `Escape`, backdrop e o próprio X continua suportado;
+- a identidade textual pode encolher sem empurrar relógio/sync/bloqueio/notificações;
 - `prefers-reduced-motion` elimina as transições do ícone/drawer sem remover funcionalidade;
 - `forced-colors` mantém as linhas do controlo através de cores de sistema;
 - estado de sync tem `aria-label`/texto e não depende apenas de cor;
