@@ -6,8 +6,59 @@ Atualizado em: 2026-09-07
 
 - React 19 + TypeScript.
 - Vite para desenvolvimento e build.
-- Dexie/IndexedDB para persistência local.
+- Cofre local cifrado sobre IndexedDB para persistência operacional.
 - Vitest para testes automatizados.
+- GitHub Pages como frontend oficial.
+- Cloudflare Worker + Durable Objects como backend opcional de sincronização cifrada, em validação na branch `feat/cloudflare-sync`.
+
+## Fluxo relevante — sincronização móvel e computador
+
+```text
+AppDatabase / EncryptedVaultStore
+  └─ EncryptedVaultRecord (AES-GCM no cliente)
+       ├─ evento local de alteração do cofre
+       └─ CloudSyncManager
+            ├─ impressão digital SHA-256 do cofre cifrado
+            ├─ token de sincronização derivado da dataKey
+            ├─ GET /v1/vault/:profileId
+            └─ PUT /v1/vault/:profileId + expectedRevision
+                 └─ Cloudflare Worker
+                      └─ Durable Object por profileId
+                           ├─ authHash
+                           ├─ remoteRevision
+                           └─ EncryptedVaultRecord
+```
+
+### Modelo de segurança da sincronização
+
+O backend não recebe o snapshot em texto simples. O cliente envia o mesmo `EncryptedVaultRecord` já protegido por AES-GCM. A `dataKey` original permanece no dispositivo e só existe em memória enquanto o perfil está desbloqueado.
+
+O token HTTP é derivado localmente a partir da `dataKey` com contexto específico de sincronização e SHA-256. O Worker volta a aplicar SHA-256 antes de guardar o verificador. Assim, uma cópia do armazenamento remoto contém ciphertext, revisão e um hash de autenticação, mas não contém PIN, palavra-passe, código de recuperação nem a chave AES original.
+
+### Concorrência e conflitos
+
+A revisão local de `EncryptedVaultRecord` e a revisão remota são independentes. O Worker só aceita uma escrita quando `expectedRevision` coincide com a revisão remota atual. Cada perfil é encaminhado para um Durable Object próprio, que serializa as operações desse perfil.
+
+O cliente guarda no `SecurityProfile`:
+
+- se a sincronização está ativa;
+- última revisão remota confirmada;
+- impressão digital do último cofre sincronizado;
+- hora da última sincronização;
+- último estado/erro de sincronização.
+
+Com esta base, o cliente distingue:
+
+- alteração apenas local → envia;
+- alteração apenas remota → descarrega antes de reabrir o `AppDatabase`;
+- conteúdo idêntico → apenas atualiza metadados;
+- alteração independente nos dois lados → conflito, sem sobrescrita automática.
+
+A sincronização é tentada no desbloqueio, após gravações locais do cofre, quando a aplicação volta ao primeiro plano, quando a ligação regressa e periodicamente enquanto está aberta. Falhas de rede não invalidam a escrita local.
+
+### Primeiro emparelhamento
+
+Dois dispositivos só podem sincronizar automaticamente se representarem o mesmo perfil criptográfico. O primeiro emparelhamento usa o mecanismo de cópia segura já existente: exporta-se o perfil protegido num dispositivo e importa-se no outro. Isso transfere `profileId`, material de chave cifrado e o cofre sem expor a `dataKey` em texto simples ao servidor.
 
 ## Fluxo relevante — horas de trabalho
 
@@ -50,6 +101,14 @@ MedicationPrototypeWorkspace
 
 ## Responsabilidades
 
+### `cloudSync.ts`
+
+Coordena a sincronização sem aceder aos dados desencriptados. Deriva o token de sincronização, calcula fingerprints do ciphertext, consulta a revisão remota, aplica compare-and-set e decide entre envio, receção ou conflito.
+
+### `cloudflare/sync-worker.js`
+
+Expõe apenas `GET` e `PUT` para cofres cifrados, valida origem, autenticação, tamanho e formato do payload e delega cada `profileId` para um Durable Object. Não contém segredos versionados.
+
 ### `WorkHours.ts`
 
 É o motor de regras para cálculo de horas planeadas, presença, trabalho efetivo, períodos não trabalhados, horas extra, saldo e ocorrências. Os cálculos usam intervalos normalizados e fundidos para evitar dupla contagem de pausas sobrepostas. A normalização de turnos noturnos deve preservar a relação temporal com o turno planeado, incluindo entrada antecipada e saída tardia.
@@ -88,7 +147,7 @@ Versões posteriores do mesmo `order` são apresentadas como **Horário alterado
 
 ## Dados e auditoria
 
-A correção do motor de horas não altera schema nem persistência; só altera a interpretação temporal no momento do cálculo.
+A sincronização não altera o schema operacional do cofre. Apenas acrescenta metadados opcionais `cloudSync` ao `SecurityProfile`, fora do payload de negócio.
 
 `MedicationSchedule` inclui o campo opcional `deletedAt`. A combinação `deletedAt` + `effectiveUntil` funciona como tombstone lógico. Os filtros existentes baseados em `effectiveFrom/effectiveUntil` deixam automaticamente de devolver o horário eliminado no dia da operação e nas previsões futuras.
 
@@ -98,14 +157,15 @@ Depois de operações iniciadas pela página, o mecanismo existente continua a c
 
 ## Qualidade e distribuição
 
-O caminho oficial de publicação do projeto continua a ser GitHub Pages. O commit do PR #189 concluiu com sucesso o workflow **Qualidade** e o workflow **Publicar Foco & Jornada**.
+O frontend oficial continua a ser publicado em GitHub Pages. A integração Cloudflare passa a ter finalidade arquitetural explícita apenas para o endpoint de sincronização.
 
-Existe adicionalmente uma integração externa **Cloudflare Workers and Pages** ligada ao repositório. O respetivo check **Workers Builds: foco-jornada** falhou para o PR #189 e para o commit integrado. Como a causa detalhada está apenas nos logs externos do Cloudflare e não existe configuração Cloudflare versionada no repositório, esta integração não deve ser considerada parte suportada da arquitetura até ser explicitamente revista e documentada.
+A configuração do Worker está versionada em `wrangler.toml`; o build GitHub Pages recebe o endpoint através da variável de repositório `VITE_SYNC_API_URL`. Enquanto o Worker não estiver efetivamente publicado e essa variável não estiver definida, a interface apresenta a sincronização como indisponível e o modo local continua funcional.
 
 ## Acessibilidade e responsividade
 
 - Alvos compatíveis com toque.
 - Ações destrutivas têm texto e ícone e não dependem apenas da cor.
+- O controlo de sincronização usa botão textual e estado legível, sem depender apenas de cor.
 - Histórico compacto usa botões reais com `aria-pressed` para alternar resumo/detalhes técnicos.
 - Paginação do histórico reduz comprimento vertical sem remover informação.
 - `prefers-reduced-motion` mantém-se aplicado ao deslize.
