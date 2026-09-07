@@ -1,4 +1,5 @@
 import type { WrappedKey } from './crypto'
+import type { CloudSyncProfileState } from './cloudSync'
 
 export interface PasskeyProfile {
   credentialId: string
@@ -26,6 +27,7 @@ export interface SecurityProfile {
   failedAttempts: number
   lockedUntil?: string
   autoLockMinutes: number
+  cloudSync?: CloudSyncProfileState
 }
 
 const DB_NAME = 'foco-jornada-security-v1'
