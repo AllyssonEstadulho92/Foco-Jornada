@@ -17,7 +17,8 @@ A causa principal da inconsistência de dados foi confirmada como identidade/per
 7. PR #194 auditou e reforçou a consistência móvel ↔ web e está integrado em `main`;
 8. PR #195 introduziu a transformação hambúrguer ↔ X e foi integrado/publicado;
 9. PR #196 removeu o X duplicado, corrigiu o orçamento de largura do top bar móvel e foi integrado/publicado;
-10. PR #197 refinou a hierarquia visual do controlo do menu para apresentar apenas o glifo, sem caixa, fundo ou moldura persistente, e está integrado/publicado.
+10. PR #197 refinou a hierarquia visual do controlo do menu para apresentar apenas o glifo, sem caixa, fundo ou moldura persistente, e está integrado/publicado;
+11. PR #198 corrige a superfície branca residual do próprio top bar recortado quando o drawer está aberto.
 
 A associação física dos dispositivos reais do utilizador continua a ser um critério obrigatório antes de declarar o problema operacional de sincronização totalmente encerrado.
 
@@ -110,6 +111,19 @@ Implementado e publicado:
 
 O head final do PR #197 passou auditoria de dependências, typecheck, lint, testes, build, Worker dry-run, smoke test e criação do artefacto. O PR foi integrado em `main` no commit `7fb419372026144b8488f13ba84ea11db10cac2f` e o workflow de publicação GitHub Pages concluiu com sucesso.
 
+## Superfície transparente no estado aberto — PR #198
+
+A captura real posterior ao PR #197 mostrou que a caixa branca persistia mesmo com o `mobileMenuButton` transparente. A revisão do CSS confirmou a origem: o `appTopBar` continua elevado acima do backdrop e é recortado para deixar o X acessível; o fundo, blur e linha inferior dessa superfície ainda eram pintados dentro da zona recortada.
+
+Implementado no PR #198:
+
+- o top bar continua elevado apenas para preservar a interação com o X;
+- no estado `appShellMobileMenuOpen`, a zona recortada do top bar passa a `background: transparent`;
+- `border-bottom`, `box-shadow`, `backdrop-filter` e `-webkit-backdrop-filter` são removidos nesse estado;
+- o X fica diretamente sobre o backdrop, sem cartão ou retângulo branco;
+- o estado fechado do top bar não é alterado;
+- o alvo de toque de `44 × 44 px`, ARIA, safe-area, animação e mecanismos de fecho permanecem iguais.
+
 ## Segurança e integridade
 
 - nenhum PIN, palavra-passe, código de recuperação ou `dataKey` é enviado ao Worker;
@@ -119,12 +133,12 @@ O head final do PR #197 passou auditoria de dependências, typecheck, lint, test
 - conflito bilateral continua sem `last-write-wins` silencioso;
 - CORS e CSP continuam limitados ao endpoint suportado;
 - o service worker não cacheia a API de sincronização;
-- PR #195, PR #196 e PR #197 são alterações de navegação/apresentação e não alteram persistência nem sincronização.
+- PR #195, PR #196, PR #197 e PR #198 são alterações de navegação/apresentação e não alteram persistência nem sincronização.
 
 ## Riscos/limitações ainda abertas
 
 1. **Validação física de sincronização:** testes automáticos não substituem telemóvel e computador reais. É necessário associar os dois browsers e confirmar os registos reais.
-2. **Validação visual final do PR #197:** confirmar no iPhone que o hambúrguer/X aparece sem caixa branca, sem moldura e sem fragmentos da identidade junto ao controlo.
+2. **Validação visual final do PR #198:** confirmar no iPhone que o X fica diretamente sobre o backdrop, sem superfície branca do top bar recortado.
 3. **Android/tablet:** confirmar o mesmo comportamento entre 360 e 899 px, incluindo orientação horizontal e safe-area quando aplicável.
 4. **Acessibilidade:** confirmar `focus-visible`, `forced-colors` e redução de movimento em navegação por teclado/tecnologia de apoio.
 5. **Timezone geral:** a jornada/relatórios gerais usam o timezone do browser em vários utilitários. Se os sistemas tiverem timezones diferentes, o mesmo timestamp pode ser apresentado noutro dia/hora.
@@ -137,12 +151,13 @@ A correção de turnos noturnos do PR #189 permanece integrada. A área de medic
 
 ## Última alteração
 
-PR #197 integrado e publicado: o controlo hambúrguer/X passa a mostrar apenas o glifo, mantendo área de toque, estados ARIA, safe-area e mecanismos de fecho existentes.
+Aberto o PR #198 para remover a superfície branca residual do top bar recortado no estado de drawer aberto, preservando apenas o X como elemento visual acima do backdrop.
 
 ## Próximo passo
 
-1. validar no iPhone o estado fechado e aberto sem caixa branca/moldura;
-2. confirmar que não existe fragmento de texto junto ao X nem estado verde residual após toque;
-3. validar Android/tablet e viewport web abaixo de 900 px;
-4. validar `focus-visible`, `forced-colors` e `prefers-reduced-motion`;
-5. continuar a validação física da sincronização móvel ↔ computador com o mesmo perfil/cofre.
+1. concluir os quality gates do PR #198;
+2. integrar apenas com CI verde e confirmar publicação GitHub Pages;
+3. validar no iPhone que o X aparece sem caixa/cartão/retângulo branco;
+4. validar Android/tablet e viewport web abaixo de 900 px;
+5. validar `focus-visible`, `forced-colors` e `prefers-reduced-motion`;
+6. continuar a validação física da sincronização móvel ↔ computador com o mesmo perfil/cofre.

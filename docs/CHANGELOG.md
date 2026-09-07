@@ -1,5 +1,28 @@
 # Changelog
 
+## 2026-09-07 — superfície transparente do X aberto (PR #198)
+
+### Corrigido
+
+- A superfície branca que permanecia atrás do X com o drawer aberto foi identificada como a zona recortada do próprio `appTopBar`, e não como o `mobileMenuButton`.
+- No estado `appShellMobileMenuOpen`, o top bar continua acima do backdrop apenas para manter o X interativo, mas a zona recortada passa a ter fundo totalmente transparente.
+- Nesse estado são removidos `border-bottom`, `box-shadow`, `backdrop-filter` e `-webkit-backdrop-filter`.
+- O X passa a ficar diretamente sobre o backdrop, sem cartão, moldura ou retângulo branco.
+
+### Preservado
+
+- Alvo funcional de `44 × 44 px`, `aria-expanded`, `aria-label`, safe-area e transformação hambúrguer ↔ X.
+- Fecho por X, backdrop, tecla `Escape` e mudança de rota.
+- Superfície normal do top bar quando o drawer está fechado.
+- Dados, repositories, schema, cifragem, API, backend e sincronização móvel ↔ computador.
+
+### Validação pendente
+
+- Quality gates do head final do PR #198.
+- Publicação GitHub Pages após integração.
+- Confirmação física no iPhone de que o X aparece sem superfície branca residual.
+- Confirmação em Android/Chrome, tablet e orientação horizontal.
+
 ## 2026-09-07 — hierarquia minimalista do menu móvel (PR #197)
 
 ### Alterado

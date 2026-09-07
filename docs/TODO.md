@@ -133,6 +133,19 @@ Atualizado em: 2026-09-07
 - [ ] Validar navegação por teclado e `focus-visible` em viewport responsiva.
 - [ ] Validar Android/Chrome e tablet.
 
+## P0 — Superfície transparente do X aberto (PR #198)
+
+- [x] Confirmar pela captura física que a superfície branca persistente não é o `mobileMenuButton`, mas a zona recortada do `appTopBar` elevada acima do backdrop.
+- [x] Manter o `appTopBar` acima do backdrop apenas para preservar o X clicável.
+- [x] Tornar transparente o fundo da zona recortada quando `mobileMenuOpen = true`.
+- [x] Remover nesse estado `border-bottom`, `box-shadow`, `backdrop-filter` e `-webkit-backdrop-filter`.
+- [x] Preservar alvo de toque `44 × 44 px`, ARIA, safe-area, animação e caminhos de fecho.
+- [ ] Confirmar auditoria de dependências, typecheck, lint, testes, build, Worker dry-run e smoke test no head final do PR #198.
+- [ ] Integrar PR #198 apenas com CI verde.
+- [ ] Confirmar publicação GitHub Pages do PR #198.
+- [ ] Validar no iPhone que o X fica diretamente sobre o backdrop sem retângulo/cartão branco.
+- [ ] Validar Android/Chrome, tablet e orientação horizontal.
+
 ## P0 — Correção de turnos noturnos
 
 - [x] Reproduzir logicamente o erro de entrada antecipada num turno **22:00–06:00**.

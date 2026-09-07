@@ -197,3 +197,18 @@ Quando o drawer está aberto, a zona recortada do top bar corresponde apenas à 
 - o mesmo `mobileMenuOpen` continua a controlar hambúrguer, X, drawer e backdrop;
 - não é criada nova biblioteca, componente, store ou persistência;
 - alterações limitam-se a apresentação e hierarquia visual do shell móvel.
+
+## D-018 — O estado aberto eleva o controlo, não a superfície do top bar
+
+**Estado:** implementada no PR #198.
+
+**Decisão:** quando o drawer está aberto, o `appTopBar` continua acima do backdrop apenas para manter o X interativo, mas a zona recortada desse top bar deve ser completamente transparente. Nesse estado são removidos `background`, `border-bottom`, `box-shadow` e `backdrop-filter` da superfície recortada.
+
+**Motivo:** tornar apenas o `mobileMenuButton` transparente não elimina a pintura do seu elemento pai. A captura real mostrou que o fundo branco visível vinha da superfície do próprio top bar elevada e recortada, não do botão.
+
+**Consequências:**
+
+- o X fica diretamente sobre o backdrop, sem cartão ou retângulo branco;
+- o alvo de toque de `44 × 44 px`, os estados ARIA, safe-area e animação permanecem inalterados;
+- o top bar fechado mantém a superfície normal;
+- nenhuma rota, dado, persistência, sincronização ou regra de segurança é alterada.
