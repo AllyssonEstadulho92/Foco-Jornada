@@ -1,27 +1,57 @@
 # Changelog
 
+## 2026-09-07 — top bar persistente no menu móvel
+
+### Corrigido
+
+- A validação física após o PR #198 mostrou que, ao abrir o menu, desapareciam **Foco Jornada**, relógio, sincronização, bloqueio e notificações, ficando visível apenas o controlo do menu.
+- A causa foi confirmada em `mobile-shell.css`: o estado `appShellMobileMenuOpen` recortava o `appTopBar` com `clip-path` e ocultava explicitamente a identidade com `visibility: hidden`.
+- O top bar passa a permanecer integralmente visível no estado aberto, mantendo a mesma estrutura de duas colunas e a superfície normal da aplicação.
+- Drawer e backdrop passam a começar abaixo dos `64px` do top bar, em vez de ocupar a mesma faixa vertical.
+- O drawer deixa de reservar uma faixa lateral exclusiva para o X, porque o controlo e o painel já não se sobrepõem verticalmente.
+
+### Hierarquia e interação
+
+- O top bar fica na camada superior do shell móvel; drawer e backdrop ficam abaixo dele e acima do conteúdo/bottom navigation.
+- O mesmo botão continua a alternar hambúrguer ↔ X e a fechar o drawer.
+- O alvo de toque continua em `44 × 44 px`, sem caixa ou cápsula visual persistente.
+- `aria-expanded`, `aria-label`, fecho por backdrop, tecla `Escape`, `forced-colors` e `prefers-reduced-motion` permanecem inalterados.
+
+### Preservado
+
+- Sem alterações a dados, repositories, schema, cifragem, API, backend, autenticação ou sincronização móvel ↔ computador.
+- Sem novo componente, store, biblioteca ou dependência.
+- Sidebar desktop e restantes breakpoints funcionais permanecem inalterados.
+
+### Validação pendente
+
+- Quality gates do head final da correção.
+- Integração em `main` e publicação GitHub Pages.
+- Confirmação física no iPhone de que o top bar inteiro permanece visível e o hambúrguer se transforma em X.
+- Confirmação em Android/Chrome, tablet e orientação horizontal.
+
 ## 2026-09-07 — superfície transparente do X aberto (PR #198)
 
 ### Corrigido
 
 - A superfície branca que permanecia atrás do X com o drawer aberto foi identificada como a zona recortada do próprio `appTopBar`, e não como o `mobileMenuButton`.
-- No estado `appShellMobileMenuOpen`, o top bar continua acima do backdrop apenas para manter o X interativo, mas a zona recortada passa a ter fundo totalmente transparente.
-- Nesse estado são removidos `border-bottom`, `box-shadow`, `backdrop-filter` e `-webkit-backdrop-filter`.
-- O X passa a ficar diretamente sobre o backdrop, sem cartão, moldura ou retângulo branco.
+- No estado `appShellMobileMenuOpen`, o top bar continuava acima do backdrop apenas para manter o X interativo, mas a zona recortada passou a ter fundo totalmente transparente.
+- Nesse estado foram removidos `border-bottom`, `box-shadow`, `backdrop-filter` e `-webkit-backdrop-filter`.
+- O X passou a ficar diretamente sobre o backdrop, sem cartão, moldura ou retângulo branco.
 
 ### Preservado
 
 - Alvo funcional de `44 × 44 px`, `aria-expanded`, `aria-label`, safe-area e transformação hambúrguer ↔ X.
 - Fecho por X, backdrop, tecla `Escape` e mudança de rota.
-- Superfície normal do top bar quando o drawer está fechado.
+- Superfície normal do top bar quando o drawer estava fechado.
 - Dados, repositories, schema, cifragem, API, backend e sincronização móvel ↔ computador.
 
-### Validação pendente
+### Qualidade, publicação e revalidação
 
-- Quality gates do head final do PR #198.
-- Publicação GitHub Pages após integração.
-- Confirmação física no iPhone de que o X aparece sem superfície branca residual.
-- Confirmação em Android/Chrome, tablet e orientação horizontal.
+- Auditoria de dependências, typecheck, lint, testes, build, Worker dry-run e smoke test concluíram com sucesso.
+- PR #198 foi integrado em `main`.
+- Workflow **Publicar Foco & Jornada** / GitHub Pages concluiu com sucesso.
+- A captura física posterior confirmou um novo problema: o recorte necessário a essa solução fazia desaparecer a restante barra superior, tratado na correção seguinte.
 
 ## 2026-09-07 — hierarquia minimalista do menu móvel (PR #197)
 
@@ -52,11 +82,10 @@
 - PR #197 integrado em `main` no commit `7fb419372026144b8488f13ba84ea11db10cac2f`.
 - Workflow **Publicar Foco & Jornada** / GitHub Pages concluído com sucesso.
 
-### Validação física pendente
+### Validação física posterior
 
-- Confirmar no iPhone o hambúrguer e X sem caixa branca/moldura.
-- Confirmar ausência de fragmento de texto junto ao X e de estado verde residual após toque.
-- Confirmar em Android/Chrome, tablet e navegação por teclado.
+- A revalidação em iPhone confirmou que a estratégia de recortar a barra superior precisava de revisão estrutural, apesar de o próprio botão já não apresentar a caixa branca original.
+- Android/Chrome, tablet e navegação por teclado continuam a exigir validação após a correção estrutural.
 
 ## 2026-09-07 — correção do shell móvel (PR #196)
 

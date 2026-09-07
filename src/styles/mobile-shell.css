@@ -22,7 +22,7 @@
 
 @media (max-width: 899px) {
   .appShell {
-    --mobile-menu-toggle-zone: calc(max(14px, env(safe-area-inset-left)) + 44px);
+    --mobile-topbar-height: 64px;
     min-height: 100dvh;
     background: var(--bg);
   }
@@ -43,9 +43,9 @@
   .appTopBar {
     position: sticky;
     top: 0;
-    z-index: 110;
+    z-index: 160;
     display: grid;
-    min-height: 64px;
+    min-height: var(--mobile-topbar-height);
     grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;
     justify-content: initial;
@@ -59,18 +59,18 @@
   }
 
   /*
-   * Com o drawer aberto, o top bar sobe apenas para manter o controlo X acima
-   * do backdrop. A própria superfície do top bar fica totalmente transparente:
-   * assim não existe qualquer cartão/retângulo branco atrás do glifo.
+   * O top bar é uma camada persistente da aplicação: abrir o drawer não deve
+   * apagar identidade, relógio ou estado operacional. O drawer e o backdrop
+   * começam abaixo desta barra e ficam numa camada inferior.
    */
   .appShellMobileMenuOpen .appTopBar {
-    z-index: 145;
-    clip-path: inset(0 calc(100% - var(--mobile-menu-toggle-zone)) 0 0);
-    border-bottom-color: transparent !important;
-    background: transparent !important;
+    z-index: 160;
+    clip-path: none;
+    border-bottom-color: var(--line) !important;
+    background: color-mix(in srgb, var(--surface) 94%, transparent) !important;
     box-shadow: none !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
   }
 
   .mobileAppIdentity {
@@ -112,7 +112,7 @@
   }
 
   .appShellMobileMenuOpen .mobileAppIdentity > strong {
-    visibility: hidden;
+    visibility: visible;
   }
 
   /*
@@ -269,7 +269,10 @@
   .mobileDrawerBackdrop {
     position: fixed;
     z-index: 140;
-    inset: 0;
+    top: var(--mobile-topbar-height);
+    right: 0;
+    bottom: 0;
+    left: 0;
     display: block;
     padding: 0;
     border: 0;
@@ -287,14 +290,14 @@
   .mobileDrawer {
     position: fixed;
     z-index: 150;
-    top: 0;
+    top: var(--mobile-topbar-height);
     right: 0;
     bottom: 0;
     display: flex;
     width: min(88vw, 360px);
-    max-width: calc(100vw - var(--mobile-menu-toggle-zone));
+    max-width: calc(100vw - 16px);
     flex-direction: column;
-    padding: calc(16px + env(safe-area-inset-top)) 14px calc(18px + env(safe-area-inset-bottom));
+    padding: 16px 14px calc(18px + env(safe-area-inset-bottom));
     overflow-y: auto;
     border: 0;
     border-left: 1px solid var(--line);
@@ -585,7 +588,7 @@
 
   .mobileDrawer {
     width: min(92vw, 348px);
-    max-width: calc(100vw - var(--mobile-menu-toggle-zone));
+    max-width: calc(100vw - 16px);
   }
 
   .mobileDrawerQuickAccess {

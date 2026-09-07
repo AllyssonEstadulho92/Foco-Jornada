@@ -18,7 +18,8 @@ A causa principal da inconsistência de dados foi confirmada como identidade/per
 8. PR #195 introduziu a transformação hambúrguer ↔ X e foi integrado/publicado;
 9. PR #196 removeu o X duplicado, corrigiu o orçamento de largura do top bar móvel e foi integrado/publicado;
 10. PR #197 refinou a hierarquia visual do controlo do menu para apresentar apenas o glifo, sem caixa, fundo ou moldura persistente, e está integrado/publicado;
-11. PR #198 corrige a superfície branca residual do próprio top bar recortado quando o drawer está aberto.
+11. PR #198 removeu a superfície branca residual do top bar recortado e foi integrado/publicado;
+12. a revisão física posterior mostrou que o recorte do top bar era estruturalmente excessivo: ao abrir o menu desapareciam identidade, relógio, sincronização, bloqueio e notificações. A correção seguinte passa a manter o top bar persistente e a abrir drawer/backdrop abaixo dele.
 
 A associação física dos dispositivos reais do utilizador continua a ser um critério obrigatório antes de declarar o problema operacional de sincronização totalmente encerrado.
 
@@ -113,16 +114,37 @@ O head final do PR #197 passou auditoria de dependências, typecheck, lint, test
 
 ## Superfície transparente no estado aberto — PR #198
 
-A captura real posterior ao PR #197 mostrou que a caixa branca persistia mesmo com o `mobileMenuButton` transparente. A revisão do CSS confirmou a origem: o `appTopBar` continua elevado acima do backdrop e é recortado para deixar o X acessível; o fundo, blur e linha inferior dessa superfície ainda eram pintados dentro da zona recortada.
+A captura real posterior ao PR #197 mostrou que a caixa branca persistia mesmo com o `mobileMenuButton` transparente. A revisão do CSS confirmou a origem: o `appTopBar` continuava elevado acima do backdrop e era recortado para deixar o X acessível; o fundo, blur e linha inferior dessa superfície ainda eram pintados dentro da zona recortada.
 
-Implementado no PR #198:
+Implementado e publicado no PR #198:
 
-- o top bar continua elevado apenas para preservar a interação com o X;
-- no estado `appShellMobileMenuOpen`, a zona recortada do top bar passa a `background: transparent`;
-- `border-bottom`, `box-shadow`, `backdrop-filter` e `-webkit-backdrop-filter` são removidos nesse estado;
-- o X fica diretamente sobre o backdrop, sem cartão ou retângulo branco;
-- o estado fechado do top bar não é alterado;
-- o alvo de toque de `44 × 44 px`, ARIA, safe-area, animação e mecanismos de fecho permanecem iguais.
+- o top bar continuava elevado apenas para preservar a interação com o X;
+- no estado `appShellMobileMenuOpen`, a zona recortada passava a `background: transparent`;
+- `border-bottom`, `box-shadow`, `backdrop-filter` e `-webkit-backdrop-filter` eram removidos nesse estado;
+- o X ficava diretamente sobre o backdrop, sem cartão ou retângulo branco;
+- o estado fechado do top bar não era alterado;
+- o alvo de toque de `44 × 44 px`, ARIA, safe-area, animação e mecanismos de fecho permaneciam iguais.
+
+O PR #198 foi integrado em `main`; a pipeline **Qualidade** e o workflow **Publicar Foco & Jornada** concluíram com sucesso.
+
+## Top bar persistente com drawer abaixo — correção seguinte
+
+As duas capturas reais de iPhone após a publicação do PR #198 confirmam um problema diferente do fundo branco: ao abrir o menu, a aplicação mostra apenas o controlo do menu e oculta toda a restante barra superior. O código confirma a causa objetiva:
+
+- `.appShellMobileMenuOpen .appTopBar` usa `clip-path` para conservar apenas a faixa esquerda do controlo;
+- `.appShellMobileMenuOpen .mobileAppIdentity > strong` aplica `visibility: hidden`;
+- o drawer começa em `top: 0`, ocupando a mesma camada vertical do top bar.
+
+A correção implementada na branch `fix/mobile-menu-persistent-topbar` altera a hierarquia, sem alterar estado ou regras de negócio:
+
+- o top bar torna-se a camada persistente superior do shell móvel;
+- deixa de existir recorte no estado aberto;
+- **Foco Jornada**, hora, estado de sincronização, bloqueio e notificações permanecem visíveis;
+- o mesmo hambúrguer continua a transformar-se em X e continua a fechar o menu;
+- backdrop e drawer passam a começar abaixo dos `64px` do top bar;
+- o drawer deixa de reservar largura lateral apenas para proteger o X, porque já não ocupa a mesma faixa vertical do controlo;
+- bottom navigation e conteúdo continuam abaixo do backdrop quando o drawer está aberto;
+- não foram alterados dados, sincronização, segurança, rotas, persistência nem schema.
 
 ## Segurança e integridade
 
@@ -133,12 +155,12 @@ Implementado no PR #198:
 - conflito bilateral continua sem `last-write-wins` silencioso;
 - CORS e CSP continuam limitados ao endpoint suportado;
 - o service worker não cacheia a API de sincronização;
-- PR #195, PR #196, PR #197 e PR #198 são alterações de navegação/apresentação e não alteram persistência nem sincronização.
+- as alterações dos PR #195–#198 e desta correção são de navegação/apresentação e não alteram persistência nem sincronização.
 
 ## Riscos/limitações ainda abertas
 
 1. **Validação física de sincronização:** testes automáticos não substituem telemóvel e computador reais. É necessário associar os dois browsers e confirmar os registos reais.
-2. **Validação visual final do PR #198:** confirmar no iPhone que o X fica diretamente sobre o backdrop, sem superfície branca do top bar recortado.
+2. **Validação visual desta correção:** confirmar no iPhone que o top bar permanece integralmente visível ao abrir o drawer e que o hambúrguer se transforma efetivamente em X.
 3. **Android/tablet:** confirmar o mesmo comportamento entre 360 e 899 px, incluindo orientação horizontal e safe-area quando aplicável.
 4. **Acessibilidade:** confirmar `focus-visible`, `forced-colors` e redução de movimento em navegação por teclado/tecnologia de apoio.
 5. **Timezone geral:** a jornada/relatórios gerais usam o timezone do browser em vários utilitários. Se os sistemas tiverem timezones diferentes, o mesmo timestamp pode ser apresentado noutro dia/hora.
@@ -151,13 +173,14 @@ A correção de turnos noturnos do PR #189 permanece integrada. A área de medic
 
 ## Última alteração
 
-Aberto o PR #198 para remover a superfície branca residual do top bar recortado no estado de drawer aberto, preservando apenas o X como elemento visual acima do backdrop.
+Corrigida na branch `fix/mobile-menu-persistent-topbar` a hierarquia do shell móvel: o top bar deixa de ser recortado/ocultado e drawer/backdrop passam a ocupar apenas a área abaixo da barra superior.
 
 ## Próximo passo
 
-1. concluir os quality gates do PR #198;
+1. abrir PR da correção e executar quality gates;
 2. integrar apenas com CI verde e confirmar publicação GitHub Pages;
-3. validar no iPhone que o X aparece sem caixa/cartão/retângulo branco;
-4. validar Android/tablet e viewport web abaixo de 900 px;
-5. validar `focus-visible`, `forced-colors` e `prefers-reduced-motion`;
-6. continuar a validação física da sincronização móvel ↔ computador com o mesmo perfil/cofre.
+3. validar no iPhone que **Foco Jornada**, hora, sync, bloqueio e sino permanecem visíveis durante o menu aberto;
+4. confirmar hambúrguer ↔ X e fecho por X/backdrop/Escape;
+5. validar Android/tablet e viewport web abaixo de 900 px;
+6. validar `focus-visible`, `forced-colors` e `prefers-reduced-motion`;
+7. continuar a validação física da sincronização móvel ↔ computador com o mesmo perfil/cofre.
