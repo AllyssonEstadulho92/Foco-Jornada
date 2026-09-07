@@ -62,7 +62,7 @@ Atualizado em: 2026-09-07
 
 ## D-010 — Cloudflare Workers como backend de sincronização cifrada
 
-**Estado:** aceite; implementação em validação na branch `feat/cloudflare-sync`.
+**Estado:** aceite; implementação validada no PR #191, pendente de bootstrap de produção.
 
 **Decisão:** utilizar Cloudflare Workers exclusivamente como serviço remoto de sincronização, mantendo GitHub Pages como frontend oficial. O Worker guarda apenas o `EncryptedVaultRecord` já cifrado no cliente e metadados técnicos de concorrência. O estado de cada perfil é isolado num Durable Object.
 
@@ -76,9 +76,18 @@ Quando existem alterações independentes nos dois dispositivos, nenhuma cópia 
 
 **Consequências:**
 
-- a funcionalidade depende de `VITE_SYNC_API_URL` na publicação GitHub Pages;
+- a funcionalidade depende de um endpoint remoto configurado na publicação GitHub Pages;
 - o primeiro emparelhamento de outro dispositivo requer importar uma cópia segura do mesmo perfil para partilhar `profileId` e chave de dados;
 - o serviço remoto não consegue desencriptar o payload armazenado;
 - indisponibilidade de rede não impede o uso local;
-- conflitos são bloqueados em vez de aplicar política destrutiva de “última escrita vence”;
-- a ativação em produção só fica concluída depois do Worker estar publicado, o endpoint ser configurado no GitHub e os quality gates terminarem com sucesso.
+- conflitos são bloqueados em vez de aplicar política destrutiva de “última escrita vence”.
+
+## D-011 — Bootstrap inicial de Durable Object através do branch de produção
+
+**Estado:** aceite para o PR #191.
+
+**Decisão:** integrar a primeira criação da classe `SyncVault` em `main` depois de o código, o frontend e o bundle do Worker passarem nos quality gates locais/GitHub, mesmo que o check Cloudflare de preview do PR permaneça vermelho exclusivamente por não conseguir aplicar a alteração de ciclo de vida.
+
+**Motivo:** Workers Builds usa por omissão `wrangler versions upload` em branches não produtivas. Esse mecanismo não pode criar, eliminar, renomear ou transferir classes Durable Object. O branch de produção usa `wrangler deploy`, que é o mecanismo suportado para aplicar a criação inicial. O bundle e a configuração são verificados previamente por `wrangler deploy --dry-run` na pipeline **Qualidade**.
+
+**Limite:** esta decisão não autoriza ignorar erros de compilação, testes, segurança ou configuração. Se o `wrangler deploy` de produção falhar, a sincronização permanece desativada e a causa deve ser corrigida antes de configurar o frontend para o endpoint remoto.
