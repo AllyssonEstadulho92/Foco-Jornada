@@ -82,7 +82,7 @@ Quando existem alterações independentes nos dois dispositivos, nenhuma cópia 
 
 ## D-012 — Endpoint de sincronização pode ser configurado no próprio perfil
 
-**Estado:** proposto no PR #192.
+**Estado:** aceite, integrada no PR #192 e publicada.
 
 **Decisão:** manter `VITE_SYNC_API_URL` como configuração automática de build, mas permitir um endpoint runtime guardado em `SecurityProfile.cloudSync.endpoint` quando a publicação não tiver essa variável disponível.
 
