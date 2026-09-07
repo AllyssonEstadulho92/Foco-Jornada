@@ -1,6 +1,11 @@
 import { describe, expect, it, vi } from 'vitest'
 import { generateDataKey } from './crypto'
-import { CloudSyncClient, deriveCloudSyncToken } from './cloudSync'
+import {
+  CloudSyncClient,
+  deriveCloudSyncToken,
+  getCloudSyncEndpoint,
+  normalizeCloudSyncEndpoint,
+} from './cloudSync'
 import type { EncryptedVaultRecord } from './vaultStore'
 
 describe('cloud sync', () => {
@@ -13,6 +18,50 @@ describe('cloud sync', () => {
     expect(first).toBe(repeated)
     expect(first).not.toBe(otherProfile)
     expect(first).toMatch(/^[A-Za-z0-9_-]{43}$/)
+  })
+
+  it('aceita apenas endpoint runtime HTTPS de workers.dev e remove barra final', () => {
+    expect(normalizeCloudSyncEndpoint('https://foco-jornada.conta.workers.dev/'))
+      .toBe('https://foco-jornada.conta.workers.dev')
+    expect(normalizeCloudSyncEndpoint('http://foco-jornada.conta.workers.dev')).toBeNull()
+    expect(normalizeCloudSyncEndpoint('https://example.com')).toBeNull()
+    expect(normalizeCloudSyncEndpoint('https://user:pass@foco-jornada.conta.workers.dev')).toBeNull()
+    expect(normalizeCloudSyncEndpoint('https://foco-jornada.conta.workers.dev?token=segredo')).toBeNull()
+  })
+
+  it('usa o endpoint guardado no perfil quando a publicação não fornece outro endereço operacional', () => {
+    const endpoint = getCloudSyncEndpoint({
+      cloudSync: {
+        enabled: false,
+        endpoint: 'https://foco-jornada.conta.workers.dev/',
+      },
+    })
+    expect(endpoint).toBe('https://foco-jornada.conta.workers.dev')
+  })
+
+  it('valida a identidade do endpoint através de health antes de o usar', async () => {
+    const fetcher = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      expect(String(input)).toBe('https://foco-jornada.conta.workers.dev/health')
+      expect(init?.method).toBe('GET')
+      return new Response(JSON.stringify({ ok: true, service: 'foco-jornada-sync' }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    }) as unknown as typeof fetch
+    const client = new CloudSyncClient('https://foco-jornada.conta.workers.dev', fetcher)
+
+    await expect(client.checkHealth()).resolves.toBeUndefined()
+    expect(fetcher).toHaveBeenCalledOnce()
+  })
+
+  it('rejeita um endpoint que responde mas não é o serviço Foco Jornada', async () => {
+    const fetcher = vi.fn(async () => new Response(JSON.stringify({ ok: true, service: 'outro-servico' }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    })) as unknown as typeof fetch
+    const client = new CloudSyncClient('https://foco-jornada.conta.workers.dev', fetcher)
+
+    await expect(client.checkHealth()).rejects.toThrow('não corresponde ao serviço de sincronização')
   })
 
   it('trata 404 como ausência de cópia remota', async () => {
