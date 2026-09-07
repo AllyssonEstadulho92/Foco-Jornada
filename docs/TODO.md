@@ -12,17 +12,22 @@ Atualizado em: 2026-09-07
 - [x] Separar revisão remota da revisão local do cofre.
 - [x] Implementar fingerprint da última base sincronizada e deteção de conflito bilateral.
 - [x] Interromper sincronização sem sobrescrita quando local e remoto divergem em simultâneo.
+- [x] Validar a estrutura do envelope remoto antes de o aceitar.
+- [x] Autenticar/desencriptar e validar o snapshot remoto antes de substituir o cofre local.
 - [x] Disparar sincronização após gravações locais, regresso ao primeiro plano, recuperação de rede e por intervalo.
 - [x] Adicionar controlo **Ativar/Desativar sincronização** nas definições de segurança.
 - [x] Integrar `VITE_SYNC_API_URL` no build GitHub Pages.
 - [x] Restringir CSP do frontend a Workers HTTPS para a ligação remota.
-- [ ] Confirmar typecheck, lint, testes, build e smoke test no PR.
-- [ ] Confirmar que **Workers Builds: foco-jornada** passa com `wrangler.toml` versionado.
+- [x] Confirmar typecheck, lint, testes, build e smoke test no PR #191.
+- [ ] Abrir os logs privados do build Cloudflare `21d899d0-3e66-4e45-9a42-3c0efef5127b` e identificar a primeira causa concreta da falha.
+- [ ] Rever no Cloudflare **Settings > Builds** root directory, build command, deploy command e token de build.
+- [ ] Confirmar que **Workers Builds: foco-jornada** passa com a configuração corrigida.
 - [ ] Obter o URL real do Worker publicado e configurar a variável GitHub `VITE_SYNC_API_URL`.
 - [ ] Emparelhar o segundo dispositivo através de cópia segura do perfil de referência.
 - [ ] Validar móvel → computador e computador → móvel com dados reais.
 - [ ] Validar funcionamento offline seguido de sincronização após recuperar ligação.
 - [ ] Validar conflito simultâneo sem perda de nenhuma cópia.
+- [ ] Integrar o PR #191 em `main` depois dos bloqueios operacionais acima estarem resolvidos.
 
 ## P0 — Correção de turnos noturnos
 
