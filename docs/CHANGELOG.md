@@ -1,5 +1,35 @@
 # Changelog
 
+## 2026-09-07 — sincronização entre dispositivos
+
+### Adicionado
+
+- Cliente `CloudSyncManager` para sincronizar o `EncryptedVaultRecord` sem desencriptar os dados para transporte.
+- Token remoto derivado da `dataKey` com contexto específico de sincronização e SHA-256.
+- Fingerprint SHA-256 da última base sincronizada.
+- Revisão remota independente com compare-and-set.
+- Deteção conservadora de conflito quando móvel e computador têm alterações independentes.
+- Evento de gravação local do cofre para agendar sincronização.
+- Sincronização ao desbloquear, após gravações, ao regressar ao primeiro plano, ao recuperar rede e periodicamente.
+- Controlo de ativação da sincronização nas definições de segurança.
+- Cloudflare Worker com Durable Object isolado por `profileId`.
+- `wrangler.toml` com configuração versionada do serviço remoto.
+- Testes do token derivado e do protocolo HTTP do cliente.
+
+### Segurança
+
+- O Worker recebe apenas ciphertext/IV e metadados de revisão; não recebe PIN, palavra-passe, código de recuperação ou a chave AES original.
+- O backend guarda apenas um hash adicional do token usado na autenticação.
+- Escritas remotas exigem a revisão esperada e devolvem conflito em concorrência.
+- Divergência simultânea local/remota não usa política destrutiva de “última escrita vence”.
+- `connect-src` passa a autorizar a própria origem e endpoints HTTPS `workers.dev`.
+
+### Distribuição
+
+- GitHub Pages continua a ser o frontend oficial.
+- O workflow de publicação passa `VITE_SYNC_API_URL` a partir de uma variável do repositório.
+- A ativação real permanece pendente até o Worker ser publicado, o endpoint ser conhecido e os quality gates desta branch passarem.
+
 ## 2026-09-07
 
 ### Corrigido
@@ -28,7 +58,7 @@
 
 - O check externo **Workers Builds: foco-jornada** da integração Cloudflare falhou no PR e no commit integrado.
 - A causa não pode ser confirmada apenas a partir do GitHub, porque os detalhes estão nos logs externos do Cloudflare.
-- A integração Cloudflare fica registada como tarefa de manutenção: deve ser configurada/documentada se for necessária ou removida/desativada se não fizer parte da arquitetura pretendida.
+- A integração Cloudflare passou posteriormente a ter uma finalidade explícita de backend de sincronização, implementada na branch `feat/cloudflare-sync` e sujeita a nova validação.
 
 ## 2026-09-05
 
