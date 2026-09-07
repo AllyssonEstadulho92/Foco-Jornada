@@ -17,7 +17,7 @@ A causa principal da inconsistência de dados foi confirmada como identidade/per
 7. PR #194 auditou e reforçou a consistência móvel ↔ web e está integrado em `main`;
 8. PR #195 introduziu a transformação hambúrguer ↔ X e foi integrado/publicado;
 9. PR #196 removeu o X duplicado, corrigiu o orçamento de largura do top bar móvel e foi integrado/publicado;
-10. PR #197 refina a hierarquia visual do controlo do menu para apresentar apenas o glifo, sem caixa, fundo ou moldura persistente.
+10. PR #197 refinou a hierarquia visual do controlo do menu para apresentar apenas o glifo, sem caixa, fundo ou moldura persistente, e está integrado/publicado.
 
 A associação física dos dispositivos reais do utilizador continua a ser um critério obrigatório antes de declarar o problema operacional de sincronização totalmente encerrado.
 
@@ -95,9 +95,9 @@ O PR #196 passou nos quality gates, foi integrado em `main` e a publicação Git
 
 ## Hierarquia minimalista do controlo móvel — PR #197
 
-A validação física após o PR #196 confirmou que o único X continuava visualmente dentro de uma superfície branca. O pedido atual é manter a área funcional de toque, mas remover a aparência de botão/cartão.
+A validação física após o PR #196 confirmou que o único X continuava visualmente dentro de uma superfície branca. O objetivo do PR #197 foi manter a área funcional de toque e remover a aparência de botão/cartão.
 
-Implementado no branch `ui/minimal-mobile-menu-icon` / PR #197:
+Implementado e publicado:
 
 - alvo funcional permanece `44 × 44 px`;
 - `border`, fundo, cápsula e sombra deixam de ser visíveis no estado hambúrguer e no estado X;
@@ -107,6 +107,8 @@ Implementado no branch `ui/minimal-mobile-menu-icon` / PR #197:
 - a zona recortada do top bar passa a corresponder ao tamanho real do controlo, sem reservar o `gap` da identidade;
 - o texto da identidade fica oculto enquanto o drawer está aberto, evitando qualquer fragmento visual junto ao X;
 - `forced-colors` e `prefers-reduced-motion` continuam suportados.
+
+O head final do PR #197 passou auditoria de dependências, typecheck, lint, testes, build, Worker dry-run, smoke test e criação do artefacto. O PR foi integrado em `main` no commit `7fb419372026144b8488f13ba84ea11db10cac2f` e o workflow de publicação GitHub Pages concluiu com sucesso.
 
 ## Segurança e integridade
 
@@ -122,7 +124,7 @@ Implementado no branch `ui/minimal-mobile-menu-icon` / PR #197:
 ## Riscos/limitações ainda abertas
 
 1. **Validação física de sincronização:** testes automáticos não substituem telemóvel e computador reais. É necessário associar os dois browsers e confirmar os registos reais.
-2. **Validação visual do PR #197:** confirmar no iPhone que o hambúrguer/X aparece sem caixa branca, sem moldura e sem fragmentos da identidade junto ao controlo.
+2. **Validação visual final do PR #197:** confirmar no iPhone que o hambúrguer/X aparece sem caixa branca, sem moldura e sem fragmentos da identidade junto ao controlo.
 3. **Android/tablet:** confirmar o mesmo comportamento entre 360 e 899 px, incluindo orientação horizontal e safe-area quando aplicável.
 4. **Acessibilidade:** confirmar `focus-visible`, `forced-colors` e redução de movimento em navegação por teclado/tecnologia de apoio.
 5. **Timezone geral:** a jornada/relatórios gerais usam o timezone do browser em vários utilitários. Se os sistemas tiverem timezones diferentes, o mesmo timestamp pode ser apresentado noutro dia/hora.
@@ -135,14 +137,12 @@ A correção de turnos noturnos do PR #189 permanece integrada. A área de medic
 
 ## Última alteração
 
-Aberto o PR #197 para tornar o controlo hambúrguer/X visualmente minimalista: apenas o ícone fica visível, mantendo área de toque, estados ARIA, safe-area e mecanismos de fecho existentes.
+PR #197 integrado e publicado: o controlo hambúrguer/X passa a mostrar apenas o glifo, mantendo área de toque, estados ARIA, safe-area e mecanismos de fecho existentes.
 
 ## Próximo passo
 
-1. concluir os quality gates do PR #197;
-2. corrigir qualquer regressão de typecheck, lint, testes, build ou smoke test antes de integrar;
-3. integrar o PR #197 apenas com CI verde;
-4. confirmar publicação GitHub Pages;
-5. validar no iPhone o estado fechado e aberto sem caixa branca/moldura;
-6. validar Android/tablet e viewport web abaixo de 900 px;
-7. continuar a validação física da sincronização móvel ↔ computador com o mesmo perfil/cofre.
+1. validar no iPhone o estado fechado e aberto sem caixa branca/moldura;
+2. confirmar que não existe fragmento de texto junto ao X nem estado verde residual após toque;
+3. validar Android/tablet e viewport web abaixo de 900 px;
+4. validar `focus-visible`, `forced-colors` e `prefers-reduced-motion`;
+5. continuar a validação física da sincronização móvel ↔ computador com o mesmo perfil/cofre.

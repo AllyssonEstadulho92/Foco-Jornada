@@ -108,14 +108,14 @@ Atualizado em: 2026-09-07
 - [x] Confirmar quality gates no head final do PR #196.
 - [x] Integrar PR #196 e confirmar publicação GitHub Pages.
 - [x] Validar no iPhone que existe apenas um X e que o top bar já não apresenta o X duplicado.
-- [ ] Revalidar no iPhone a aparência final do controlo através do PR #197, removendo a superfície branca ainda visível.
+- [x] Revalidar a superfície visual através do PR #197 e remover a caixa branca do controlo.
 - [ ] Validar Android/Chrome entre 360 e 480 px.
 - [ ] Validar tablet/viewport web entre 481 e 899 px.
 - [ ] Validar orientação horizontal/safe-area quando aplicável.
 
 ## P0 — Hierarquia minimalista do menu móvel (PR #197)
 
-- [x] Confirmar pela captura física que o único X ainda aparece dentro de uma superfície branca independente.
+- [x] Confirmar pela captura física que o único X ainda aparecia dentro de uma superfície branca independente.
 - [x] Manter o alvo funcional de toque em `44 × 44 px`.
 - [x] Remover `border`, fundo, cápsula e sombra visíveis do controlo hambúrguer/X.
 - [x] Manter as três linhas do hambúrguer e a transformação para X sem alterar `mobileMenuOpen`.
@@ -124,13 +124,14 @@ Atualizado em: 2026-09-07
 - [x] Reduzir a zona recortada do top bar à safe-area esquerda + 44 px do controlo.
 - [x] Ocultar a identidade textual enquanto o drawer está aberto para evitar fragmentos junto ao X.
 - [x] Preservar `forced-colors` e `prefers-reduced-motion`.
-- [ ] Confirmar auditoria de dependências, typecheck, lint, testes, build, Worker dry-run e smoke test no head final do PR #197.
+- [x] Confirmar auditoria de dependências, typecheck, lint, testes, build, Worker dry-run e smoke test no head final do PR #197.
+- [x] Integrar PR #197 com CI verde.
+- [x] Confirmar publicação GitHub Pages do PR #197.
 - [ ] Validar no iPhone: hambúrguer sem caixa branca/moldura.
 - [ ] Validar no iPhone: X sem caixa branca/moldura e sem fragmento de texto ao lado.
 - [ ] Validar toque repetido abrir ↔ fechar sem estado verde residual.
 - [ ] Validar navegação por teclado e `focus-visible` em viewport responsiva.
 - [ ] Validar Android/Chrome e tablet.
-- [ ] Integrar PR #197 apenas com CI verde e confirmar publicação GitHub Pages.
 
 ## P0 — Correção de turnos noturnos
 

@@ -23,12 +23,17 @@
 - Top bar em duas colunas, relógio compacto, indicador de sincronização, bloqueio e notificações.
 - Sem alterações a dados, repositories, schema, cifragem, API, backend ou sincronização móvel ↔ computador.
 
-### Validação pendente
+### Qualidade e publicação
 
-- Quality gates do head final do PR #197.
-- Confirmação física no iPhone do hambúrguer e X sem caixa branca/moldura.
-- Confirmação de ausência de fragmento de texto junto ao X e de estado verde residual após toque.
-- Confirmação em Android/Chrome, tablet e navegação por teclado.
+- Auditoria de dependências, typecheck, lint, testes, build, Worker dry-run e smoke test concluídos com sucesso no head final do PR #197.
+- PR #197 integrado em `main` no commit `7fb419372026144b8488f13ba84ea11db10cac2f`.
+- Workflow **Publicar Foco & Jornada** / GitHub Pages concluído com sucesso.
+
+### Validação física pendente
+
+- Confirmar no iPhone o hambúrguer e X sem caixa branca/moldura.
+- Confirmar ausência de fragmento de texto junto ao X e de estado verde residual após toque.
+- Confirmar em Android/Chrome, tablet e navegação por teclado.
 
 ## 2026-09-07 — correção do shell móvel (PR #196)
 
