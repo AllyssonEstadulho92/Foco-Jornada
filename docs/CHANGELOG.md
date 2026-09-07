@@ -11,10 +11,12 @@
 - Deteção conservadora de conflito quando móvel e computador têm alterações independentes.
 - Evento de gravação local do cofre para agendar sincronização.
 - Sincronização ao desbloquear, após gravações, ao regressar ao primeiro plano, ao recuperar rede e periodicamente.
+- Reabertura controlada do runtime após receber uma cópia remota, permitindo que a interface passe a ler o cofre recebido.
 - Controlo de ativação da sincronização nas definições de segurança.
 - Cloudflare Worker com Durable Object isolado por `profileId`.
 - `wrangler.toml` com configuração versionada do serviço remoto.
 - Testes do token derivado, protocolo HTTP e rejeição de envelopes remotos incompatíveis.
+- `worker:check` com `wrangler deploy --dry-run` integrado na pipeline **Qualidade**.
 
 ### Segurança
 
@@ -29,17 +31,16 @@
 
 ### Qualidade
 
-- Workflow GitHub **Qualidade** do PR #191 aprovado no commit `0ebafd13f3783f4eb08aae994d8a6987685c8250`.
-- Auditoria de dependências, typecheck, lint, testes, build e smoke test concluídos com sucesso.
-- Artefacto de build gerado com sucesso.
+- Workflow GitHub **Qualidade** do PR #191 aprovado com auditoria de dependências, typecheck, lint, testes, build, smoke test e artefacto.
+- Bundle e configuração do Worker aprovados por `wrangler deploy --dry-run`.
+- O check Cloudflare de PR continua a falhar porque a criação inicial da classe Durable Object `SyncVault` altera o ciclo de vida e branches não produtivas usam `wrangler versions upload`, que não aplica esse tipo de alteração.
+- O bootstrap correto passa a ser a integração em `main`, onde Workers Builds usa `wrangler deploy` para a publicação de produção.
 
 ### Distribuição
 
 - GitHub Pages continua a ser o frontend oficial.
 - O workflow de publicação passa `VITE_SYNC_API_URL` a partir de uma variável do repositório.
-- O check externo **Workers Builds: foco-jornada** falhou no build Cloudflare `21d899d0-3e66-4e45-9a42-3c0efef5127b`.
-- O GitHub não contém a mensagem detalhada desse erro; é necessário consultar o log privado no Cloudflare e rever **Settings > Builds** antes de integrar em `main`.
-- A sincronização permanece desativada em produção enquanto o Worker não publicar com sucesso e `VITE_SYNC_API_URL` não estiver definido.
+- A sincronização só é considerada operacional depois do Worker de produção publicar, o endpoint ser ligado ao frontend e o fluxo ser validado em dois dispositivos.
 
 ## 2026-09-07
 
@@ -68,8 +69,7 @@
 ### Observação operacional
 
 - O check externo **Workers Builds: foco-jornada** da integração Cloudflare falhou no PR e no commit integrado.
-- A causa não pode ser confirmada apenas a partir do GitHub, porque os detalhes estão nos logs externos do Cloudflare.
-- A integração Cloudflare passou posteriormente a ter uma finalidade explícita de backend de sincronização, implementada na branch `feat/cloudflare-sync` e sujeita a nova validação.
+- A integração Cloudflare passou posteriormente a ter uma finalidade explícita de backend de sincronização, implementada no PR #191.
 
 ## 2026-09-05
 
