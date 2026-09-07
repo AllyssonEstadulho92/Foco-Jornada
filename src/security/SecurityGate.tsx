@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useRef, useState, type ChangeEvent, type FormEvent } from 'react'
+import { browserPairingManager, parseBrowserPairingLink } from './browserPairing'
 import type { SecurityProfile } from './profileStore'
 import {
   securityManager,
   type SecuritySession,
 } from './SecurityManager'
 
-type View = 'unlock' | 'create' | 'recover' | 'recovery-code'
+type View = 'unlock' | 'existing' | 'create' | 'recover' | 'recovery-code'
 
 const keypad = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
@@ -32,7 +33,7 @@ export function SecurityGate({
   const activeId = securityManager.getActiveProfileId()
   const initialProfile = profiles.find((profile) => profile.id === activeId) ?? profiles[0]
   const [selectedId, setSelectedId] = useState(initialProfile?.id ?? '')
-  const [view, setView] = useState<View>(profiles.length ? 'unlock' : 'create')
+  const [view, setView] = useState<View>(profiles.length ? 'unlock' : 'existing')
   const [secretType, setSecretType] = useState<'pin' | 'password'>('pin')
   const [secret, setSecret] = useState('')
   const [confirmSecret, setConfirmSecret] = useState('')
@@ -43,10 +44,12 @@ export function SecurityGate({
   const [createdRecoveryCode, setCreatedRecoveryCode] = useState('')
   const [pendingSession, setPendingSession] = useState<SecuritySession | null>(null)
   const [enablePasskey, setEnablePasskey] = useState(false)
+  const [pairingInput, setPairingInput] = useState('')
   const [message, setMessage] = useState('')
   const [busy, setBusy] = useState(false)
   const [now, setNow] = useState(Date.now())
   const importRef = useRef<HTMLInputElement | null>(null)
+  const pairingAttemptedRef = useRef(false)
 
   const selected = profiles.find((profile) => profile.id === selectedId) ?? profiles[0]
 
@@ -70,6 +73,7 @@ export function SecurityGate({
     setRecoveryCode('')
     setNewRecoverySecret('')
     setConfirmRecoverySecret('')
+    setPairingInput('')
     setMessage('')
   }
 
@@ -85,6 +89,39 @@ export function SecurityGate({
       setBusy(false)
     }
   }
+
+  async function associateFromLink(rawLink: string) {
+    if (busy) return
+    setBusy(true)
+    setMessage('A associar este navegador ao perfil existente…')
+    try {
+      const remoteProfile = await browserPairingManager.redeem(rawLink)
+      const imported = await securityManager.importPairedProfile(remoteProfile)
+      await onProfilesChanged()
+      setSelectedId(imported.id)
+      setSecret('')
+      setPairingInput('')
+      setView('unlock')
+      if (window.location.hash) {
+        window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}`)
+      }
+      setMessage('Navegador associado. Introduz o mesmo PIN/palavra-passe que já utilizas. Depois do desbloqueio, os dados serão obtidos pela sincronização cifrada.')
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'Não foi possível associar este navegador.')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  useEffect(() => {
+    if (profiles.length || pairingAttemptedRef.current) return
+    if (!parseBrowserPairingLink(window.location.href)) return
+    pairingAttemptedRef.current = true
+    setView('existing')
+    void associateFromLink(window.location.href)
+    // A associação automática só deve arrancar uma vez para a ligação presente no carregamento.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profiles.length])
 
   function appendPin(value: number) {
     if (busy || lockSeconds > 0 || secret.length >= 6) return
@@ -195,7 +232,7 @@ export function SecurityGate({
       await onProfilesChanged()
       resetInputs()
       setSelectedId('')
-      setView(profiles.length <= 1 ? 'create' : 'unlock')
+      setView(profiles.length <= 1 ? 'existing' : 'unlock')
     })
   }
 
@@ -224,16 +261,98 @@ export function SecurityGate({
     )
   }
 
+  if (view === 'existing') {
+    return (
+      <main className="securityScreen">
+        <section className="securityCard securityExistingCard" aria-labelledby="security-existing-title">
+          <div className="securityBrandMark" aria-hidden="true">FJ</div>
+          <span className="securityEyebrow">FOCO JORNADA · ACESSO EXISTENTE</span>
+          <h1 id="security-existing-title">Já tens acesso noutro dispositivo?</h1>
+          <p>
+            Não cries outro PIN. Associa este navegador ao perfil onde já tens os teus dados e continua a usar o mesmo PIN/palavra-passe.
+          </p>
+
+          <div className="securityExistingSteps">
+            <strong>Forma recomendada</strong>
+            <ol>
+              <li>No telemóvel ou navegador que já tem os dados, abre <b>Privacidade e acesso</b>.</li>
+              <li>Em <b>Sincronização móvel ↔ computador</b>, escolhe <b>Associar outro navegador</b>.</li>
+              <li>Abre aqui a ligação temporária criada. Este ecrã fará a associação automaticamente.</li>
+            </ol>
+          </div>
+
+          <form
+            className="securityCreateForm"
+            onSubmit={(event) => {
+              event.preventDefault()
+              if (pairingInput.trim()) void associateFromLink(pairingInput)
+            }}
+          >
+            <label>
+              <span>Ligação de associação</span>
+              <input
+                type="url"
+                inputMode="url"
+                autoComplete="off"
+                spellCheck={false}
+                placeholder="Cole aqui a ligação temporária"
+                value={pairingInput}
+                disabled={busy}
+                onChange={(event) => setPairingInput(event.target.value)}
+              />
+            </label>
+            <button className="securityPrimary" type="submit" disabled={busy || !pairingInput.trim()}>
+              {busy ? 'A associar…' : 'Associar este navegador'}
+            </button>
+          </form>
+
+          <div className="securityExistingDivider"><span>ou</span></div>
+          <button
+            className="securitySecondary"
+            type="button"
+            disabled={busy}
+            onClick={() => importRef.current?.click()}
+          >
+            Importar cópia segura existente
+          </button>
+          <input
+            ref={importRef}
+            className="securityHiddenFileInput"
+            type="file"
+            accept="application/json,.json"
+            onChange={handleImportChange}
+            aria-label="Importar cópia segura do Foco Jornada"
+          />
+
+          {message ? <p className="securityMessage" role="status">{message}</p> : null}
+          <div className="securityProtectedNote">
+            A ligação temporária transporta o perfil criptográfico cifrado. O PIN, a palavra-passe e a chave de dados não são enviados em texto simples.
+          </div>
+          <button
+            className="securityTextAction"
+            type="button"
+            disabled={busy}
+            onClick={() => {
+              resetInputs()
+              setView('create')
+            }}
+          >
+            Não tenho perfil · Criar novo acesso
+          </button>
+        </section>
+      </main>
+    )
+  }
+
   if (view === 'create') {
     return (
       <main className="securityScreen">
         <section className="securityCard" aria-labelledby="security-create-title">
           <div className="securityBrandMark" aria-hidden="true">FJ</div>
           <span className="securityEyebrow">FOCO JORNADA · USO PESSOAL</span>
-          <h1 id="security-create-title">Criar acesso</h1>
+          <h1 id="security-create-title">Criar novo acesso</h1>
           <p>
-            Será criado um cofre local independente. Os dados existentes neste navegador,
-            se existirem, só serão removidos do formato antigo depois de uma migração encriptada validada.
+            Usa esta opção apenas se estás a criar um perfil novo. Se já tens dados noutro navegador ou telemóvel, volta e associa o acesso existente para não criar cofres independentes.
           </p>
 
           <form className="securityCreateForm" onSubmit={submitCreate}>
@@ -322,31 +441,13 @@ export function SecurityGate({
             className="securitySecondary"
             type="button"
             disabled={busy}
-            onClick={() => importRef.current?.click()}
+            onClick={() => {
+              resetInputs()
+              setView(profiles.length ? 'unlock' : 'existing')
+            }}
           >
-            Importar cópia segura
+            {profiles.length ? 'Voltar aos perfis existentes' : 'Já tenho acesso noutro dispositivo'}
           </button>
-          <input
-            ref={importRef}
-            className="securityHiddenFileInput"
-            type="file"
-            accept="application/json,.json"
-            onChange={handleImportChange}
-            aria-label="Importar cópia segura do Foco Jornada"
-          />
-
-          {profiles.length ? (
-            <button
-              className="securityTextAction"
-              type="button"
-              onClick={() => {
-                resetInputs()
-                setView('unlock')
-              }}
-            >
-              Voltar aos perfis existentes
-            </button>
-          ) : null}
         </section>
       </main>
     )

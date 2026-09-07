@@ -8,6 +8,7 @@ import {
   useRef,
   type ReactNode,
 } from 'react'
+import { browserPairingManager } from './browserPairing'
 import { cloudSyncManager } from './cloudSync'
 import {
   securityManager,
@@ -30,6 +31,7 @@ interface SecurityContextValue {
   cloudSyncEndpoint: string | null
   configureCloudSyncEndpoint: (endpoint: string) => Promise<void>
   setCloudSyncEnabled: (enabled: boolean) => Promise<void>
+  createBrowserPairing: () => Promise<{ url: string; expiresAt: string }>
 }
 
 const SecurityContext = createContext<SecurityContextValue | null>(null)
@@ -117,6 +119,11 @@ export function SecurityProvider({
     },
     setCloudSyncEnabled: async (enabled) => {
       onSessionChange(await cloudSyncManager.setEnabled(session, enabled))
+    },
+    createBrowserPairing: async () => {
+      const result = await browserPairingManager.create(session)
+      onSessionChange(result.session)
+      return { url: result.url, expiresAt: result.expiresAt }
     },
   }), [lock, onSessionChange, session])
 

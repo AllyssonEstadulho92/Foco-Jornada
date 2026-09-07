@@ -13,6 +13,7 @@ import {
   validateSecret,
   wrapDataKey,
 } from './crypto'
+import { normalizeCloudSyncEndpoint } from './cloudSync'
 import { SecurityProfileStore, type SecurityProfile } from './profileStore'
 import { EncryptedVaultStore } from './vaultStore'
 import { canAttemptPasskey, createPasskeyMaterial, unwrapWithPasskey } from './webauthn'
@@ -57,6 +58,88 @@ function delayForAttempts(attempts: number): number {
 function isLocked(profile: SecurityProfile, now = Date.now()): boolean {
   if (!profile.lockedUntil) return false
   return Date.parse(profile.lockedUntil) > now
+}
+
+function validWrappedKey(value: unknown): boolean {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false
+  const wrapped = value as { iv?: unknown; ciphertext?: unknown }
+  return typeof wrapped.iv === 'string'
+    && wrapped.iv.length >= 12
+    && typeof wrapped.ciphertext === 'string'
+    && wrapped.ciphertext.length >= 16
+}
+
+function validPasskey(value: unknown): boolean {
+  if (value === undefined) return true
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false
+  const passkey = value as {
+    credentialId?: unknown
+    prfSalt?: unknown
+    wrappedDataKey?: unknown
+    createdAt?: unknown
+  }
+  return typeof passkey.credentialId === 'string'
+    && typeof passkey.prfSalt === 'string'
+    && validWrappedKey(passkey.wrappedDataKey)
+    && typeof passkey.createdAt === 'string'
+    && Number.isFinite(Date.parse(passkey.createdAt))
+}
+
+function validCloudSync(value: unknown): boolean {
+  if (value === undefined) return true
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false
+  const state = value as {
+    enabled?: unknown
+    endpoint?: unknown
+    remoteRevision?: unknown
+    lastSyncedFingerprint?: unknown
+    lastSyncedAt?: unknown
+    lastStatus?: unknown
+    lastError?: unknown
+  }
+  if (typeof state.enabled !== 'boolean') return false
+  if (state.endpoint !== undefined && (
+    typeof state.endpoint !== 'string' || normalizeCloudSyncEndpoint(state.endpoint) === null
+  )) return false
+  if (state.remoteRevision !== undefined && (
+    !Number.isSafeInteger(state.remoteRevision) || Number(state.remoteRevision) < 1
+  )) return false
+  if (state.lastSyncedFingerprint !== undefined && typeof state.lastSyncedFingerprint !== 'string') return false
+  if (state.lastSyncedAt !== undefined && (
+    typeof state.lastSyncedAt !== 'string' || !Number.isFinite(Date.parse(state.lastSyncedAt))
+  )) return false
+  if (state.lastStatus !== undefined && !['synced', 'conflict', 'error'].includes(String(state.lastStatus))) return false
+  if (state.lastError !== undefined && typeof state.lastError !== 'string') return false
+  return true
+}
+
+function isImportableProfile(value: unknown): value is SecurityProfile {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false
+  const profile = value as Partial<SecurityProfile>
+  return typeof profile.id === 'string'
+    && profile.id.length >= 8
+    && profile.id.length <= 128
+    && typeof profile.label === 'string'
+    && typeof profile.createdAt === 'string'
+    && Number.isFinite(Date.parse(profile.createdAt))
+    && typeof profile.updatedAt === 'string'
+    && Number.isFinite(Date.parse(profile.updatedAt))
+    && typeof profile.lastUsedAt === 'string'
+    && Number.isFinite(Date.parse(profile.lastUsedAt))
+    && (profile.secretType === 'pin' || profile.secretType === 'password')
+    && profile.kdf?.name === 'PBKDF2'
+    && profile.kdf.hash === 'SHA-256'
+    && Number.isSafeInteger(profile.kdf.iterations)
+    && Number(profile.kdf.iterations) >= 100_000
+    && Number(profile.kdf.iterations) <= 2_000_000
+    && typeof profile.kdf.salt === 'string'
+    && profile.kdf.salt.length >= 16
+    && validWrappedKey(profile.wrappedDataKey)
+    && validWrappedKey(profile.recoveryWrappedDataKey)
+    && validPasskey(profile.passkey)
+    && Number.isSafeInteger(profile.autoLockMinutes)
+    && [1, 5, 10, 15, 30].includes(Number(profile.autoLockMinutes))
+    && validCloudSync(profile.cloudSync)
 }
 
 export class SecurityManager {
@@ -349,6 +432,43 @@ export class SecurityManager {
     return { ...session, profile: updated }
   }
 
+  async importPairedProfile(value: unknown): Promise<SecurityProfile> {
+    if (!isImportableProfile(value)) {
+      throw new Error('O perfil recebido pela associação está incompleto ou contém parâmetros inválidos.')
+    }
+    const endpoint = value.cloudSync?.endpoint
+    if (
+      !value.cloudSync?.enabled
+      || typeof endpoint !== 'string'
+      || normalizeCloudSyncEndpoint(endpoint) === null
+      || !Number.isSafeInteger(value.cloudSync.remoteRevision)
+      || Number(value.cloudSync.remoteRevision) < 1
+    ) {
+      throw new Error('O perfil associado não contém uma sincronização remota válida.')
+    }
+    if (await this.profiles.get(value.id)) {
+      throw new Error('Este navegador já tem o mesmo perfil associado.')
+    }
+
+    const now = new Date().toISOString()
+    const imported: SecurityProfile = {
+      ...value,
+      failedAttempts: 0,
+      lockedUntil: undefined,
+      lastUsedAt: now,
+      updatedAt: now,
+      cloudSync: {
+        ...value.cloudSync,
+        endpoint: normalizeCloudSyncEndpoint(endpoint) ?? endpoint,
+        enabled: true,
+        lastError: undefined,
+      },
+    }
+    await this.profiles.put(imported)
+    this.setActiveProfileId(imported.id)
+    return imported
+  }
+
   async importSecureBackup(text: string): Promise<SecurityProfile> {
     let parsed: unknown
     try {
@@ -363,7 +483,7 @@ export class SecurityManager {
     const payload = parsed as {
       format?: unknown
       schemaVersion?: unknown
-      profile?: Partial<SecurityProfile>
+      profile?: unknown
       vault?: {
         profileId?: unknown
         revision?: unknown
@@ -381,27 +501,7 @@ export class SecurityManager {
     const profile = payload.profile
     const vault = payload.vault
     if (
-      !profile
-      || typeof profile.id !== 'string'
-      || profile.id.length < 8
-      || profile.id.length > 128
-      || typeof profile.label !== 'string'
-      || typeof profile.createdAt !== 'string'
-      || typeof profile.updatedAt !== 'string'
-      || typeof profile.lastUsedAt !== 'string'
-      || (profile.secretType !== 'pin' && profile.secretType !== 'password')
-      || profile.kdf?.name !== 'PBKDF2'
-      || profile.kdf.hash !== 'SHA-256'
-      || !Number.isSafeInteger(profile.kdf.iterations)
-      || profile.kdf.iterations < 100_000
-      || profile.kdf.iterations > 2_000_000
-      || typeof profile.kdf.salt !== 'string'
-      || typeof profile.wrappedDataKey?.iv !== 'string'
-      || typeof profile.wrappedDataKey.ciphertext !== 'string'
-      || typeof profile.recoveryWrappedDataKey?.iv !== 'string'
-      || typeof profile.recoveryWrappedDataKey.ciphertext !== 'string'
-      || !Number.isSafeInteger(profile.autoLockMinutes)
-      || ![1, 5, 10, 15, 30].includes(Number(profile.autoLockMinutes))
+      !isImportableProfile(profile)
       || !vault
       || vault.profileId !== profile.id
       || vault.schemaVersion !== 1
@@ -419,7 +519,7 @@ export class SecurityManager {
     }
 
     const importedProfile: SecurityProfile = {
-      ...(profile as SecurityProfile),
+      ...profile,
       failedAttempts: 0,
       lockedUntil: undefined,
       lastUsedAt: new Date().toISOString(),

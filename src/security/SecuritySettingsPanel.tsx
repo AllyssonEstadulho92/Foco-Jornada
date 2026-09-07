@@ -22,6 +22,16 @@ function endpointLabel(value: string | null): string {
   }
 }
 
+function formatPairingExpiry(value: string): string {
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return 'validade indisponível'
+  return new Intl.DateTimeFormat('pt-PT', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  }).format(date)
+}
+
 export function SecuritySettingsPanel() {
   const security = useSecurity()
   const [busy, setBusy] = useState(false)
@@ -33,6 +43,8 @@ export function SecuritySettingsPanel() {
   const [confirmSecret, setConfirmSecret] = useState('')
   const [nextType, setNextType] = useState<'pin' | 'password'>(security.session.profile.secretType)
   const [syncEndpoint, setSyncEndpoint] = useState(security.cloudSyncEndpoint ?? '')
+  const [pairingLink, setPairingLink] = useState('')
+  const [pairingExpiresAt, setPairingExpiresAt] = useState('')
   const cloudSync = security.session.profile.cloudSync
 
   useEffect(() => {
@@ -66,6 +78,30 @@ export function SecuritySettingsPanel() {
       setShowChange(false)
       setMessage('O método principal de acesso foi atualizado.')
     })
+  }
+
+  async function copyPairingLink() {
+    if (!pairingLink) return
+    try {
+      await navigator.clipboard.writeText(pairingLink)
+      setMessage('Ligação de associação copiada. Abre-a no outro navegador antes de expirar.')
+    } catch {
+      setMessage('Não foi possível copiar automaticamente. Seleciona a ligação e copia-a manualmente.')
+    }
+  }
+
+  async function sharePairingLink() {
+    if (!pairingLink || !navigator.share) return
+    try {
+      await navigator.share({
+        title: 'Associar Foco Jornada',
+        text: 'Abre esta ligação no navegador que queres associar ao mesmo perfil.',
+        url: pairingLink,
+      })
+    } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') return
+      setMessage('Não foi possível abrir a partilha neste dispositivo.')
+    }
   }
 
   return (
@@ -145,6 +181,8 @@ export function SecuritySettingsPanel() {
             disabled={busy || !syncEndpoint.trim()}
             onClick={() => void run(async () => {
               await security.configureCloudSyncEndpoint(syncEndpoint)
+              setPairingLink('')
+              setPairingExpiresAt('')
               setMessage('Ligação Cloudflare validada e sincronização ativada. O cofre continua cifrado durante todo o transporte.')
             })}
           >
@@ -161,6 +199,8 @@ export function SecuritySettingsPanel() {
               onClick={() => void run(async () => {
                 const nextEnabled = !cloudSync?.enabled
                 await security.setCloudSyncEnabled(nextEnabled)
+                setPairingLink('')
+                setPairingExpiresAt('')
                 setMessage(nextEnabled
                   ? 'Sincronização ativada. O cofre será comparado com a cópia remota sem sobrescrever conflitos.'
                   : 'Sincronização desativada neste perfil. A cópia local continua disponível normalmente.')
@@ -170,9 +210,57 @@ export function SecuritySettingsPanel() {
             </button>
           ) : null}
           {cloudSync?.lastError ? <small role="alert">{cloudSync.lastError}</small> : null}
-          <small>
-            Para associar outro dispositivo pela primeira vez, importe nele uma cópia segura deste mesmo perfil. O endereço do Worker acompanha o perfil e ambos passam a usar a mesma chave de dados sem a enviar ao servidor.
-          </small>
+
+          {security.cloudSyncConfigured && cloudSync?.enabled ? (
+            <div className="securityBrowserPairing">
+              <strong>Outro navegador já tem este acesso?</strong>
+              <small>
+                Cria uma ligação temporária e abre-a no novo navegador. Ele recebe apenas o perfil criptográfico protegido e, depois de introduzires o mesmo PIN/palavra-passe, descarrega o cofre cifrado da sincronização. Não é criado um PIN novo.
+              </small>
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() => void run(async () => {
+                  const pairing = await security.createBrowserPairing()
+                  setPairingLink(pairing.url)
+                  setPairingExpiresAt(pairing.expiresAt)
+                  setMessage('Ligação temporária criada. Usa-a apenas no navegador que queres associar.')
+                })}
+              >
+                Associar outro navegador
+              </button>
+              {pairingLink ? (
+                <div className="securityPairingReveal" role="status">
+                  <label>
+                    <span>Ligação temporária</span>
+                    <input
+                      type="text"
+                      readOnly
+                      value={pairingLink}
+                      onFocus={(event) => event.currentTarget.select()}
+                    />
+                  </label>
+                  <small>
+                    Válida até {formatPairingExpiry(pairingExpiresAt)}. Quem tiver esta ligação durante esse período pode tentar associar um navegador, por isso não a publiques nem a guardes em locais partilhados.
+                  </small>
+                  <div>
+                    <button type="button" disabled={busy} onClick={() => void copyPairingLink()}>
+                      Copiar ligação
+                    </button>
+                    {typeof navigator.share === 'function' ? (
+                      <button type="button" disabled={busy} onClick={() => void sharePairingLink()}>
+                        Partilhar ligação
+                      </button>
+                    ) : null}
+                  </div>
+                </div>
+              ) : null}
+            </div>
+          ) : (
+            <small>
+              Ativa e conclui primeiro uma sincronização remota para poderes associar outro navegador sem recriar o acesso.
+            </small>
+          )}
         </div>
       </div>
 
