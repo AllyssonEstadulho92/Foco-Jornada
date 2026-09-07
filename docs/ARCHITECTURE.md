@@ -29,6 +29,8 @@ Para horas reais, pausas e ocorrências num turno noturno, cada hora civil tem d
 
 A regra de turnos diurnos permanece inalterada. Uma saída realmente anterior à entrada continua a representar passagem pela meia-noite; horas iguais continuam a representar duração zero.
 
+A correção desta regra foi integrada no PR #189 e faz parte de `main` desde o commit `90d19791f7892e51c5baf2c27967d53e7b464b8c`.
+
 ## Fluxo relevante — medicação
 
 ```text
@@ -93,6 +95,12 @@ A correção do motor de horas não altera schema nem persistência; só altera 
 A tabela `medicationSchedules` mantém todas as versões necessárias para que `MedicationDoseEvent.scheduleId` continue a apontar para um registo existente. Não é feito `delete()` físico nesta funcionalidade.
 
 Depois de operações iniciadas pela página, o mecanismo existente continua a criar checkpoints quando a assinatura dos dados muda e tenta sincronizar a cópia redundante local.
+
+## Qualidade e distribuição
+
+O caminho oficial de publicação do projeto continua a ser GitHub Pages. O commit do PR #189 concluiu com sucesso o workflow **Qualidade** e o workflow **Publicar Foco & Jornada**.
+
+Existe adicionalmente uma integração externa **Cloudflare Workers and Pages** ligada ao repositório. O respetivo check **Workers Builds: foco-jornada** falhou para o PR #189 e para o commit integrado. Como a causa detalhada está apenas nos logs externos do Cloudflare e não existe configuração Cloudflare versionada no repositório, esta integração não deve ser considerada parte suportada da arquitetura até ser explicitamente revista e documentada.
 
 ## Acessibilidade e responsividade
 

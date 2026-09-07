@@ -46,6 +46,16 @@ Atualizado em: 2026-09-07
 
 ## D-008 — Normalizar horas noturnas pela proximidade ao turno planeado
 
+**Estado:** aceite, integrada no PR #189 e publicada em GitHub Pages.
+
 **Decisão:** quando o turno planeado atravessa a meia-noite, uma hora civil real, de pausa ou de ocorrência é representada no dia inicial ou no dia seguinte conforme a opção que fica temporalmente mais próxima do intervalo planeado.
 
 **Motivo:** a regra anterior deslocava para o dia seguinte qualquer hora inferior à hora de entrada planeada. Num turno **22:00–06:00**, isso transformava uma entrada antecipada às **21:00** numa hora do dia seguinte, quebrando a interseção entre trabalho realizado e trabalho planeado. A nova regra mantém **21:00** no próprio dia, associa **02:00** e **07:00** à manhã seguinte e preserva o comportamento dos turnos diurnos.
+
+## D-009 — GitHub Pages é a distribuição oficial; integrações externas só contam quando documentadas
+
+**Estado:** aceite.
+
+**Decisão:** a publicação suportada do projeto permanece GitHub Pages enquanto não existir uma decisão explícita que introduza outro canal de distribuição com configuração versionada, testes e responsabilidade operacional definidos.
+
+**Motivo:** o repositório tem uma integração externa Cloudflare Workers que atualmente produz um check falhado, mas não existe configuração Cloudflare no código nem evidência suficiente para tratar esse serviço como parte da arquitetura suportada. Um check externo não documentado não deve alterar a definição da distribuição oficial nem mascarar o sucesso do pipeline GitHub Pages.

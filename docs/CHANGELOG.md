@@ -13,6 +13,22 @@
 
 - Adicionado caso **22:00–06:00** com entrada real às **21:00**.
 - Adicionado caso **22:00–06:00** com saída real às **07:00**.
+- Workflow **Qualidade** do PR #189 concluído com sucesso.
+- Workflow **Qualidade** de `main` após integração concluído com sucesso.
+- Build, lint, typecheck, testes e smoke test aprovados.
+
+### Integração e publicação
+
+- PR #189 integrado em `main`.
+- Commit: `90d19791f7892e51c5baf2c27967d53e7b464b8c`.
+- Workflow **Publicar Foco & Jornada** / GitHub Pages concluído com sucesso.
+- A distribuição oficial permanece GitHub Pages.
+
+### Observação operacional
+
+- O check externo **Workers Builds: foco-jornada** da integração Cloudflare falhou no PR e no commit integrado.
+- A causa não pode ser confirmada apenas a partir do GitHub, porque os detalhes estão nos logs externos do Cloudflare.
+- A integração Cloudflare fica registada como tarefa de manutenção: deve ser configurada/documentada se for necessária ou removida/desativada se não fizer parte da arquitetura pretendida.
 
 ## 2026-09-05
 
