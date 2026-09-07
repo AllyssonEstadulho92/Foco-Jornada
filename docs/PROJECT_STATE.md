@@ -14,7 +14,8 @@ A causa principal da inconsistência de dados foi confirmada como identidade/per
 4. PR #191 introduziu Cloudflare Workers/Durable Objects para sincronização cifrada;
 5. PR #192 tornou o endpoint `workers.dev` configurável e validável no perfil;
 6. PR #193 adicionou associação segura de outro navegador sem recriar PIN/palavra-passe;
-7. PR #194 auditou e reforçou a consistência móvel ↔ web e está integrado em `main`.
+7. PR #194 auditou e reforçou a consistência móvel ↔ web e está integrado em `main`;
+8. PR #195 introduziu a transformação hambúrguer ↔ X e foi integrado/publicado.
 
 A associação física dos dispositivos reais do utilizador continua a ser um critério obrigatório antes de declarar o problema operacional de sincronização totalmente encerrado.
 
@@ -61,22 +62,32 @@ O PR #194 foi integrado em `main` em 2026-09-07.
 
 ## Menu hambúrguer ↔ X — PR #195
 
-Foi aberta a alteração `ui/hamburger-morph` para tornar o mesmo controlo de menu coerente entre a PWA instalada no telemóvel e a versão web responsiva.
+O PR #195 alterou o botão do top bar móvel para alternar o mesmo estado `mobileMenuOpen` e transformar as três linhas do hambúrguer num **X**. O alvo de toque passou a `44 × 44 px`, o drawer manteve safe-area e o efeito respeita `prefers-reduced-motion`/`forced-colors`.
 
-Implementado:
+O PR #195 foi integrado em `main`. A pipeline **Qualidade** e a publicação GitHub Pages do merge concluíram com sucesso.
 
-- o botão do top bar passa a alternar abrir/fechar o drawer em vez de apenas abrir;
-- o estado visual usa a classe já existente `appShellMobileMenuOpen`, sem novo store ou estado duplicado;
-- o hambúrguer é desenhado em CSS com três linhas de comprimentos progressivos e transforma-se num **X** por `transform`/`transition`;
-- o alvo de toque passa a `44 × 44 px`;
-- o botão permanece visível e clicável acima do backdrop enquanto o drawer está aberto;
-- o resto do top bar fica recortado durante o drawer para não escapar ao escurecimento;
-- o drawer respeita uma zona lateral reservada ao botão, incluindo `safe-area`;
-- `aria-expanded` e `aria-label` acompanham o estado real do menu;
-- continuam suportados fecho por backdrop, `Escape` e botão interno do drawer;
-- `prefers-reduced-motion` remove a animação e `forced-colors` mantém as linhas legíveis.
+## Correção do shell móvel — PR #196
 
-A sidebar desktop acima de 899 px não foi alterada.
+As capturas reais de iPhone mostraram dois problemas após a publicação do PR #195:
+
+1. existiam dois **X** ao mesmo tempo: o hambúrguer transformado no top bar e o botão **Fechar** dentro do cabeçalho do drawer;
+2. a identidade móvel ocupava largura excessiva e competia com relógio, sincronização, bloqueio e notificações.
+
+A revisão do código confirmou ainda dois conflitos de CSS legados:
+
+- `mobile-quick-access.css` aplica `hover/focus-visible` verde com `!important`; em navegadores móveis com estado hover persistente isso podia fazer o X parecer selecionado e o shorthand `background` podia eliminar a linha central do hambúrguer;
+- `prototype-v2.css` injeta um logo e um wordmark através de `::before`/`::after` em `.mobileAppIdentity > strong`, consumindo espaço no top bar mesmo existindo um wordmark completo dentro do drawer.
+
+Implementado no PR #196:
+
+- removido o botão X duplicado do cabeçalho do drawer;
+- o único controlo explícito de fecho visível é o mesmo botão que alterna hambúrguer ↔ X;
+- o X aberto fica neutro, sem preenchimento/seleção verde;
+- a linha central do hambúrguer passa a ser preservada também contra regras legadas com `!important`;
+- o top bar móvel passa a grelha `minmax(0, 1fr) auto`, separando identidade e grupo de estado;
+- o top bar usa o texto real compacto **Foco Jornada**, neutralizando o pseudo-logo legado; o wordmark completo permanece no drawer;
+- o relógio reduz densidade em ecrãs estreitos, ocultando apenas o ícone e mantendo a hora;
+- o drawer mantém safe-area, backdrop, fecho por `Escape` e mudança de rota.
 
 ## Segurança e integridade
 
@@ -87,15 +98,16 @@ A sidebar desktop acima de 899 px não foi alterada.
 - conflito bilateral continua sem `last-write-wins` silencioso;
 - CORS e CSP continuam limitados ao endpoint suportado;
 - o service worker não cacheia a API de sincronização;
-- o PR #195 é exclusivamente de navegação/apresentação e não toca na persistência nem na sincronização.
+- PR #195 e PR #196 são alterações de navegação/apresentação e não alteram persistência nem sincronização.
 
 ## Riscos/limitações ainda abertas
 
 1. **Validação física de sincronização:** testes automáticos não substituem telemóvel e computador reais. É necessário associar os dois browsers e confirmar os registos reais.
-2. **Validação visual do PR #195:** deve ser confirmada em iPhone/Android, tablet e viewport web inferior a 900 px, incluindo safe-area, modo escuro, `forced-colors` e redução de movimento.
-3. **Timezone geral:** a jornada/relatórios gerais usam o timezone do browser em vários utilitários. Se os sistemas tiverem timezones diferentes, o mesmo timestamp pode ser apresentado noutro dia/hora.
-4. **Edição simultânea:** o cofre é sincronizado como snapshot cifrado. Alterações independentes em dois dispositivos geram conflito conservador; não existe fusão granular automática.
-5. **Permissões de dispositivo:** notificações do sistema e WebAuthn/passkeys são capacidades locais e não devem ser forçadas a ser idênticas entre browsers.
+2. **Validação visual do PR #196:** confirmar no iPhone que existe apenas um X, que o X não fica verde e que `Foco Jornada`, hora, sync, bloqueio e sino não se sobrepõem.
+3. **Android/tablet:** confirmar o mesmo comportamento entre 360 e 899 px, incluindo orientação horizontal e safe-area quando aplicável.
+4. **Timezone geral:** a jornada/relatórios gerais usam o timezone do browser em vários utilitários. Se os sistemas tiverem timezones diferentes, o mesmo timestamp pode ser apresentado noutro dia/hora.
+5. **Edição simultânea:** o cofre é sincronizado como snapshot cifrado. Alterações independentes em dois dispositivos geram conflito conservador; não existe fusão granular automática.
+6. **Permissões de dispositivo:** notificações do sistema e WebAuthn/passkeys são capacidades locais e não devem ser forçadas a ser idênticas entre browsers.
 
 ## Estado anterior preservado
 
@@ -103,14 +115,14 @@ A correção de turnos noturnos do PR #189 permanece integrada. A área de medic
 
 ## Última alteração
 
-Aberto o PR #195 para transformar o menu hambúrguer em **X** com animação CSS e permitir que o mesmo botão abra e feche o drawer, preservando a arquitetura responsiva única.
+Aberto o PR #196 para remover o segundo X, neutralizar o estado verde persistente do controlo e reorganizar o top bar móvel sem tocar em dados ou regras de negócio.
 
 ## Próximo passo
 
-1. aguardar os quality gates do PR #195;
+1. concluir os quality gates do head final do PR #196;
 2. corrigir qualquer regressão de typecheck, lint, testes, build ou smoke test antes de integrar;
-3. validar manualmente o gesto hambúrguer → X → hambúrguer em telemóvel, tablet e web responsiva;
-4. integrar o PR #195 e confirmar publicação GitHub Pages;
-5. continuar a validação física da sincronização móvel ↔ computador com o mesmo perfil/cofre;
-6. testar refresh, cache limpa, fechar/reabrir, offline → reconexão e diferentes resoluções;
-7. confirmar que ambos os dispositivos usam o mesmo timezone do sistema durante a validação de sincronização.
+3. integrar o PR #196 apenas com CI verde;
+4. confirmar publicação GitHub Pages;
+5. validar no iPhone as duas capturas reportadas: menu fechado e menu aberto;
+6. validar Android/tablet e viewport web abaixo de 900 px;
+7. continuar a validação física da sincronização móvel ↔ computador com o mesmo perfil/cofre.
