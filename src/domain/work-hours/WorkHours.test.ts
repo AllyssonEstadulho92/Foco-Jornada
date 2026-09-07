@@ -123,6 +123,48 @@ describe('calculateWorkHours', () => {
     expect(result.overtimeMinutes).toBe(0)
   })
 
+  it('atribui a entrada antecipada ao próprio dia num turno que atravessa a meia-noite', () => {
+    const result = calculateWorkHours({
+      ...base,
+      plannedStart: '22:00',
+      plannedEnd: '06:00',
+      plannedBreakMinutes: 15,
+      plannedBreaks: [{ start: '02:00', end: '02:15' }],
+      actualStart: '21:00',
+      actualEnd: '06:00',
+      actualBreakMinutes: 15,
+      actualBreaks: [{ start: '02:00', end: '02:15' }],
+    })
+
+    expect(result.presenceMinutes).toBe(540)
+    expect(result.workedMinutes).toBe(525)
+    expect(result.scheduledWorkedMinutes).toBe(465)
+    expect(result.nonWorkedMinutes).toBe(0)
+    expect(result.overtimeMinutes).toBe(60)
+    expect(result.balanceMinutes).toBe(60)
+  })
+
+  it('atribui a saída após o fim à manhã seguinte num turno que atravessa a meia-noite', () => {
+    const result = calculateWorkHours({
+      ...base,
+      plannedStart: '22:00',
+      plannedEnd: '06:00',
+      plannedBreakMinutes: 15,
+      plannedBreaks: [{ start: '02:00', end: '02:15' }],
+      actualStart: '22:00',
+      actualEnd: '07:00',
+      actualBreakMinutes: 15,
+      actualBreaks: [{ start: '02:00', end: '02:15' }],
+    })
+
+    expect(result.presenceMinutes).toBe(540)
+    expect(result.workedMinutes).toBe(525)
+    expect(result.scheduledWorkedMinutes).toBe(465)
+    expect(result.nonWorkedMinutes).toBe(0)
+    expect(result.overtimeMinutes).toBe(60)
+    expect(result.balanceMinutes).toBe(60)
+  })
+
   it('não duplica minutos quando existem pausas sobrepostas', () => {
     const result = calculateWorkHours({
       ...base,
