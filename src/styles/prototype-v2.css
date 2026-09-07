@@ -92,7 +92,7 @@ body {
   overflow: hidden;
   font-size: 22px;
   font-style: normal;
-  font-weight: 800;
+  font-weight: var(--weight-bold);
   letter-spacing: -0.035em;
   white-space: nowrap;
 }
@@ -116,7 +116,7 @@ body {
   display: block;
   margin: -4px 0 0 52px;
   color: var(--muted);
-  font-size: 11px;
+  font-size: var(--text-xs);
 }
 
 /* Sidebar desktop */
@@ -241,7 +241,7 @@ body {
 }
 
 .todayHero h1 {
-  font-size: clamp(30px, 5vw, 42px);
+  font-size: var(--text-2xl);
   letter-spacing: -0.045em;
 }
 
@@ -296,7 +296,7 @@ body {
 }
 
 .historyHeader h1 {
-  font-size: clamp(31px, 5vw, 44px);
+  font-size: var(--text-2xl);
   letter-spacing: -0.045em;
 }
 
@@ -596,8 +596,8 @@ body {
   }
 
   .mobileMenuButton {
-    width: 38px !important;
-    height: 38px !important;
+    width: var(--control-height-compact) !important;
+    height: var(--control-height-compact) !important;
     flex-basis: 38px !important;
     border: 0 !important;
     border-radius: 0 !important;
@@ -643,7 +643,7 @@ body {
     color: transparent;
     content: 'Foco Jornada';
     font-size: clamp(15px, 4.4vw, 21px);
-    font-weight: 800;
+    font-weight: var(--weight-bold);
     letter-spacing: -0.035em;
     white-space: nowrap;
     -webkit-background-clip: text;
@@ -661,8 +661,8 @@ body {
   }
 
   .notificationButton {
-    width: 38px !important;
-    height: 38px !important;
+    width: var(--control-height-compact) !important;
+    height: var(--control-height-compact) !important;
     background: transparent !important;
   }
 
@@ -709,7 +709,7 @@ body {
 
   .mobileBottomBar .navLabel {
     font-size: 10.5px !important;
-    font-weight: 650 !important;
+    font-weight: var(--weight-semibold) !important;
   }
 
   .mobileDrawerHeader {
@@ -833,8 +833,8 @@ body {
   }
 
   .notificationButton {
-    width: 34px !important;
-    height: 34px !important;
+    width: var(--control-height-compact) !important;
+    height: var(--control-height-compact) !important;
   }
 
   .appContent {

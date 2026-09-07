@@ -236,7 +236,7 @@ export function ExportDataPage() {
             </div>
             <div className="exportA4DocumentMeta">
               <strong>Relatório diário</strong>
-              <span>▣ {formatReportDate(date)}</span>
+              <span><AppIcon name="calendar" />{formatReportDate(date)}</span>
             </div>
           </header>
 
@@ -283,12 +283,12 @@ export function ExportDataPage() {
             <article className="exportA4Panel exportA4DaySummary">
               <h3>Resumo do dia</h3>
               <dl>
-                <div><dt>◷ Jornada planeada</dt><dd>{formatDuration(plannedJourneyMs)}</dd></div>
-                <div><dt>☕ Pausas</dt><dd>{formatDuration(report.summary.breakMs)}</dd></div>
-                <div><dt>◎ Tempo efetivo</dt><dd>{formatDuration(report.summary.effectiveMs)}</dd></div>
-                <div><dt>⊙ Foco total</dt><dd>{formatDuration(report.summary.focusMs)}</dd></div>
-                <div><dt>▤ Atividades concluídas</dt><dd>{report.summary.activityCount}</dd></div>
-                <div><dt>☕ Cafés</dt><dd>{report.summary.coffeeCount}</dd></div>
+                <div><dt><AppIcon name="journey" />Jornada planeada</dt><dd>{formatDuration(plannedJourneyMs)}</dd></div>
+                <div><dt><AppIcon name="break" />Pausas</dt><dd>{formatDuration(report.summary.breakMs)}</dd></div>
+                <div><dt><AppIcon name="clock" />Tempo efetivo</dt><dd>{formatDuration(report.summary.effectiveMs)}</dd></div>
+                <div><dt><AppIcon name="focus" />Foco total</dt><dd>{formatDuration(report.summary.focusMs)}</dd></div>
+                <div><dt><AppIcon name="activities" />Atividades concluídas</dt><dd>{report.summary.activityCount}</dd></div>
+                <div><dt><AppIcon name="coffee" />Cafés</dt><dd>{report.summary.coffeeCount}</dd></div>
               </dl>
             </article>
 

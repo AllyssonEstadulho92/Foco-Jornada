@@ -508,7 +508,7 @@
 .stockHubLinearIntegrity p{margin:0;color:var(--text-muted,#66706a);line-height:1.4}
 .stockHubLinearIntegrity small{color:var(--text-muted,#66706a)}
 .stockHubLinearBackup{margin:0;color:var(--text-muted,#66706a)}
-.stockHubLinearBackup a{font-weight:750;color:var(--accent,#1d6f5f)}
+.stockHubLinearBackup a{font-weight: var(--weight-bold);color:var(--accent,#1d6f5f)}
 
 [data-theme="dark"] .stockHubLinearCard{background:#0f1512;border-color:#29352f}
 [data-theme="dark"] .stockHubLinearIcon{background:#151d19}
@@ -556,8 +556,8 @@
   max-width: 760px;
   margin: 0;
   color: var(--text);
-  font-size: clamp(var(--text-2xl), 5vw, var(--text-3xl));
-  font-weight: var(--weight-heavy);
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
   line-height: var(--line-height-tight);
   letter-spacing: -0.035em;
   overflow-wrap: anywhere;
@@ -628,7 +628,7 @@
 
 .stockHubLinearCard .stockPanelTag {
   color: var(--muted) !important;
-  font-size: 11px;
+  font-size: var(--text-xs);
   font-weight: var(--weight-heavy);
   line-height: var(--line-height-control);
   letter-spacing: 0.08em;
@@ -787,7 +787,7 @@
   }
 
   .personalStockHubPage.stockHubLinear .stockHubHeader h1 {
-    font-size: clamp(26px, 8vw, 32px);
+    font-size: var(--text-2xl);
   }
 
   .stockHubLinearGrid {
@@ -818,7 +818,7 @@
 
 @media (max-width: 420px) {
   .personalStockHubPage.stockHubLinear .stockHubHeader h1 {
-    font-size: 26px;
+    font-size: var(--text-2xl);
   }
 
   .personalStockHubPage.stockHubLinear .stockHubHeader p {

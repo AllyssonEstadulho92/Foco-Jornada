@@ -96,7 +96,7 @@ export function AppAboutSettings() {
     <section className="referenceSettingsCard referenceAboutCard" aria-label="Sobre a aplicação">
       <details className="referenceSettingsRow referenceAboutRow">
         <summary>
-          <span className="referenceAboutInfoIcon" aria-hidden="true">i</span>
+          <span className="referenceAboutInfoIcon" aria-hidden="true"><AppIcon name="info" /></span>
           <span>
             <strong>Versão</strong>
             <small>Consulta a compilação e verifica atualizações</small>
@@ -117,7 +117,10 @@ export function AppAboutSettings() {
               onClick={() => void checkForUpdate()}
               aria-label="Verificar e aplicar atualização da aplicação"
             >
-              {versionState === 'checking' ? 'A verificar…' : standalone ? 'Instalada · ↻' : 'Navegador · ↻'}
+              {versionState === 'checking' ? 'A verificar…' : (<>
+                <span>{standalone ? 'Instalada' : 'Navegador'}</span>
+                <AppIcon name="refresh" />
+              </>)}
             </button>
           </div>
 
@@ -176,21 +179,21 @@ export function AppAboutSettings() {
 
           <div className="referenceBrandMeaningGrid">
             <article>
-              <span className="referenceBrandMeaningIcon" aria-hidden="true">◷</span>
+              <span className="referenceBrandMeaningIcon" aria-hidden="true"><AppIcon name="clock" /></span>
               <div>
                 <strong>Relógio</strong>
                 <p>Representa a jornada, os horários, as pausas e o controlo real do tempo.</p>
               </div>
             </article>
             <article>
-              <span className="referenceBrandMeaningIcon" aria-hidden="true">↗</span>
+              <span className="referenceBrandMeaningIcon" aria-hidden="true"><AppIcon name="route" /></span>
               <div>
                 <strong>Caminho verde</strong>
                 <p>Representa foco, progresso e a continuidade do percurso ao longo do dia.</p>
               </div>
             </article>
             <article>
-              <span className="referenceBrandMeaningIcon" aria-hidden="true">○</span>
+              <span className="referenceBrandMeaningIcon" aria-hidden="true"><AppIcon name="circle" /></span>
               <div>
                 <strong>Forma aberta</strong>
                 <p>Reforça a ideia de uma jornada em movimento, com espaço para adaptar o plano ao que realmente acontece.</p>

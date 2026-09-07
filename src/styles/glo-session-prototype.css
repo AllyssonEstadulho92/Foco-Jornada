@@ -23,7 +23,7 @@
 
 .sticksLinearPage .sticksDeviceTimerCard>.sticksSectionHeading h2{
   margin:10px 0 0;
-  font-size:clamp(34px,5vw,52px);
+  font-size: var(--text-lg);
   line-height:1;
   letter-spacing:-.045em;
 }
@@ -190,7 +190,7 @@
 }
 
 .sticksLinearPage .sticksDeviceTimerCard .gloSessionDialFace small{
-  font-size:11px;
+  font-size: var(--text-xs);
   letter-spacing:.08em;
 }
 
@@ -303,7 +303,7 @@
   }
 
   .sticksLinearPage .sticksDeviceTimerCard>.sticksSectionHeading h2{
-    font-size:34px;
+    font-size: var(--text-lg);
   }
 
   .sticksLinearPage .sticksDeviceTimerCard .gloSessionStatusBadge{
@@ -327,7 +327,7 @@
   }
 
   .sticksLinearPage .sticksDeviceTimerCard .gloSessionDurationGrid span{
-    font-size:10px;
+    font-size: var(--text-xs);
     letter-spacing:.04em;
   }
 

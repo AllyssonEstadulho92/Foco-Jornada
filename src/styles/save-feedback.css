@@ -76,7 +76,7 @@
   display: -webkit-box;
   overflow: hidden;
   color: var(--muted);
-  font-size: 10px;
+  font-size: var(--text-xs);
   line-height: 1.4;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;

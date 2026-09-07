@@ -13,7 +13,7 @@
   margin-bottom:18px;
   color:var(--muted);
   font-size:14px;
-  font-weight:800;
+  font-weight: var(--weight-bold);
   line-height:1.2;
   letter-spacing:.15em;
 }
@@ -21,8 +21,8 @@
 .sticksLinearPage .sticksRegisterCard > div:first-child > h2{
   margin:0 0 10px;
   color:var(--text);
-  font-size:clamp(32px,3.2vw,44px);
-  font-weight:850;
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
   line-height:1.05;
   letter-spacing:-.035em;
 }
@@ -105,7 +105,7 @@
   background:color-mix(in srgb,var(--success) 6%,var(--surface));
   color:var(--success);
   font-size:14px;
-  font-weight:850;
+  font-weight: var(--weight-bold);
   line-height:1;
   letter-spacing:.14em;
   white-space:nowrap;
@@ -119,19 +119,14 @@
   color:var(--primary);
 }
 
-.sticksLinearPage .sticksPacingClock.isWaiting .sticksPacingCopy > span::before{
-  content:"◷";
-  background:var(--primary);
-  font-size:22px;
-  font-weight:700;
-}
+
 
 .sticksLinearPage .sticksPacingCopy > strong{
   max-width:920px;
   margin-top:2px;
   color:var(--text);
   font-size:clamp(26px,2.6vw,38px);
-  font-weight:850;
+  font-weight: var(--weight-bold);
   line-height:1.08;
   letter-spacing:-.03em;
   overflow-wrap:anywhere;
@@ -162,7 +157,7 @@
   color:var(--success);
   font:inherit;
   font-size:clamp(17px,1.65vw,20px);
-  font-weight:800;
+  font-weight: var(--weight-bold);
   line-height:1.15;
   text-align:center;
   cursor:pointer;
@@ -170,19 +165,7 @@
   transition:border-color .15s ease,background .15s ease,transform .12s ease;
 }
 
-.sticksLinearPage .sticksPacingZeroButton::before{
-  content:"↻";
-  position:static;
-  display:inline-grid;
-  width:30px;
-  height:30px;
-  place-items:center;
-  transform:none;
-  color:currentColor;
-  font-size:29px;
-  font-weight:500;
-  line-height:1;
-}
+
 
 .sticksLinearPage .sticksPacingZeroButton::after{content:none;display:none}
 
@@ -272,7 +255,7 @@
 .sticksLinearPage .sticksPacingDialFace strong{
   color:var(--primary);
   font-size:clamp(28px,3vw,40px);
-  font-weight:900;
+  font-weight: var(--weight-bold);
   line-height:1;
   font-variant-numeric:tabular-nums;
   letter-spacing:-.035em;
@@ -282,7 +265,7 @@
 .sticksLinearPage .sticksPacingClock.isReady .sticksPacingDialFace strong{
   color:var(--success);
   font-size:clamp(24px,2.6vw,34px);
-  font-weight:900;
+  font-weight: var(--weight-bold);
   line-height:1;
 }
 
@@ -295,7 +278,7 @@
   background:var(--surface);
   color:var(--text);
   font-size:clamp(16px,1.5vw,19px);
-  font-weight:800;
+  font-weight: var(--weight-bold);
   line-height:1;
   letter-spacing:-.01em;
   white-space:nowrap;
@@ -367,7 +350,7 @@
   }
 
   .sticksLinearPage .sticksRegisterCard > div:first-child > h2{
-    font-size:30px;
+    font-size: var(--text-lg);
   }
 
   .sticksLinearPage .sticksRegisterCard > div:first-child > p{

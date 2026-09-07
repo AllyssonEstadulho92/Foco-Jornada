@@ -697,7 +697,7 @@ export function SticksStockPage() {
                   </span>
                 </div>
                 <div className="sticksPacingCopy">
-                  <span><AppIcon name="check" /> INTERVALO CONSCIENTE</span>
+                  <span>{displayedPacingStatus.ready ? <AppIcon name="check" /> : <AppIcon name="clock" />} INTERVALO CONSCIENTE</span>
                   <strong>{displayedPacingStatus.ready ? 'Meta de intervalo concluída' : 'Espera antes do próximo stick'}</strong>
                   <small>
                     {displayedPacingStatus.nextTargetAt

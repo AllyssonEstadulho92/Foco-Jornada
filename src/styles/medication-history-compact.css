@@ -10,14 +10,14 @@
 
 .medProtoHistorySwitch button,
 .medProtoHistoryMore{
-  min-height:42px;
+  min-height: var(--control-height-compact);
   border:1px solid transparent;
   border-radius:10px;
   background:transparent;
   color:var(--text-muted,#66706a);
   padding:9px 12px;
   font:inherit;
-  font-weight:750;
+  font-weight: var(--weight-bold);
   cursor:pointer;
 }
 

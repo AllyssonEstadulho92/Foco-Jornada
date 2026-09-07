@@ -17,7 +17,7 @@
 .opsPageHeader h1,
 .medicationsStockPage .personalStockHeader h1 {
   margin: 4px 0 6px;
-  font-size: clamp(1.75rem, 3vw, 2.4rem);
+  font-size: var(--text-2xl);
   line-height: var(--line-height-tight);
   letter-spacing: -0.03em;
 }
@@ -272,7 +272,7 @@
   .opsWeekdays span {
     min-width: 0;
     overflow: hidden;
-    font-size: 9px;
+    font-size: var(--text-xs);
     text-overflow: clip;
   }
 
@@ -297,7 +297,7 @@
 
   .opsCalendarDay small {
     overflow: hidden;
-    font-size: 8px;
+    font-size: var(--text-xs);
     text-overflow: ellipsis;
     white-space: nowrap;
   }
@@ -318,7 +318,7 @@
     min-width: 0;
     padding: 10px 6px !important;
     overflow: hidden;
-    font-size: 11px;
+    font-size: var(--text-xs);
     text-overflow: ellipsis;
     white-space: nowrap;
   }
@@ -357,6 +357,6 @@
   .opsTable th,
   .opsTable td {
     padding-inline: 4px !important;
-    font-size: 10px;
+    font-size: var(--text-xs);
   }
 }

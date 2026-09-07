@@ -10,7 +10,7 @@
 }
 
 :where(button:not(.iconButton), .navLink, .mobileQuickLink, input, select) {
-  min-height: 40px;
+  min-height: var(--control-height-compact);
 }
 
 :where(input, select, textarea) {

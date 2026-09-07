@@ -649,7 +649,7 @@ export function NotificationCenterPage() {
               <AppIcon name="chevron-right" />
             </div>
             <div>
-              <span className={'notificationStatusDot ' + (capability.serviceWorkerRegistered ? 'state-good' : 'state-warning')}>✓</span>
+              <span className={'notificationStatusDot ' + (capability.serviceWorkerRegistered ? 'state-good' : 'state-warning')}><AppIcon name={capability.serviceWorkerRegistered ? 'check' : 'warning'} /></span>
               <div><strong>Service Worker</strong><small>Canal local da PWA</small></div>
               <b className={capability.serviceWorkerRegistered ? 'state-good' : 'state-warning'}>
                 {capability.serviceWorkerRegistered ? 'Pronto' : 'Verificar'}

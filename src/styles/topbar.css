@@ -34,7 +34,7 @@
   color: var(--text);
   box-shadow: 0 4px 14px rgba(28, 38, 32, 0.035);
   font-variant-numeric: tabular-nums;
-  font-weight: 800;
+  font-weight: var(--weight-bold);
   letter-spacing: 0.01em;
 }
 
@@ -61,8 +61,8 @@
 .notificationButton {
   position: relative;
   display: grid;
-  width: 40px;
-  height: 40px;
+  width: var(--control-height-compact);
+  height: var(--control-height-compact);
   place-items: center;
   border: 1px solid var(--line);
   border-radius: 12px;
@@ -93,8 +93,8 @@
   border-radius: 999px;
   background: #d84b4b;
   color: white;
-  font-size: 10px;
-  font-weight: 900;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
   line-height: 1;
 }
 
@@ -129,8 +129,8 @@
 
 .notificationPanelHeader > div > span {
   color: var(--primary);
-  font-size: 10px;
-  font-weight: 900;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
   letter-spacing: 0.14em;
 }
 
@@ -147,7 +147,7 @@
   border-radius: 999px;
   color: var(--muted);
   font-size: 12px;
-  font-weight: 800;
+  font-weight: var(--weight-bold);
 }
 
 .notificationList {
@@ -185,7 +185,7 @@
 .notificationItem span,
 .notificationEmpty span {
   color: var(--muted);
-  font-size: 11px;
+  font-size: var(--text-xs);
   line-height: 1.45;
 }
 
@@ -244,8 +244,8 @@
 
   .appClock,
   .notificationButton {
-    min-height: 38px;
-    height: 38px;
+    min-height: var(--control-height-compact);
+    height: var(--control-height-compact);
   }
 
   .appClock {

@@ -194,7 +194,7 @@
   background: var(--primary-soft);
   color: var(--primary);
   font-size: 12px;
-  font-weight: 900;
+  font-weight: var(--weight-bold);
 }
 
 .moreAboutCard p {
@@ -235,8 +235,8 @@
   }
 
   .bottomNav .navLabel {
-    font-size: 10px;
-    font-weight: 650;
+    font-size: var(--text-xs);
+    font-weight: var(--weight-semibold);
   }
 
   .bottomNav .navLinkActive {
@@ -246,7 +246,7 @@
 
   .activitiesHeader h1,
   .reportHeader h1 {
-    font-size: clamp(34px, 10vw, 48px);
+    font-size: var(--text-2xl);
   }
 
   .activityCreatePanel,

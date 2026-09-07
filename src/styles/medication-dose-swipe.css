@@ -34,7 +34,7 @@
   box-shadow: none !important;
   font: inherit;
   font-size: .78rem !important;
-  font-weight: 800 !important;
+  font-weight: var(--weight-bold) !important;
   line-height: 1.1;
   cursor: pointer;
 }
@@ -90,8 +90,8 @@
   display: block;
   margin-top: 7px;
   color: var(--muted);
-  font-size: .69rem;
-  font-weight: 750;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
   letter-spacing: .035em;
   text-transform: uppercase;
 }
@@ -159,7 +159,7 @@
 }
 
 .medDoseActionHeader h3 {
-  font-size: 1.05rem;
+  font-size: var(--text-base);
   line-height: 1.25;
 }
 
@@ -207,7 +207,7 @@
   gap: 7px;
   color: var(--muted);
   font-size: .78rem;
-  font-weight: 750;
+  font-weight: var(--weight-bold);
 }
 
 .medDoseActionFields input {

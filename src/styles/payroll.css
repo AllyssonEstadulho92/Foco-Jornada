@@ -21,7 +21,7 @@
 
 .payrollHeader h1 {
   margin: 10px 0;
-  font-size: clamp(34px, 6vw, 58px);
+  font-size: var(--text-2xl);
   line-height: 1;
   letter-spacing: -0.05em;
 }
@@ -40,8 +40,8 @@
   flex-direction: column;
   gap: 7px;
   color: var(--muted);
-  font-size: 11px;
-  font-weight: 800;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
 }
 
 .payrollMonthPicker {
@@ -68,7 +68,7 @@
 
 .payrollFieldHelp {
   color: color-mix(in srgb, var(--muted) 82%, transparent);
-  font-size: 9px;
+  font-size: var(--text-xs);
   font-weight: 550;
   line-height: 1.45;
 }
@@ -92,8 +92,8 @@
 
 .payrollManualIntro > div:first-child > span {
   color: var(--primary);
-  font-size: 9px;
-  font-weight: 900;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
   letter-spacing: 0.14em;
 }
 
@@ -107,7 +107,7 @@
   max-width: 720px;
   margin: 5px 0 0;
   color: var(--muted);
-  font-size: 10px;
+  font-size: var(--text-xs);
   line-height: 1.5;
 }
 
@@ -142,8 +142,8 @@
 
 .payrollHero > div:first-child > span {
   color: var(--primary);
-  font-size: 10px;
-  font-weight: 900;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
   letter-spacing: 0.13em;
 }
 
@@ -182,7 +182,7 @@
 
 .payrollHeroStats small {
   color: var(--muted);
-  font-size: 10px;
+  font-size: var(--text-xs);
 }
 
 .payrollHeroStats strong {
@@ -224,28 +224,28 @@
 
 .payrollSectionHeader > div > span {
   color: var(--primary);
-  font-size: 10px;
-  font-weight: 900;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
   letter-spacing: 0.13em;
 }
 
 .payrollSectionHeader h2 {
   margin: 5px 0 0;
   overflow-wrap: anywhere;
-  font-size: 22px;
+  font-size: var(--text-lg);
   letter-spacing: -0.025em;
   text-transform: capitalize;
 }
 
 .payrollGhostButton,
 .payrollPrimaryButton {
-  min-height: 40px;
+  min-height: var(--control-height-compact);
   padding: 8px 12px;
   border-radius: 11px;
   cursor: pointer;
   font: inherit;
-  font-size: 11px;
-  font-weight: 850;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
 }
 
 .payrollGhostButton {
@@ -281,8 +281,8 @@
 .payrollWeekdays span {
   min-width: 0;
   color: var(--muted);
-  font-size: 9px;
-  font-weight: 850;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
   text-align: center;
 }
 
@@ -307,21 +307,21 @@
 
 .payrollDay > span {
   font-size: 14px;
-  font-weight: 900;
+  font-weight: var(--weight-bold);
 }
 
 .payrollDay small {
   max-width: 100%;
   overflow: hidden;
   color: var(--muted);
-  font-size: 9px;
-  font-weight: 850;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
   text-overflow: ellipsis;
 }
 
 .payrollDay b {
   color: #fbbf24;
-  font-size: 9px;
+  font-size: var(--text-xs);
 }
 
 .payrollDaySelected {
@@ -366,7 +366,7 @@
   align-items: center;
   gap: 5px;
   color: var(--muted);
-  font-size: 9px;
+  font-size: var(--text-xs);
 }
 
 .payrollLegendDot {
@@ -410,7 +410,7 @@
 
 .payrollFormSectionTitle span {
   color: var(--muted);
-  font-size: 9px;
+  font-size: var(--text-xs);
   line-height: 1.4;
 }
 
@@ -444,7 +444,7 @@
   border-radius: 11px;
   background: rgba(91, 156, 255, 0.05);
   color: var(--muted);
-  font-size: 10px;
+  font-size: var(--text-xs);
   line-height: 1.5;
 }
 
@@ -475,14 +475,14 @@
 
 .payrollReceiptIdentity small {
   color: var(--muted);
-  font-size: 8px;
+  font-size: var(--text-xs);
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
 
 .payrollReceiptIdentity strong {
   overflow-wrap: anywhere;
-  font-size: 10px;
+  font-size: var(--text-xs);
 }
 
 .payrollReceiptTable {
@@ -509,7 +509,7 @@
   min-width: 0;
   padding: 9px 11px;
   overflow-wrap: anywhere;
-  font-size: 11px;
+  font-size: var(--text-xs);
   font-variant-numeric: tabular-nums;
 }
 
@@ -520,7 +520,7 @@
 .payrollReceiptHead {
   background: rgba(148, 163, 184, 0.12);
   color: var(--muted);
-  font-weight: 850;
+  font-weight: var(--weight-bold);
 }
 
 .payrollReceiptDeduction > span:last-child {
@@ -529,7 +529,7 @@
 
 .payrollReceiptTotals {
   background: rgba(91, 156, 255, 0.07);
-  font-weight: 900;
+  font-weight: var(--weight-bold);
 }
 
 .payrollFacts {
@@ -555,7 +555,7 @@
 
 .payrollFacts span {
   color: var(--muted);
-  font-size: 9px;
+  font-size: var(--text-xs);
 }
 
 .payrollFacts strong {
@@ -579,7 +579,7 @@
 .payrollLegalNote p {
   margin: 6px 0 0;
   color: var(--muted);
-  font-size: 10px;
+  font-size: var(--text-xs);
   line-height: 1.55;
 }
 
@@ -636,7 +636,7 @@
 
 @media (max-width: 680px) {
   .payrollHeader h1 {
-    font-size: clamp(34px, 10vw, 46px);
+    font-size: var(--text-2xl);
   }
 
   .payrollHero {
@@ -664,7 +664,7 @@
   }
 
   .payrollDay small {
-    font-size: 8px;
+    font-size: var(--text-xs);
   }
 
   .payrollReceiptTable {
@@ -708,7 +708,7 @@
 
   .payrollReceiptRow > span::before {
     color: var(--muted);
-    font-size: 8px;
+    font-size: var(--text-xs);
     font-weight: 700;
     letter-spacing: 0.04em;
     text-transform: uppercase;
@@ -756,7 +756,7 @@
   }
 
   .payrollDay b {
-    font-size: 8px;
+    font-size: var(--text-xs);
   }
 
   .payrollSectionHeader {
@@ -812,8 +812,8 @@
 .payrollHeader h1{
   margin:var(--space-1) 0 var(--space-2);
   color:var(--text);
-  font-size:clamp(var(--text-2xl),5vw,var(--text-3xl));
-  font-weight:var(--weight-heavy);
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
   line-height:var(--line-height-tight);
   letter-spacing:-.035em;
   overflow-wrap:anywhere;
@@ -866,7 +866,7 @@
 .payrollManualIntro>div:first-child{min-width:0}
 .payrollManualIntro>div:first-child>span{
   color:var(--muted);
-  font-size:11px;
+  font-size: var(--text-xs);
   font-weight:var(--weight-heavy);
   line-height:var(--line-height-control);
   letter-spacing:.08em;
@@ -935,7 +935,7 @@
 }
 .payrollHero>div:first-child>span{
   color:var(--muted);
-  font-size:11px;
+  font-size: var(--text-xs);
   font-weight:var(--weight-heavy);
   letter-spacing:.08em;
 }
@@ -1001,7 +1001,7 @@
 .payrollSectionHeader>div{min-width:0}
 .payrollSectionHeader>div>span{
   color:var(--muted);
-  font-size:11px;
+  font-size: var(--text-xs);
   font-weight:var(--weight-heavy);
   line-height:var(--line-height-control);
   letter-spacing:.08em;
@@ -1009,8 +1009,8 @@
 .payrollSectionHeader h2{
   margin:var(--space-1) 0 0;
   color:var(--text);
-  font-size:var(--text-lg);
-  font-weight:var(--weight-heavy);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
   line-height:var(--line-height-tight);
   letter-spacing:-.02em;
   overflow-wrap:anywhere;
@@ -1045,13 +1045,13 @@
 }
 .payrollDay small{
   color:var(--muted);
-  font-size:10px;
+  font-size: var(--text-xs);
   font-weight:var(--weight-semibold);
   line-height:var(--line-height-normal);
 }
 .payrollDay b{
   color:var(--warning);
-  font-size:10px;
+  font-size: var(--text-xs);
   font-weight:var(--weight-bold);
 }
 .payrollDaySelected{
@@ -1135,7 +1135,7 @@
 }
 .payrollReceiptIdentity small{
   color:var(--muted);
-  font-size:10px;
+  font-size: var(--text-xs);
   font-weight:var(--weight-heavy);
 }
 .payrollReceiptIdentity strong{
@@ -1257,7 +1257,7 @@
     flex-direction:column;
     gap:var(--space-3);
   }
-  .payrollHeader h1{font-size:clamp(26px,8vw,32px)}
+  .payrollHeader h1{font-size: var(--text-2xl)}
   .payrollHeader p{font-size:var(--text-sm)}
   .payrollMonthPicker{flex-basis:auto}
   .payrollManualIntro{
@@ -1309,7 +1309,7 @@
   .payrollFacts{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media(max-width:480px){
-  .payrollHeader h1{font-size:26px}
+  .payrollHeader h1{font-size: var(--text-2xl)}
   .payrollManualActions{grid-template-columns:minmax(0,1fr)}
   .payrollHeroStats{grid-template-columns:repeat(2,minmax(0,1fr))}
   .payrollCalendar,

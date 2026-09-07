@@ -6,15 +6,15 @@
 }
 
 .notificationHeaderActions button {
-  min-height: 30px;
+  min-height: var(--control-height-compact);
   padding: 5px 9px;
   border: 1px solid var(--line);
   border-radius: 9px;
   background: transparent;
   color: var(--muted);
   cursor: pointer;
-  font-size: 10px;
-  font-weight: 800;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
 }
 
 .notificationHeaderActions button:hover {
@@ -51,7 +51,7 @@
 .notificationItem time {
   margin-top: 2px;
   color: color-mix(in srgb, var(--muted) 76%, transparent);
-  font-size: 9px;
+  font-size: var(--text-xs);
   font-variant-numeric: tabular-nums;
 }
 
@@ -65,9 +65,9 @@
 
 .notificationItemActions button {
   display: grid;
-  width: 32px;
-  height: 32px;
-  flex: 0 0 32px;
+  width: var(--control-height-compact);
+  height: var(--control-height-compact);
+  flex: 0 0 var(--control-height-compact);
   place-items: center;
   padding: 0;
   border: 0;
@@ -118,8 +118,8 @@
 
 .notificationEditForm label > span {
   color: var(--muted);
-  font-size: 9px;
-  font-weight: 800;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
@@ -157,7 +157,7 @@
 }
 
 .notificationEditActions button {
-  min-height: 32px;
+  min-height: var(--control-height-compact);
   padding: 6px 10px;
   border: 1px solid var(--line);
   border-radius: 9px;
@@ -165,8 +165,8 @@
   color: var(--muted);
   cursor: pointer;
   font: inherit;
-  font-size: 10px;
-  font-weight: 800;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
 }
 
 .notificationEditActions button[type='submit'] {
@@ -194,8 +194,8 @@
   }
 
   .notificationItemActions button {
-    width: 36px;
-    height: 36px;
+    width: var(--control-height-compact);
+    height: var(--control-height-compact);
     flex-basis: 36px;
   }
 }
@@ -225,7 +225,7 @@
 }
 
 .notificationPanelHeader > div:first-child > span {
-  font-size: 9px;
+  font-size: var(--text-xs);
   letter-spacing: .15em;
 }
 
@@ -243,13 +243,13 @@
 }
 
 .notificationHeaderActions > button {
-  min-height: 34px !important;
-  height: 34px !important;
+  min-height: var(--control-height-compact) !important;
+  height: var(--control-height-compact) !important;
   padding: 0 10px !important;
   border: 0 !important;
   background: transparent !important;
   color: var(--muted) !important;
-  font-size: 11px !important;
+  font-size: var(--text-xs) !important;
 }
 
 .notificationHeaderActions > button:hover {

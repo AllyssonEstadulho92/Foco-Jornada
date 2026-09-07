@@ -93,7 +93,7 @@
   .shiftMapWeekday {
     min-width: 0;
     padding: 5px 1px;
-    font-size: 10px;
+    font-size: var(--text-xs);
   }
 
   .shiftMapBlank,
@@ -116,7 +116,7 @@
   .shiftMapDayNumber {
     top: 5px;
     right: 5px;
-    font-size: 9px;
+    font-size: var(--text-xs);
   }
 
   .shiftMapDay > strong {
@@ -125,7 +125,7 @@
     padding: 3px 4px;
     overflow: hidden;
     border-radius: 6px;
-    font-size: 8px;
+    font-size: var(--text-xs);
     line-height: 1.1;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -140,7 +140,7 @@
   .shiftMapLegend {
     width: 100%;
     gap: 7px 10px;
-    font-size: 9px;
+    font-size: var(--text-xs);
   }
 
   .shiftMapLegend span {
@@ -216,7 +216,7 @@
   }
 
   .shiftMapWeekday {
-    font-size: 9px;
+    font-size: var(--text-xs);
   }
 
   .shiftMapBlank,
@@ -231,7 +231,7 @@
   .shiftMapDayNumber {
     top: 4px;
     right: 4px;
-    font-size: 8px;
+    font-size: var(--text-xs);
   }
 
   .shiftMapDay > strong {

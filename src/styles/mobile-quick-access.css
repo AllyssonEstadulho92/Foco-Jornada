@@ -21,16 +21,16 @@
 
   .mobileDrawerSectionHeading > span {
     color: var(--muted);
-    font-size: 11px;
-    font-weight: 850;
+    font-size: var(--text-xs);
+    font-weight: var(--weight-bold);
     letter-spacing: .11em;
     text-transform: uppercase;
   }
 
   .mobileDrawerSectionHeading > small {
     color: var(--muted);
-    font-size: 10px;
-    font-weight: 650;
+    font-size: var(--text-xs);
+    font-weight: var(--weight-semibold);
   }
 
   .mobileDrawerSectionHeadingSecondary {
@@ -157,7 +157,7 @@
     background: var(--surface-2) !important;
     color: var(--text) !important;
     font-size: 13px;
-    font-weight: 750;
+    font-weight: var(--weight-bold);
     line-height: 1.2;
     text-decoration: none;
   }
@@ -222,7 +222,7 @@
   line-height:var(--line-height-tight);letter-spacing:-.03em;text-overflow:ellipsis
 }
 .brandLockupText em{color:var(--primary);font-weight:var(--weight-semibold)}
-.brandTagline{margin:0 0 0 46px;color:var(--muted);font-size:11px;line-height:var(--line-height-normal)}
+.brandTagline{margin:0 0 0 46px;color:var(--muted);font-size: var(--text-xs);line-height:var(--line-height-normal)}
 .sidebarNav,.sidebarSecondary{min-width:0;gap:var(--space-1)}
 .sidebar .navLink,.sidebarToggle{
   min-width:0;min-height:var(--control-height-compact);gap:var(--space-2);
@@ -371,7 +371,7 @@
   }
   .mobileDrawerQuickSection{gap:var(--space-2);margin:0 0 var(--space-3)}
   .mobileDrawerSectionHeading{min-width:0;min-height:28px;gap:var(--space-2);padding:0 4px}
-  .mobileDrawerSectionHeading>span{font-size:10px!important;font-weight:var(--weight-heavy)!important;letter-spacing:.08em}
+  .mobileDrawerSectionHeading>span{font-size: var(--text-xs)!important;font-weight:var(--weight-heavy)!important;letter-spacing:.08em}
   .mobileDrawerQuickAccess{gap:var(--space-2)}
   .mobileDrawerQuickAccess .navLink{
     min-height:64px;grid-template-columns:36px minmax(0,1fr);gap:var(--space-2);
@@ -433,7 +433,7 @@
   }
   .mobileBottomBar .navMark svg{width:21px!important;height:21px!important}
   .mobileBottomBar .navLabel{
-    min-width:0;width:100%!important;color:inherit!important;font-size:9px!important;
+    min-width:0;width:100%!important;color:inherit!important;font-size: var(--text-xs)!important;
     font-weight:var(--weight-semibold)!important;line-height:1.15!important;text-align:center;text-overflow:ellipsis;white-space:nowrap
   }
   .mobileQuickButton{
@@ -532,7 +532,7 @@
     height:21px!important;
   }
   .mobileBottomBar .navLabel{
-    font-size:9px!important;
+    font-size: var(--text-xs)!important;
     font-weight:var(--weight-semibold)!important;
   }
 
@@ -592,7 +592,7 @@
   }
   .mobileQuickButtonLabel{
     color:inherit;
-    font-size:9px;
+    font-size: var(--text-xs);
     font-weight:var(--weight-semibold);
     line-height:1.1;
     white-space:nowrap;
@@ -643,7 +643,7 @@
   .mobileQuickPanelHeader span{
     flex:0 0 auto;
     color:var(--muted);
-    font-size:10px;
+    font-size: var(--text-xs);
     font-weight:var(--weight-medium);
     line-height:var(--line-height-control);
   }
@@ -886,7 +886,7 @@
   .mobileQuickLinkCopy small{
     min-width:0;
     color:var(--muted);
-    font-size:11px;
+    font-size: var(--text-xs);
     font-weight:var(--weight-normal);
     line-height:var(--line-height-normal);
     overflow-wrap:anywhere;
@@ -930,7 +930,7 @@
   }
   .mobileQuickPanelCallout small{
     color:var(--muted);
-    font-size:11px;
+    font-size: var(--text-xs);
     line-height:var(--line-height-normal);
     overflow-wrap:anywhere;
   }
@@ -983,7 +983,7 @@
     font-size:var(--text-xs);
   }
   .mobileQuickLinkCopy small{
-    font-size:10px;
+    font-size: var(--text-xs);
   }
   .mobileQuickPanelCallout{
     grid-template-columns:40px minmax(0,1fr);
@@ -1083,7 +1083,7 @@
     width:100%;
     margin:0!important;
     color:inherit;
-    font-size:10px!important;
+    font-size: var(--text-xs)!important;
     font-weight:var(--weight-semibold)!important;
     line-height:1.05!important;
     text-align:center;
@@ -1181,7 +1181,7 @@
 
   .mobileBottomBar .navLabel,
   .mobileQuickButton > .mobileQuickButtonLabel{
-    font-size:9px!important;
+    font-size: var(--text-xs)!important;
   }
 }
 

@@ -16,13 +16,13 @@
     margin-bottom: 5px;
     color: var(--muted);
     font-size: 13px;
-    font-weight: 650;
+    font-weight: var(--weight-semibold);
   }
 
   .todayHero h1 {
     margin: 0;
-    font-size: 28px;
-    font-weight: 850;
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-bold);
     letter-spacing: -0.045em;
   }
 
@@ -38,7 +38,7 @@
     border: 0;
     background: transparent;
     box-shadow: none;
-    font-size: 10px;
+    font-size: var(--text-xs);
   }
 
   .todayJourneyCard,
@@ -67,8 +67,8 @@
 
   .todayCardHeader h2 {
     margin: 0;
-    font-size: 18px;
-    font-weight: 820;
+    font-size: var(--text-lg);
+    font-weight: var(--weight-semibold);
     letter-spacing: -0.025em;
   }
 
@@ -80,7 +80,7 @@
     border-radius: 10px;
     background: #f7f8f6;
     color: var(--primary);
-    font-size: 10px;
+    font-size: var(--text-xs);
     box-shadow: none;
   }
 
@@ -100,7 +100,7 @@
     border-radius: 15px;
     background: #fbfcfa;
     color: var(--muted);
-    font-size: 11px;
+    font-size: var(--text-xs);
   }
 
   .schedulePlanSummary > span {
@@ -120,7 +120,7 @@
     padding: 15px 112px 15px 15px;
     border-top: 0;
     background: linear-gradient(90deg, rgba(31, 157, 99, 0.10), rgba(31, 157, 99, 0.035));
-    font-size: 11px;
+    font-size: var(--text-xs);
   }
 
   .schedulePlanSummary > span:first-child strong {
@@ -128,7 +128,7 @@
     margin: 4px 0 0;
     color: var(--primary);
     font-size: 23px;
-    font-weight: 850;
+    font-weight: var(--weight-bold);
     letter-spacing: -0.04em;
   }
 
@@ -147,7 +147,7 @@
     z-index: 1;
     top: 18px;
     right: 12px;
-    min-height: 36px;
+    min-height: var(--control-height-compact);
     padding: 7px 10px;
     border-radius: 10px;
     background: rgba(255, 255, 255, 0.92);
@@ -166,7 +166,7 @@
   }
 
   .scheduleNextEvent > span {
-    font-size: 9px;
+    font-size: var(--text-xs);
   }
 
   .scheduleNextEvent > strong {
@@ -250,7 +250,7 @@
   .scheduleMilestone span {
     align-self: end;
     color: var(--muted);
-    font-size: 10px;
+    font-size: var(--text-xs);
   }
 
   .scheduleMilestone strong {
@@ -279,7 +279,7 @@
   }
 
   .scheduleLiveMetrics span {
-    font-size: 9px;
+    font-size: var(--text-xs);
   }
 
   .scheduleLiveMetrics strong {
@@ -307,12 +307,12 @@
   }
 
   .todayJourneyEmpty > div > span {
-    font-size: 10px;
+    font-size: var(--text-xs);
   }
 
   .todayJourneyEmpty .actionButtonPrimary {
     min-width: 124px;
-    min-height: 38px;
+    min-height: var(--control-height-compact);
     padding: 8px 12px;
   }
 
@@ -329,12 +329,12 @@
   }
 
   .todaySectionTitle h2 {
-    font-size: 16px;
+    font-size: var(--text-lg);
     letter-spacing: -0.02em;
   }
 
   .todaySectionTitle > span {
-    font-size: 9px;
+    font-size: var(--text-xs);
   }
 
   .todayQuickGrid {
@@ -430,7 +430,7 @@
   }
 
   .todaySummaryCard dt {
-    font-size: 9px;
+    font-size: var(--text-xs);
   }
 
   .todaySummaryCard dd {
@@ -451,7 +451,7 @@
 
 @media (max-width: 420px) {
   .todayHero h1 {
-    font-size: 25px;
+    font-size: var(--text-2xl);
   }
 
   .journeyStatus {

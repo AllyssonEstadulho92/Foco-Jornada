@@ -11,7 +11,7 @@
 
 .moreToolsHeader h1 {
   margin-top: 6px;
-  font-size: clamp(34px, 6vw, 48px);
+  font-size: var(--text-2xl);
   letter-spacing: -0.045em;
 }
 
@@ -53,8 +53,8 @@
 .moreSectionHeading h2 {
   margin: 0;
   color: var(--text);
-  font-size: 14px;
-  font-weight: 800;
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
   letter-spacing: -0.01em;
 }
 
@@ -102,7 +102,7 @@
 
 .moreListGrouped .moreRowCopy small {
   color: var(--muted);
-  font-size: 11px;
+  font-size: var(--text-xs);
   line-height: 1.35;
 }
 
@@ -140,7 +140,6 @@
 }
 
 .moreLocalInfoIcon {
-  font-family: ui-serif, Georgia, serif;
   font-size: 19px;
   font-weight: 700;
 }
@@ -179,13 +178,13 @@
 .moreLocalCard strong {
   display: block;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: var(--weight-bold);
 }
 
 .moreLocalCard p {
   margin: 3px 0 0;
   color: var(--muted);
-  font-size: 10px;
+  font-size: var(--text-xs);
   line-height: 1.4;
 }
 
@@ -207,14 +206,14 @@
 
 .moreProtectionHeader h2 {
   margin: 4px 0 0;
-  font-size: 18px;
+  font-size: var(--text-lg);
   letter-spacing: -0.025em;
 }
 
 .moreProtectionHeader p {
   margin: 5px 0 0;
   color: var(--muted);
-  font-size: 11px;
+  font-size: var(--text-xs);
   line-height: 1.45;
 }
 
@@ -318,8 +317,8 @@
 .moreProtectionCheckTitle span {
   flex: 0 0 auto;
   color: var(--muted);
-  font-size: 9px;
-  font-weight: 800;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
@@ -339,7 +338,7 @@
 .moreProtectionCheck p {
   margin: 3px 0 0;
   color: var(--muted);
-  font-size: 10px;
+  font-size: var(--text-xs);
   line-height: 1.45;
 }
 
@@ -355,7 +354,7 @@
 
 .moreProtectionFooter > span {
   color: var(--muted);
-  font-size: 10px;
+  font-size: var(--text-xs);
 }
 
 .moreProtectionRefresh {
@@ -366,8 +365,8 @@
   background: var(--surface-2);
   color: var(--text);
   font: inherit;
-  font-size: 11px;
-  font-weight: 750;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
   cursor: pointer;
 }
 
@@ -391,7 +390,7 @@
   }
 
   .moreToolsHeader h1 {
-    font-size: clamp(32px, 10vw, 42px);
+    font-size: var(--text-2xl);
   }
 
   .moreToolsHeader p {
@@ -495,8 +494,8 @@
 .moreToolsPage .moreToolsHeader h1{
   margin:var(--space-1) 0 var(--space-2);
   color:var(--text);
-  font-size:clamp(var(--text-2xl),5vw,var(--text-3xl));
-  font-weight:var(--weight-heavy);
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
   line-height:var(--line-height-tight);
   letter-spacing:-.035em;
   overflow-wrap:anywhere;
@@ -526,8 +525,8 @@
 .moreToolsPage .moreSectionHeading h2{
   margin:0;
   color:var(--text);
-  font-size:var(--text-base);
-  font-weight:var(--weight-bold);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
   line-height:var(--line-height-control);
 }
 
@@ -659,8 +658,8 @@
 .moreToolsPage .moreProtectionHeader h2{
   margin:var(--space-1) 0 0;
   color:var(--text);
-  font-size:var(--text-lg);
-  font-weight:var(--weight-heavy);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
   line-height:var(--line-height-tight);
 }
 .moreToolsPage .moreProtectionHeader p{
@@ -717,7 +716,7 @@
 }
 .moreToolsPage .moreProtectionCheckTitle span{
   color:var(--muted);
-  font-size:10px;
+  font-size: var(--text-xs);
   font-weight:var(--weight-heavy);
   line-height:var(--line-height-control);
 }
@@ -769,7 +768,7 @@
 .moreToolsPage .appBackupPanel .stockPanelHeading>div{min-width:0}
 .moreToolsPage .appBackupPanel .stockPanelTag{
   color:var(--muted)!important;
-  font-size:11px;
+  font-size: var(--text-xs);
   font-weight:var(--weight-heavy);
   line-height:var(--line-height-control);
   letter-spacing:.08em;
@@ -777,8 +776,8 @@
 .moreToolsPage .appBackupPanel .stockPanelHeading h2{
   margin:var(--space-1) 0 0;
   color:var(--text);
-  font-size:var(--text-lg);
-  font-weight:var(--weight-heavy);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
   line-height:var(--line-height-tight);
   overflow-wrap:anywhere;
 }
@@ -791,7 +790,7 @@
   border-radius:999px;
   background:color-mix(in srgb,var(--success) 7%,var(--surface));
   color:var(--success);
-  font-size:10px;
+  font-size: var(--text-xs);
   font-weight:var(--weight-heavy);
   line-height:var(--line-height-control);
 }
@@ -898,7 +897,7 @@
     padding-inline:0;
   }
   .moreToolsPage .moreToolsHeader h1{
-    font-size:clamp(26px,8vw,32px);
+    font-size: var(--text-2xl);
   }
   .moreToolsPage .moreToolsHeader p{
     font-size:var(--text-sm);
@@ -941,7 +940,7 @@
   }
 }
 @media(max-width:420px){
-  .moreToolsPage .moreToolsHeader h1{font-size:26px}
+  .moreToolsPage .moreToolsHeader h1{font-size: var(--text-2xl)}
   .moreToolsPage .moreLocalCard{
     grid-template-columns:36px minmax(0,1fr);
   }

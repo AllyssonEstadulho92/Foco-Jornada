@@ -23,9 +23,9 @@
   height:16px;
 }
 .notificationButton{
-  width:36px;
-  height:36px;
-  min-height:36px;
+  width: var(--control-height-compact);
+  height: var(--control-height-compact);
+  min-height: var(--control-height-compact);
 }
 
 /* Página Hoje: ilustração e mostrador operacional deixam de ocupar altura excessiva. */
@@ -79,24 +79,24 @@
   font-size:13px;
 }
 .sticksLinearPage .sticksPacingDialFace small{
-  font-size:9px;
+  font-size: var(--text-xs);
 }
 .sticksLinearPage .sticksPacingCopy{
   gap:3px;
 }
 .sticksLinearPage .sticksPacingCopy>span{
-  font-size:9px;
+  font-size: var(--text-xs);
 }
 .sticksLinearPage .sticksPacingCopy>strong{
   font-size:13px;
 }
 .sticksLinearPage .sticksPacingCopy>small{
-  font-size:11px;
+  font-size: var(--text-xs);
 }
 .sticksLinearPage .sticksPacingZeroButton{
   min-width:0;
   width:max-content;
-  min-height:34px;
+  min-height: var(--control-height-compact);
   margin-top:5px;
   padding:6px 10px;
   font-size:12px;
@@ -129,7 +129,7 @@
   font-size:15px;
 }
 .sticksLinearPage .gloSessionDialFace small{
-  font-size:8px;
+  font-size: var(--text-xs);
 }
 .sticksLinearPage .gloSessionTimerBody{
   gap:8px;
@@ -139,10 +139,10 @@
 }
 .sticksLinearPage .gloSessionSelectors label{
   gap:4px;
-  font-size:11px;
+  font-size: var(--text-xs);
 }
 .sticksLinearPage .gloSessionSelectors select{
-  min-height:36px;
+  min-height: var(--control-height-compact);
   padding:6px 8px;
   font-size:12px;
 }
@@ -153,7 +153,7 @@
   font-size:12px;
 }
 .sticksLinearPage .gloSessionTimelineHeading>small{
-  font-size:10px;
+  font-size: var(--text-xs);
 }
 .sticksLinearPage .gloSessionFacts{
   gap:6px;
@@ -164,7 +164,7 @@
 }
 .sticksLinearPage .gloSessionFacts article>span,
 .sticksLinearPage .gloSessionFacts article>small{
-  font-size:10px;
+  font-size: var(--text-xs);
 }
 .sticksLinearPage .gloSessionFacts article>strong{
   font-size:12px;
@@ -174,38 +174,38 @@
   padding:7px 9px;
 }
 .sticksLinearPage .gloSessionPhaseCopy>span{
-  font-size:9px;
+  font-size: var(--text-xs);
 }
 .sticksLinearPage .gloSessionPhaseCopy>strong{
   font-size:13px;
 }
 .sticksLinearPage .gloSessionPhaseCopy>small{
-  font-size:10px;
+  font-size: var(--text-xs);
 }
 .sticksLinearPage .gloSessionActions{
   gap:6px;
 }
 .sticksLinearPage .gloSessionActions button{
-  min-height:36px;
+  min-height: var(--control-height-compact);
   padding:7px 9px;
   font-size:12px;
 }
 .sticksLinearPage .gloSessionAccuracyNote{
-  font-size:10px;
+  font-size: var(--text-xs);
   line-height:1.35;
 }
 
 /* Tablet e telemóvel. */
 @media(max-width:899px){
   .appTopBar{
-    min-height:54px!important;
+    min-height:calc(64px + env(safe-area-inset-top))!important;
     align-items:center!important;
-    padding:7px max(12px,env(safe-area-inset-right)) 7px max(12px,env(safe-area-inset-left))!important;
+    padding:max(var(--space-2),env(safe-area-inset-top)) max(var(--page-padding-mobile),env(safe-area-inset-right)) var(--space-2) max(var(--page-padding-mobile),env(safe-area-inset-left))!important;
   }
   .mobileMenuButton{
-    width:36px;
-    height:36px;
-    flex-basis:36px;
+    width: var(--control-height-compact);
+    height: var(--control-height-compact);
+    flex-basis:var(--control-height-compact);
     border-radius:11px;
   }
   .mobileMenuButton svg{
@@ -233,9 +233,9 @@
     height:14px;
   }
   .notificationButton{
-    width:34px;
-    height:34px!important;
-    min-height:34px!important;
+    width: var(--control-height-compact);
+    height: var(--control-height-compact)!important;
+    min-height: var(--control-height-compact)!important;
   }
   .notificationButton svg{
     width:17px;
@@ -250,7 +250,7 @@
     padding:14px 2px 8px!important;
   }
   .referenceGreeting h2{
-    font-size:26px;
+    font-size: var(--text-lg);
   }
   .referenceGreeting p{
     margin-top:5px;
@@ -277,7 +277,7 @@
     gap:9px;
   }
   .referenceFocusHeader h2{
-    font-size:17px;
+    font-size: var(--text-lg);
   }
   .referenceFocusHeader p{
     font-size:12px;
@@ -306,7 +306,7 @@
     padding:9px 11px;
   }
   .referenceEncouragement p{
-    font-size:11px;
+    font-size: var(--text-xs);
   }
 
   .sticksLinearPage .sticksPacingClock{
@@ -424,10 +424,10 @@
   }
   .referenceGreeting>div:first-child>span{
     margin-bottom:4px;
-    font-size:10px;
+    font-size: var(--text-xs);
   }
   .referenceGreeting h2{
-    font-size:22px!important;
+    font-size: var(--text-lg);
   }
   .referenceGreeting p{
     display:none;
@@ -441,7 +441,7 @@
     padding:12px!important;
   }
   .referenceFocusHeader h2{
-    font-size:16px!important;
+    font-size: var(--text-lg);
   }
   .referenceFocusHeader p{
     max-width:170px;
@@ -477,9 +477,9 @@
     display:none;
   }
   .sticksLinearPage .sticksPacingZeroButton{
-    min-height:32px;
+    min-height: var(--control-height-compact);
     padding:5px 8px;
-    font-size:11px;
+    font-size: var(--text-xs);
   }
 
   .sticksLinearPage .gloSessionIntro{
@@ -498,22 +498,22 @@
     height:42px!important;
   }
   .sticksLinearPage .gloSessionDialFace strong{
-    font-size:11px!important;
+    font-size: var(--text-xs)!important;
   }
   .sticksLinearPage .gloSessionDialFace small{
     display:none;
   }
   .sticksLinearPage .gloSessionFacts article{
     grid-template-columns:55px minmax(0,1fr);
-    font-size:10px;
+    font-size: var(--text-xs);
   }
   .sticksLinearPage .gloSessionPhaseCopy{
     padding:5px 7px;
   }
   .sticksLinearPage .gloSessionActions button{
-    min-height:34px;
+    min-height: var(--control-height-compact);
     padding:6px;
-    font-size:11px;
+    font-size: var(--text-xs);
   }
   .sticksLinearPage .gloSessionAccuracyNote{
     display:none;

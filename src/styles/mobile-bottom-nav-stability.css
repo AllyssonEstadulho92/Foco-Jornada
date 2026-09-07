@@ -82,7 +82,7 @@
   .mobileBottomBar .navLabel {
     width: 100%;
     color: currentColor !important;
-    font-size: 11px !important;
+    font-size: var(--text-xs) !important;
     font-weight: var(--weight-semibold) !important;
     line-height: 1.1 !important;
     text-align: center !important;
@@ -145,7 +145,7 @@
   }
 
   .mobileBottomBar .navLabel {
-    font-size: 10px !important;
+    font-size: var(--text-xs) !important;
   }
 
   .mobileBottomBar .navMark,

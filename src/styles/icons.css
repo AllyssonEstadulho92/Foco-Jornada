@@ -82,6 +82,7 @@ button:hover .appIcon--edit {
   92% { transform: rotate(-2deg); }
 }
 
+
 @keyframes appIconBellClapper {
   0%, 72%, 100% { transform: translateX(0); }
   78% { transform: translateX(1.2px); }
@@ -136,7 +137,6 @@ button:hover .appIcon--edit {
   }
 }
 
-
 /* Integração do sistema de ícones nas superfícies existentes. */
 .referenceSettingsIcon .appIcon,
 .referencePayrollIcon .appIcon,
@@ -153,46 +153,46 @@ button:hover .appIcon--edit {
 .historyDateControl .appIcon,
 .notificationInboxList article > button .appIcon,
 .moreProtectionClose .appIcon {
-  width: 18px;
-  height: 18px;
+  width: var(--icon-size);
+  height: var(--icon-size);
 }
 
 .referenceProgressAction .appIcon {
-  width: 22px;
-  height: 22px;
+  width: var(--icon-size-primary);
+  height: var(--icon-size-primary);
 }
 
 .referenceGreeting h2 i .appIcon {
-  width: 18px;
-  height: 18px;
+  width: var(--icon-size);
+  height: var(--icon-size);
 }
 
 .notificationPlatformIcon .appIcon {
-  width: 24px;
-  height: 24px;
+  width: var(--icon-size-primary);
+  height: var(--icon-size-primary);
 }
 
 .notificationStatusDot .appIcon,
 .notificationSetupProgress .appIcon,
 .notificationInfoCallout > span .appIcon {
-  width: 12px;
-  height: 12px;
+  width: var(--icon-size-compact);
+  height: var(--icon-size-compact);
 }
 
 .notificationCategorySymbol .appIcon {
-  width: 17px;
-  height: 17px;
+  width: var(--icon-size);
+  height: var(--icon-size);
 }
 
 .focusPage b[aria-hidden='true'] .appIcon,
 .focusPresetGuide b[aria-hidden='true'] .appIcon {
-  width: 19px;
-  height: 19px;
+  width: var(--icon-size);
+  height: var(--icon-size);
 }
 
 .sticksPacingDialFace .appIcon {
-  width: 26px;
-  height: 26px;
+  width: var(--icon-size-primary);
+  height: var(--icon-size-primary);
   margin: 0 auto;
 }
 
@@ -208,19 +208,18 @@ summary:focus-visible .appIcon {
   filter: drop-shadow(0 0 4px color-mix(in srgb, currentColor 24%, transparent));
 }
 
-
 .sticksPacingCopy > span .appIcon,
 .sticksPacingZeroButton .appIcon,
 .gloSessionStatusBadge .appIcon {
-  width: 16px;
-  height: 16px;
+  width: var(--icon-size-compact);
+  height: var(--icon-size-compact);
 }
 
 .sticksPacingCopy > span,
 .sticksPacingZeroButton,
 .gloSessionStatusBadge {
   align-items: center;
-  gap: 7px;
+  gap: var(--space-2);
 }
 
 .sticksPacingCopy > span,
@@ -233,10 +232,7 @@ summary:focus-visible .appIcon {
   justify-content: center;
 }
 
-
-/* Marca glo fornecida como referência visual pelo utilizador.
- * Mantida localmente para não depender de CDN nem de assets remotos.
- */
+/* Marca glo: logótipo, não ícone de ação. */
 .gloBrandLogo {
   width: 30px;
   height: auto;
@@ -265,3 +261,6 @@ summary:focus-visible .appIcon {
     width: 27px;
   }
 }
+
+.referenceAboutInfoIcon .appIcon,.referenceBrandMeaningIcon .appIcon,.referenceVersionBadgeButton .appIcon{width:var(--icon-size);height:var(--icon-size)}
+.securityBackspaceIcon{width:var(--icon-size-primary);height:var(--icon-size-primary)}

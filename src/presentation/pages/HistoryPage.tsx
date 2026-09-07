@@ -93,10 +93,7 @@ export function HistoryPage() {
         <div className="historyTimelineHeader">
           <div className="historyTimelineTitle">
             <span className="historyTimelineIcon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                <circle cx="12" cy="12" r="8.5" />
-                <path d="M12 7v5l3.5 2" />
-              </svg>
+              <AppIcon name="history" />
             </span>
             <div>
               <h2 id="timeline-title">Registos do dia</h2>
@@ -129,9 +126,7 @@ export function HistoryPage() {
                     aria-label={`Eliminar registo: ${event.label}`}
                     title="Eliminar registo"
                   >
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M9 3h6l1 2h4v2H4V5h4l1-2Zm-2 6h10l-.7 11H7.7L7 9Zm3 2v7h2v-7h-2Zm4 0v7h2v-7h-2Z" />
-                    </svg>
+                    <AppIcon name="trash" />
                   </button>
                 ) : (
                   <span className="historyActivePill">Ativo</span>
