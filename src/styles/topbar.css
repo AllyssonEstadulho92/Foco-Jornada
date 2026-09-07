@@ -53,6 +53,59 @@
   color: var(--primary);
 }
 
+.cloudSyncStatus {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 750;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.cloudSyncStatus svg {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.9;
+}
+
+.cloudSyncStatus-synced {
+  border-color: color-mix(in srgb, var(--primary) 25%, var(--line));
+  background: color-mix(in srgb, var(--primary) 7%, var(--surface));
+  color: var(--primary);
+}
+
+.cloudSyncStatus-pending,
+.cloudSyncStatus-paused {
+  background: var(--surface-2);
+  color: var(--muted);
+}
+
+.cloudSyncStatus-error,
+.cloudSyncStatus-conflict {
+  border-color: color-mix(in srgb, #a83b32 34%, var(--line));
+  background: color-mix(in srgb, #a83b32 7%, var(--surface));
+  color: #96372f;
+}
+
+.cloudSyncStatus:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--primary) 22%, transparent);
+  outline-offset: 2px;
+}
+
 .notificationCenter {
   position: relative;
   min-width: 0;
