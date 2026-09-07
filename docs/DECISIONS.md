@@ -212,3 +212,22 @@ Quando o drawer está aberto, a zona recortada do top bar corresponde apenas à 
 - o alvo de toque de `44 × 44 px`, os estados ARIA, safe-area e animação permanecem inalterados;
 - o top bar fechado mantém a superfície normal;
 - nenhuma rota, dado, persistência, sincronização ou regra de segurança é alterada.
+
+## D-019 — O top bar móvel é persistente e o drawer começa abaixo dele
+
+**Estado:** implementada na branch `fix/mobile-menu-persistent-topbar`; substitui apenas os detalhes de recorte/ocultação definidos em D-015, D-017 e D-018.
+
+**Decisão:** abrir o drawer não deve remover nem recortar a barra superior da aplicação. `Foco Jornada`, relógio, estado de sincronização, bloqueio e notificações permanecem visíveis no mesmo top bar. O mesmo botão hambúrguer continua a transformar-se em X e a representar `mobileMenuOpen`.
+
+O top bar ocupa a camada superior do shell móvel. Drawer e backdrop passam a começar abaixo da sua altura de `64px`, ficando sobre o conteúdo e a bottom navigation, mas não sobre a barra superior. O drawer deixa de reservar uma faixa lateral específica para o X, porque os dois elementos já não disputam a mesma faixa vertical.
+
+**Motivo:** as capturas físicas após o PR #198 mostraram que o recorte do top bar corrigia a superfície branca à custa de apagar a restante estrutura da aplicação. Isso quebra continuidade visual e faz o estado aberto parecer uma página diferente. A hierarquia correta é manter a navegação global estável e sobrepor apenas o conteúdo que o drawer deve substituir temporariamente.
+
+**Consequências:**
+
+- o estado aberto conserva identidade e indicadores operacionais;
+- desaparecem `clip-path` e `visibility: hidden` usados para reduzir a barra ao controlo;
+- backdrop e drawer deixam de cobrir o top bar;
+- o hambúrguer/X mantém alvo de `44 × 44 px`, ARIA, `forced-colors` e `prefers-reduced-motion`;
+- não é criado novo estado, componente, store ou dependência;
+- não há alteração de dados, sincronização, segurança, rotas, persistência ou schema.
