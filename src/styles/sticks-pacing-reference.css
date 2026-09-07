@@ -119,12 +119,7 @@
   color:var(--primary);
 }
 
-.sticksLinearPage .sticksPacingClock.isWaiting .sticksPacingCopy > span::before{
-  content:"◷";
-  background:var(--primary);
-  font-size:22px;
-  font-weight:700;
-}
+
 
 .sticksLinearPage .sticksPacingCopy > strong{
   max-width:920px;
@@ -170,19 +165,7 @@
   transition:border-color .15s ease,background .15s ease,transform .12s ease;
 }
 
-.sticksLinearPage .sticksPacingZeroButton::before{
-  content:"↻";
-  position:static;
-  display:inline-grid;
-  width:30px;
-  height:30px;
-  place-items:center;
-  transform:none;
-  color:currentColor;
-  font-size:29px;
-  font-weight:500;
-  line-height:1;
-}
+
 
 .sticksLinearPage .sticksPacingZeroButton::after{content:none;display:none}
 

@@ -52,6 +52,9 @@ export type AppIconName =
   | 'monitor'
   | 'globe'
   | 'refresh'
+  | 'backspace'
+  | 'route'
+  | 'circle'
   | 'theme'
 
 export type AppIconMotion = 'none' | 'ring' | 'pulse' | 'draw' | 'float'
@@ -304,6 +307,22 @@ function iconContent(name: AppIconName) {
       <path d="M19 8a7.5 7.5 0 1 0 1 7" />
       <path d="M19 3v5h-5" />
     </>
+  }
+  if (name === 'backspace') {
+    return <>
+      <path d="M9 6h10a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H9l-6-6 6-6Z" />
+      <path d="m12 9 5 6M17 9l-5 6" />
+    </>
+  }
+  if (name === 'route') {
+    return <>
+      <circle cx="6" cy="18" r="2" />
+      <circle cx="18" cy="6" r="2" />
+      <path d="M8 18h2a3 3 0 0 0 3-3v-6a3 3 0 0 1 3-3" />
+    </>
+  }
+  if (name === 'circle') {
+    return <circle cx="12" cy="12" r="8.5" />
   }
   if (name === 'theme') {
     return <>

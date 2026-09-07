@@ -1379,13 +1379,7 @@
 .sticksLinearPage .sticksPacingClock.isReady .sticksPacingDialFace strong{
   font-size:0;
 }
-.sticksLinearPage .sticksPacingClock.isReady .sticksPacingDialFace strong::before{
-  content:"⚡";
-  display:block;
-  color:var(--primary);
-  font-size:29px;
-  line-height:1;
-}
+
 .sticksLinearPage .sticksPacingDialFace small{
   color:var(--text);
   font-size:12px;

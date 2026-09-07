@@ -82,12 +82,6 @@ button:hover .appIcon--edit {
   92% { transform: rotate(-2deg); }
 }
 
-@keyframes appIconClapper {
-  0%, 72%, 100% { transform: translateX(0); }
-  78% { transform: translateX(1.2px); }
-  84% { transform: translateX(-1.1px); }
-  90% { transform: translateX(.5px); }
-}
 
 @keyframes appIconBellClapper {
   0%, 72%, 100% { transform: translateX(0); }
@@ -267,3 +261,6 @@ summary:focus-visible .appIcon {
     width: 27px;
   }
 }
+
+.referenceAboutInfoIcon .appIcon,.referenceBrandMeaningIcon .appIcon,.referenceVersionBadgeButton .appIcon{width:var(--icon-size);height:var(--icon-size)}
+.securityBackspaceIcon{width:var(--icon-size-primary);height:var(--icon-size-primary)}
