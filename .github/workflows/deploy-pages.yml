@@ -29,6 +29,8 @@ jobs:
         run: npm install --no-audit --no-fund --no-package-lock
 
       - name: Gerar aplicação
+        env:
+          VITE_SYNC_API_URL: ${{ vars.VITE_SYNC_API_URL }}
         run: npm run build
 
       - name: Validar build
