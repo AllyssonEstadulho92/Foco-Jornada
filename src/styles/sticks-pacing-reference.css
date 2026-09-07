@@ -21,8 +21,8 @@
 .sticksLinearPage .sticksRegisterCard > div:first-child > h2{
   margin:0 0 10px;
   color:var(--text);
-  font-size:clamp(32px,3.2vw,44px);
-  font-weight: var(--weight-bold);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
   line-height:1.05;
   letter-spacing:-.035em;
 }
@@ -350,7 +350,7 @@
   }
 
   .sticksLinearPage .sticksRegisterCard > div:first-child > h2{
-    font-size:30px;
+    font-size: var(--text-lg);
   }
 
   .sticksLinearPage .sticksRegisterCard > div:first-child > p{

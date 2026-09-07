@@ -43,7 +43,7 @@
 .workHoursVerifierActions button,
 .workHoursExampleButton,
 .workHoursMonthActions button {
-  min-height: 40px;
+  min-height: var(--control-height-compact);
   padding: 8px 12px;
   border: 1px solid var(--line);
   border-radius: 10px;
@@ -170,7 +170,7 @@
 
 .workHoursSectionHeading h2 {
   margin: 5px 0 0;
-  font-size: 22px;
+  font-size: var(--text-lg);
 }
 
 .workHoursPlanNote {
@@ -355,7 +355,7 @@
 }
 
 .workHoursEntries article > button {
-  min-height: 36px;
+  min-height: var(--control-height-compact);
   padding: 7px 10px;
   border: 1px solid rgba(248, 113, 113, 0.3);
   border-radius: 9px;
@@ -514,8 +514,8 @@
 .workHoursHeader h1{
   margin:var(--space-1) 0 var(--space-2);
   color:var(--text);
-  font-size:clamp(var(--text-2xl),5vw,var(--text-3xl));
-  font-weight:var(--weight-heavy);
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
   line-height:var(--line-height-tight);
   letter-spacing:-.035em;
   overflow-wrap:anywhere;
@@ -676,8 +676,8 @@
 .workHoursSectionHeading h2{
   margin:var(--space-1) 0 0;
   color:var(--text);
-  font-size:var(--text-lg);
-  font-weight:var(--weight-heavy);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
   line-height:var(--line-height-tight);
 }
 .workHoursPlanNote{
@@ -892,7 +892,7 @@
 @media(max-width:760px){
   .workHoursPage{gap:var(--space-3)}
   .workHoursHeader{padding-inline:0}
-  .workHoursHeader h1{font-size:clamp(26px,8vw,32px)}
+  .workHoursHeader h1{font-size: var(--text-2xl)}
   .workHoursVerifier{padding:var(--space-3);border-radius:var(--radius-md)}
   .workHoursVerifierActions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
   .workHoursVerifierActions button{width:100%}
@@ -902,7 +902,7 @@
   .workHoursSectionHeading{gap:var(--space-2)}
 }
 @media(max-width:640px){
-  .workHoursHeader h1{font-size:26px}
+  .workHoursHeader h1{font-size: var(--text-2xl)}
   .workHoursHeader p{font-size:var(--text-sm)}
   .workHoursSummary,
   .workHoursMonthTotals{

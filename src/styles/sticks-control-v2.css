@@ -675,8 +675,8 @@
 .sticksLinearPage>.sticksLinearHeader h1{
   margin:var(--space-1) 0 0;
   color:var(--text);
-  font-size:clamp(var(--text-2xl),5vw,var(--text-3xl));
-  font-weight:var(--weight-heavy);
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
   line-height:var(--line-height-tight);
   letter-spacing:-.035em;
   overflow-wrap:anywhere;
@@ -737,8 +737,8 @@
 ){
   margin:var(--space-1) 0 0;
   color:var(--text);
-  font-size:var(--text-lg);
-  font-weight:var(--weight-heavy);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
   line-height:var(--line-height-tight);
 }
 .sticksLinearPage :is(
@@ -1157,8 +1157,8 @@
 }
 .sticksLinearPage .sticksAdjustmentsBody h3{
   color:var(--text);
-  font-size:var(--text-base);
-  font-weight:var(--weight-bold);
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
 }
 .sticksLinearPage .sticksAdjustmentsBody p{
   color:var(--muted);
@@ -1225,7 +1225,7 @@
 @media(max-width:700px){
   .sticksLinearPage{gap:var(--space-3)}
   .sticksLinearPage>.sticksLinearHeader{padding-inline:0}
-  .sticksLinearPage>.sticksLinearHeader h1{font-size:clamp(26px,8vw,32px)}
+  .sticksLinearPage>.sticksLinearHeader h1{font-size: var(--text-2xl)}
   .sticksLinearPage :is(
     .sticksSetupCard,
     .sticksRegisterCard,
@@ -1256,7 +1256,7 @@
   .sticksLinearPage .sticksAdjustmentsBody{grid-template-columns:minmax(0,1fr)}
 }
 @media(max-width:420px){
-  .sticksLinearPage>.sticksLinearHeader h1{font-size:26px}
+  .sticksLinearPage>.sticksLinearHeader h1{font-size: var(--text-2xl)}
   .sticksLinearPage>.sticksLinearHeader p{font-size:var(--text-sm)}
   .sticksLinearPage :is(
     .sticksSetupCard,
@@ -1706,7 +1706,7 @@
 }
 .sticksLinearPage .gloSessionSelectors select{
   width:100%;
-  min-height:42px;
+  min-height: var(--control-height-compact);
   box-sizing:border-box;
   border:1px solid var(--line);
   border-radius:var(--control-radius);

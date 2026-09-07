@@ -61,7 +61,7 @@
   align-items:end;
   gap:16px;
 }
-.medProtoHeader h2{margin:4px 0 6px;font-size:1.55rem;letter-spacing:-.025em}
+.medProtoHeader h2{margin:4px 0 6px;font-size: var(--text-lg);letter-spacing:-.025em}
 .medProtoHeader p{margin:0;color:var(--text-muted,#66706a);line-height:1.45;max-width:760px}
 .medProtoAddButton{white-space:nowrap}
 .medProtoSummary{
@@ -198,7 +198,7 @@
   gap:12px;
   align-items:center;
 }
-.medProtoDetailTitle h3{margin:0 0 5px;font-size:1.25rem}
+.medProtoDetailTitle h3{margin:0 0 5px;font-size: var(--text-base)}
 .medProtoStock{font-size:1.45rem;text-align:right}
 .medProtoStock small{font-size: var(--text-xs);color:var(--text-muted,#66706a)}
 .medProtoInformationGrid{
@@ -579,8 +579,8 @@
 .medicationLinearPage>.personalStockHeader h1{
   margin:var(--space-1) 0 0;
   color:var(--text);
-  font-size:clamp(var(--text-2xl),5vw,var(--text-3xl));
-  font-weight:var(--weight-heavy);
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
   line-height:var(--line-height-tight);
   letter-spacing:-.035em;
   overflow-wrap:anywhere;
@@ -921,8 +921,8 @@
 }
 .medicationLinearPage .medicationLinearAdvancedBody h3{
   color:var(--text);
-  font-size:var(--text-base);
-  font-weight:var(--weight-bold);
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
 }
 .medicationLinearPage .stockInlineFormStack{min-width:0;gap:var(--space-2)}
 .medicationLinearPage .stockInlineFormStack>button,
@@ -980,7 +980,7 @@
 @media(max-width:700px){
   .medicationLinearPage{width:100%;max-width:100%;gap:var(--space-3)}
   .medicationLinearPage>.personalStockHeader{grid-template-columns:minmax(0,1fr);align-items:stretch;padding-inline:0}
-  .medicationLinearPage>.personalStockHeader h1{font-size:clamp(26px,8vw,32px)}
+  .medicationLinearPage>.personalStockHeader h1{font-size: var(--text-2xl)}
   .medicationLinearPage>.personalStockHeader>button{width:100%;min-width:0}
   .medicationLinearPage :is(.stockFormGrid,.medProtoMedicationList,.medProtoInformationGrid,.medProtoInformationTab,.stockDoseDetailsGrid){grid-template-columns:minmax(0,1fr)}
   .medicationLinearPage :is(.medProtoWorkspace,.medProtoDetail,.medicationLinearCreate,.medicationLinearForecast,.medicationLinearToday){padding:var(--space-3);border-radius:var(--radius-md)}
@@ -997,7 +997,7 @@
   .medicationLinearPage .medicationLinearExact span{text-align:left}
 }
 @media(max-width:420px){
-  .medicationLinearPage>.personalStockHeader h1{font-size:26px}
+  .medicationLinearPage>.personalStockHeader h1{font-size: var(--text-2xl)}
   .medicationLinearPage>.personalStockHeader p{font-size:var(--text-sm)}
   .medicationLinearPage :is(.medProtoWorkspace,.medicationLinearCreate,.medicationLinearForecast,.medicationLinearToday){padding:14px}
   .medicationLinearPage .medProtoSummary{grid-template-columns:minmax(0,1fr)}

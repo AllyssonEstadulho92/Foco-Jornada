@@ -241,7 +241,7 @@ body {
 }
 
 .todayHero h1 {
-  font-size: clamp(30px, 5vw, 42px);
+  font-size: var(--text-2xl);
   letter-spacing: -0.045em;
 }
 
@@ -296,7 +296,7 @@ body {
 }
 
 .historyHeader h1 {
-  font-size: clamp(31px, 5vw, 44px);
+  font-size: var(--text-2xl);
   letter-spacing: -0.045em;
 }
 
@@ -596,8 +596,8 @@ body {
   }
 
   .mobileMenuButton {
-    width: 38px !important;
-    height: 38px !important;
+    width: var(--control-height-compact) !important;
+    height: var(--control-height-compact) !important;
     flex-basis: 38px !important;
     border: 0 !important;
     border-radius: 0 !important;
@@ -661,8 +661,8 @@ body {
   }
 
   .notificationButton {
-    width: 38px !important;
-    height: 38px !important;
+    width: var(--control-height-compact) !important;
+    height: var(--control-height-compact) !important;
     background: transparent !important;
   }
 
@@ -833,8 +833,8 @@ body {
   }
 
   .notificationButton {
-    width: 34px !important;
-    height: 34px !important;
+    width: var(--control-height-compact) !important;
+    height: var(--control-height-compact) !important;
   }
 
   .appContent {

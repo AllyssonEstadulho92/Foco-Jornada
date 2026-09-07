@@ -20,7 +20,7 @@
 }
 
 .workHoursEntryActions button {
-  min-height: 36px;
+  min-height: var(--control-height-compact);
   padding: 7px 10px;
   border: 1px solid var(--line);
   border-radius: 9px;

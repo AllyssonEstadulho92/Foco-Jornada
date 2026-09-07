@@ -17,7 +17,7 @@
 .opsPageHeader h1,
 .medicationsStockPage .personalStockHeader h1 {
   margin: 4px 0 6px;
-  font-size: clamp(1.75rem, 3vw, 2.4rem);
+  font-size: var(--text-2xl);
   line-height: var(--line-height-tight);
   letter-spacing: -0.03em;
 }

@@ -215,7 +215,7 @@
 
 .settingsGroupHeader h2 {
   margin: 5px 0 0;
-  font-size: 20px;
+  font-size: var(--text-lg);
 }
 
 .settingsScheduleSummary {
@@ -256,7 +256,7 @@
 .settingsToggleRow input[type='checkbox'] {
   width: 18px;
   height: 18px;
-  min-height: 18px;
+  min-height: var(--control-height-compact);
   flex: 0 0 18px;
   padding: 0;
   accent-color: var(--primary);

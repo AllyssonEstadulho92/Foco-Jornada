@@ -61,8 +61,8 @@
 .notificationButton {
   position: relative;
   display: grid;
-  width: 40px;
-  height: 40px;
+  width: var(--control-height-compact);
+  height: var(--control-height-compact);
   place-items: center;
   border: 1px solid var(--line);
   border-radius: 12px;
@@ -244,8 +244,8 @@
 
   .appClock,
   .notificationButton {
-    min-height: 38px;
-    height: 38px;
+    min-height: var(--control-height-compact);
+    height: var(--control-height-compact);
   }
 
   .appClock {

@@ -74,7 +74,7 @@
 .customBreak input {
   min-width: 0;
   width: 100%;
-  min-height: 42px;
+  min-height: var(--control-height-compact);
   padding: 8px 10px;
   border: 1px solid var(--line);
   border-radius: 10px;
@@ -88,7 +88,7 @@
 }
 
 .customBreak button {
-  min-height: 42px;
+  min-height: var(--control-height-compact);
   padding: 8px 14px;
   border: 0;
   border-radius: 10px;

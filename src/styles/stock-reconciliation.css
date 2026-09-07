@@ -58,7 +58,7 @@
 .stockCorrectionActions button,
 .stockPostponeEditor button,
 .stockDoseActions button {
-  min-height: 40px;
+  min-height: var(--control-height-compact);
 }
 
 .stockPostponeEditor {
@@ -97,7 +97,7 @@
 
 .stockPostponeEditor input {
   width: 100%;
-  min-height: 42px;
+  min-height: var(--control-height-compact);
   padding: 8px 10px;
   border: 1px solid var(--line-strong);
   border-radius: 11px;
@@ -272,7 +272,7 @@
 }
 
 .stockDoseQuickActions > button {
-  min-height: 40px;
+  min-height: var(--control-height-compact);
 }
 
 .stockDoseMenuRoot {

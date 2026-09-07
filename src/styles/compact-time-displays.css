@@ -23,9 +23,9 @@
   height:16px;
 }
 .notificationButton{
-  width:36px;
-  height:36px;
-  min-height:36px;
+  width: var(--control-height-compact);
+  height: var(--control-height-compact);
+  min-height: var(--control-height-compact);
 }
 
 /* Página Hoje: ilustração e mostrador operacional deixam de ocupar altura excessiva. */
@@ -96,7 +96,7 @@
 .sticksLinearPage .sticksPacingZeroButton{
   min-width:0;
   width:max-content;
-  min-height:34px;
+  min-height: var(--control-height-compact);
   margin-top:5px;
   padding:6px 10px;
   font-size:12px;
@@ -142,7 +142,7 @@
   font-size: var(--text-xs);
 }
 .sticksLinearPage .gloSessionSelectors select{
-  min-height:36px;
+  min-height: var(--control-height-compact);
   padding:6px 8px;
   font-size:12px;
 }
@@ -186,7 +186,7 @@
   gap:6px;
 }
 .sticksLinearPage .gloSessionActions button{
-  min-height:36px;
+  min-height: var(--control-height-compact);
   padding:7px 9px;
   font-size:12px;
 }
@@ -203,8 +203,8 @@
     padding:7px max(12px,env(safe-area-inset-right)) 7px max(12px,env(safe-area-inset-left))!important;
   }
   .mobileMenuButton{
-    width:36px;
-    height:36px;
+    width: var(--control-height-compact);
+    height: var(--control-height-compact);
     flex-basis:36px;
     border-radius:11px;
   }
@@ -233,9 +233,9 @@
     height:14px;
   }
   .notificationButton{
-    width:34px;
-    height:34px!important;
-    min-height:34px!important;
+    width: var(--control-height-compact);
+    height: var(--control-height-compact)!important;
+    min-height: var(--control-height-compact)!important;
   }
   .notificationButton svg{
     width:17px;
@@ -250,7 +250,7 @@
     padding:14px 2px 8px!important;
   }
   .referenceGreeting h2{
-    font-size:26px;
+    font-size: var(--text-lg);
   }
   .referenceGreeting p{
     margin-top:5px;
@@ -277,7 +277,7 @@
     gap:9px;
   }
   .referenceFocusHeader h2{
-    font-size:17px;
+    font-size: var(--text-lg);
   }
   .referenceFocusHeader p{
     font-size:12px;
@@ -427,7 +427,7 @@
     font-size: var(--text-xs);
   }
   .referenceGreeting h2{
-    font-size:22px!important;
+    font-size: var(--text-lg);
   }
   .referenceGreeting p{
     display:none;
@@ -441,7 +441,7 @@
     padding:12px!important;
   }
   .referenceFocusHeader h2{
-    font-size:16px!important;
+    font-size: var(--text-lg);
   }
   .referenceFocusHeader p{
     max-width:170px;
@@ -477,7 +477,7 @@
     display:none;
   }
   .sticksLinearPage .sticksPacingZeroButton{
-    min-height:32px;
+    min-height: var(--control-height-compact);
     padding:5px 8px;
     font-size: var(--text-xs);
   }
@@ -511,7 +511,7 @@
     padding:5px 7px;
   }
   .sticksLinearPage .gloSessionActions button{
-    min-height:34px;
+    min-height: var(--control-height-compact);
     padding:6px;
     font-size: var(--text-xs);
   }

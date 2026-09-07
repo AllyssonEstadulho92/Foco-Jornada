@@ -14,7 +14,7 @@
 
 .guideQuickStart h2 {
   margin: 6px 0 16px;
-  font-size: clamp(20px, 2.5vw, 28px);
+  font-size: var(--text-lg);
 }
 
 .guideFlow {
@@ -247,8 +247,8 @@
 .guidePage .guideHeader h1{
   margin:var(--space-1) 0 var(--space-2);
   color:var(--text);
-  font-size:clamp(var(--text-2xl),5vw,var(--text-3xl));
-  font-weight:var(--weight-heavy);
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
   line-height:var(--line-height-tight);
   letter-spacing:-.035em;
   overflow-wrap:anywhere;
@@ -274,8 +274,8 @@
 .guidePage .guideQuickStart h2{
   margin:var(--space-1) 0 var(--space-3);
   color:var(--text);
-  font-size:var(--text-lg);
-  font-weight:var(--weight-heavy);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
   line-height:var(--line-height-tight);
   overflow-wrap:anywhere;
 }
@@ -449,7 +449,7 @@
     padding-inline:0;
   }
   .guidePage .guideHeader h1{
-    font-size:clamp(26px,8vw,32px);
+    font-size: var(--text-2xl);
   }
   .guidePage .guideHeader p{
     font-size:var(--text-sm);
@@ -473,7 +473,7 @@
   }
 }
 @media(max-width:420px){
-  .guidePage .guideHeader h1{font-size:26px}
+  .guidePage .guideHeader h1{font-size: var(--text-2xl)}
   .guidePage .guideFlow{
     grid-template-columns:minmax(0,1fr);
   }

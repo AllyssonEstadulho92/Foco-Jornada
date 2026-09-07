@@ -253,9 +253,9 @@
   .mobileMenuButton,
   .notificationButton {
     display: grid !important;
-    width: 40px !important;
-    height: 40px !important;
-    flex: 0 0 40px !important;
+    width: var(--control-height-compact) !important;
+    height: var(--control-height-compact) !important;
+    flex: 0 0 var(--control-height-compact) !important;
     place-items: center !important;
     padding: 0 !important;
     line-height: 0;

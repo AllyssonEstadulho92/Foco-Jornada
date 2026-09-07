@@ -17,7 +17,7 @@
 
 .todayHero h1 {
   margin: 0;
-  font-size: clamp(30px, 4vw, 42px);
+  font-size: var(--text-2xl);
   line-height: 1;
   letter-spacing: -0.045em;
 }
@@ -62,7 +62,7 @@
 }
 
 .todayCardHeader h2 {
-  font-size: clamp(20px, 3vw, 26px);
+  font-size: var(--text-lg);
 }
 
 .todayHeaderAction {
@@ -295,7 +295,7 @@
 }
 
 .todayActiveBreak button {
-  min-height: 38px;
+  min-height: var(--control-height-compact);
   padding: 8px 13px;
   border: 1px solid rgba(245, 168, 77, 0.3);
   border-radius: 10px;
@@ -317,7 +317,7 @@
 
 .todaySectionTitle h2 {
   margin: 0;
-  font-size: 16px;
+  font-size: var(--text-lg);
 }
 
 .todaySectionTitle > span,
@@ -424,7 +424,7 @@
 
 .todayCustomBreak input {
   width: 72px;
-  min-height: 36px;
+  min-height: var(--control-height-compact);
   padding: 6px 8px;
   border: 1px solid var(--line);
   border-radius: 9px;
@@ -433,7 +433,7 @@
 }
 
 .todayCustomBreak button {
-  min-height: 36px;
+  min-height: var(--control-height-compact);
   margin-left: auto;
   padding: 7px 12px;
   border: 1px solid var(--primary);
@@ -571,7 +571,7 @@
   }
 
   .todayHero h1 {
-    font-size: 30px;
+    font-size: var(--text-2xl);
   }
 
   .todayHero p {
@@ -602,7 +602,7 @@
   }
 
   .todayCardHeader h2 {
-    font-size: 18px;
+    font-size: var(--text-lg);
   }
 
   .todayHeaderAction {

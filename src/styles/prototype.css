@@ -246,7 +246,7 @@
 
   .activitiesHeader h1,
   .reportHeader h1 {
-    font-size: clamp(34px, 10vw, 48px);
+    font-size: var(--text-2xl);
   }
 
   .activityCreatePanel,

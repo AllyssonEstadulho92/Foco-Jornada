@@ -78,7 +78,7 @@
 
 .nicotineReductionHeading h3 {
   margin: 3px 0 0;
-  font-size: clamp(1.05rem, 3.5vw, 1.3rem);
+  font-size: var(--text-base);
 }
 
 .nicotineReductionBadge {

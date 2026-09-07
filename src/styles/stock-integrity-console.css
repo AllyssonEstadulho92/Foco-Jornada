@@ -156,11 +156,11 @@
 
 .stockHubFunctionalPanelHeader h2 {
   margin: 3px 0 0;
-  font-size: 1.05rem;
+  font-size: var(--text-lg);
 }
 
 .stockHubFunctionalPanelHeader button {
-  min-height: 40px;
+  min-height: var(--control-height-compact);
   padding: 0 12px;
   border: 1px solid var(--border-subtle);
   border-radius: 12px;
@@ -202,7 +202,7 @@
 }
 
 .stockHubFunctionalLinks a {
-  min-height: 42px;
+  min-height: var(--control-height-compact);
   display: flex;
   align-items: center;
   justify-content: space-between;

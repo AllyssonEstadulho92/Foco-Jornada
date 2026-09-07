@@ -6,7 +6,7 @@
 }
 
 .notificationHeaderActions button {
-  min-height: 30px;
+  min-height: var(--control-height-compact);
   padding: 5px 9px;
   border: 1px solid var(--line);
   border-radius: 9px;
@@ -65,9 +65,9 @@
 
 .notificationItemActions button {
   display: grid;
-  width: 32px;
-  height: 32px;
-  flex: 0 0 32px;
+  width: var(--control-height-compact);
+  height: var(--control-height-compact);
+  flex: 0 0 var(--control-height-compact);
   place-items: center;
   padding: 0;
   border: 0;
@@ -157,7 +157,7 @@
 }
 
 .notificationEditActions button {
-  min-height: 32px;
+  min-height: var(--control-height-compact);
   padding: 6px 10px;
   border: 1px solid var(--line);
   border-radius: 9px;
@@ -194,8 +194,8 @@
   }
 
   .notificationItemActions button {
-    width: 36px;
-    height: 36px;
+    width: var(--control-height-compact);
+    height: var(--control-height-compact);
     flex-basis: 36px;
   }
 }
@@ -243,8 +243,8 @@
 }
 
 .notificationHeaderActions > button {
-  min-height: 34px !important;
-  height: 34px !important;
+  min-height: var(--control-height-compact) !important;
+  height: var(--control-height-compact) !important;
   padding: 0 10px !important;
   border: 0 !important;
   background: transparent !important;

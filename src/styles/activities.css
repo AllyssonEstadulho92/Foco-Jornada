@@ -13,7 +13,7 @@
 
 .activitiesHeader h1 {
   margin: 12px 0;
-  font-size: clamp(38px, 7vw, 64px);
+  font-size: var(--text-2xl);
   line-height: 1;
   letter-spacing: -0.055em;
 }
@@ -111,7 +111,7 @@
 
 .currentActivityPanel h2 {
   margin: 6px 0 7px;
-  font-size: clamp(23px, 4vw, 32px);
+  font-size: var(--text-lg);
 }
 
 .currentActivityPanel p {
@@ -229,7 +229,7 @@
 
 .activityCardActions button,
 .activityInlineActions button {
-  min-height: 36px;
+  min-height: var(--control-height-compact);
   padding: 7px 10px;
   border: 1px solid var(--line);
   border-radius: 9px;
@@ -274,7 +274,7 @@
 
 .todayActivityPanel h2 {
   margin: 5px 0 6px;
-  font-size: 22px;
+  font-size: var(--text-lg);
 }
 
 .todayActivityPanel p {
@@ -358,8 +358,8 @@
 .activitiesPage .activitiesHeader h1{
   margin:var(--space-1) 0 var(--space-2);
   color:var(--text);
-  font-size:clamp(var(--text-2xl),5vw,var(--text-3xl));
-  font-weight:var(--weight-heavy);
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
   line-height:var(--line-height-tight);
   letter-spacing:-.035em;
   overflow-wrap:anywhere;
@@ -417,8 +417,8 @@
 .activitiesPage .sectionHeadingRow h2{
   margin:var(--space-1) 0 0;
   color:var(--text);
-  font-size:var(--text-lg);
-  font-weight:var(--weight-heavy);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
   line-height:var(--line-height-tight);
 }
 .activitiesPage .historyCount{
@@ -508,8 +508,8 @@
 .activitiesPage .currentActivityPanel h2{
   margin:var(--space-1) 0 var(--space-1);
   color:var(--text);
-  font-size:var(--text-lg);
-  font-weight:var(--weight-heavy);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
   line-height:var(--line-height-tight);
   overflow-wrap:anywhere;
 }
@@ -695,7 +695,7 @@
     flex-direction:column;
     gap:var(--space-3);
   }
-  .activitiesPage .activitiesHeader h1{font-size:clamp(26px,8vw,32px)}
+  .activitiesPage .activitiesHeader h1{font-size: var(--text-2xl)}
   .activitiesPage .activitiesHeader p{font-size:var(--text-sm)}
   .activitiesPage .activityJourneyState{
     align-self:flex-start;
@@ -716,7 +716,7 @@
   .activitiesPage .activityCardActions button{width:100%}
 }
 @media(max-width:420px){
-  .activitiesPage .activitiesHeader h1{font-size:26px}
+  .activitiesPage .activitiesHeader h1{font-size: var(--text-2xl)}
   .activitiesPage .activityCardActions{
     grid-template-columns:minmax(0,1fr);
   }

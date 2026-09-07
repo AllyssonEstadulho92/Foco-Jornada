@@ -159,7 +159,7 @@
 }
 
 .medDoseActionHeader h3 {
-  font-size: 1.05rem;
+  font-size: var(--text-base);
   line-height: 1.25;
 }
 

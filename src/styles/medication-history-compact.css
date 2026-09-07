@@ -10,7 +10,7 @@
 
 .medProtoHistorySwitch button,
 .medProtoHistoryMore{
-  min-height:42px;
+  min-height: var(--control-height-compact);
   border:1px solid transparent;
   border-radius:10px;
   background:transparent;

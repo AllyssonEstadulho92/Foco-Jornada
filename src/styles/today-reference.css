@@ -21,7 +21,7 @@
 
   .todayHero h1 {
     margin: 0;
-    font-size: 28px;
+    font-size: var(--text-2xl);
     font-weight: var(--weight-bold);
     letter-spacing: -0.045em;
   }
@@ -67,8 +67,8 @@
 
   .todayCardHeader h2 {
     margin: 0;
-    font-size: 18px;
-    font-weight: 820;
+    font-size: var(--text-lg);
+    font-weight: var(--weight-semibold);
     letter-spacing: -0.025em;
   }
 
@@ -147,7 +147,7 @@
     z-index: 1;
     top: 18px;
     right: 12px;
-    min-height: 36px;
+    min-height: var(--control-height-compact);
     padding: 7px 10px;
     border-radius: 10px;
     background: rgba(255, 255, 255, 0.92);
@@ -312,7 +312,7 @@
 
   .todayJourneyEmpty .actionButtonPrimary {
     min-width: 124px;
-    min-height: 38px;
+    min-height: var(--control-height-compact);
     padding: 8px 12px;
   }
 
@@ -329,7 +329,7 @@
   }
 
   .todaySectionTitle h2 {
-    font-size: 16px;
+    font-size: var(--text-lg);
     letter-spacing: -0.02em;
   }
 
@@ -451,7 +451,7 @@
 
 @media (max-width: 420px) {
   .todayHero h1 {
-    font-size: 25px;
+    font-size: var(--text-2xl);
   }
 
   .journeyStatus {

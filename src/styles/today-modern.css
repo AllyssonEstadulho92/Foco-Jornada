@@ -11,8 +11,8 @@
 }
 
 .todayHero h1 {
-  font-size: clamp(34px, 4.2vw, 50px);
-  font-weight: 820;
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
   letter-spacing: -0.05em;
 }
 
@@ -66,8 +66,8 @@
 
 .todayCardHeader h2 {
   margin-top: 6px;
-  font-size: clamp(21px, 2.8vw, 28px);
-  font-weight: var(--weight-bold);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
 }
 
 .scheduleSettingsLink {
@@ -261,7 +261,7 @@
 
 .todayJourneyEmpty .actionButtonPrimary {
   min-width: 146px;
-  min-height: 42px;
+  min-height: var(--control-height-compact);
   border-radius: 11px;
   box-shadow: none;
 }
@@ -392,7 +392,7 @@
   }
 
   .todayHero h1 {
-    font-size: 32px;
+    font-size: var(--text-2xl);
   }
 
   .todayHero p {
@@ -415,7 +415,7 @@
   }
 
   .todayCardHeader h2 {
-    font-size: 19px;
+    font-size: var(--text-lg);
   }
 
   .scheduleNextEvent {

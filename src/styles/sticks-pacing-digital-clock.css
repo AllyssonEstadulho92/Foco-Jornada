@@ -48,7 +48,7 @@
   min-height:44px;
   margin-top:2px;
   padding:8px 14px;
-  border-width:1px;
+  border-width: var(--control-height-compact);
   border-radius:12px;
   font-size:14px;
 }

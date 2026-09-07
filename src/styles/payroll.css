@@ -21,7 +21,7 @@
 
 .payrollHeader h1 {
   margin: 10px 0;
-  font-size: clamp(34px, 6vw, 58px);
+  font-size: var(--text-2xl);
   line-height: 1;
   letter-spacing: -0.05em;
 }
@@ -232,14 +232,14 @@
 .payrollSectionHeader h2 {
   margin: 5px 0 0;
   overflow-wrap: anywhere;
-  font-size: 22px;
+  font-size: var(--text-lg);
   letter-spacing: -0.025em;
   text-transform: capitalize;
 }
 
 .payrollGhostButton,
 .payrollPrimaryButton {
-  min-height: 40px;
+  min-height: var(--control-height-compact);
   padding: 8px 12px;
   border-radius: 11px;
   cursor: pointer;
@@ -636,7 +636,7 @@
 
 @media (max-width: 680px) {
   .payrollHeader h1 {
-    font-size: clamp(34px, 10vw, 46px);
+    font-size: var(--text-2xl);
   }
 
   .payrollHero {
@@ -812,8 +812,8 @@
 .payrollHeader h1{
   margin:var(--space-1) 0 var(--space-2);
   color:var(--text);
-  font-size:clamp(var(--text-2xl),5vw,var(--text-3xl));
-  font-weight:var(--weight-heavy);
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
   line-height:var(--line-height-tight);
   letter-spacing:-.035em;
   overflow-wrap:anywhere;
@@ -1009,8 +1009,8 @@
 .payrollSectionHeader h2{
   margin:var(--space-1) 0 0;
   color:var(--text);
-  font-size:var(--text-lg);
-  font-weight:var(--weight-heavy);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
   line-height:var(--line-height-tight);
   letter-spacing:-.02em;
   overflow-wrap:anywhere;
@@ -1257,7 +1257,7 @@
     flex-direction:column;
     gap:var(--space-3);
   }
-  .payrollHeader h1{font-size:clamp(26px,8vw,32px)}
+  .payrollHeader h1{font-size: var(--text-2xl)}
   .payrollHeader p{font-size:var(--text-sm)}
   .payrollMonthPicker{flex-basis:auto}
   .payrollManualIntro{
@@ -1309,7 +1309,7 @@
   .payrollFacts{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media(max-width:480px){
-  .payrollHeader h1{font-size:26px}
+  .payrollHeader h1{font-size: var(--text-2xl)}
   .payrollManualActions{grid-template-columns:minmax(0,1fr)}
   .payrollHeroStats{grid-template-columns:repeat(2,minmax(0,1fr))}
   .payrollCalendar,

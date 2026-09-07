@@ -34,7 +34,7 @@
 
 .notificationCenterHeader h1 {
   margin: 7px 0 0;
-  font-size: clamp(31px, 5vw, 46px);
+  font-size: var(--text-2xl);
   line-height: 1.02;
   letter-spacing: -.045em;
 }
@@ -123,7 +123,7 @@
 
 .notificationCenterIdentity h2 {
   margin: 0;
-  font-size: 20px;
+  font-size: var(--text-lg);
   letter-spacing: -.025em;
 }
 
@@ -152,7 +152,7 @@
 .notificationCenterState > h3,
 .notificationCenterSummary > h3 {
   margin: 0 0 12px;
-  font-size: 14px;
+  font-size: var(--text-base);
 }
 
 .notificationStatusList {
@@ -254,7 +254,7 @@
 }
 
 .notificationPreferenceSummary span {
-  min-height: 28px;
+  min-height: var(--control-height-compact);
   display: inline-flex;
   align-items: center;
   padding: 4px 10px;
@@ -336,7 +336,7 @@
 
 .notificationInboxSection h2 {
   margin: 4px 0 0;
-  font-size: 18px;
+  font-size: var(--text-lg);
 }
 
 .notificationInboxSection > header > div:last-child {
@@ -345,7 +345,7 @@
 }
 
 .notificationInboxSection > header button {
-  min-height: 34px;
+  min-height: var(--control-height-compact);
   padding: 6px 10px;
   border: 1px solid var(--notification-line);
   border-radius: 10px;
@@ -447,8 +447,8 @@
 }
 
 .notificationInboxList article > button {
-  width: 34px;
-  height: 34px;
+  width: var(--control-height-compact);
+  height: var(--control-height-compact);
   border: 0;
   border-radius: 10px;
   background: transparent;
@@ -505,8 +505,8 @@
 .notificationSetupHeader h1 {
   margin: 0;
   overflow: hidden;
-  font-size: 17px;
-  font-weight: 760;
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
   letter-spacing: -.02em;
   text-align: center;
   text-overflow: ellipsis;
@@ -514,8 +514,8 @@
 }
 
 .notificationBackButton {
-  width: 40px;
-  height: 40px;
+  width: var(--control-height-compact);
+  height: var(--control-height-compact);
   border: 0;
   border-radius: 12px;
   background: transparent;
@@ -614,7 +614,7 @@
 
 .notificationPlatformHeading h2 {
   margin: 4px 0 0;
-  font-size: 22px;
+  font-size: var(--text-lg);
   letter-spacing: -.03em;
 }
 
@@ -937,8 +937,8 @@
 }
 
 .notificationWeekdays button {
-  min-width: 42px;
-  min-height: 34px;
+  min-width: var(--control-height-compact);
+  min-height: var(--control-height-compact);
   padding: 5px 8px;
   border: 1px solid var(--notification-line);
   border-radius: 999px;
@@ -994,7 +994,7 @@
 .notificationSummaryStage h2,
 .notificationHelpContent h2 {
   margin: 0;
-  font-size: 21px;
+  font-size: var(--text-lg);
   letter-spacing: -.03em;
 }
 
@@ -1107,7 +1107,7 @@
   }
 
   .notificationCenterHeader h1 {
-    font-size: 31px;
+    font-size: var(--text-2xl);
   }
 
   .notificationCenterUnread {
@@ -1178,7 +1178,7 @@
   }
 
   .notificationCenterHeader h1 {
-    font-size: 28px;
+    font-size: var(--text-2xl);
   }
 
   .notificationCenterUnread {
@@ -1203,7 +1203,7 @@
   }
 
   .notificationCenterIdentity h2 {
-    font-size: 18px;
+    font-size: var(--text-lg);
   }
 
   .notificationCenterIdentity p {
