@@ -1,4 +1,4 @@
-/* global crypto, Response, TextEncoder, URL */
+/* global btoa, crypto, Headers, Response, TextEncoder, URL */
 
 const MAX_BODY_CHARS = 6_500_000
 const MAX_CIPHERTEXT_CHARS = 6_000_000
