@@ -4,73 +4,78 @@ Atualizado em: 2026-09-07
 
 ## Estado atual
 
-A sincronização cifrada móvel ↔ computador está integrada em `main` e publicada. O PR #191 introduziu o backend Cloudflare Workers/Durable Objects e o PR #192 removeu a dependência exclusiva de `VITE_SYNC_API_URL`, permitindo configurar e validar o endpoint `workers.dev` diretamente no perfil.
+A sincronização cifrada móvel ↔ computador está integrada em `main` e publicada. O PR #191 introduziu o backend Cloudflare Workers/Durable Objects e o PR #192 permitiu configurar/validar o endpoint `workers.dev` diretamente no perfil.
 
-O problema original estava confirmado na arquitetura antiga: cada dispositivo mantinha um cofre local independente e não existia uma fonte remota comum. A arquitetura atual acrescenta `CloudSyncManager`, revisão remota, compare-and-set, deteção conservadora de conflitos, validação criptográfica do cofre recebido e Cloudflare Worker com Durable Object por `profileId`.
+Durante a validação em dispositivo real foi confirmado um segundo problema de bootstrap: num navegador novo, o Foco Jornada não encontra nenhum `SecurityProfile` local e apresenta **Criar acesso**, mesmo quando o utilizador já tem PIN/palavra-passe e todos os dados noutro navegador/telemóvel.
 
-## Configuração operacional
+Isto não é perda do cofre remoto. O perfil de segurança que contém `profileId`, KDF, chave de dados embrulhada e metadados de sincronização é guardado no IndexedDB de cada navegador. Sem esse perfil, um navegador vazio não consegue derivar a `dataKey`, autenticar-se perante o Worker nem desencriptar o cofre remoto.
 
-O Worker de produção está publicado e os checks Cloudflare concluíram com sucesso. O subdomínio `workers.dev` real não é exposto pelos dados acessíveis através da integração GitHub; por segurança, a aplicação não inventa nem presume esse endereço.
+## Correção em validação — PR #193
 
-A interface **Privacidade e acesso** permite agora introduzir o endpoint público uma única vez no dispositivo de referência. A aplicação:
+O PR #193 (`fix/browser-profile-pairing`) adiciona associação segura entre navegadores sem recriar PIN/palavra-passe.
 
-- aceita apenas HTTPS `workers.dev` (ou localhost em desenvolvimento);
-- rejeita credenciais, query string e fragmentos;
-- chama `/health` e exige `service: foco-jornada-sync` antes de guardar;
-- ativa a sincronização após uma validação positiva;
-- limpa revisão/fingerprint remotas se o endpoint mudar;
-- guarda o endpoint em `SecurityProfile.cloudSync.endpoint`;
-- transporta essa configuração na cópia segura para o segundo dispositivo.
+Novo fluxo:
 
-`VITE_SYNC_API_URL` continua suportado como configuração automática de build.
+1. o navegador/dispositivo já autorizado tem de possuir sincronização remota ativa e pelo menos uma revisão remota confirmada;
+2. em **Privacidade e acesso → Sincronização móvel ↔ computador**, o utilizador escolhe **Associar outro navegador**;
+3. o cliente cria um segredo aleatório de 256 bits e uma ligação temporária válida por 10 minutos;
+4. desse segredo são derivados, com contextos separados, uma chave AES de associação e um token HTTP;
+5. apenas o `SecurityProfile` necessário ao bootstrap é cifrado e enviado temporariamente ao Worker; o segredo raiz e a chave AES de associação não são enviados;
+6. o novo navegador abre a ligação, recebe/desencripta o perfil, guarda-o localmente e pede o **mesmo PIN/palavra-passe já existente**;
+7. depois do desbloqueio, o fluxo normal `CloudSyncManager` descarrega e valida o cofre remoto cifrado antes de abrir os dados;
+8. o payload temporário é eliminado após redenção e também possui expiração por alarme do Durable Object.
+
+A importação de cópia segura continua disponível como fallback.
+
+## Alteração de UX
+
+Um navegador sem perfis deixa de entrar diretamente em **Criar acesso**. O ecrã inicial passa a privilegiar **Já tens acesso noutro dispositivo?**, com:
+
+- associação pela ligação temporária;
+- importação de cópia segura;
+- criação de novo perfil apenas como opção explícita para quem realmente começa do zero.
+
+Isto reduz a criação acidental de perfis independentes e elimina o loop de recriar credenciais ao mudar de browser.
 
 ## Segurança e integridade
 
-O backend remoto recebe apenas o `EncryptedVaultRecord` já cifrado. PIN, palavra-passe, código de recuperação e `dataKey` não são enviados.
+O backend remoto do cofre continua a receber apenas o `EncryptedVaultRecord` já cifrado. PIN, palavra-passe, código de recuperação e `dataKey` não são enviados.
 
-Uma cópia remota é validada estruturalmente e autenticada/desencriptada em memória com a chave do perfil antes de substituir o cofre local. Alterações simultâneas dos dois lados continuam a gerar conflito sem política de “última escrita vence”.
+Na associação de browser:
 
-O endpoint Cloudflare é configuração pública, não segredo, mas a sua identidade é validada antes de persistir.
-
-## Primeiro emparelhamento
-
-Móvel e computador precisam de representar o mesmo perfil criptográfico. O dispositivo de referência configura/valida o Worker e cria uma cópia segura. O segundo dispositivo importa essa cópia; assim recebe `profileId`, material de chave protegido, cofre, metadados de sincronização e endpoint, sem enviar a chave de dados ao servidor.
-
-Dois perfis criados separadamente não são fundidos automaticamente.
+- o segredo raiz permanece no fragmento `#pair=...` da ligação e não faz parte do pedido HTTP normal da página;
+- autenticação do canal e cifragem do perfil usam material derivado com contextos distintos;
+- o Worker guarda apenas ciphertext, hash do token e validade temporária;
+- a ligação expira em 10 minutos e deve ser tratada como segredo temporário;
+- o novo navegador só obtém os dados após introduzir a credencial já existente e autenticar/desencriptar o cofre remoto;
+- perfis independentes continuam a não ser fundidos automaticamente.
 
 ## Estado anterior preservado
 
 A correção de turnos noturnos do PR #189 continua em `main`. A área de medicação mantém deslize, ações **Definir** e **Eliminar**, tombstone lógico e histórico funcional/técnico. O modo local-first continua funcional se o serviço remoto estiver indisponível.
 
-## Validação concluída
+## Validação
 
-PR #191 e PR #192:
+PR #191 e PR #192 permanecem aprovados e publicados.
 
-- auditoria de dependências: aprovada;
-- TypeScript/typecheck: aprovado;
-- lint: aprovado;
-- testes automatizados: aprovados;
-- build do frontend: aprovado;
-- `wrangler deploy --dry-run`: aprovado;
-- smoke test de browser: aprovado;
-- Workers Builds/Cloudflare: aprovado;
-- integração em `main`: concluída;
-- GitHub Pages: publicado com sucesso.
+PR #193:
 
-## Validação física ainda pendente
-
-Não é possível confirmar a sincronização real entre os dispositivos do utilizador sem acesso a esses dispositivos e ao endpoint exato da conta Cloudflare. Falta:
-
-1. copiar o endpoint real `workers.dev` do Worker `foco-jornada` e validá-lo na aplicação;
-2. exportar a cópia segura do dispositivo de referência e importá-la no segundo dispositivo;
-3. validar uma alteração móvel → computador;
-4. validar uma alteração computador → móvel;
-5. validar offline/reconexão e um conflito controlado.
+- TypeScript/typecheck: aprovado na primeira execução;
+- lint: primeira execução falhou apenas por duas constantes não utilizadas no Worker; corrigido no commit seguinte;
+- nova execução dos quality gates: em curso;
+- Workers Builds do PR: em curso;
+- validação física móvel → browser novo: pendente após integração/publicação.
 
 ## Última alteração
 
-PR #192 integrado e publicado: o frontend consegue configurar o endpoint Cloudflare em runtime, validá-lo antes de ativar a sincronização e levá-lo na cópia segura para o segundo dispositivo.
+Foi implementado o bootstrap seguro de um navegador novo por ligação temporária, evitando que a ausência de IndexedDB local seja interpretada como necessidade de criar outro PIN/perfil.
 
 ## Próximo passo
 
-Executar o primeiro emparelhamento real em dois dispositivos e confirmar o critério de aceitação: uma alteração confirmada num dispositivo aparece no outro sem reintrodução manual, sem duplicação e sem perda de dados.
+1. concluir quality gates e Workers Builds do PR #193;
+2. integrar PR #193 em `main` e confirmar GitHub Pages/Worker em produção;
+3. no telemóvel com os dados, criar **Associar outro navegador**;
+4. abrir a ligação temporária no computador;
+5. introduzir o mesmo PIN/palavra-passe;
+6. confirmar que o cofre remoto é recebido e que os dados aparecem no computador;
+7. validar depois alterações computador → móvel, móvel → computador, offline/reconexão e conflito controlado.
