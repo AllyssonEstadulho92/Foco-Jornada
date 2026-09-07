@@ -1,4 +1,4 @@
-name: Normalização visual auditada
+name: Migração visual auditada
 
 on:
   push:
@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  normalize-css:
+  migrate-visuals:
     if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
@@ -18,64 +18,207 @@ jobs:
         with:
           ref: fix/visual-consistency-audit
 
-      - name: Normalizar tipografia CSS confirmada pela auditoria
+      - name: Migrar ícones e famílias tipográficas remanescentes
         shell: python
         run: |
           from pathlib import Path
           import re
 
-          changed = []
-          for path in sorted(Path('src/styles').glob('*.css')):
-              original = path.read_text(encoding='utf-8')
-              text = original
+          def read(path):
+              return Path(path).read_text(encoding='utf-8')
 
-              # Regra de acessibilidade: nenhum texto CSS abaixo de 12 px.
-              text = re.sub(
-                  r'font-size\s*:\s*(?:8|9|10|11)px(?P<important>\s*!important)?',
-                  lambda match: 'font-size: var(--text-xs)' + (match.group('important') or ''),
-                  text,
-                  flags=re.IGNORECASE,
-              )
+          def write(path, text):
+              Path(path).write_text(text, encoding='utf-8')
 
-              def normalize_rem(match: re.Match[str]) -> str:
-                  value = float(match.group('value'))
-                  if value >= 0.75:
-                      return match.group(0)
-                  return 'font-size: var(--text-xs)' + (match.group('important') or '')
+          def replace_once(text, old, new, label):
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f'{label}: esperado 1, encontrado {count}')
+              return text.replace(old, new, 1)
 
-              text = re.sub(
-                  r'font-size\s*:\s*(?P<value>0?\.\d+)rem(?P<important>\s*!important)?',
-                  normalize_rem,
-                  text,
-                  flags=re.IGNORECASE,
-              )
+          def regex_once(text, pattern, replacement, label, flags=0):
+              result, count = re.subn(pattern, replacement, text, count=1, flags=flags)
+              if count != 1:
+                  raise SystemExit(f'{label}: esperado 1, encontrado {count}')
+              return result
 
-              # Retira pesos arbitrários/excessivos, preservando 400/500/600/700.
-              text = re.sub(
-                  r'font-weight\s*:\s*(?:750|800|850|900)(?P<important>\s*!important)?',
-                  lambda match: 'font-weight: var(--weight-bold)' + (match.group('important') or ''),
-                  text,
-                  flags=re.IGNORECASE,
-              )
-              text = re.sub(
-                  r'font-weight\s*:\s*650(?P<important>\s*!important)?',
-                  lambda match: 'font-weight: var(--weight-semibold)' + (match.group('important') or ''),
-                  text,
-                  flags=re.IGNORECASE,
-              )
+          # AppIcon é a autoridade iconográfica da interface.
+          path = 'src/presentation/components/ui/AppIcon.tsx'
+          text = read(path)
+          text = replace_once(
+              text,
+              "  | 'refresh'\n  | 'theme'",
+              "  | 'refresh'\n  | 'backspace'\n  | 'route'\n  | 'circle'\n  | 'theme'",
+              'tipos AppIcon',
+          )
+          marker = "  if (name === 'theme') {"
+          additions = """  if (name === 'backspace') {
+    return <>
+      <path d=\"M9 6h10a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H9l-6-6 6-6Z\" />
+      <path d=\"m12 9 5 6M17 9l-5 6\" />
+    </>
+  }
+  if (name === 'route') {
+    return <>
+      <circle cx=\"6\" cy=\"18\" r=\"2\" />
+      <circle cx=\"18\" cy=\"6\" r=\"2\" />
+      <path d=\"M8 18h2a3 3 0 0 0 3-3v-6a3 3 0 0 1 3-3\" />
+    </>
+  }
+  if (name === 'circle') {
+    return <circle cx=\"12\" cy=\"12\" r=\"8.5\" />
+  }
+"""
+          text = replace_once(text, marker, additions + marker, 'casos AppIcon')
+          write(path, text)
 
-              if text != original:
-                  path.write_text(text, encoding='utf-8')
-                  changed.append(str(path))
+          # Histórico: remove SVGs locais de relógio e lixo.
+          path = 'src/presentation/pages/HistoryPage.tsx'
+          text = read(path)
+          text = regex_once(
+              text,
+              r'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1\.8">\s*<circle cx="12" cy="12" r="8\.5" />\s*<path d="M12 7v5l3\.5 2" />\s*</svg>',
+              '<AppIcon name="history" />',
+              'ícone histórico',
+              re.S,
+          )
+          text = regex_once(
+              text,
+              r'<svg viewBox="0 0 24 24" aria-hidden="true">\s*<path d="M9 3h6l1 2h4v2H4V5h4l1-2Zm-2 6h10l-\.7 11H7\.7L7 9Zm3 2v7h2v-7h-2Zm4 0v7h2v-7h-2Z" />\s*</svg>',
+              '<AppIcon name="trash" />',
+              'ícone eliminar histórico',
+              re.S,
+          )
+          write(path, text)
 
-          print(f'Ficheiros CSS normalizados: {len(changed)}')
-          for item in changed:
-              print(f'- {item}')
+          # Centro de notificações: o estado usa o mesmo sistema semântico.
+          path = 'src/presentation/pages/NotificationCenterPage.tsx'
+          text = read(path)
+          text = regex_once(
+              text,
+              r'(<span className=\{\'notificationStatusDot \' \+ \(capability\.serviceWorkerRegistered \? \'state-good\' : \'state-warning\'\)\}>)✓(</span>)',
+              r'\1<AppIcon name={capability.serviceWorkerRegistered ? \'check\' : \'warning\'} />\2',
+              'estado Service Worker',
+          )
+          write(path, text)
+
+          # Sobre a aplicação: elimina glifos Unicode usados como ícones.
+          path = 'src/presentation/components/AppAboutSettings.tsx'
+          text = read(path)
+          text = replace_once(
+              text,
+              '<span className="referenceAboutInfoIcon" aria-hidden="true">i</span>',
+              '<span className="referenceAboutInfoIcon" aria-hidden="true"><AppIcon name="info" /></span>',
+              'ícone informação',
+          )
+          text = replace_once(
+              text,
+              "{versionState === 'checking' ? 'A verificar…' : standalone ? 'Instalada · ↻' : 'Navegador · ↻'}",
+              "{versionState === 'checking' ? 'A verificar…' : (<>\n                <span>{standalone ? 'Instalada' : 'Navegador'}</span>\n                <AppIcon name=\"refresh\" />\n              </>)}",
+              'ícone atualizar versão',
+          )
+          text = replace_once(text, '<span className="referenceBrandMeaningIcon" aria-hidden="true">◷</span>', '<span className="referenceBrandMeaningIcon" aria-hidden="true"><AppIcon name="clock" /></span>', 'ícone relógio marca')
+          text = replace_once(text, '<span className="referenceBrandMeaningIcon" aria-hidden="true">↗</span>', '<span className="referenceBrandMeaningIcon" aria-hidden="true"><AppIcon name="route" /></span>', 'ícone percurso marca')
+          text = replace_once(text, '<span className="referenceBrandMeaningIcon" aria-hidden="true">○</span>', '<span className="referenceBrandMeaningIcon" aria-hidden="true"><AppIcon name="circle" /></span>', 'ícone forma marca')
+          write(path, text)
+
+          # Relatório A4: substitui pictogramas de fonte pelo sistema AppIcon.
+          path = 'src/presentation/pages/ExportDataPage.tsx'
+          text = read(path)
+          replacements = {
+              '<span>▣ {formatReportDate(date)}</span>': '<span><AppIcon name="calendar" />{formatReportDate(date)}</span>',
+              '<dt>◷ Jornada planeada</dt>': '<dt><AppIcon name="journey" />Jornada planeada</dt>',
+              '<dt>☕ Pausas</dt>': '<dt><AppIcon name="break" />Pausas</dt>',
+              '<dt>◎ Tempo efetivo</dt>': '<dt><AppIcon name="clock" />Tempo efetivo</dt>',
+              '<dt>⊙ Foco total</dt>': '<dt><AppIcon name="focus" />Foco total</dt>',
+              '<dt>▤ Atividades concluídas</dt>': '<dt><AppIcon name="activities" />Atividades concluídas</dt>',
+              '<dt>☕ Cafés</dt>': '<dt><AppIcon name="coffee" />Cafés</dt>',
+          }
+          for old, new in replacements.items():
+              text = replace_once(text, old, new, f'relatório {old}')
+          write(path, text)
+
+          # Segurança: backspace deixa de ser SVG local.
+          path = 'src/security/SecurityGate.tsx'
+          text = read(path)
+          text = replace_once(
+              text,
+              "import { useEffect, useMemo, useRef, useState, type ChangeEvent, type FormEvent } from 'react'\n",
+              "import { useEffect, useMemo, useRef, useState, type ChangeEvent, type FormEvent } from 'react'\nimport { AppIcon } from '../presentation/components/ui/AppIcon'\n",
+              'import AppIcon segurança',
+          )
+          text = regex_once(
+              text,
+              r'<svg className="securityBackspaceIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1\.8"[^>]*>.*?</svg>',
+              '<AppIcon name="backspace" className="securityBackspaceIcon" />',
+              'backspace segurança',
+              re.S,
+          )
+          write(path, text)
+
+          # Controlo de sticks: sem pseudo-ícones Unicode e com semântica de estado.
+          path = 'src/presentation/pages/SticksStockPage.tsx'
+          text = read(path)
+          text = replace_once(
+              text,
+              '<span><AppIcon name="check" /> INTERVALO CONSCIENTE</span>',
+              '<span>{displayedPacingStatus.ready ? <AppIcon name="check" /> : <AppIcon name="clock" />} INTERVALO CONSCIENTE</span>',
+              'estado intervalo consciente',
+          )
+          write(path, text)
+
+          for path, selectors in {
+              'src/styles/sticks-pacing-reference.css': [
+                  r'\.sticksLinearPage \.sticksPacingClock\.isWaiting \.sticksPacingCopy > span::before\s*\{.*?\}',
+                  r'\.sticksLinearPage \.sticksPacingZeroButton::before\s*\{.*?\}',
+              ],
+              'src/styles/sticks-control-v2.css': [
+                  r'\.sticksLinearPage \.sticksPacingClock\.isReady \.sticksPacingDialFace strong::before\s*\{.*?\}',
+              ],
+          }.items():
+              text = read(path)
+              for pattern in selectors:
+                  text, count = re.subn(pattern, '', text, count=1, flags=re.S)
+                  if count != 1:
+                      raise SystemExit(f'{path}: pseudo-ícone não encontrado: {pattern}')
+              write(path, text)
+
+          # Famílias diretas antigas: mantêm-se apenas tokens e monospace técnico.
+          path = 'src/styles/more-redesign.css'
+          text = read(path).replace('  font-family: ui-serif, Georgia, serif;\n', '')
+          write(path, text)
+
+          path = 'src/styles/medication-protection.css'
+          text = read(path)
+          text = re.sub(r'font-family:\s*ui-monospace,\s*SFMono-Regular,\s*Menlo,\s*Monaco,\s*Consolas,\s*monospace;', 'font-family: var(--font-mono);', text)
+          write(path, text)
+
+          path = 'src/styles/export-a4.css'
+          text = read(path)
+          text = text.replace('font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif', 'font-family:var(--font-sans)')
+          # AppIcon nos metadados e detalhes do relatório.
+          text += '\n.exportA4DocumentMeta>span,.exportA4DaySummary dt{display:flex;align-items:center;gap:6px}.exportA4DocumentMeta .appIcon,.exportA4DaySummary dt .appIcon{width:14px;height:14px;flex:0 0 14px}\n'
+          write(path, text)
+
+          # Fallback de arranque usa a mesma família da aplicação.
+          for path in ['index.html', 'src/index.html']:
+              text = read(path)
+              text = text.replace("font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;", "font-family: 'Inter Variable', Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;")
+              write(path, text)
+
+          # Remove uma keyframe redundante introduzida durante a centralização.
+          path = 'src/styles/icons.css'
+          text = read(path)
+          text, count = re.subn(r'\n@keyframes appIconClapper \{.*?\n\}\n', '\n', text, count=1, flags=re.S)
+          if count != 1:
+              raise SystemExit('keyframe redundante appIconClapper não encontrada')
+          text += '\n.referenceAboutInfoIcon .appIcon,.referenceBrandMeaningIcon .appIcon,.referenceVersionBadgeButton .appIcon{width:var(--icon-size);height:var(--icon-size)}\n.securityBackspaceIcon{width:var(--icon-size-primary);height:var(--icon-size-primary)}\n'
+          write(path, text)
 
       - name: Validar diff
         run: git diff --check
 
-      - name: Registar normalização
+      - name: Registar migração
         run: |
           if git diff --quiet; then
             echo 'Sem alterações adicionais.'
@@ -83,6 +226,6 @@ jobs:
           fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add src/styles
-          git commit -m 'style: normalizar tipografia e pesos visuais'
+          git add src index.html
+          git commit -m 'style: unificar iconografia e famílias tipográficas'
           git push origin HEAD:fix/visual-consistency-audit
