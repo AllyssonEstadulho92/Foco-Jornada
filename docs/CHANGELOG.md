@@ -1,5 +1,30 @@
 # Changelog
 
+## 2026-09-07 — correção do shell móvel (PR #196)
+
+### Corrigido
+
+- Removido o segundo botão **X** do cabeçalho do drawer; o único X visível passa a ser o próprio hambúrguer transformado.
+- Neutralizado o estado verde de `hover/focus-visible` que podia permanecer após toque em iOS e fazer o X parecer selecionado.
+- A terceira linha do hambúrguer passa a ser preservada explicitamente contra regras históricas com shorthand `background: ... !important`.
+- O pseudo-logo/wordmark legado de `prototype-v2.css` deixa de ocupar espaço no top bar móvel; o wordmark completo permanece no drawer.
+- O top bar móvel passa a usar duas colunas (`minmax(0, 1fr)` + `auto`) para separar identidade e estado operacional.
+- O relógio fica mais compacto em ecrãs estreitos, mantendo sempre a hora e ocultando apenas o ícone quando necessário.
+- `Foco Jornada`, hora, indicador de sincronização, bloqueio e notificações deixam de competir pela mesma largura flexível.
+
+### Preservado
+
+- O mesmo `mobileMenuOpen` continua a controlar drawer, backdrop e animação.
+- Mantido fecho por X, backdrop, tecla `Escape` e mudança de rota.
+- Mantidos safe-area, `forced-colors` e `prefers-reduced-motion`.
+- Sem alterações a dados, repositories, schema, cifragem, API ou sincronização móvel ↔ computador.
+
+### Validação pendente
+
+- Quality gates do head final do PR #196.
+- Confirmação física no iPhone de apenas um X neutro e ausência de sobreposição no top bar.
+- Confirmação em Android/Chrome, tablet e viewport web abaixo de 900 px.
+
 ## 2026-09-07 — menu móvel hambúrguer ↔ X (PR #195)
 
 ### Alterado
@@ -13,7 +38,7 @@
 
 ### Acessibilidade e interação
 
-- Mantido fecho por backdrop, tecla `Escape`, mudança de rota e botão interno do drawer.
+- Mantido fecho por backdrop, tecla `Escape` e mudança de rota.
 - Qualquer caminho de fecho repõe o hambúrguer e o estado ARIA correspondente.
 - `prefers-reduced-motion` remove as transições do drawer e do ícone sem remover funcionalidade.
 - `forced-colors` mantém as linhas do hambúrguer/**X** através de cores de sistema.
@@ -24,10 +49,13 @@
 - Rotas, dados, repositories, regras de negócio, sincronização móvel ↔ computador e segurança.
 - Sem nova biblioteca de animação, store, persistência ou alteração de schema.
 
-### Validação pendente
+### Qualidade e publicação
 
-- Quality gates do head final do PR #195.
-- Validação manual em iPhone, Android/Chrome, tablet e viewport web inferior a 900 px, incluindo safe-area, modo claro/escuro, `forced-colors` e redução de movimento.
+- Quality gates do PR #195 concluídos com sucesso.
+- PR #195 integrado em `main`.
+- Workflow **Qualidade** do merge concluído com sucesso.
+- Workflow **Publicar Foco & Jornada** / GitHub Pages concluído com sucesso.
+- A validação física posterior revelou os problemas visuais tratados no PR #196.
 
 ## 2026-09-07 — auditoria de consistência móvel ↔ web
 
