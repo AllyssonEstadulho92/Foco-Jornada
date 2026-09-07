@@ -14,7 +14,7 @@
 - Controlo de ativação da sincronização nas definições de segurança.
 - Cloudflare Worker com Durable Object isolado por `profileId`.
 - `wrangler.toml` com configuração versionada do serviço remoto.
-- Testes do token derivado e do protocolo HTTP do cliente.
+- Testes do token derivado, protocolo HTTP e rejeição de envelopes remotos incompatíveis.
 
 ### Segurança
 
@@ -22,13 +22,24 @@
 - O backend guarda apenas um hash adicional do token usado na autenticação.
 - Escritas remotas exigem a revisão esperada e devolvem conflito em concorrência.
 - Divergência simultânea local/remota não usa política destrutiva de “última escrita vence”.
+- Respostas remotas são validadas estruturalmente antes de serem consideradas cofres válidos.
+- Um cofre remoto é autenticado/desencriptado em memória e o snapshot é validado antes de qualquer substituição do cofre local.
 - `connect-src` passa a autorizar a própria origem e endpoints HTTPS `workers.dev`.
+- `.wrangler` e `.dev.vars*` passam a ser ignorados pelo Git.
+
+### Qualidade
+
+- Workflow GitHub **Qualidade** do PR #191 aprovado no commit `0ebafd13f3783f4eb08aae994d8a6987685c8250`.
+- Auditoria de dependências, typecheck, lint, testes, build e smoke test concluídos com sucesso.
+- Artefacto de build gerado com sucesso.
 
 ### Distribuição
 
 - GitHub Pages continua a ser o frontend oficial.
 - O workflow de publicação passa `VITE_SYNC_API_URL` a partir de uma variável do repositório.
-- A ativação real permanece pendente até o Worker ser publicado, o endpoint ser conhecido e os quality gates desta branch passarem.
+- O check externo **Workers Builds: foco-jornada** falhou no build Cloudflare `21d899d0-3e66-4e45-9a42-3c0efef5127b`.
+- O GitHub não contém a mensagem detalhada desse erro; é necessário consultar o log privado no Cloudflare e rever **Settings > Builds** antes de integrar em `main`.
+- A sincronização permanece desativada em produção enquanto o Worker não publicar com sucesso e `VITE_SYNC_API_URL` não estiver definido.
 
 ## 2026-09-07
 
