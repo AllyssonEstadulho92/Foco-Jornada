@@ -4,17 +4,18 @@ Atualizado em: 2026-09-07
 
 ## Estado atual
 
-Está em implementação, na branch `feat/cloudflare-sync`, a sincronização cifrada entre móvel e computador através de Cloudflare Workers, mantendo GitHub Pages como frontend oficial.
+A implementação técnica da sincronização cifrada entre móvel e computador está concluída na branch `feat/cloudflare-sync` e aberta no PR #191, mantendo GitHub Pages como frontend oficial.
 
 O problema confirmado era arquitetural: cada dispositivo mantinha o seu próprio cofre local e não existia uma fonte remota comum. A aplicação já possuía um `EncryptedVaultRecord` cifrado com AES-GCM, revisão local e cópias seguras, mas não existia protocolo de sincronização entre instalações.
 
-A solução agora versionada acrescenta:
+A solução versionada acrescenta:
 
-- `CloudSyncManager` no cliente, sem acesso ao snapshot desencriptado;
+- `CloudSyncManager` no cliente, sem acesso ao snapshot desencriptado para transporte;
 - token de sincronização derivado da `dataKey`, sem enviar a chave AES original;
 - fingerprint SHA-256 do cofre cifrado para detetar alterações locais;
 - revisão remota independente e compare-and-set;
 - bloqueio de conflitos quando os dois dispositivos alteram a mesma base de forma independente;
+- validação estrutural da resposta remota e autenticação/desencriptação do snapshot antes de substituir qualquer cofre local;
 - sincronização no desbloqueio, após gravações locais, ao regressar ao primeiro plano, ao recuperar ligação e periodicamente;
 - controlo de ativação em **Privacidade e acesso**;
 - Cloudflare Worker com Durable Object por `profileId`;
@@ -35,6 +36,8 @@ O Worker guarda:
 
 A revisão local do cofre não é reutilizada como revisão remota. O cliente guarda a última revisão remota e a impressão digital da última base sincronizada. Se existirem alterações independentes dos dois lados, nenhuma cópia é escolhida automaticamente.
 
+Uma cópia remota recebida não é gravada diretamente sobre o dispositivo: primeiro é validada, autenticada e desencriptada em memória com a chave do perfil, e o snapshot tem de apresentar a estrutura suportada. Só depois pode substituir o registo cifrado local.
+
 Falhas de rede ou do serviço remoto não anulam gravações locais. O funcionamento local-first permanece disponível.
 
 ## Primeiro emparelhamento entre dispositivos
@@ -47,41 +50,48 @@ Não existe fusão automática entre dois perfis independentes já criados, porq
 
 A correção de turnos noturnos continua integrada em `main` desde o PR #189. A área **Medicamentos > Tomas programadas** mantém deslize, ações **Definir** e **Eliminar**, tombstone lógico e histórico funcional/técnico.
 
-## Validação concluída anteriormente
+## Validação concluída — PR #191
 
-Para o PR #189 e respetivo `main`:
+O workflow GitHub **Qualidade** terminou com sucesso no commit `0ebafd13f3783f4eb08aae994d8a6987685c8250`:
 
+- instalação de dependências: aprovada;
 - auditoria de dependências: aprovada;
 - TypeScript/typecheck: aprovado;
 - lint: aprovado;
 - testes automatizados: aprovados;
 - build: aprovado;
 - smoke test de arranque no browser: aprovado;
-- GitHub Pages: publicado com sucesso.
+- artefacto de build: gerado com sucesso.
 
-## Validação da sincronização — ainda pendente
+## Bloqueio operacional — Cloudflare Workers
 
-Enquanto esta branch não passar pelos quality gates e pelo build externo, não se deve considerar a sincronização pronta para produção.
+O check externo **Workers Builds: foco-jornada** continua a falhar. No commit validado pelo GitHub, o build Cloudflare `21d899d0-3e66-4e45-9a42-3c0efef5127b` terminou com falha.
 
-Falta confirmar:
+O GitHub expõe o identificador e o link para o build, mas não contém o erro detalhado dos logs privados do Cloudflare. Por isso não é possível confirmar a causa apenas a partir do repositório. A configuração versionada (`wrangler.toml`, entry point e nome `foco-jornada`) está presente, mas ainda é necessário verificar no Cloudflare **Settings > Builds** o root directory, build/deploy commands, token de build e o erro concreto do log.
 
-- typecheck, lint, testes, build e smoke test da branch;
-- build do Worker Cloudflare com a nova configuração versionada;
-- URL real do Worker publicado;
-- variável de repositório `VITE_SYNC_API_URL` apontada para esse endpoint;
-- teste físico móvel → computador e computador → móvel;
-- teste offline seguido de recuperação de rede;
-- teste controlado de conflito simultâneo;
-- primeiro emparelhamento por cópia segura num segundo dispositivo.
+Enquanto este check externo estiver vermelho e não existir um endpoint Worker publicado, a sincronização não deve ser considerada ativa em produção. O modo local continua operacional e não depende deste serviço.
+
+## Validação física ainda pendente
+
+- obter o URL real do Worker depois de uma publicação Cloudflare bem-sucedida;
+- configurar a variável GitHub `VITE_SYNC_API_URL` com esse endpoint;
+- emparelhar um segundo dispositivo por cópia segura;
+- testar móvel → computador e computador → móvel;
+- testar funcionamento offline seguido de recuperação de rede;
+- testar conflito simultâneo sem perda de nenhuma cópia;
+- confirmar pelo menos um turno noturno real com entrada antes da hora planeada;
+- confirmar pelo menos um turno noturno real com saída depois da hora planeada;
+- testar o deslize de medicação em iPhone/iPad e Android.
 
 ## Última alteração
 
-Implementação da primeira arquitetura de sincronização cifrada entre dispositivos, com proteção contra sobrescrita concorrente e separação explícita entre GitHub Pages e backend Cloudflare.
+Validação completa do código da sincronização no GitHub, reforço da validação do cofre remoto antes de qualquer substituição local e registo explícito de que o único bloqueio atual é o build externo Cloudflare, cuja causa detalhada está fora dos logs disponibilizados pelo GitHub.
 
 ## Próximo passo
 
-1. executar os quality gates através de pull request;
-2. corrigir qualquer erro de typecheck/lint/test/build encontrado;
-3. confirmar o deploy do Worker e obter o endpoint `workers.dev`;
-4. configurar `VITE_SYNC_API_URL` no GitHub;
-5. validar o fluxo completo em dois dispositivos reais antes de integrar em `main`.
+1. abrir o build Cloudflare `21d899d0-3e66-4e45-9a42-3c0efef5127b` e identificar a primeira mensagem de erro;
+2. corrigir, conforme o log, a configuração do Workers Builds ou o código versionado;
+3. repetir o check até o Worker publicar com sucesso;
+4. configurar `VITE_SYNC_API_URL` no GitHub com o endpoint publicado;
+5. validar o fluxo completo em dois dispositivos reais;
+6. integrar o PR #191 em `main` apenas depois destes bloqueios operacionais estarem resolvidos.
