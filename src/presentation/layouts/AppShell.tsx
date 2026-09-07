@@ -68,7 +68,6 @@ export function AppShell() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [deviceTheme, setDeviceTheme] = useState<ResolvedTheme>(systemTheme)
   const mobileMenuButtonRef = useRef<HTMLButtonElement | null>(null)
-  const mobileDrawerCloseRef = useRef<HTMLButtonElement | null>(null)
   const wasMobileMenuOpenRef = useRef(false)
   const resolvedTheme: ResolvedTheme = theme === 'system' ? deviceTheme : theme
 
@@ -131,7 +130,6 @@ export function AppShell() {
   useEffect(() => {
     if (mobileMenuOpen) {
       wasMobileMenuOpenRef.current = true
-      window.requestAnimationFrame(() => mobileDrawerCloseRef.current?.focus())
       return
     }
 
@@ -151,7 +149,6 @@ export function AppShell() {
   const toggleMobileMenu = () => {
     setMobileMenuOpen((current) => !current)
   }
-
 
   return (
     <div className={`appShell${sidebarCollapsed ? ' appShellCollapsed' : ''}${mobileMenuOpen ? ' appShellMobileMenuOpen' : ''}`}>
@@ -245,7 +242,6 @@ export function AppShell() {
       <aside id="mobile-main-drawer" className={`mobileDrawer${mobileMenuOpen ? ' mobileDrawerOpen' : ''}`} aria-label="Menu móvel" aria-hidden={!mobileMenuOpen} inert={!mobileMenuOpen}>
         <header className="mobileDrawerHeader">
           <BrandLockup />
-          <button ref={mobileDrawerCloseRef} type="button" onClick={() => setMobileMenuOpen(false)} aria-label="Fechar menu"><AppIcon name="close" /></button>
         </header>
         <p className="mobileDrawerTagline">Tudo o que precisas, organizado por prioridade.</p>
 
@@ -300,7 +296,6 @@ export function AppShell() {
           <span>Versão <strong>{appVersion}</strong></span>
         </footer>
       </aside>
-
 
       <nav className="bottomNav mobileBottomBar" aria-label="Navegação móvel">
         {mobileBottomNavigation.map((item) => (
