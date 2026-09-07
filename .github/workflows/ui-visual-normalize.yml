@@ -1,0 +1,88 @@
+name: Normalização visual auditada
+
+on:
+  push:
+    branches:
+      - fix/visual-consistency-audit
+
+permissions:
+  contents: write
+
+jobs:
+  normalize-css:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Obter código
+        uses: actions/checkout@v5
+        with:
+          ref: fix/visual-consistency-audit
+
+      - name: Normalizar tipografia CSS confirmada pela auditoria
+        shell: python
+        run: |
+          from pathlib import Path
+          import re
+
+          changed = []
+          for path in sorted(Path('src/styles').glob('*.css')):
+              original = path.read_text(encoding='utf-8')
+              text = original
+
+              # Regra de acessibilidade: nenhum texto CSS abaixo de 12 px.
+              text = re.sub(
+                  r'font-size\s*:\s*(?:8|9|10|11)px(?P<important>\s*!important)?',
+                  lambda match: 'font-size: var(--text-xs)' + (match.group('important') or ''),
+                  text,
+                  flags=re.IGNORECASE,
+              )
+
+              def normalize_rem(match: re.Match[str]) -> str:
+                  value = float(match.group('value'))
+                  if value >= 0.75:
+                      return match.group(0)
+                  return 'font-size: var(--text-xs)' + (match.group('important') or '')
+
+              text = re.sub(
+                  r'font-size\s*:\s*(?P<value>0?\.\d+)rem(?P<important>\s*!important)?',
+                  normalize_rem,
+                  text,
+                  flags=re.IGNORECASE,
+              )
+
+              # Retira pesos arbitrários/excessivos, preservando 400/500/600/700.
+              text = re.sub(
+                  r'font-weight\s*:\s*(?:750|800|850|900)(?P<important>\s*!important)?',
+                  lambda match: 'font-weight: var(--weight-bold)' + (match.group('important') or ''),
+                  text,
+                  flags=re.IGNORECASE,
+              )
+              text = re.sub(
+                  r'font-weight\s*:\s*650(?P<important>\s*!important)?',
+                  lambda match: 'font-weight: var(--weight-semibold)' + (match.group('important') or ''),
+                  text,
+                  flags=re.IGNORECASE,
+              )
+
+              if text != original:
+                  path.write_text(text, encoding='utf-8')
+                  changed.append(str(path))
+
+          print(f'Ficheiros CSS normalizados: {len(changed)}')
+          for item in changed:
+              print(f'- {item}')
+
+      - name: Validar diff
+        run: git diff --check
+
+      - name: Registar normalização
+        run: |
+          if git diff --quiet; then
+            echo 'Sem alterações adicionais.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/styles
+          git commit -m 'style: normalizar tipografia e pesos visuais'
+          git push origin HEAD:fix/visual-consistency-audit
