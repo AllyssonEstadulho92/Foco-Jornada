@@ -44,9 +44,12 @@
     position: sticky;
     top: 0;
     z-index: 110;
+    display: grid;
     min-height: 64px;
-    justify-content: space-between;
-    gap: 10px;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    justify-content: initial;
+    gap: 8px;
     padding: 8px max(14px, env(safe-area-inset-right)) 8px max(14px, env(safe-area-inset-left));
     border-bottom: 1px solid var(--line);
     background: color-mix(in srgb, var(--surface) 94%, transparent);
@@ -63,18 +66,39 @@
   .mobileAppIdentity {
     display: flex;
     min-width: 0;
+    max-width: 100%;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
+    overflow: hidden;
   }
 
+  /*
+   * O wordmark completo continua no drawer. No topbar usamos apenas o texto real
+   * para não competir com relógio, sync, bloqueio e notificações.
+   * Estas regras neutralizam o pseudo-logo legado de prototype-v2.css.
+   */
   .mobileAppIdentity > strong {
+    position: static;
+    display: block;
+    width: auto;
+    max-width: 104px;
+    height: auto;
+    min-width: 0;
+    padding-left: 0;
     overflow: hidden;
-    color: var(--text);
-    font-size: 15px;
+    color: var(--text) !important;
+    font-size: 14px !important;
     font-weight: var(--weight-bold);
+    line-height: 1.15;
     letter-spacing: -0.02em;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+
+  .mobileAppIdentity > strong::before,
+  .mobileAppIdentity > strong::after {
+    display: none !important;
+    content: none !important;
   }
 
   .mobileMenuButton {
@@ -138,10 +162,31 @@
     pointer-events: none;
   }
 
-  .appShellMobileMenuOpen .mobileMenuButton {
-    border-color: color-mix(in srgb, var(--primary) 28%, var(--line));
-    background-color: var(--surface-2);
-    background-size: 0 2px;
+  /* Evita o hover/focus verde persistente do iOS e preserva a terceira linha. */
+  .mobileMenuButton:hover,
+  .mobileMenuButton:focus-visible {
+    border-color: var(--line-strong) !important;
+    background-color: var(--surface) !important;
+    background-image: linear-gradient(currentColor, currentColor) !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    background-size: 20px 2px !important;
+    color: var(--text) !important;
+  }
+
+  .mobileMenuButton:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--primary) 24%, transparent);
+    outline-offset: 2px;
+  }
+
+  .appShellMobileMenuOpen .mobileMenuButton,
+  .appShellMobileMenuOpen .mobileMenuButton:hover,
+  .appShellMobileMenuOpen .mobileMenuButton:focus-visible {
+    border-color: var(--line-strong) !important;
+    background-color: var(--surface) !important;
+    background-image: none !important;
+    background-size: 0 2px !important;
+    color: var(--text) !important;
   }
 
   .appShellMobileMenuOpen .mobileMenuButton::before,
@@ -158,21 +203,25 @@
   }
 
   .topBarStatusGroup {
+    min-width: max-content;
     flex: 0 0 auto;
     gap: 4px;
+    margin-left: auto;
   }
 
   .appClock {
-    gap: 6px;
-    padding: 4px 2px;
+    min-width: 52px;
+    gap: 5px;
+    padding: 4px;
     color: var(--text);
-    font-size: 15px;
+    font-size: 14px;
     font-weight: var(--weight-bold);
   }
 
   .appClock svg {
-    width: 18px;
-    height: 18px;
+    width: 17px;
+    height: 17px;
+    flex: 0 0 17px;
   }
 
   .notificationButton {
@@ -241,27 +290,22 @@
 
   .mobileDrawerHeader {
     display: flex;
+    min-width: 0;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
     gap: 12px;
     padding: 0 2px 12px;
   }
 
-  .mobileDrawerHeader > button {
-    display: grid;
-    width: 38px;
-    height: 38px;
-    flex: 0 0 38px;
-    place-items: center;
-    padding: 0;
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    background: var(--surface-2);
-    color: var(--text);
-    font-size: 24px;
-    font-weight: 400;
-    line-height: 1;
-    cursor: pointer;
+  .mobileDrawerHeader .brandLockup {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .mobileDrawerHeader .brandLockupText {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .mobileDrawerTagline {
@@ -474,13 +518,41 @@
     font-size: 10px;
     font-weight: var(--weight-semibold);
   }
+}
 
+@media (max-width: 480px) {
+  .mobileAppIdentity > strong {
+    max-width: 92px;
+    font-size: 13px !important;
+  }
+
+  .appClock {
+    min-width: 44px;
+    gap: 0;
+    padding-inline: 2px;
+    font-size: 13px;
+  }
+
+  .appClock svg {
+    display: none;
+  }
 }
 
 @media (max-width: 420px) {
+  .appTopBar {
+    gap: 6px;
+  }
+
+  .mobileAppIdentity {
+    gap: 6px;
+  }
+
   .mobileAppIdentity > strong {
-    max-width: 94px;
-    font-size: 14px;
+    max-width: 84px;
+  }
+
+  .topBarStatusGroup {
+    gap: 3px;
   }
 
   .mobileDrawer {
@@ -493,9 +565,25 @@
   }
 }
 
+@media (max-width: 360px) {
+  .mobileAppIdentity > strong {
+    max-width: 70px;
+  }
+}
+
 @media (max-width: 899px) and (forced-colors: active) {
-  .mobileMenuButton {
-    background-image: linear-gradient(ButtonText, ButtonText);
+  .mobileMenuButton,
+  .mobileMenuButton:hover,
+  .mobileMenuButton:focus-visible {
+    background-color: ButtonFace !important;
+    background-image: linear-gradient(ButtonText, ButtonText) !important;
+    color: ButtonText !important;
+  }
+
+  .appShellMobileMenuOpen .mobileMenuButton,
+  .appShellMobileMenuOpen .mobileMenuButton:hover,
+  .appShellMobileMenuOpen .mobileMenuButton:focus-visible {
+    background-image: none !important;
   }
 
   .mobileMenuButton::before,
