@@ -1,5 +1,41 @@
 # Changelog
 
+## 2026-09-07 — associação de browser sem recriar PIN
+
+### Corrigido
+
+- Um navegador sem `SecurityProfile` deixa de abrir diretamente em **Criar acesso** quando o utilizador pode já possuir um perfil noutro dispositivo.
+- O ecrã inicial de um browser vazio passa a mostrar **Já tens acesso noutro dispositivo?**, reduzindo a criação acidental de perfis independentes.
+- Depois de uma associação bem-sucedida, o novo browser utiliza o mesmo PIN/palavra-passe já existente e obtém o cofre através da sincronização cifrada.
+
+### Adicionado
+
+- `BrowserPairingManager` para criar e redimir ligações temporárias de associação.
+- Ação **Associar outro navegador** em **Privacidade e acesso → Sincronização móvel ↔ computador**.
+- Ligação `#pair=...` com `pairingId`, endpoint e segredo raiz aleatório de 256 bits.
+- Derivação separada de chave AES-GCM e token HTTP a partir do segredo raiz.
+- `SecurityManager.importPairedProfile()` para validar/importar o perfil criptográfico sem criar nova credencial nem novo `profileId`.
+- Rotas `PUT`, `GET` e `DELETE /v1/pair/:pairingId` no Worker.
+- Expiração fixa de 10 minutos e limpeza por alarme do Durable Object.
+- Eliminação do payload temporário depois de redenção bem-sucedida.
+- Testes de aceitação/rejeição da estrutura das ligações temporárias.
+- Estilos responsivos e compatíveis com `forced-colors` para o novo fluxo.
+
+### Segurança
+
+- O PIN, a palavra-passe, o código de recuperação e a `dataKey` continuam sem ser enviados ao Worker.
+- O segredo raiz de associação não é enviado ao Worker; o servidor recebe apenas um token derivado e guarda o respetivo hash.
+- O `SecurityProfile` é cifrado no cliente antes do envio temporário.
+- O canal de associação não duplica o cofre operacional; os dados continuam a chegar pelo protocolo normal de sincronização, depois de o mesmo PIN/palavra-passe desbloquear a chave.
+- A ligação temporária deve ser tratada como segredo durante os 10 minutos de validade.
+- Endpoints continuam limitados a HTTPS `workers.dev`/localhost de desenvolvimento.
+
+### Qualidade
+
+- Typecheck da primeira execução do PR #193 concluído com sucesso.
+- A primeira execução de lint identificou duas constantes não utilizadas no Worker; foram removidas sem alterar o protocolo.
+- Quality gates finais e Workers Builds do PR #193 permanecem em validação antes da integração.
+
 ## 2026-09-07 — endpoint runtime da sincronização
 
 ### Alterado
@@ -13,7 +49,7 @@
 ### Segurança
 
 - Endpoints introduzidos em runtime só são aceites em HTTPS `workers.dev` (ou localhost em desenvolvimento).
-- URLs com credenciais, query string ou fragmento são rejeitados.
+- URLs com credenciais, query string ou fragmento são rejeitadas.
 - Antes de guardar, a aplicação chama `/health` e exige `ok: true` e `service: foco-jornada-sync`.
 - O endpoint é configuração pública; PIN, palavra-passe, código de recuperação e `dataKey` continuam sem sair do cliente.
 
