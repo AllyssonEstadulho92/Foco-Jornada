@@ -15,30 +15,29 @@ Atualizado em: 2026-09-07
 - [x] Validar a estrutura e autenticação criptográfica do cofre remoto antes de o aceitar.
 - [x] Reabrir o runtime após receber uma cópia remota para refletir os dados na interface.
 - [x] Disparar sincronização após gravações locais, regresso ao primeiro plano, recuperação de rede e por intervalo.
-- [x] Integrar PR #191 em `main`.
-- [x] Confirmar **Workers Builds: foco-jornada** com sucesso no branch de produção.
-- [x] Confirmar publicação GitHub Pages após a integração.
-- [x] Criar fallback de configuração do endpoint no próprio perfil para não depender exclusivamente de `VITE_SYNC_API_URL`.
+- [x] Integrar PR #191 em `main` e publicar backend/frontend.
+- [x] Criar fallback de configuração do endpoint no próprio perfil.
 - [x] Validar endpoint runtime como HTTPS `workers.dev`, sem credenciais/query/hash.
 - [x] Validar `/health` e a identidade `foco-jornada-sync` antes de guardar/ativar a ligação.
-- [x] Fazer o endpoint acompanhar a cópia segura do perfil para o segundo dispositivo.
-- [x] Confirmar quality gates do PR #192.
-- [x] Integrar PR #192 em `main`.
-- [x] Confirmar Workers Builds e publicação GitHub Pages após PR #192.
-- [x] Confirmar em dispositivo real que um browser novo entra em **Criar acesso** porque não possui `SecurityProfile` local.
-- [x] Alterar o ecrã inicial de browser vazio para **Já tens acesso noutro dispositivo?**.
+- [x] Integrar PR #192 em `main` e confirmar Workers Builds/GitHub Pages.
+- [x] Confirmar em dispositivo real que um browser novo não conhece o `SecurityProfile` de outro browser.
+- [x] Alterar browser vazio para **Já tens acesso noutro dispositivo?**.
 - [x] Implementar ligação temporária de associação com segredo raiz de 256 bits.
-- [x] Separar criptograficamente material de autenticação e de cifragem da associação.
+- [x] Separar criptograficamente material de autenticação e cifragem da associação.
 - [x] Enviar ao Worker apenas `SecurityProfile` cifrado, sem duplicar o cofre operacional.
-- [x] Adicionar rotas temporárias `PUT/GET/DELETE /v1/pair/:pairingId` sem nova classe Durable Object.
+- [x] Adicionar `PUT/GET/DELETE /v1/pair/:pairingId` sem nova classe Durable Object.
 - [x] Aplicar expiração de 10 minutos e eliminação por redenção/alarme.
 - [x] Importar perfil associado sem criar novo PIN/palavra-passe nem novo `profileId`.
+- [x] Intercetar `#pair=...` antes do runtime, inclusive quando o browser já possui outro perfil local criado por engano.
 - [x] Manter importação de cópia segura como fallback.
 - [x] Adicionar testes de validação das ligações de associação.
-- [ ] Confirmar quality gates finais do PR #193 depois da correção de lint.
-- [ ] Confirmar Workers Builds do PR #193.
-- [ ] Integrar PR #193 em `main` e confirmar GitHub Pages/Worker em produção.
-- [ ] No telemóvel com os dados, confirmar endpoint real `workers.dev` e uma revisão remota concluída.
+- [x] Confirmar quality gates finais do PR #193.
+- [x] Confirmar Workers Builds do PR #193.
+- [x] Integrar PR #193 em `main`.
+- [x] Confirmar Workers Builds de produção após PR #193.
+- [x] Confirmar publicação GitHub Pages após PR #193.
+- [x] Confirmar workflow **Qualidade** de produção após PR #193.
+- [ ] No telemóvel com os dados, confirmar uma revisão remota concluída/estado sincronizado.
 - [ ] Criar **Associar outro navegador** no telemóvel e abrir a ligação no computador.
 - [ ] Confirmar que o computador pede o mesmo PIN/palavra-passe em vez de criar outro acesso.
 - [ ] Confirmar que os dados aparecem no computador após desbloqueio e `pull` remoto.
@@ -51,12 +50,8 @@ Atualizado em: 2026-09-07
 - [x] Reproduzir logicamente o erro de entrada antecipada num turno **22:00–06:00**.
 - [x] Corrigir a normalização temporal para não deslocar **21:00** para o dia seguinte.
 - [x] Preservar a associação de horas após a meia-noite, como **02:00** e **07:00**, à manhã seguinte.
-- [x] Criar teste de regressão para entrada **21:00** num turno planeado **22:00–06:00**.
-- [x] Criar teste de regressão para saída **07:00** num turno planeado **22:00–06:00**.
-- [x] Confirmar workflow **Qualidade**: auditoria, typecheck, lint, testes, build e smoke test.
-- [x] Rever o diff final e integrar em `main` através do PR #189.
-- [x] Confirmar workflow **Qualidade** de `main` após integração.
-- [x] Confirmar publicação oficial em GitHub Pages após integração.
+- [x] Criar testes de regressão para entrada antecipada e saída tardia em **22:00–06:00**.
+- [x] Confirmar workflow **Qualidade**, integração e publicação.
 - [ ] Validar manualmente um registo real de turno noturno com entrada antecipada.
 - [ ] Validar manualmente um registo real de turno noturno com saída tardia.
 
@@ -74,6 +69,6 @@ Atualizado em: 2026-09-07
 - [ ] Criar um fluxo explícito de resolução de conflitos apenas depois de validar o comportamento conservador atual em uso real.
 - [ ] Avaliar eliminação autenticada da cópia remota quando um perfil é removido localmente.
 - [ ] Avaliar revogação/listagem de browsers associados apenas se surgir necessidade operacional; a associação temporária atual não cria sessão remota persistente separada.
+- [ ] Avaliar proteção adicional contra abuso de armazenamento do endpoint público (rate limiting/Turnstile ou autenticação de criação) caso o serviço deixe de ser estritamente pessoal.
 - [ ] Avaliar um indicador discreto de que a linha de medicação admite deslize sem aumentar ruído visual.
 - [ ] Avaliar um filtro adicional por tipo de evento apenas se o volume de histórico funcional justificar.
-- [ ] Acrescentar casos de teste noturnos adicionais se surgirem horários reais próximos do ponto médio entre o fim e o início do turno.
