@@ -1,5 +1,35 @@
 # Changelog
 
+## 2026-09-07 — hierarquia minimalista do menu móvel (PR #197)
+
+### Alterado
+
+- O controlo hambúrguer/X mantém o alvo funcional de `44 × 44 px`, mas deixa de apresentar caixa, fundo, cápsula, moldura ou sombra persistente.
+- A hierarquia visual passa a depender apenas dos traços do hambúrguer e do X.
+- A zona recortada do top bar quando o drawer está aberto passa a corresponder à safe-area esquerda + 44 px do controlo.
+- A identidade textual é ocultada enquanto o drawer está aberto para impedir fragmentos visuais junto ao X.
+- O iOS deixa de apresentar realce residual de toque através de `-webkit-tap-highlight-color: transparent`.
+
+### Acessibilidade e interação
+
+- `focus-visible` mantém um contorno discreto para navegação por teclado sem reintroduzir uma superfície permanente.
+- `forced-colors` continua a desenhar os traços com cores do sistema.
+- `prefers-reduced-motion` continua a remover a transição sem alterar a funcionalidade.
+- O mesmo `mobileMenuOpen`, `aria-expanded` e `aria-label` continuam a representar o estado real do drawer.
+
+### Preservado
+
+- Fecho por X, backdrop, tecla `Escape` e mudança de rota.
+- Top bar em duas colunas, relógio compacto, indicador de sincronização, bloqueio e notificações.
+- Sem alterações a dados, repositories, schema, cifragem, API, backend ou sincronização móvel ↔ computador.
+
+### Validação pendente
+
+- Quality gates do head final do PR #197.
+- Confirmação física no iPhone do hambúrguer e X sem caixa branca/moldura.
+- Confirmação de ausência de fragmento de texto junto ao X e de estado verde residual após toque.
+- Confirmação em Android/Chrome, tablet e navegação por teclado.
+
 ## 2026-09-07 — correção do shell móvel (PR #196)
 
 ### Corrigido
@@ -19,11 +49,12 @@
 - Mantidos safe-area, `forced-colors` e `prefers-reduced-motion`.
 - Sem alterações a dados, repositories, schema, cifragem, API ou sincronização móvel ↔ computador.
 
-### Validação pendente
+### Qualidade e publicação
 
-- Quality gates do head final do PR #196.
-- Confirmação física no iPhone de apenas um X neutro e ausência de sobreposição no top bar.
-- Confirmação em Android/Chrome, tablet e viewport web abaixo de 900 px.
+- Quality gates do PR #196 concluídos com sucesso.
+- PR #196 integrado em `main`.
+- Workflow **Publicar Foco & Jornada** / GitHub Pages concluído com sucesso.
+- A validação física posterior revelou a superfície branca do controlo tratada no PR #197.
 
 ## 2026-09-07 — menu móvel hambúrguer ↔ X (PR #195)
 

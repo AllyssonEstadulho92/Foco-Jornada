@@ -163,7 +163,7 @@ O controlo usa alvo de toque `44 × 44 px`, atualiza `aria-expanded` e `aria-lab
 
 ## D-016 — Um único X e orçamento explícito de largura no top bar móvel
 
-**Estado:** implementada no PR #196.
+**Estado:** aceite no PR #196, integrada e publicada.
 
 **Decisão:** quando o drawer está aberto, não deve existir um segundo botão **Fechar** dentro do cabeçalho. O único X visível é o próprio botão hambúrguer transformado, que continua a alternar `mobileMenuOpen`.
 
@@ -180,3 +180,20 @@ O estado visual do menu não deve depender de `hover` verde persistente. As regr
 - relógio, sync, bloqueio e sino ficam isolados do crescimento da marca;
 - nenhum dado, regra de negócio, persistência, API ou mecanismo de sincronização é alterado;
 - validação física em iPhone/Android continua obrigatória antes de considerar a correção visual encerrada.
+
+## D-017 — O controlo do menu mantém a área de toque, mas não uma superfície visual
+
+**Estado:** implementada no PR #197.
+
+**Decisão:** o controlo hambúrguer/X continua semanticamente a ser um botão de `44 × 44 px`, mas a sua superfície visual deve ser transparente. `border`, fundo, cápsula e sombra não fazem parte da hierarquia normal; o utilizador deve perceber o controlo através dos próprios traços do ícone.
+
+Quando o drawer está aberto, a zona recortada do top bar corresponde apenas à safe-area esquerda mais os 44 px do controlo. O texto da identidade é ocultado durante esse estado para impedir fragmentos junto ao X. Em toque, `-webkit-tap-highlight-color` é removido; em teclado, `focus-visible` mantém um contorno discreto e explícito. `forced-colors` continua a desenhar os traços com cores do sistema e `prefers-reduced-motion` continua a desativar a transição.
+
+**Motivo:** a validação física no iPhone mostrou que, apesar de existir apenas um X, a caixa branca do botão continuava a competir visualmente com a marca e com o drawer. A interface deve manter acessibilidade e área de toque sem transformar um ícone de navegação primário num cartão independente.
+
+**Consequências:**
+
+- o alvo de toque e os atributos ARIA permanecem inalterados;
+- o mesmo `mobileMenuOpen` continua a controlar hambúrguer, X, drawer e backdrop;
+- não é criada nova biblioteca, componente, store ou persistência;
+- alterações limitam-se a apresentação e hierarquia visual do shell móvel.

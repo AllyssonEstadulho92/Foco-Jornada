@@ -62,7 +62,20 @@ Após o PR #196, existe **um único X visível**: o próprio controlo hambúrgue
 
 O top bar é recortado enquanto o drawer está aberto para manter apenas a zona do botão acima do backdrop; o drawer respeita essa zona através de `max-width` e `safe-area`, evitando sobreposição do X.
 
+No PR #197, a zona reservada passa a corresponder exatamente à safe-area esquerda mais os `44px` do alvo do controlo. O texto da identidade é ocultado durante o estado aberto para que nenhum fragmento fique visível junto ao X.
+
 A animação é responsabilidade de `src/styles/mobile-shell.css`: React/TypeScript controla o estado, CSS controla movimento e geometria. Não foi criada biblioteca de animação nem novo componente de estado.
+
+### Hierarquia visual do controlo móvel
+
+O controlo do menu mantém duas dimensões distintas:
+
+- **área funcional:** `44 × 44 px`, adequada a toque e acessibilidade;
+- **área visual:** apenas os traços do hambúrguer ou do X.
+
+A superfície do botão é transparente: sem `border`, fundo, cápsula ou sombra persistente. Em toque, `-webkit-tap-highlight-color: transparent` evita realce residual no iOS. Em teclado, `:focus-visible` apresenta um contorno discreto, sem alterar a geometria normal do ícone.
+
+A linha central continua desenhada com `background-image`, e as linhas superior/inferior continuam em `::before`/`::after`. No estado aberto, a linha central desaparece e os dois pseudo-elementos rodam para formar o X. Em `forced-colors`, os traços usam `ButtonText`; com `prefers-reduced-motion`, as transições são removidas.
 
 ### Orçamento de largura do top bar móvel
 
@@ -234,7 +247,7 @@ Não existe uma API REST alternativa por entidade para mobile ou desktop.
 - `src/security/SecurityContext.tsx`: sessão e operações de segurança/sync para UI.
 - `src/presentation/components/AppTopBar.tsx`: estado operacional, indicador de sync e botão físico do menu móvel.
 - `src/presentation/layouts/AppShell.tsx`: estado do drawer, alternância abrir/fechar, reposição de foco e atributos ARIA do botão móvel.
-- `src/styles/mobile-shell.css`: camada final de geometria do shell móvel, orçamento de largura, drawer/backdrop e transformação hambúrguer ↔ X.
+- `src/styles/mobile-shell.css`: camada final de geometria do shell móvel, orçamento de largura, hierarquia visual do controlo, drawer/backdrop e transformação hambúrguer ↔ X.
 - `src/presentation/providers/AppServicesProvider.tsx`: fonte única dos services/repositories usados por todas as páginas.
 - `cloudflare/sync-worker.js`: CORS, autenticação, validação, Durable Object, vault/pairing.
 - `wrangler.toml`: configuração versionada do Worker/Durable Object/origem autorizada.
@@ -289,11 +302,12 @@ GitHub Pages continua a distribuir o frontend. Cloudflare Workers serve apenas a
 
 - mesmas rotas e conteúdo funcional em todos os breakpoints;
 - navegação adapta-se entre sidebar e bottom nav/drawer;
-- o controlo hambúrguer/X tem alvo de `44 × 44 px` e continua disponível por toque, rato e teclado;
+- o controlo hambúrguer/X tem alvo funcional de `44 × 44 px`, mas sem superfície visual persistente;
 - existe um único X visível quando o drawer abre;
 - `aria-expanded` e `aria-label` refletem o estado do drawer, independentemente do efeito visual;
 - fechar por `Escape`, backdrop e o próprio X continua suportado;
-- a identidade textual pode encolher sem empurrar relógio/sync/bloqueio/notificações;
+- a identidade textual pode encolher sem empurrar relógio/sync/bloqueio/notificações e fica oculta enquanto o drawer está aberto;
+- `focus-visible` mantém indicação de foco para teclado sem reintroduzir uma caixa branca permanente;
 - `prefers-reduced-motion` elimina as transições do ícone/drawer sem remover funcionalidade;
 - `forced-colors` mantém as linhas do controlo através de cores de sistema;
 - estado de sync tem `aria-label`/texto e não depende apenas de cor;
