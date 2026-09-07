@@ -1,6 +1,7 @@
 node_modules
 dist
 .vite
+.wrangler
 coverage
 playwright-report
 test-results
@@ -9,6 +10,8 @@ test-results
 .env
 .env.*
 !.env.example
+.dev.vars
+.dev.vars.*
 *.local
 *.pem
 *.key

@@ -1,5 +1,47 @@
 # Changelog
 
+## 2026-09-07 — sincronização entre dispositivos
+
+### Adicionado
+
+- Cliente `CloudSyncManager` para sincronizar o `EncryptedVaultRecord` sem desencriptar os dados para transporte.
+- Token remoto derivado da `dataKey` com contexto específico de sincronização e SHA-256.
+- Fingerprint SHA-256 da última base sincronizada.
+- Revisão remota independente com compare-and-set.
+- Deteção conservadora de conflito quando móvel e computador têm alterações independentes.
+- Evento de gravação local do cofre para agendar sincronização.
+- Sincronização ao desbloquear, após gravações, ao regressar ao primeiro plano, ao recuperar rede e periodicamente.
+- Reabertura controlada do runtime após receber uma cópia remota, permitindo que a interface passe a ler o cofre recebido.
+- Controlo de ativação da sincronização nas definições de segurança.
+- Cloudflare Worker com Durable Object isolado por `profileId`.
+- `wrangler.toml` com configuração versionada do serviço remoto.
+- Testes do token derivado, protocolo HTTP e rejeição de envelopes remotos incompatíveis.
+- `worker:check` com `wrangler deploy --dry-run` integrado na pipeline **Qualidade**.
+
+### Segurança
+
+- O Worker recebe apenas ciphertext/IV e metadados de revisão; não recebe PIN, palavra-passe, código de recuperação ou a chave AES original.
+- O backend guarda apenas um hash adicional do token usado na autenticação.
+- Escritas remotas exigem a revisão esperada e devolvem conflito em concorrência.
+- Divergência simultânea local/remota não usa política destrutiva de “última escrita vence”.
+- Respostas remotas são validadas estruturalmente antes de serem consideradas cofres válidos.
+- Um cofre remoto é autenticado/desencriptado em memória e o snapshot é validado antes de qualquer substituição do cofre local.
+- `connect-src` passa a autorizar a própria origem e endpoints HTTPS `workers.dev`.
+- `.wrangler` e `.dev.vars*` passam a ser ignorados pelo Git.
+
+### Qualidade
+
+- Workflow GitHub **Qualidade** do PR #191 aprovado com auditoria de dependências, typecheck, lint, testes, build, smoke test e artefacto.
+- Bundle e configuração do Worker aprovados por `wrangler deploy --dry-run`.
+- O check Cloudflare de PR continua a falhar porque a criação inicial da classe Durable Object `SyncVault` altera o ciclo de vida e branches não produtivas usam `wrangler versions upload`, que não aplica esse tipo de alteração.
+- O bootstrap correto passa a ser a integração em `main`, onde Workers Builds usa `wrangler deploy` para a publicação de produção.
+
+### Distribuição
+
+- GitHub Pages continua a ser o frontend oficial.
+- O workflow de publicação passa `VITE_SYNC_API_URL` a partir de uma variável do repositório.
+- A sincronização só é considerada operacional depois do Worker de produção publicar, o endpoint ser ligado ao frontend e o fluxo ser validado em dois dispositivos.
+
 ## 2026-09-07
 
 ### Corrigido
@@ -27,8 +69,7 @@
 ### Observação operacional
 
 - O check externo **Workers Builds: foco-jornada** da integração Cloudflare falhou no PR e no commit integrado.
-- A causa não pode ser confirmada apenas a partir do GitHub, porque os detalhes estão nos logs externos do Cloudflare.
-- A integração Cloudflare fica registada como tarefa de manutenção: deve ser configurada/documentada se for necessária ou removida/desativada se não fizer parte da arquitetura pretendida.
+- A integração Cloudflare passou posteriormente a ter uma finalidade explícita de backend de sincronização, implementada no PR #191.
 
 ## 2026-09-05
 

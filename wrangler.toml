@@ -1,0 +1,15 @@
+name = "foco-jornada"
+main = "cloudflare/sync-worker.js"
+compatibility_date = "2026-09-01"
+workers_dev = true
+
+[vars]
+ALLOWED_ORIGINS = "https://allyssonestadulho92.github.io"
+
+[[durable_objects.bindings]]
+name = "SYNC_VAULTS"
+class_name = "SyncVault"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["SyncVault"]

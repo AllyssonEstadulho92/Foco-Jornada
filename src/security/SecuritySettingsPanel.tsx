@@ -1,6 +1,18 @@
 import { useState, type FormEvent } from 'react'
 import { useSecurity } from './SecurityContext'
 
+function formatSyncTime(value: string | undefined): string {
+  if (!value) return 'Ainda não sincronizado'
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return 'Data de sincronização indisponível'
+  return new Intl.DateTimeFormat('pt-PT', {
+    day: '2-digit',
+    month: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(date)
+}
+
 export function SecuritySettingsPanel() {
   const security = useSecurity()
   const [busy, setBusy] = useState(false)
@@ -11,6 +23,7 @@ export function SecuritySettingsPanel() {
   const [nextSecret, setNextSecret] = useState('')
   const [confirmSecret, setConfirmSecret] = useState('')
   const [nextType, setNextType] = useState<'pin' | 'password'>(security.session.profile.secretType)
+  const cloudSync = security.session.profile.cloudSync
 
   async function run(action: () => Promise<void>) {
     if (busy) return
@@ -88,6 +101,34 @@ export function SecuritySettingsPanel() {
               Ativar passkey
             </button>
           )}
+        </div>
+
+        <div className="securitySettingAction">
+          <span>Sincronização móvel ↔ computador</span>
+          <small>
+            {security.cloudSyncConfigured
+              ? cloudSync?.enabled
+                ? `Ativa · ${formatSyncTime(cloudSync.lastSyncedAt)}`
+                : 'Disponível, mas desativada neste perfil.'
+              : 'O backend Cloudflare ainda não está configurado nesta publicação.'}
+          </small>
+          <button
+            type="button"
+            disabled={busy || (!security.cloudSyncConfigured && !cloudSync?.enabled)}
+            onClick={() => void run(async () => {
+              const nextEnabled = !cloudSync?.enabled
+              await security.setCloudSyncEnabled(nextEnabled)
+              setMessage(nextEnabled
+                ? 'Sincronização ativada. O cofre continua cifrado e será comparado com a cópia remota sem sobrescrever conflitos.'
+                : 'Sincronização desativada neste perfil. A cópia local continua disponível normalmente.')
+            })}
+          >
+            {cloudSync?.enabled ? 'Desativar sincronização' : 'Ativar sincronização'}
+          </button>
+          {cloudSync?.lastError ? <small role="alert">{cloudSync.lastError}</small> : null}
+          <small>
+            Para associar outro dispositivo pela primeira vez, importe nele uma cópia segura deste mesmo perfil. Assim ambos partilham a mesma chave de dados sem a enviar ao servidor.
+          </small>
         </div>
       </div>
 
