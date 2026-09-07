@@ -112,11 +112,11 @@
     padding: 0;
     border: 1px solid var(--line);
     border-radius: 12px;
-    background-color: var(--surface);
-    background-image: linear-gradient(currentColor, currentColor);
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: 20px 2px;
+    background-color: var(--surface) !important;
+    background-image: linear-gradient(currentColor, currentColor) !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    background-size: 20px 2px !important;
     color: var(--text);
     box-shadow: none;
     cursor: pointer;
