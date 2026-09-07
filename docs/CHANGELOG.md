@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-09-07
+
+### Corrigido
+
+- Normalização de horas reais em turnos que atravessam a meia-noite.
+- Uma entrada antecipada antes da hora planeada deixa de ser deslocada incorretamente para o dia seguinte.
+- Uma saída após o fim planeado continua corretamente associada à manhã seguinte.
+- A interseção entre trabalho realizado e turno planeado deixa de transformar trabalho normal em horas extra ou horas não trabalhadas por erro de alinhamento temporal.
+
+### Testes
+
+- Adicionado caso **22:00–06:00** com entrada real às **21:00**.
+- Adicionado caso **22:00–06:00** com saída real às **07:00**.
+
 ## 2026-09-05
 
 ### Adicionado
