@@ -1,5 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import { BrowserPairingBootstrap } from './security/BrowserPairingBootstrap'
+import { parseBrowserPairingLink } from './security/browserPairing'
 import { SecureAppBootstrap } from './security/SecureAppBootstrap'
 import { installNumberInputNormalization } from './shared/utils/numberInput'
 import './styles/tokens.css'
@@ -109,8 +111,10 @@ function keepInstalledPwaCurrent() {
 
 keepInstalledPwaCurrent()
 
+const pairingLink = parseBrowserPairingLink(window.location.href) ? window.location.href : null
+
 createRoot(root).render(
   <StrictMode>
-    <SecureAppBootstrap />
+    {pairingLink ? <BrowserPairingBootstrap link={pairingLink} /> : <SecureAppBootstrap />}
   </StrictMode>,
 )
