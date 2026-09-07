@@ -60,6 +60,31 @@ function normalizeEndpoint(raw: string | undefined): string | null {
   }
 }
 
+function isEncryptedVaultRecord(value: unknown, profileId: string): value is EncryptedVaultRecord {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false
+  const vault = value as Partial<EncryptedVaultRecord>
+  return vault.profileId === profileId
+    && vault.schemaVersion === 1
+    && Number.isSafeInteger(vault.revision)
+    && Number(vault.revision) >= 1
+    && typeof vault.updatedAt === 'string'
+    && Number.isFinite(Date.parse(vault.updatedAt))
+    && typeof vault.iv === 'string'
+    && vault.iv.length >= 12
+    && typeof vault.ciphertext === 'string'
+    && vault.ciphertext.length >= 16
+}
+
+function isRemoteVaultEnvelope(value: unknown, profileId: string): value is RemoteVaultEnvelope {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false
+  const envelope = value as Partial<RemoteVaultEnvelope>
+  return Number.isSafeInteger(envelope.revision)
+    && Number(envelope.revision) >= 1
+    && typeof envelope.updatedAt === 'string'
+    && Number.isFinite(Date.parse(envelope.updatedAt))
+    && isEncryptedVaultRecord(envelope.vault, profileId)
+}
+
 export function getCloudSyncEndpoint(): string | null {
   return normalizeEndpoint(import.meta.env.VITE_SYNC_API_URL)
 }
@@ -104,6 +129,19 @@ async function parseError(response: Response): Promise<CloudSyncHttpError> {
   return new CloudSyncHttpError(message, response.status, currentRevision)
 }
 
+async function parseRemoteEnvelope(response: Response, profileId: string): Promise<RemoteVaultEnvelope> {
+  let value: unknown
+  try {
+    value = await response.json() as unknown
+  } catch {
+    throw new CloudSyncHttpError('O serviço remoto devolveu JSON inválido.', 502)
+  }
+  if (!isRemoteVaultEnvelope(value, profileId)) {
+    throw new CloudSyncHttpError('O serviço remoto devolveu um cofre com estrutura inválida.', 502)
+  }
+  return value
+}
+
 export class CloudSyncClient {
   constructor(
     private readonly endpoint: string,
@@ -131,7 +169,7 @@ export class CloudSyncClient {
     })
     if (response.status === 404) return null
     if (!response.ok) throw await parseError(response)
-    return await response.json() as RemoteVaultEnvelope
+    return parseRemoteEnvelope(response, profileId)
   }
 
   async putVault(
@@ -149,7 +187,7 @@ export class CloudSyncClient {
       body: JSON.stringify({ expectedRevision, vault }),
     })
     if (!response.ok) throw await parseError(response)
-    return await response.json() as RemoteVaultEnvelope
+    return parseRemoteEnvelope(response, profileId)
   }
 }
 
@@ -186,6 +224,31 @@ export class CloudSyncManager {
     if (patch.lastError === undefined) delete updated.cloudSync?.lastError
     await this.profiles.put(updated)
     return updated
+  }
+
+  private async validateRemoteVault(session: SecuritySession, vault: EncryptedVaultRecord): Promise<void> {
+    let candidate: unknown
+    try {
+      candidate = (await this.vaults.decryptRecord<unknown>(session.profile.id, session.dataKey, vault)).value
+    } catch {
+      throw new Error('A cópia remota não pôde ser autenticada/desencriptada com a chave deste perfil.')
+    }
+
+    if (!candidate || typeof candidate !== 'object' || Array.isArray(candidate)) {
+      throw new Error('A cópia remota desencriptada não contém um snapshot válido.')
+    }
+    const snapshot = candidate as { schemaVersion?: unknown; tables?: unknown; secureStorage?: unknown }
+    if (
+      snapshot.schemaVersion !== 1
+      || !snapshot.tables
+      || typeof snapshot.tables !== 'object'
+      || Array.isArray(snapshot.tables)
+      || !snapshot.secureStorage
+      || typeof snapshot.secureStorage !== 'object'
+      || Array.isArray(snapshot.secureStorage)
+    ) {
+      throw new Error('A cópia remota desencriptada usa uma estrutura não suportada.')
+    }
   }
 
   async setEnabled(session: SecuritySession, enabled: boolean): Promise<SecuritySession> {
@@ -234,6 +297,7 @@ export class CloudSyncManager {
       if (!localVault && !remote) return { action: 'idle', session: currentSession }
 
       if (!localVault && remote) {
+        await this.validateRemoteVault(currentSession, remote.vault)
         await this.vaults.replace(currentProfile.id, remote.vault)
         const fingerprint = await fingerprintEncryptedVault(remote.vault)
         const profile = await this.updateSyncState(currentProfile.id, {
@@ -312,6 +376,7 @@ export class CloudSyncManager {
       }
 
       if (remoteChanged && !localChanged) {
+        await this.validateRemoteVault(currentSession, remote.vault)
         await this.vaults.replace(currentProfile.id, remote.vault)
         const profile = await this.updateSyncState(currentProfile.id, {
           remoteRevision: remote.revision,
