@@ -2,16 +2,25 @@
 
 Atualizado em: 2026-09-07
 
-## P0 — Correção atual: turnos noturnos
+## P0 — Correção de turnos noturnos
 
 - [x] Reproduzir logicamente o erro de entrada antecipada num turno **22:00–06:00**.
 - [x] Corrigir a normalização temporal para não deslocar **21:00** para o dia seguinte.
 - [x] Preservar a associação de horas após a meia-noite, como **02:00** e **07:00**, à manhã seguinte.
 - [x] Criar teste de regressão para entrada **21:00** num turno planeado **22:00–06:00**.
 - [x] Criar teste de regressão para saída **07:00** num turno planeado **22:00–06:00**.
-- [ ] Confirmar workflow **Qualidade**: auditoria, typecheck, lint, testes, build e smoke test.
-- [ ] Rever o diff final e integrar em `main` apenas com CI verde.
-- [ ] Validar manualmente um registo real de turno noturno com entrada antecipada e saída tardia.
+- [x] Confirmar workflow **Qualidade**: auditoria, typecheck, lint, testes, build e smoke test.
+- [x] Rever o diff final e integrar em `main` através do PR #189.
+- [x] Confirmar workflow **Qualidade** de `main` após integração.
+- [x] Confirmar publicação oficial em GitHub Pages após integração.
+- [ ] Validar manualmente um registo real de turno noturno com entrada antecipada.
+- [ ] Validar manualmente um registo real de turno noturno com saída tardia.
+
+## P1 — Integrações e distribuição
+
+- [ ] Rever o check externo **Workers Builds: foco-jornada**, que falhou no PR #189 e no commit integrado em `main`.
+- [ ] Se Cloudflare Workers não fizer parte da arquitetura pretendida, remover/desativar a integração no serviço para evitar checks falhados sem utilidade.
+- [ ] Se Cloudflare Workers for necessário, consultar os logs do Cloudflare e documentar build, output e estratégia de publicação antes de o considerar caminho suportado.
 
 ## P1 — Validação de interface em dispositivo real
 
