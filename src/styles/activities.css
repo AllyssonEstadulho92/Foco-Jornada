@@ -31,7 +31,7 @@
   border-radius: 999px;
   color: var(--muted);
   font-size: 12px;
-  font-weight: 800;
+  font-weight: var(--weight-bold);
 }
 
 .activityJourneyStateActive {
@@ -129,7 +129,7 @@
 
 .currentActivityTime span {
   color: var(--muted);
-  font-size: 11px;
+  font-size: var(--text-xs);
 }
 
 .currentActivityTime strong {
@@ -201,8 +201,8 @@
   border: 1px solid var(--line);
   border-radius: 999px;
   color: var(--muted);
-  font-size: 10px;
-  font-weight: 800;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
 }
 
 .activityStatus-active {
@@ -237,7 +237,7 @@
   background: var(--surface);
   color: var(--text);
   font-size: 12px;
-  font-weight: 750;
+  font-weight: var(--weight-bold);
 }
 
 .activityCardActions button:hover:not(:disabled),
@@ -286,7 +286,7 @@
 .todayActivityTimer {
   font-size: clamp(25px, 4vw, 36px);
   font-variant-numeric: tabular-nums;
-  font-weight: 850;
+  font-weight: var(--weight-bold);
 }
 
 @media (max-width: 860px) {
@@ -409,7 +409,7 @@
 .activitiesPage .sectionHeadingRow>div{min-width:0}
 .activitiesPage .sectionKicker{
   color:var(--muted);
-  font-size:11px;
+  font-size: var(--text-xs);
   font-weight:var(--weight-heavy);
   line-height:var(--line-height-control);
   letter-spacing:.08em;
@@ -600,7 +600,7 @@
   border:1px solid var(--line);
   border-radius:999px;
   color:var(--muted);
-  font-size:10px;
+  font-size: var(--text-xs);
   font-weight:var(--weight-heavy);
   line-height:var(--line-height-control);
 }

@@ -92,7 +92,7 @@ body {
   overflow: hidden;
   font-size: 22px;
   font-style: normal;
-  font-weight: 800;
+  font-weight: var(--weight-bold);
   letter-spacing: -0.035em;
   white-space: nowrap;
 }
@@ -116,7 +116,7 @@ body {
   display: block;
   margin: -4px 0 0 52px;
   color: var(--muted);
-  font-size: 11px;
+  font-size: var(--text-xs);
 }
 
 /* Sidebar desktop */
@@ -643,7 +643,7 @@ body {
     color: transparent;
     content: 'Foco Jornada';
     font-size: clamp(15px, 4.4vw, 21px);
-    font-weight: 800;
+    font-weight: var(--weight-bold);
     letter-spacing: -0.035em;
     white-space: nowrap;
     -webkit-background-clip: text;
@@ -709,7 +709,7 @@ body {
 
   .mobileBottomBar .navLabel {
     font-size: 10.5px !important;
-    font-weight: 650 !important;
+    font-weight: var(--weight-semibold) !important;
   }
 
   .mobileDrawerHeader {

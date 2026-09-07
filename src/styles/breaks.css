@@ -95,7 +95,7 @@
   cursor: pointer;
   background: #f5a84d;
   color: #201305;
-  font-weight: 800;
+  font-weight: var(--weight-bold);
 }
 
 .customBreak button:disabled {
@@ -122,8 +122,8 @@
 
 .breakLiveLabel {
   color: #f5a84d;
-  font-size: 11px;
-  font-weight: 900;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
   letter-spacing: 0.12em;
 }
 
@@ -184,7 +184,7 @@
   flex: 0 0 auto;
   font-size: 13px;
   font-variant-numeric: tabular-nums;
-  font-weight: 800;
+  font-weight: var(--weight-bold);
 }
 
 @media (max-width: 900px) {

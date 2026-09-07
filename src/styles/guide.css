@@ -34,7 +34,7 @@
   background: var(--surface-2);
   color: var(--text);
   font-size: 12px;
-  font-weight: 800;
+  font-weight: var(--weight-bold);
   line-height: 1.35;
   text-align: center;
 }
@@ -136,7 +136,7 @@
   background: rgba(48, 111, 214, 0.12);
   color: #8ab8ff;
   font-size: 12px;
-  font-weight: 850;
+  font-weight: var(--weight-bold);
   text-decoration: none;
 }
 
@@ -195,7 +195,7 @@
   .guideFlow span {
     min-height: 60px;
     padding: 8px;
-    font-size: 11px;
+    font-size: var(--text-xs);
   }
 
   .guideCard summary {

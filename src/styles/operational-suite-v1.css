@@ -29,7 +29,7 @@
   display: block;
   color: var(--primary);
   font-size: 12px;
-  font-weight: 800;
+  font-weight: var(--weight-bold);
   letter-spacing: .08em;
 }
 
@@ -171,7 +171,7 @@
   border-bottom: 1px solid var(--line);
   color: var(--muted);
   font-size: 12px;
-  font-weight: 800;
+  font-weight: var(--weight-bold);
   text-align: center;
 }
 
@@ -201,7 +201,7 @@
 .opsCalendarDay span,
 .opsCalendarDay small {
   color: var(--muted);
-  font-size: 11px;
+  font-size: var(--text-xs);
 }
 
 .opsCalendarDay.isOutside {
@@ -407,7 +407,7 @@
   }
 
   .opsWeekdays span {
-    font-size: 10px;
+    font-size: var(--text-xs);
   }
 
   .opsCalendarGrid {
@@ -425,7 +425,7 @@
   }
 
   .opsCalendarDay small {
-    font-size: 9px;
+    font-size: var(--text-xs);
   }
 
   .opsDayLinks {

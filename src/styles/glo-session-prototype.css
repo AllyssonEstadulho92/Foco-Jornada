@@ -190,7 +190,7 @@
 }
 
 .sticksLinearPage .sticksDeviceTimerCard .gloSessionDialFace small{
-  font-size:11px;
+  font-size: var(--text-xs);
   letter-spacing:.08em;
 }
 
@@ -327,7 +327,7 @@
   }
 
   .sticksLinearPage .sticksDeviceTimerCard .gloSessionDurationGrid span{
-    font-size:10px;
+    font-size: var(--text-xs);
     letter-spacing:.04em;
   }
 

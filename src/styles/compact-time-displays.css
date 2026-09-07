@@ -79,19 +79,19 @@
   font-size:13px;
 }
 .sticksLinearPage .sticksPacingDialFace small{
-  font-size:9px;
+  font-size: var(--text-xs);
 }
 .sticksLinearPage .sticksPacingCopy{
   gap:3px;
 }
 .sticksLinearPage .sticksPacingCopy>span{
-  font-size:9px;
+  font-size: var(--text-xs);
 }
 .sticksLinearPage .sticksPacingCopy>strong{
   font-size:13px;
 }
 .sticksLinearPage .sticksPacingCopy>small{
-  font-size:11px;
+  font-size: var(--text-xs);
 }
 .sticksLinearPage .sticksPacingZeroButton{
   min-width:0;
@@ -129,7 +129,7 @@
   font-size:15px;
 }
 .sticksLinearPage .gloSessionDialFace small{
-  font-size:8px;
+  font-size: var(--text-xs);
 }
 .sticksLinearPage .gloSessionTimerBody{
   gap:8px;
@@ -139,7 +139,7 @@
 }
 .sticksLinearPage .gloSessionSelectors label{
   gap:4px;
-  font-size:11px;
+  font-size: var(--text-xs);
 }
 .sticksLinearPage .gloSessionSelectors select{
   min-height:36px;
@@ -153,7 +153,7 @@
   font-size:12px;
 }
 .sticksLinearPage .gloSessionTimelineHeading>small{
-  font-size:10px;
+  font-size: var(--text-xs);
 }
 .sticksLinearPage .gloSessionFacts{
   gap:6px;
@@ -164,7 +164,7 @@
 }
 .sticksLinearPage .gloSessionFacts article>span,
 .sticksLinearPage .gloSessionFacts article>small{
-  font-size:10px;
+  font-size: var(--text-xs);
 }
 .sticksLinearPage .gloSessionFacts article>strong{
   font-size:12px;
@@ -174,13 +174,13 @@
   padding:7px 9px;
 }
 .sticksLinearPage .gloSessionPhaseCopy>span{
-  font-size:9px;
+  font-size: var(--text-xs);
 }
 .sticksLinearPage .gloSessionPhaseCopy>strong{
   font-size:13px;
 }
 .sticksLinearPage .gloSessionPhaseCopy>small{
-  font-size:10px;
+  font-size: var(--text-xs);
 }
 .sticksLinearPage .gloSessionActions{
   gap:6px;
@@ -191,7 +191,7 @@
   font-size:12px;
 }
 .sticksLinearPage .gloSessionAccuracyNote{
-  font-size:10px;
+  font-size: var(--text-xs);
   line-height:1.35;
 }
 
@@ -306,7 +306,7 @@
     padding:9px 11px;
   }
   .referenceEncouragement p{
-    font-size:11px;
+    font-size: var(--text-xs);
   }
 
   .sticksLinearPage .sticksPacingClock{
@@ -424,7 +424,7 @@
   }
   .referenceGreeting>div:first-child>span{
     margin-bottom:4px;
-    font-size:10px;
+    font-size: var(--text-xs);
   }
   .referenceGreeting h2{
     font-size:22px!important;
@@ -479,7 +479,7 @@
   .sticksLinearPage .sticksPacingZeroButton{
     min-height:32px;
     padding:5px 8px;
-    font-size:11px;
+    font-size: var(--text-xs);
   }
 
   .sticksLinearPage .gloSessionIntro{
@@ -498,14 +498,14 @@
     height:42px!important;
   }
   .sticksLinearPage .gloSessionDialFace strong{
-    font-size:11px!important;
+    font-size: var(--text-xs)!important;
   }
   .sticksLinearPage .gloSessionDialFace small{
     display:none;
   }
   .sticksLinearPage .gloSessionFacts article{
     grid-template-columns:55px minmax(0,1fr);
-    font-size:10px;
+    font-size: var(--text-xs);
   }
   .sticksLinearPage .gloSessionPhaseCopy{
     padding:5px 7px;
@@ -513,7 +513,7 @@
   .sticksLinearPage .gloSessionActions button{
     min-height:34px;
     padding:6px;
-    font-size:11px;
+    font-size: var(--text-xs);
   }
   .sticksLinearPage .gloSessionAccuracyNote{
     display:none;

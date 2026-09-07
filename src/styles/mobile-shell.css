@@ -219,7 +219,7 @@
     gap: 12px;
     margin: 0 2px 8px;
     color: var(--muted);
-    font-size: 11px;
+    font-size: var(--text-xs);
     font-weight: var(--weight-bold);
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -227,7 +227,7 @@
 
   .mobileDrawerSectionHeading small {
     color: var(--muted);
-    font-size: 10px;
+    font-size: var(--text-xs);
     font-weight: var(--weight-medium);
     letter-spacing: 0;
     text-transform: none;
@@ -408,7 +408,7 @@
   }
 
   .mobileBottomBar .navLabel {
-    font-size: 10px;
+    font-size: var(--text-xs);
     font-weight: var(--weight-semibold);
   }
 

@@ -74,7 +74,7 @@
   color: var(--text);
   cursor: pointer;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: var(--weight-bold);
 }
 
 .todayHeaderActionDanger {
@@ -111,8 +111,8 @@
 .todayPauseStrip span,
 .todayProductivityCard > span {
   color: var(--muted);
-  font-size: 11px;
-  font-weight: 750;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
 }
 
 .todayMainMetrics strong {
@@ -244,7 +244,7 @@
 .todayProductivityCard small {
   overflow: hidden;
   color: var(--muted);
-  font-size: 11px;
+  font-size: var(--text-xs);
   line-height: 1.35;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -279,8 +279,8 @@
 
 .todayActiveBreak span {
   color: #f5a84d;
-  font-size: 10px;
-  font-weight: 850;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
   letter-spacing: 0.1em;
 }
 
@@ -302,7 +302,7 @@
   background: transparent;
   color: #ffd19a;
   cursor: pointer;
-  font-weight: 800;
+  font-weight: var(--weight-bold);
 }
 
 .todayQuickPanel,
@@ -323,8 +323,8 @@
 .todaySectionTitle > span,
 .todaySectionTitle > a {
   color: var(--muted);
-  font-size: 11px;
-  font-weight: 750;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
   text-decoration: none;
 }
 
@@ -378,7 +378,7 @@
 
 .todayQuickGrid small {
   color: var(--muted);
-  font-size: 10px;
+  font-size: var(--text-xs);
 }
 
 .quickIcon {
@@ -407,8 +407,8 @@
 .todayCustomBreak summary {
   padding-top: 12px;
   cursor: pointer;
-  font-size: 11px;
-  font-weight: 750;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
 }
 
 .todayCustomBreak > div {
@@ -419,7 +419,7 @@
 }
 
 .todayCustomBreak label {
-  font-size: 11px;
+  font-size: var(--text-xs);
 }
 
 .todayCustomBreak input {
@@ -441,7 +441,7 @@
   background: var(--primary-soft);
   color: var(--primary);
   cursor: pointer;
-  font-weight: 800;
+  font-weight: var(--weight-bold);
 }
 
 .todayLowerGrid {
@@ -466,7 +466,7 @@
 
 .todayTimelineRow time {
   color: var(--muted);
-  font-size: 11px;
+  font-size: var(--text-xs);
   font-variant-numeric: tabular-nums;
 }
 
@@ -492,7 +492,7 @@
 
 .todayTimelineRow small {
   color: var(--muted);
-  font-size: 10px;
+  font-size: var(--text-xs);
 }
 
 .todaySummaryCard dl {
@@ -518,14 +518,14 @@
 
 .todaySummaryCard dt {
   color: var(--muted);
-  font-size: 11px;
+  font-size: var(--text-xs);
 }
 
 .todaySummaryCard dd {
   margin: 0;
   font-size: 12px;
   font-variant-numeric: tabular-nums;
-  font-weight: 800;
+  font-weight: var(--weight-bold);
 }
 
 .todayEmptyText {
@@ -576,14 +576,14 @@
 
   .todayHero p {
     margin-top: 5px;
-    font-size: 11px;
+    font-size: var(--text-xs);
   }
 
   .todayHero .journeyStatus {
     max-width: 48%;
     padding: 7px 9px;
     gap: 7px;
-    font-size: 10px;
+    font-size: var(--text-xs);
   }
 
   .todayJourneyCard,
@@ -608,7 +608,7 @@
   .todayHeaderAction {
     min-height: 32px;
     padding: 6px 9px;
-    font-size: 10px;
+    font-size: var(--text-xs);
   }
 
   .todayMainMetrics article {
@@ -618,7 +618,7 @@
   }
 
   .todayMainMetrics span {
-    font-size: 9px;
+    font-size: var(--text-xs);
   }
 
   .todayMainMetrics strong {
@@ -736,6 +736,6 @@
   }
 
   .bottomNav .navLabel {
-    font-size: 9px;
+    font-size: var(--text-xs);
   }
 }

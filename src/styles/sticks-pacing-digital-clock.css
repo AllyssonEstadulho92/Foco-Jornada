@@ -18,7 +18,7 @@
   min-height:38px;
   padding:6px 12px;
   border-radius:999px;
-  font-size:11px;
+  font-size: var(--text-xs);
   letter-spacing:.12em;
 }
 
@@ -140,7 +140,7 @@
 .sticksLinearPage .sticksPacingDialFace strong{
   color:var(--text);
   font-size:clamp(42px,6vw,64px);
-  font-weight:800;
+  font-weight: var(--weight-bold);
   line-height:.92;
   font-variant-numeric:tabular-nums;
   letter-spacing:-.055em;
@@ -155,7 +155,7 @@
   content:"30:00";
   color:var(--text);
   font-size:clamp(42px,6vw,64px);
-  font-weight:800;
+  font-weight: var(--weight-bold);
   line-height:.92;
   font-variant-numeric:tabular-nums;
   letter-spacing:-.055em;
@@ -170,7 +170,7 @@
   background:color-mix(in srgb,var(--surface-2) 84%,var(--surface));
   color:var(--muted);
   font-size:12px;
-  font-weight:800;
+  font-weight: var(--weight-bold);
   line-height:1;
   white-space:nowrap;
   box-shadow:none;
@@ -233,7 +233,7 @@
   .sticksLinearPage .sticksPacingDialFace small,
   .sticksLinearPage .sticksPacingClock.isWaiting .sticksPacingDialFace small::after,
   .sticksLinearPage .sticksPacingClock.isReady .sticksPacingDialFace small::after{
-    font-size:11px;
+    font-size: var(--text-xs);
   }
 }
 
