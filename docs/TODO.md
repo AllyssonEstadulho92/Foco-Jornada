@@ -31,19 +31,47 @@ Atualizado em: 2026-09-07
 - [x] Intercetar `#pair=...` antes do runtime, inclusive quando o browser já possui outro perfil local criado por engano.
 - [x] Manter importação de cópia segura como fallback.
 - [x] Adicionar testes de validação das ligações de associação.
-- [x] Confirmar quality gates finais do PR #193.
-- [x] Confirmar Workers Builds do PR #193.
-- [x] Integrar PR #193 em `main`.
-- [x] Confirmar Workers Builds de produção após PR #193.
-- [x] Confirmar publicação GitHub Pages após PR #193.
-- [x] Confirmar workflow **Qualidade** de produção após PR #193.
-- [ ] No telemóvel com os dados, confirmar uma revisão remota concluída/estado sincronizado.
+- [x] Confirmar quality gates, Workers Builds e publicação do PR #193.
+
+## P0 — Auditoria de consistência móvel ↔ web (PR #194)
+
+- [x] Criar matriz de comparação antes das correções em `docs/MOBILE-WEB-CONSISTENCY-AUDIT.md`.
+- [x] Confirmar que mobile/desktop executam a mesma PWA, rotas, páginas e services.
+- [x] Auditar origem dos dados, repositories, hooks, Context e Zustand.
+- [x] Auditar IndexedDB, `localStorage`, `sessionStorage` e cache/service worker.
+- [x] Confirmar que horas/notificações persistidas em Zustand usam `secureStorage` dentro do cofre cifrado.
+- [x] Auditar API, endpoints, CORS e `VITE_SYNC_API_URL`/endpoint por perfil.
+- [x] Confirmar que não existe endpoint/mocks de negócio exclusivo de mobile ou desktop.
+- [x] Auditar CSS responsivo e confirmar que a divergência observada não é causada por `display:none` da jornada.
+- [x] Adicionar sincronização ao recuperar `window.focus` sem introduzir realtime complexo.
+- [x] Adicionar indicador acessível de estado de sincronização no top bar.
+- [x] Manter o indicador ligado ao próprio `SecurityProfile.cloudSync`, sem estado duplicado.
+- [x] Tornar dependências do `CloudSyncManager` injetáveis para testes sem mudar os defaults de produção.
+- [x] Criar teste com duas réplicas lógicas do mesmo perfil.
+- [x] Testar criação mobile → web em réplica simulada.
+- [x] Testar edição web → mobile em réplica simulada.
+- [x] Testar eliminação mobile → web em réplica simulada.
+- [x] Testar `secureStorage` sincronizado na mesma unidade de cofre.
+- [x] Testar conflito simultâneo sem sobrescrita.
+- [x] Confirmar auditoria de dependências, typecheck, lint, testes, build, Worker dry-run e smoke test no head funcional do PR #194.
+- [x] Confirmar Workers Builds do PR #194 no head funcional.
+- [ ] Integrar PR #194 em `main` e confirmar publicação de produção.
+- [ ] No telemóvel com os dados, confirmar estado **Sincronizado**/revisão remota concluída.
 - [ ] Criar **Associar outro navegador** no telemóvel e abrir a ligação no computador.
 - [ ] Confirmar que o computador pede o mesmo PIN/palavra-passe em vez de criar outro acesso.
 - [ ] Confirmar que os dados aparecem no computador após desbloqueio e `pull` remoto.
-- [ ] Validar móvel → computador e computador → móvel com dados reais.
-- [ ] Validar funcionamento offline seguido de sincronização após recuperar ligação.
-- [ ] Validar conflito simultâneo sem perda de nenhuma cópia.
+- [ ] Criar um registo real no mobile e confirmar na web.
+- [ ] Criar um registo real na web e confirmar no mobile.
+- [ ] Editar no mobile e confirmar na web.
+- [ ] Editar na web e confirmar no mobile.
+- [ ] Eliminar, quando aplicável, e confirmar em ambos.
+- [ ] Fechar/reabrir ambas as plataformas e confirmar persistência.
+- [ ] Bloquear/voltar a entrar com a mesma credencial e confirmar o mesmo perfil.
+- [ ] Atualizar a página web e testar com cache limpa.
+- [ ] Validar offline → reconexão.
+- [ ] Validar conflito simultâneo sem perda de nenhuma cópia em dispositivos reais.
+- [ ] Validar resoluções mobile/tablet/desktop.
+- [ ] Confirmar que telemóvel e computador usam o mesmo timezone do sistema durante o teste.
 
 ## P0 — Correção de turnos noturnos
 
@@ -63,6 +91,11 @@ Atualizado em: 2026-09-07
 - [ ] Testar em Android/Chrome e tablet.
 - [ ] Verificar VoiceOver/TalkBack e navegação por teclado através do menu `···`.
 - [ ] Confirmar contraste no modo claro/escuro e em `forced-colors`.
+
+## P1 — Consistência temporal
+
+- [ ] Decidir se jornada/relatórios devem usar um timezone global explícito em `AppSettings`.
+- [ ] Se aprovado, especificar migração compatível antes de alterar a interpretação de timestamps existentes.
 
 ## P2 — Melhoria futura
 
