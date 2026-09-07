@@ -27,6 +27,8 @@ interface SecurityContextValue {
   ) => Promise<void>
   rotateRecoveryCode: () => Promise<string>
   cloudSyncConfigured: boolean
+  cloudSyncEndpoint: string | null
+  configureCloudSyncEndpoint: (endpoint: string) => Promise<void>
   setCloudSyncEnabled: (enabled: boolean) => Promise<void>
 }
 
@@ -108,7 +110,11 @@ export function SecurityProvider({
       onSessionChange(result.session)
       return result.recoveryCode
     },
-    cloudSyncConfigured: cloudSyncManager.isConfigured(),
+    cloudSyncConfigured: cloudSyncManager.isConfigured(session.profile),
+    cloudSyncEndpoint: cloudSyncManager.getEndpoint(session.profile),
+    configureCloudSyncEndpoint: async (endpoint) => {
+      onSessionChange(await cloudSyncManager.configureEndpoint(session, endpoint))
+    },
     setCloudSyncEnabled: async (enabled) => {
       onSessionChange(await cloudSyncManager.setEnabled(session, enabled))
     },
