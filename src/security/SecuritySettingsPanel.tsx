@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { useSecurity } from './SecurityContext'
 
 function formatSyncTime(value: string | undefined): string {
@@ -13,6 +13,15 @@ function formatSyncTime(value: string | undefined): string {
   }).format(date)
 }
 
+function endpointLabel(value: string | null): string {
+  if (!value) return 'Sem endereço configurado'
+  try {
+    return new URL(value).hostname
+  } catch {
+    return 'Endereço inválido'
+  }
+}
+
 export function SecuritySettingsPanel() {
   const security = useSecurity()
   const [busy, setBusy] = useState(false)
@@ -23,7 +32,12 @@ export function SecuritySettingsPanel() {
   const [nextSecret, setNextSecret] = useState('')
   const [confirmSecret, setConfirmSecret] = useState('')
   const [nextType, setNextType] = useState<'pin' | 'password'>(security.session.profile.secretType)
+  const [syncEndpoint, setSyncEndpoint] = useState(security.cloudSyncEndpoint ?? '')
   const cloudSync = security.session.profile.cloudSync
+
+  useEffect(() => {
+    setSyncEndpoint(security.cloudSyncEndpoint ?? '')
+  }, [security.cloudSyncEndpoint])
 
   async function run(action: () => Promise<void>) {
     if (busy) return
@@ -108,26 +122,56 @@ export function SecuritySettingsPanel() {
           <small>
             {security.cloudSyncConfigured
               ? cloudSync?.enabled
-                ? `Ativa · ${formatSyncTime(cloudSync.lastSyncedAt)}`
-                : 'Disponível, mas desativada neste perfil.'
-              : 'O backend Cloudflare ainda não está configurado nesta publicação.'}
+                ? `Ativa · ${formatSyncTime(cloudSync.lastSyncedAt)} · ${endpointLabel(security.cloudSyncEndpoint)}`
+                : `Ligação pronta · ${endpointLabel(security.cloudSyncEndpoint)}`
+              : 'Indique o endereço público do Worker Cloudflare para ligar esta publicação ao backend já criado.'}
           </small>
+
+          <label>
+            <span>Endpoint do Worker Cloudflare</span>
+            <input
+              type="url"
+              inputMode="url"
+              autoComplete="url"
+              spellCheck={false}
+              placeholder="https://foco-jornada.<subdomínio>.workers.dev"
+              value={syncEndpoint}
+              disabled={busy}
+              onChange={(event) => setSyncEndpoint(event.target.value)}
+            />
+          </label>
           <button
             type="button"
-            disabled={busy || (!security.cloudSyncConfigured && !cloudSync?.enabled)}
+            disabled={busy || !syncEndpoint.trim()}
             onClick={() => void run(async () => {
-              const nextEnabled = !cloudSync?.enabled
-              await security.setCloudSyncEnabled(nextEnabled)
-              setMessage(nextEnabled
-                ? 'Sincronização ativada. O cofre continua cifrado e será comparado com a cópia remota sem sobrescrever conflitos.'
-                : 'Sincronização desativada neste perfil. A cópia local continua disponível normalmente.')
+              await security.configureCloudSyncEndpoint(syncEndpoint)
+              setMessage('Ligação Cloudflare validada e sincronização ativada. O cofre continua cifrado durante todo o transporte.')
             })}
           >
-            {cloudSync?.enabled ? 'Desativar sincronização' : 'Ativar sincronização'}
+            {security.cloudSyncConfigured ? 'Validar e atualizar ligação' : 'Validar ligação e ativar'}
           </button>
+          <small>
+            O endereço é validado através de <code>/health</code> antes de ser guardado. Só são aceites endpoints HTTPS em <code>workers.dev</code> (ou localhost em desenvolvimento).
+          </small>
+
+          {security.cloudSyncConfigured ? (
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => void run(async () => {
+                const nextEnabled = !cloudSync?.enabled
+                await security.setCloudSyncEnabled(nextEnabled)
+                setMessage(nextEnabled
+                  ? 'Sincronização ativada. O cofre será comparado com a cópia remota sem sobrescrever conflitos.'
+                  : 'Sincronização desativada neste perfil. A cópia local continua disponível normalmente.')
+              })}
+            >
+              {cloudSync?.enabled ? 'Desativar sincronização' : 'Ativar sincronização'}
+            </button>
+          ) : null}
           {cloudSync?.lastError ? <small role="alert">{cloudSync.lastError}</small> : null}
           <small>
-            Para associar outro dispositivo pela primeira vez, importe nele uma cópia segura deste mesmo perfil. Assim ambos partilham a mesma chave de dados sem a enviar ao servidor.
+            Para associar outro dispositivo pela primeira vez, importe nele uma cópia segura deste mesmo perfil. O endereço do Worker acompanha o perfil e ambos passam a usar a mesma chave de dados sem a enviar ao servidor.
           </small>
         </div>
       </div>
