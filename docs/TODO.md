@@ -25,8 +25,23 @@ Atualizado em: 2026-09-07
 - [x] Confirmar quality gates do PR #192.
 - [x] Integrar PR #192 em `main`.
 - [x] Confirmar Workers Builds e publicação GitHub Pages após PR #192.
-- [ ] Introduzir uma vez o endpoint `workers.dev` real do Worker no dispositivo de referência, caso `VITE_SYNC_API_URL` continue vazio.
-- [ ] Emparelhar o segundo dispositivo através de cópia segura do perfil de referência.
+- [x] Confirmar em dispositivo real que um browser novo entra em **Criar acesso** porque não possui `SecurityProfile` local.
+- [x] Alterar o ecrã inicial de browser vazio para **Já tens acesso noutro dispositivo?**.
+- [x] Implementar ligação temporária de associação com segredo raiz de 256 bits.
+- [x] Separar criptograficamente material de autenticação e de cifragem da associação.
+- [x] Enviar ao Worker apenas `SecurityProfile` cifrado, sem duplicar o cofre operacional.
+- [x] Adicionar rotas temporárias `PUT/GET/DELETE /v1/pair/:pairingId` sem nova classe Durable Object.
+- [x] Aplicar expiração de 10 minutos e eliminação por redenção/alarme.
+- [x] Importar perfil associado sem criar novo PIN/palavra-passe nem novo `profileId`.
+- [x] Manter importação de cópia segura como fallback.
+- [x] Adicionar testes de validação das ligações de associação.
+- [ ] Confirmar quality gates finais do PR #193 depois da correção de lint.
+- [ ] Confirmar Workers Builds do PR #193.
+- [ ] Integrar PR #193 em `main` e confirmar GitHub Pages/Worker em produção.
+- [ ] No telemóvel com os dados, confirmar endpoint real `workers.dev` e uma revisão remota concluída.
+- [ ] Criar **Associar outro navegador** no telemóvel e abrir a ligação no computador.
+- [ ] Confirmar que o computador pede o mesmo PIN/palavra-passe em vez de criar outro acesso.
+- [ ] Confirmar que os dados aparecem no computador após desbloqueio e `pull` remoto.
 - [ ] Validar móvel → computador e computador → móvel com dados reais.
 - [ ] Validar funcionamento offline seguido de sincronização após recuperar ligação.
 - [ ] Validar conflito simultâneo sem perda de nenhuma cópia.
@@ -58,6 +73,7 @@ Atualizado em: 2026-09-07
 
 - [ ] Criar um fluxo explícito de resolução de conflitos apenas depois de validar o comportamento conservador atual em uso real.
 - [ ] Avaliar eliminação autenticada da cópia remota quando um perfil é removido localmente.
+- [ ] Avaliar revogação/listagem de browsers associados apenas se surgir necessidade operacional; a associação temporária atual não cria sessão remota persistente separada.
 - [ ] Avaliar um indicador discreto de que a linha de medicação admite deslize sem aumentar ruído visual.
 - [ ] Avaliar um filtro adicional por tipo de evento apenas se o volume de histórico funcional justificar.
 - [ ] Acrescentar casos de teste noturnos adicionais se surgirem horários reais próximos do ponto médio entre o fim e o início do turno.
