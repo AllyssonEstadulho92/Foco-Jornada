@@ -25,6 +25,10 @@ import { installDeadlineNotificationCoordinator } from '../presentation/utils/in
 import { installGloSessionPrototypeEnhancement } from '../presentation/utils/installGloSessionPrototypeEnhancement'
 import { installMedicationNextDoseTimerEnhancement } from '../presentation/utils/installMedicationNextDoseTimerEnhancement'
 import {
+  cloudSyncManager,
+  CLOUD_SYNC_VAULT_SAVED_EVENT,
+} from './cloudSync'
+import {
   migrateLegacyDataIfNeeded,
   type LegacyMigrationResult,
 } from './legacyMigration'
@@ -76,9 +80,13 @@ export function SecureAppBootstrap() {
   const [session, setSession] = useState<SecuritySession | null>(null)
   const [runtime, setRuntime] = useState<Runtime | null>(null)
   const [runtimeError, setRuntimeError] = useState('')
+  const [syncEpoch, setSyncEpoch] = useState(0)
   const sessionRef = useRef<SecuritySession | null>(session)
+  const runtimeRef = useRef<Runtime | null>(runtime)
   sessionRef.current = session
+  runtimeRef.current = runtime
   const activeProfileId = session?.profile.id
+  const syncEnabled = Boolean(session?.profile.cloudSync?.enabled)
 
   const refreshProfiles = useCallback(async () => {
     setProfiles(await securityManager.listProfiles())
@@ -92,6 +100,7 @@ export function SecureAppBootstrap() {
   useEffect(() => {
     const activeSession = sessionRef.current
     if (!activeSession) {
+      runtimeRef.current = null
       setRuntime(null)
       return
     }
@@ -103,7 +112,16 @@ export function SecureAppBootstrap() {
     const start = async () => {
       try {
         setRuntimeError('')
-        db = new AppDatabase(activeSession)
+        let effectiveSession = activeSession
+
+        if (activeSession.profile.cloudSync?.enabled) {
+          const syncResult = await cloudSyncManager.reconcile(activeSession)
+          effectiveSession = syncResult.session
+          sessionRef.current = effectiveSession
+          if (!disposed) setSession(effectiveSession)
+        }
+
+        db = new AppDatabase(effectiveSession)
         await db.ensureReady()
         if (disposed) {
           db.close()
@@ -147,11 +165,14 @@ export function SecureAppBootstrap() {
           db.close()
           return
         }
-        setRuntime({ db, services, cleanup, migration })
+        const nextRuntime = { db, services, cleanup, migration }
+        runtimeRef.current = nextRuntime
+        setRuntime(nextRuntime)
       } catch (error) {
         if (!disposed) {
           secureStorage.unbind()
           db?.close()
+          runtimeRef.current = null
           setRuntimeError(
             error instanceof Error ? error.message : 'Não foi possível abrir o cofre local.',
           )
@@ -166,8 +187,60 @@ export function SecureAppBootstrap() {
       cleanup()
       secureStorage.unbind()
       db?.close()
+      if (runtimeRef.current?.db === db) runtimeRef.current = null
     }
-  }, [activeProfileId])
+  }, [activeProfileId, syncEnabled, syncEpoch])
+
+  const runCloudSync = useCallback(async () => {
+    const activeSession = sessionRef.current
+    const activeRuntime = runtimeRef.current
+    if (!activeSession?.profile.cloudSync?.enabled || !activeRuntime) return
+
+    await activeRuntime.db.flushStorage()
+    const result = await cloudSyncManager.reconcile(activeSession)
+    sessionRef.current = result.session
+    setSession(result.session)
+
+    if (result.action === 'pulled') {
+      setSyncEpoch((value) => value + 1)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!runtime || !syncEnabled || !activeProfileId) return
+    let debounceTimer: number | null = null
+
+    const scheduleSync = () => {
+      if (debounceTimer !== null) window.clearTimeout(debounceTimer)
+      debounceTimer = window.setTimeout(() => {
+        debounceTimer = null
+        void runCloudSync()
+      }, 800)
+    }
+
+    const handleVaultSaved = (event: Event) => {
+      const detail = (event as CustomEvent<{ profileId?: string }>).detail
+      if (detail?.profileId === activeProfileId) scheduleSync()
+    }
+
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') scheduleSync()
+    }
+
+    window.addEventListener(CLOUD_SYNC_VAULT_SAVED_EVENT, handleVaultSaved)
+    window.addEventListener('online', scheduleSync)
+    document.addEventListener('visibilitychange', handleVisibility)
+    const interval = window.setInterval(scheduleSync, 30_000)
+    scheduleSync()
+
+    return () => {
+      if (debounceTimer !== null) window.clearTimeout(debounceTimer)
+      window.clearInterval(interval)
+      window.removeEventListener(CLOUD_SYNC_VAULT_SAVED_EVENT, handleVaultSaved)
+      window.removeEventListener('online', scheduleSync)
+      document.removeEventListener('visibilitychange', handleVisibility)
+    }
+  }, [activeProfileId, runCloudSync, runtime, syncEnabled])
 
   const lock = useCallback(async () => {
     try {
@@ -178,12 +251,14 @@ export function SecureAppBootstrap() {
     secureStorage.unbind()
     useWorkHoursStore.setState({ entries: [] })
     useNotificationStore.setState({ notifications: [] })
-    runtime?.cleanup()
-    runtime?.db.close()
+    const activeRuntime = runtimeRef.current
+    activeRuntime?.cleanup()
+    activeRuntime?.db.close()
+    runtimeRef.current = null
     setRuntime(null)
     setSession(null)
     await refreshProfiles()
-  }, [refreshProfiles, runtime])
+  }, [refreshProfiles])
 
   if (!profilesLoaded) {
     return (
