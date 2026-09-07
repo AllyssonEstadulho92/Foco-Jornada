@@ -4,86 +4,68 @@ Atualizado em: 2026-09-07
 
 ## Estado atual
 
-A implementação técnica da sincronização cifrada entre móvel e computador está concluída na branch `feat/cloudflare-sync` e aberta no PR #191, mantendo GitHub Pages como frontend oficial.
+A arquitetura de sincronização cifrada móvel ↔ computador foi integrada em `main` através do PR #191. O Cloudflare Workers Builds do branch de produção concluiu com sucesso e o frontend voltou a ser publicado em GitHub Pages.
 
-O problema confirmado era arquitetural: cada dispositivo mantinha o seu próprio cofre local e não existia uma fonte remota comum. A aplicação já possuía um `EncryptedVaultRecord` cifrado com AES-GCM, revisão local e cópias seguras, mas não existia protocolo de sincronização entre instalações.
+O problema original estava confirmado na arquitetura antiga: cada dispositivo mantinha um cofre local independente e não existia uma fonte remota comum. A versão integrada acrescentou `CloudSyncManager`, revisão remota, compare-and-set, deteção conservadora de conflitos, validação criptográfica do cofre recebido e Cloudflare Worker com Durable Object por `profileId`.
 
-A solução versionada acrescenta:
+## Bloqueio operacional remanescente
 
-- `CloudSyncManager` no cliente, sem acesso do backend ao snapshot desencriptado;
-- token de sincronização derivado da `dataKey`, sem enviar a chave AES original;
-- fingerprint SHA-256 do cofre cifrado para detetar alterações locais;
-- revisão remota independente e compare-and-set;
-- bloqueio de conflitos quando os dois dispositivos alteram a mesma base de forma independente;
-- validação estrutural e criptográfica antes de aceitar uma cópia remota;
-- sincronização no desbloqueio, após gravações locais, ao regressar ao primeiro plano, ao recuperar ligação e periodicamente;
-- reabertura controlada do runtime quando é recebida uma cópia remota, para que a interface passe a usar o cofre recebido;
-- controlo de ativação em **Privacidade e acesso**;
-- Cloudflare Worker com Durable Object por `profileId`;
-- `wrangler.toml` versionado;
-- variável `VITE_SYNC_API_URL` integrada no build GitHub Pages;
-- CSP limitada a ligações `https://*.workers.dev` além da própria origem.
+O Worker de produção existe, mas o endpoint `workers.dev` não ficou disponível no código nem na informação acessível através da integração GitHub. A publicação GitHub Pages continua a aceitar `VITE_SYNC_API_URL`, mas não é seguro inventar o subdomínio Cloudflare nem gravar um endereço presumido.
+
+Para remover essa dependência da configuração de build, foi criado o PR #192 na branch `fix/runtime-sync-endpoint`.
+
+A alteração permite:
+
+- guardar o endpoint público do Worker dentro dos metadados `cloudSync` do `SecurityProfile`;
+- usar esse valor antes do fallback `VITE_SYNC_API_URL`;
+- aceitar apenas HTTPS `workers.dev` (ou localhost em desenvolvimento), rejeitando credenciais, query string e fragmentos;
+- chamar `/health` e exigir `service: foco-jornada-sync` antes de guardar;
+- ativar a sincronização imediatamente depois de uma ligação válida;
+- limpar a base de revisão/fingerprint se o endpoint mudar, impedindo que metadados de outro servidor sejam reutilizados;
+- incluir o endpoint na cópia segura do perfil, para que o segundo dispositivo receba a mesma configuração durante o primeiro emparelhamento.
 
 ## Segurança e integridade
 
-O backend remoto recebe apenas o `EncryptedVaultRecord` já cifrado. Não recebe PIN, palavra-passe, código de recuperação nem o conteúdo pessoal em texto simples.
+O backend remoto continua a receber apenas o `EncryptedVaultRecord` já cifrado. PIN, palavra-passe, código de recuperação e `dataKey` não são enviados.
 
-O Worker guarda ciphertext/IV, revisão remota, timestamp técnico e hash do token de sincronização. A revisão local do cofre não é reutilizada como revisão remota. Se existirem alterações independentes dos dois lados, nenhuma cópia é escolhida automaticamente.
+Uma cópia remota é validada estruturalmente e autenticada/desencriptada em memória com a chave do perfil antes de substituir o cofre local. Alterações simultâneas dos dois lados continuam a gerar conflito sem política de “última escrita vence”.
 
-Uma cópia remota recebida é autenticada e desencriptada em memória com a chave do perfil antes de substituir o registo cifrado local. Falhas de rede ou do serviço remoto não anulam gravações locais; o funcionamento local-first permanece disponível.
+O endpoint Cloudflare é configuração pública, não segredo. Mesmo assim, a aplicação valida esquema, hostname e identidade do serviço antes de o guardar.
 
-## Primeiro emparelhamento entre dispositivos
+## Primeiro emparelhamento
 
-A sincronização só alinha automaticamente dispositivos que representem o mesmo perfil criptográfico. Para o primeiro emparelhamento, a cópia segura existente deve ser exportada no dispositivo de referência e importada no segundo dispositivo. Isto preserva o mesmo `profileId` e a mesma chave de dados protegida.
+Móvel e computador precisam de representar o mesmo perfil criptográfico. O dispositivo de referência configura/valida o Worker e cria uma cópia segura. O segundo dispositivo importa essa cópia; assim recebe `profileId`, material de chave protegido, metadados de sincronização e endpoint, sem enviar a chave de dados ao servidor.
 
-Não existe fusão automática entre dois perfis independentes já criados, porque escolher uma das bases sem confirmação poderia destruir dados.
+Dois perfis criados separadamente continuam a não ser fundidos automaticamente, para evitar perda de dados.
 
-## Validação concluída — PR #191
+## Estado anterior preservado
 
-O workflow GitHub **Qualidade** mais recente terminou com sucesso e passou a incluir também a validação específica do Worker:
+A correção de turnos noturnos do PR #189 continua em `main`. A área de medicação mantém deslize, ações **Definir** e **Eliminar**, tombstone lógico e histórico funcional/técnico. O modo local-first continua funcional mesmo se o serviço remoto estiver indisponível.
 
-- instalação de dependências: aprovada;
+## Validação concluída
+
+Para o PR #191 e a integração em `main`:
+
 - auditoria de dependências: aprovada;
 - TypeScript/typecheck: aprovado;
 - lint: aprovado;
 - testes automatizados: aprovados;
 - build do frontend: aprovado;
-- `wrangler deploy --dry-run` (`npm run worker:check`): aprovado;
-- smoke test de arranque no browser: aprovado;
-- artefacto de build: gerado com sucesso.
+- `wrangler deploy --dry-run`: aprovado;
+- smoke test de browser: aprovado;
+- Workers Builds de produção: aprovado;
+- GitHub Pages: publicado com sucesso.
 
-## Cloudflare Workers — bootstrap de produção
-
-O check externo **Workers Builds: foco-jornada** continua vermelho nas branches não produtivas. A causa agora está tecnicamente delimitada: o PR introduz pela primeira vez a classe Durable Object `SyncVault`, o que é uma alteração ao ciclo de vida de Durable Objects.
-
-O Workers Builds usa por omissão `wrangler versions upload` para branches não produtivas. Esse comando não aplica alterações de ciclo de vida de Durable Objects. A criação inicial da classe deve ser feita no branch de produção com `wrangler deploy`.
-
-A configuração e o bundle foram validados por `wrangler deploy --dry-run`. Assim, a falha de preview não demonstra um erro de TypeScript, bundle ou configuração sintática; o próximo teste válido é a publicação de produção após integração em `main`.
-
-## Estado anterior preservado
-
-A correção de turnos noturnos continua integrada em `main` desde o PR #189. A área **Medicamentos > Tomas programadas** mantém deslize, ações **Definir** e **Eliminar**, tombstone lógico e histórico funcional/técnico.
-
-## Validação física ainda pendente
-
-Depois da publicação de produção do Worker falta confirmar:
-
-- endpoint `workers.dev` real;
-- ligação do frontend a esse endpoint;
-- primeiro emparelhamento por cópia segura num segundo dispositivo;
-- móvel → computador e computador → móvel com dados reais;
-- offline seguido de recuperação de rede;
-- conflito simultâneo sem perda de nenhuma cópia;
-- validações físicas já pendentes de turnos noturnos e medicação.
+A validação do PR #192 ainda está em curso.
 
 ## Última alteração
 
-A pipeline de qualidade passou a validar também o Worker Cloudflare com Wrangler. O PR #191 está tecnicamente validado para o bootstrap de produção; a falha Cloudflare no PR foi classificada como limitação do mecanismo de preview para a primeira alteração de ciclo de vida de Durable Objects.
+Foi removida a dependência exclusiva da variável de build para localizar o Worker. A aplicação passa a poder validar e guardar o endpoint público diretamente no perfil e a transportá-lo na cópia segura para o segundo dispositivo.
 
 ## Próximo passo
 
-1. integrar o PR #191 em `main`;
-2. confirmar a publicação de produção do Worker com `wrangler deploy` e a criação de `SyncVault`;
-3. obter o endpoint `workers.dev` publicado e ligar o frontend a esse endpoint;
-4. confirmar publicação GitHub Pages;
-5. emparelhar e validar dois dispositivos reais antes de considerar a sincronização operacionalmente concluída.
+1. concluir os quality gates do PR #192;
+2. integrar e publicar a nova interface em GitHub Pages;
+3. introduzir uma vez o endpoint real `workers.dev` do Worker no dispositivo de referência, caso `VITE_SYNC_API_URL` continue ausente;
+4. exportar/importar a cópia segura no segundo dispositivo;
+5. validar móvel → computador, computador → móvel, reconexão offline e conflito controlado em dispositivos reais.
