@@ -25,7 +25,7 @@ export interface CloudSyncResult {
   message?: string
 }
 
-interface RemoteVaultEnvelope {
+export interface RemoteVaultEnvelope {
   revision: number
   updatedAt: string
   vault: EncryptedVaultRecord
@@ -226,10 +226,49 @@ export class CloudSyncClient {
   }
 }
 
+interface CloudSyncProfileStoreLike {
+  get(id: string): Promise<SecurityProfile | undefined>
+  put(profile: SecurityProfile): Promise<void>
+}
+
+interface CloudSyncVaultStoreLike {
+  readRecord(profileId: string): Promise<EncryptedVaultRecord | undefined>
+  replace(profileId: string, record: EncryptedVaultRecord): Promise<void>
+  decryptRecord<T>(
+    profileId: string,
+    key: CryptoKey,
+    record: EncryptedVaultRecord,
+  ): Promise<{ value: T; revision: number }>
+}
+
+export interface CloudSyncRemoteClient {
+  checkHealth(): Promise<void>
+  getVault(profileId: string, token: string): Promise<RemoteVaultEnvelope | null>
+  putVault(
+    profileId: string,
+    token: string,
+    expectedRevision: number,
+    vault: EncryptedVaultRecord,
+  ): Promise<RemoteVaultEnvelope>
+}
+
+export interface CloudSyncManagerDependencies {
+  profiles?: CloudSyncProfileStoreLike
+  vaults?: CloudSyncVaultStoreLike
+  createClient?: (endpoint: string) => CloudSyncRemoteClient
+}
+
 export class CloudSyncManager {
-  private readonly profiles = new SecurityProfileStore()
-  private readonly vaults = new EncryptedVaultStore()
+  private readonly profiles: CloudSyncProfileStoreLike
+  private readonly vaults: CloudSyncVaultStoreLike
+  private readonly createClient: (endpoint: string) => CloudSyncRemoteClient
   private queue: Promise<void> = Promise.resolve()
+
+  constructor(dependencies: CloudSyncManagerDependencies = {}) {
+    this.profiles = dependencies.profiles ?? new SecurityProfileStore()
+    this.vaults = dependencies.vaults ?? new EncryptedVaultStore()
+    this.createClient = dependencies.createClient ?? ((endpoint) => new CloudSyncClient(endpoint))
+  }
 
   getEndpoint(profile?: SecurityProfile): string | null {
     return getCloudSyncEndpoint(profile)
@@ -297,7 +336,7 @@ export class CloudSyncManager {
         throw new Error('Indica um endereço HTTPS válido do Worker Cloudflare em workers.dev.')
       }
 
-      const client = new CloudSyncClient(endpoint)
+      const client = this.createClient(endpoint)
       await client.checkHealth()
 
       const current = await this.profiles.get(session.profile.id)
@@ -356,7 +395,7 @@ export class CloudSyncManager {
     try {
       const localVault = await this.vaults.readRecord(currentProfile.id)
       const token = await deriveCloudSyncToken(session.dataKey, currentProfile.id)
-      const client = new CloudSyncClient(endpoint)
+      const client = this.createClient(endpoint)
       const remote = await client.getVault(currentProfile.id, token)
       const state = currentProfile.cloudSync
 
