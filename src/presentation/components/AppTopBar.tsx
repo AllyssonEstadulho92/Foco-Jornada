@@ -1,16 +1,25 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } from 'react'
+import { Link } from 'react-router-dom'
 import { useSecurityOptional } from '../../security/SecurityContext'
 import { emitAppFeedback } from '../../shared/notifications/appFeedback'
 import { useNow } from '../hooks/useNow'
 import { useAppServices } from '../providers/AppServicesProvider'
 import { useNotificationStore, type AppNotification } from '../store/useNotificationStore'
-import { AppIcon } from './ui/AppIcon'
+import { AppIcon, type AppIconName } from './ui/AppIcon'
 
 type StatusNotification = {
   id: string
   title: string
   detail: string
   tone: 'info' | 'success'
+}
+
+type CloudSyncPresentation = {
+  label: string
+  detail: string
+  tone: 'synced' | 'pending' | 'paused' | 'error' | 'conflict'
+  icon: AppIconName
+  issue: boolean
 }
 
 function formatNotificationTime(value: string) {
@@ -20,6 +29,85 @@ function formatNotificationTime(value: string) {
     hour: '2-digit',
     minute: '2-digit',
   }).format(new Date(value))
+}
+
+function formatSyncTime(value: string | undefined): string | null {
+  if (!value) return null
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return null
+  return new Intl.DateTimeFormat('pt-PT', {
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(date)
+}
+
+function cloudSyncPresentation(input: {
+  configured: boolean
+  enabled: boolean
+  lastStatus?: string
+  lastSyncedAt?: string
+  lastError?: string
+}): CloudSyncPresentation {
+  if (!input.configured) {
+    return {
+      label: 'Local',
+      detail: 'Sincronização móvel ↔ computador ainda não configurada.',
+      tone: 'paused',
+      icon: 'cloud',
+      issue: false,
+    }
+  }
+
+  if (!input.enabled) {
+    return {
+      label: 'Pausada',
+      detail: 'Sincronização móvel ↔ computador desativada neste perfil.',
+      tone: 'paused',
+      icon: 'pause',
+      issue: false,
+    }
+  }
+
+  if (input.lastStatus === 'conflict') {
+    return {
+      label: 'Conflito',
+      detail: input.lastError || 'Existem alterações independentes em mais de um dispositivo.',
+      tone: 'conflict',
+      icon: 'warning',
+      issue: true,
+    }
+  }
+
+  if (input.lastStatus === 'error') {
+    return {
+      label: 'Erro',
+      detail: input.lastError || 'A última sincronização não foi concluída.',
+      tone: 'error',
+      icon: 'warning',
+      issue: true,
+    }
+  }
+
+  if (input.lastStatus === 'synced') {
+    const syncedAt = formatSyncTime(input.lastSyncedAt)
+    return {
+      label: 'Sincronizado',
+      detail: syncedAt
+        ? `Última sincronização concluída às ${syncedAt}.`
+        : 'Sincronização concluída com o cofre remoto.',
+      tone: 'synced',
+      icon: 'check',
+      issue: false,
+    }
+  }
+
+  return {
+    label: 'Pendente',
+    detail: 'A sincronização está ativa e aguarda a primeira confirmação remota.',
+    tone: 'pending',
+    icon: 'cloud',
+    issue: false,
+  }
 }
 
 export function AppTopBar({ onOpenMenu, menuButtonRef }: { onOpenMenu?: () => void; menuButtonRef?: RefObject<HTMLButtonElement | null> }) {
@@ -115,6 +203,16 @@ export function AppTopBar({ onOpenMenu, menuButtonRef }: { onOpenMenu?: () => vo
     return items
   }, [activeJourneyStartedAt, hasActiveFocus])
 
+  const syncPresentation = security
+    ? cloudSyncPresentation({
+        configured: security.cloudSyncConfigured,
+        enabled: Boolean(security.session.profile.cloudSync?.enabled),
+        lastStatus: security.session.profile.cloudSync?.lastStatus,
+        lastSyncedAt: security.session.profile.cloudSync?.lastSyncedAt,
+        lastError: security.session.profile.cloudSync?.lastError,
+      })
+    : null
+
   const clock = new Intl.DateTimeFormat('pt-PT', {
     hour: '2-digit',
     minute: '2-digit',
@@ -185,6 +283,18 @@ export function AppTopBar({ onOpenMenu, menuButtonRef }: { onOpenMenu?: () => vo
           <AppIcon name="clock" />
           <time dateTime={now.toISOString()}>{clock}</time>
         </div>
+
+        {syncPresentation ? (
+          <Link
+            to="/definicoes"
+            className={`cloudSyncStatus cloudSyncStatus-${syncPresentation.tone}${syncPresentation.issue ? ' cloudSyncStatusIssue' : ''}`}
+            aria-label={`${syncPresentation.label}. ${syncPresentation.detail} Abrir definições de sincronização.`}
+            title={`${syncPresentation.label} · ${syncPresentation.detail}`}
+          >
+            <AppIcon name={syncPresentation.icon} />
+            <span className="cloudSyncStatusText">{syncPresentation.label}</span>
+          </Link>
+        ) : null}
 
         {security ? (
           <button
