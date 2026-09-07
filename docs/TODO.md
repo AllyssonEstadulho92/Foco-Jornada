@@ -127,24 +127,44 @@ Atualizado em: 2026-09-07
 - [x] Confirmar auditoria de dependências, typecheck, lint, testes, build, Worker dry-run e smoke test no head final do PR #197.
 - [x] Integrar PR #197 com CI verde.
 - [x] Confirmar publicação GitHub Pages do PR #197.
-- [ ] Validar no iPhone: hambúrguer sem caixa branca/moldura.
-- [ ] Validar no iPhone: X sem caixa branca/moldura e sem fragmento de texto ao lado.
+- [x] Revalidar no iPhone e identificar que a estratégia de recorte do top bar precisava de revisão estrutural.
 - [ ] Validar toque repetido abrir ↔ fechar sem estado verde residual.
 - [ ] Validar navegação por teclado e `focus-visible` em viewport responsiva.
 - [ ] Validar Android/Chrome e tablet.
 
 ## P0 — Superfície transparente do X aberto (PR #198)
 
-- [x] Confirmar pela captura física que a superfície branca persistente não é o `mobileMenuButton`, mas a zona recortada do `appTopBar` elevada acima do backdrop.
-- [x] Manter o `appTopBar` acima do backdrop apenas para preservar o X clicável.
+- [x] Confirmar pela captura física que a superfície branca persistente não era o `mobileMenuButton`, mas a zona recortada do `appTopBar` elevada acima do backdrop.
+- [x] Manter o `appTopBar` acima do backdrop apenas para preservar o X clicável no desenho daquele PR.
 - [x] Tornar transparente o fundo da zona recortada quando `mobileMenuOpen = true`.
 - [x] Remover nesse estado `border-bottom`, `box-shadow`, `backdrop-filter` e `-webkit-backdrop-filter`.
 - [x] Preservar alvo de toque `44 × 44 px`, ARIA, safe-area, animação e caminhos de fecho.
-- [ ] Confirmar auditoria de dependências, typecheck, lint, testes, build, Worker dry-run e smoke test no head final do PR #198.
-- [ ] Integrar PR #198 apenas com CI verde.
-- [ ] Confirmar publicação GitHub Pages do PR #198.
-- [ ] Validar no iPhone que o X fica diretamente sobre o backdrop sem retângulo/cartão branco.
-- [ ] Validar Android/Chrome, tablet e orientação horizontal.
+- [x] Confirmar auditoria de dependências, typecheck, lint, testes, build, Worker dry-run e smoke test no head final do PR #198.
+- [x] Integrar PR #198 apenas com CI verde.
+- [x] Confirmar publicação GitHub Pages do PR #198.
+- [x] Revalidar no iPhone; a captura posterior confirmou que o recorte fazia desaparecer a restante top bar, originando a correção seguinte.
+- [ ] Validar Android/Chrome, tablet e orientação horizontal após a correção estrutural.
+
+## P0 — Top bar persistente com drawer abaixo (correção seguinte)
+
+- [x] Confirmar pelas capturas físicas que, ao abrir o menu, desaparecem **Foco Jornada**, relógio, sync, bloqueio e notificações.
+- [x] Confirmar no CSS que a causa é `clip-path` em `.appShellMobileMenuOpen .appTopBar`.
+- [x] Confirmar no CSS que a identidade também é ocultada por `visibility: hidden`.
+- [x] Remover o recorte do top bar no estado aberto.
+- [x] Manter a identidade textual visível durante o drawer aberto.
+- [x] Elevar o top bar como camada persistente do shell móvel.
+- [x] Fazer backdrop e drawer começarem abaixo dos `64px` do top bar.
+- [x] Remover a reserva lateral do drawer que existia apenas para proteger o X.
+- [x] Preservar o mesmo hambúrguer ↔ X, alvo `44 × 44 px`, ARIA, `Escape`, backdrop, `forced-colors` e `prefers-reduced-motion`.
+- [ ] Abrir PR e confirmar auditoria de dependências, typecheck, lint, testes, build, Worker dry-run e smoke test.
+- [ ] Integrar apenas com CI verde.
+- [ ] Confirmar publicação GitHub Pages.
+- [ ] Validar no iPhone que o top bar inteiro permanece visível ao abrir o menu.
+- [ ] Validar no iPhone que o hambúrguer se transforma em X e regressa corretamente.
+- [ ] Validar que drawer/backdrop não cobrem a barra superior.
+- [ ] Validar Android/Chrome entre 360 e 480 px.
+- [ ] Validar tablet/viewport web entre 481 e 899 px.
+- [ ] Validar orientação horizontal/safe-area quando aplicável.
 
 ## P0 — Correção de turnos noturnos
 
