@@ -29,6 +29,8 @@ jobs:
         run: npm test
       - name: Build
         run: npm run build
+      - name: Validar Worker Cloudflare
+        run: npm run worker:check
       - name: Smoke test de arranque no browser
         shell: bash
         run: |
