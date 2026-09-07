@@ -55,7 +55,8 @@ Atualizado em: 2026-09-07
 - [x] Testar conflito simultâneo sem sobrescrita.
 - [x] Confirmar auditoria de dependências, typecheck, lint, testes, build, Worker dry-run e smoke test no head funcional do PR #194.
 - [x] Confirmar Workers Builds do PR #194 no head funcional.
-- [ ] Integrar PR #194 em `main` e confirmar publicação de produção.
+- [x] Integrar PR #194 em `main`.
+- [ ] Confirmar publicação final de produção do PR #194 no fluxo operacional real.
 - [ ] No telemóvel com os dados, confirmar estado **Sincronizado**/revisão remota concluída.
 - [ ] Criar **Associar outro navegador** no telemóvel e abrir a ligação no computador.
 - [ ] Confirmar que o computador pede o mesmo PIN/palavra-passe em vez de criar outro acesso.
@@ -72,6 +73,28 @@ Atualizado em: 2026-09-07
 - [ ] Validar conflito simultâneo sem perda de nenhuma cópia em dispositivos reais.
 - [ ] Validar resoluções mobile/tablet/desktop.
 - [ ] Confirmar que telemóvel e computador usam o mesmo timezone do sistema durante o teste.
+
+## P0 — Menu móvel hambúrguer ↔ X (PR #195)
+
+- [x] Confirmar que existe um único drawer móvel em `AppShell` e que a mesma PWA serve telemóvel e web responsiva.
+- [x] Fazer o botão do top bar alternar `mobileMenuOpen` em vez de apenas abrir.
+- [x] Manter `aria-expanded` sincronizado com o estado real do drawer.
+- [x] Alterar `aria-label` entre **Abrir menu principal** e **Fechar menu principal**.
+- [x] Desenhar o hambúrguer em CSS com três linhas e transformar para **X** por `transform`/`transition`.
+- [x] Ajustar o alvo de toque para `44 × 44 px`.
+- [x] Reservar uma zona lateral para o botão enquanto o drawer está aberto, incluindo `safe-area`.
+- [x] Manter apenas a zona do botão acima do backdrop, sem expor o resto do top bar.
+- [x] Preservar fecho por backdrop, `Escape`, mudança de rota e botão interno.
+- [x] Preservar `prefers-reduced-motion` sem perder funcionalidade.
+- [x] Preservar leitura das linhas em `forced-colors`.
+- [ ] Confirmar typecheck, lint, testes, build, Worker dry-run e smoke test no head final do PR #195.
+- [ ] Validar manualmente hambúrguer → X → hambúrguer por toque num iPhone.
+- [ ] Validar manualmente hambúrguer → X → hambúrguer por toque em Android/Chrome.
+- [ ] Validar tablet e viewport web entre 421 e 899 px.
+- [ ] Validar `Escape`, backdrop e botão interno e confirmar reposição do hambúrguer/ARIA.
+- [ ] Validar safe-area em dispositivo com notch/Dynamic Island e orientação horizontal quando aplicável.
+- [ ] Validar modo claro/escuro, `forced-colors` e `prefers-reduced-motion`.
+- [ ] Integrar PR #195 e confirmar publicação GitHub Pages.
 
 ## P0 — Correção de turnos noturnos
 
