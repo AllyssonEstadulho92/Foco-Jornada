@@ -1,5 +1,39 @@
 # Changelog
 
+## 2026-09-07 — auditoria de consistência móvel ↔ web
+
+### Auditado
+
+- Confirmado que telemóvel e computador executam a mesma PWA React/TypeScript, com as mesmas rotas, páginas, repositories e regras de negócio.
+- Criada matriz factual em `docs/MOBILE-WEB-CONSISTENCY-AUDIT.md` antes das correções desta fase.
+- Revistos IndexedDB, `localStorage`, `sessionStorage`, Zustand, Context, hooks, services, API, endpoint, cache/PWA, ambiente e CSS responsivo.
+- Confirmado que `useWorkHoursStore` e `useNotificationStore` persistem através de `secureStorage` dentro do mesmo cofre cifrado.
+- Confirmado que não existe API/mocks de negócio alternativos por plataforma.
+- Confirmado que a diferença **Jornada ativa** no telemóvel versus **Pronto para começar** no computador representa estado/perfil/cofre diferente e não uma ocultação CSS da mesma jornada.
+
+### Alterado
+
+- `SecureAppBootstrap` passa a agendar reconciliação também quando a janela recupera `focus`.
+- `AppTopBar` passa a apresentar **Sincronizado**, **Pendente**, **Pausada**, **Erro** ou **Conflito** com base no próprio `SecurityProfile.cloudSync`.
+- O indicador adapta a densidade ao mobile e abre diretamente as definições de sincronização.
+- `CloudSyncManager` aceita dependências injetáveis para teste, mantendo `SecurityProfileStore`, `EncryptedVaultStore` e `CloudSyncClient` como defaults de produção.
+
+### Testes
+
+- Adicionado `cloudSyncReplication.test.ts` com duas réplicas lógicas isoladas do mesmo perfil.
+- Validada criação mobile → web, edição web → mobile e eliminação mobile → web.
+- Validada convergência do `secureStorage` na mesma unidade de cofre.
+- Validado conflito simultâneo sem sobrescrever nenhuma das cópias divergentes.
+- No head funcional do PR #194, passaram auditoria de dependências, typecheck, lint, testes, build, `wrangler deploy --dry-run`, smoke test e criação do artefacto.
+- **Workers Builds: foco-jornada** do PR #194 concluiu com sucesso.
+
+### Preservado
+
+- Sem mudança de framework, schema operacional, IndexedDB, cifragem ou protocolo de conflito.
+- Sem reset, migração destrutiva ou eliminação de registos existentes.
+- GitHub Pages continua frontend oficial e Cloudflare Worker continua backend apenas de sync/pairing cifrados.
+- Timezone geral não foi migrado; a dependência do timezone do browser ficou registada para decisão futura.
+
 ## 2026-09-07 — associação de browser sem recriar PIN
 
 ### Corrigido
@@ -30,11 +64,13 @@
 - A ligação temporária deve ser tratada como segredo durante os 10 minutos de validade.
 - Endpoints continuam limitados a HTTPS `workers.dev`/localhost de desenvolvimento.
 
-### Qualidade
+### Qualidade e publicação
 
-- Typecheck da primeira execução do PR #193 concluído com sucesso.
-- A primeira execução de lint identificou duas constantes não utilizadas no Worker; foram removidas sem alterar o protocolo.
-- Quality gates finais e Workers Builds do PR #193 permanecem em validação antes da integração.
+- Typecheck, lint, testes, build, Worker dry-run e smoke test finais do PR #193 concluídos com sucesso.
+- Workers Builds do PR e de produção concluídos com sucesso.
+- PR #193 integrado em `main` no commit `4e879e6d0abf578981ae09d212f25f43d17232cb`.
+- GitHub Pages republicado com sucesso.
+- Workflow **Qualidade** de produção concluído com sucesso.
 
 ## 2026-09-07 — endpoint runtime da sincronização
 
