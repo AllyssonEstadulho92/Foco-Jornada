@@ -1,6 +1,6 @@
 # Decisões Técnicas
 
-Atualizado em: 2026-09-05
+Atualizado em: 2026-09-07
 
 ## D-001 — Manter o menu `···` além do gesto de deslize
 
@@ -43,3 +43,9 @@ Atualizado em: 2026-09-05
 **Decisão:** ao eliminar uma versão ativa, todas as versões futuras não eliminadas com o mesmo `order` também recebem o tombstone.
 
 **Motivo:** uma definição futura já criada representa a continuação do mesmo horário. Preservá-la faria o horário eliminado reaparecer automaticamente no dia seguinte, contrariando a ação explícita do utilizador.
+
+## D-008 — Normalizar horas noturnas pela proximidade ao turno planeado
+
+**Decisão:** quando o turno planeado atravessa a meia-noite, uma hora civil real, de pausa ou de ocorrência é representada no dia inicial ou no dia seguinte conforme a opção que fica temporalmente mais próxima do intervalo planeado.
+
+**Motivo:** a regra anterior deslocava para o dia seguinte qualquer hora inferior à hora de entrada planeada. Num turno **22:00–06:00**, isso transformava uma entrada antecipada às **21:00** numa hora do dia seguinte, quebrando a interseção entre trabalho realizado e trabalho planeado. A nova regra mantém **21:00** no próprio dia, associa **02:00** e **07:00** à manhã seguinte e preserva o comportamento dos turnos diurnos.

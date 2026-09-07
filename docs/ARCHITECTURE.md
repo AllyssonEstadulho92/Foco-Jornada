@@ -1,6 +1,6 @@
 # Arquitetura
 
-Atualizado em: 2026-09-05
+Atualizado em: 2026-09-07
 
 ## Stack confirmada
 
@@ -8,6 +8,26 @@ Atualizado em: 2026-09-05
 - Vite para desenvolvimento e build.
 - Dexie/IndexedDB para persistência local.
 - Vitest para testes automatizados.
+
+## Fluxo relevante — horas de trabalho
+
+```text
+WorkHoursCalculatorPage / registos derivados da jornada
+  └─ calculateWorkHours()
+       ├─ normalização de horas e intervalos
+       ├─ pausas planeadas/reais
+       ├─ ocorrências/ausências
+       ├─ interseção com o turno planeado
+       └─ horas trabalhadas, não trabalhadas, extra e saldo
+```
+
+### Regra temporal para turnos noturnos
+
+`calculateWorkHours` representa internamente um turno que atravessa a meia-noite numa linha temporal contínua. Exemplo: **22:00–06:00** torna-se **1320–1800 minutos**.
+
+Para horas reais, pausas e ocorrências num turno noturno, cada hora civil tem duas representações possíveis: no dia inicial ou no dia seguinte. A normalização escolhe a representação mais próxima do intervalo planeado. Isto evita que uma entrada antecipada, por exemplo **21:00**, seja deslocada incorretamente para o dia seguinte, sem deixar de tratar **02:00** ou **07:00** como horas da manhã seguinte.
+
+A regra de turnos diurnos permanece inalterada. Uma saída realmente anterior à entrada continua a representar passagem pela meia-noite; horas iguais continuam a representar duração zero.
 
 ## Fluxo relevante — medicação
 
@@ -27,6 +47,10 @@ MedicationPrototypeWorkspace
 ```
 
 ## Responsabilidades
+
+### `WorkHours.ts`
+
+É o motor de regras para cálculo de horas planeadas, presença, trabalho efetivo, períodos não trabalhados, horas extra, saldo e ocorrências. Os cálculos usam intervalos normalizados e fundidos para evitar dupla contagem de pausas sobrepostas. A normalização de turnos noturnos deve preservar a relação temporal com o turno planeado, incluindo entrada antecipada e saída tardia.
 
 ### `MedicationsStockPage`
 
@@ -61,6 +85,8 @@ Carrega os horários ativos e o histórico completo de versões. O histórico é
 Versões posteriores do mesmo `order` são apresentadas como **Horário alterado**. Um tombstone gera um único evento visual **Horário eliminado**, mesmo quando a eliminação afeta mais de uma versão futura da mesma cadeia.
 
 ## Dados e auditoria
+
+A correção do motor de horas não altera schema nem persistência; só altera a interpretação temporal no momento do cálculo.
 
 `MedicationSchedule` inclui o campo opcional `deletedAt`. A combinação `deletedAt` + `effectiveUntil` funciona como tombstone lógico. Os filtros existentes baseados em `effectiveFrom/effectiveUntil` deixam automaticamente de devolver o horário eliminado no dia da operação e nas previsões futuras.
 

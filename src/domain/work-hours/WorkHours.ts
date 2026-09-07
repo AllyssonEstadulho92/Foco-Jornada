@@ -160,9 +160,29 @@ function intersectionDuration(left: NumericInterval[], right: NumericInterval[])
   return total
 }
 
+function distanceToInterval(value: number, start: number, end: number): number {
+  if (value < start) return start - value
+  if (value > end) return value - end
+  return 0
+}
+
+function normalizeOvernightClockMinute(
+  rawMinutes: number,
+  plannedStartMinutes: number,
+  plannedEndMinutes: number,
+): number {
+  const sameDay = rawMinutes
+  const nextDay = rawMinutes + 24 * 60
+  const sameDayDistance = distanceToInterval(sameDay, plannedStartMinutes, plannedEndMinutes)
+  const nextDayDistance = distanceToInterval(nextDay, plannedStartMinutes, plannedEndMinutes)
+
+  return nextDayDistance < sameDayDistance ? nextDay : sameDay
+}
+
 function normalizeClockInterval(
   interval: ClockInterval,
   plannedStartMinutes: number,
+  plannedEndMinutes: number,
   overnightShift: boolean,
 ): NumericInterval | null {
   const startRaw = clockToMinutes(interval.start)
@@ -171,8 +191,10 @@ function normalizeClockInterval(
 
   let start = startRaw
   let end = endRaw
-  if (overnightShift && start < plannedStartMinutes) start += 24 * 60
-  if (overnightShift && end < plannedStartMinutes) end += 24 * 60
+  if (overnightShift) {
+    start = normalizeOvernightClockMinute(startRaw, plannedStartMinutes, plannedEndMinutes)
+    end = normalizeOvernightClockMinute(endRaw, plannedStartMinutes, plannedEndMinutes)
+  }
   // Horas iguais representam duração zero. Só uma saída realmente anterior à entrada atravessa a meia-noite.
   if (end < start) end += 24 * 60
   return { start, end }
@@ -181,11 +203,12 @@ function normalizeClockInterval(
 function normalizeIntervals(
   intervals: ClockInterval[] | undefined,
   plannedStartMinutes: number,
+  plannedEndMinutes: number,
   overnightShift: boolean,
 ) {
   return mergeIntervals(
     (intervals ?? [])
-      .map((item) => normalizeClockInterval(item, plannedStartMinutes, overnightShift))
+      .map((item) => normalizeClockInterval(item, plannedStartMinutes, plannedEndMinutes, overnightShift))
       .filter((item): item is NumericInterval => item !== null),
   )
 }
@@ -194,12 +217,14 @@ function presenceFromLegacyTimes(
   startValue: string,
   endValue: string,
   plannedStartMinutes: number,
+  plannedEndMinutes: number,
   overnightShift: boolean,
 ): NumericInterval[] {
   if (!startValue || !endValue) return []
   const interval = normalizeClockInterval(
     { start: startValue, end: endValue },
     plannedStartMinutes,
+    plannedEndMinutes,
     overnightShift,
   )
   return interval ? [interval] : []
@@ -228,7 +253,7 @@ export function calculateWorkHours(input: WorkHoursEntryInput): WorkHoursCalcula
   const plannedShift: NumericInterval[] = plannedWorkingDay && plannedEnd > plannedStartRaw
     ? [{ start: plannedStartRaw, end: plannedEnd }]
     : []
-  const exactPlannedBreaks = normalizeIntervals(input.plannedBreaks, plannedStartRaw, overnightShift)
+  const exactPlannedBreaks = normalizeIntervals(input.plannedBreaks, plannedStartRaw, plannedEnd, overnightShift)
   const hasExactPlannedBreaks = Array.isArray(input.plannedBreaks)
   const plannedWorkIntervals = hasExactPlannedBreaks
     ? subtractIntervals(plannedShift, exactPlannedBreaks)
@@ -238,18 +263,19 @@ export function calculateWorkHours(input: WorkHoursEntryInput): WorkHoursCalcula
     : Math.max(0, totalDuration(plannedShift) - safeMinutes(input.plannedBreakMinutes))
 
   const actualPresence = input.actualSegments?.length
-    ? normalizeIntervals(input.actualSegments, plannedStartRaw, overnightShift)
-    : presenceFromLegacyTimes(input.actualStart, input.actualEnd, plannedStartRaw, overnightShift)
+    ? normalizeIntervals(input.actualSegments, plannedStartRaw, plannedEnd, overnightShift)
+    : presenceFromLegacyTimes(input.actualStart, input.actualEnd, plannedStartRaw, plannedEnd, overnightShift)
   const presenceMinutes = totalDuration(actualPresence)
 
   const occurrenceIntervals = input.occurrenceStart && input.occurrenceEnd
     ? normalizeIntervals(
         [{ start: input.occurrenceStart, end: input.occurrenceEnd }],
         plannedStartRaw,
+        plannedEnd,
         overnightShift,
       )
     : []
-  const exactActualBreaks = normalizeIntervals(input.actualBreaks, plannedStartRaw, overnightShift)
+  const exactActualBreaks = normalizeIntervals(input.actualBreaks, plannedStartRaw, plannedEnd, overnightShift)
   const hasExactActualBreaks = Array.isArray(input.actualBreaks)
 
   const presenceWithoutOccurrence = subtractIntervals(actualPresence, occurrenceIntervals)
