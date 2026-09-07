@@ -97,3 +97,29 @@ O endpoint runtime só é aceite se for HTTPS em `workers.dev` (ou localhost em 
 - o utilizador só precisa de introduzir o endpoint uma vez no dispositivo de referência quando a variável de build estiver ausente;
 - um endpoint falso ou incompatível não é guardado porque precisa de responder corretamente a `/health`;
 - custom domains continuam fora deste fluxo até CSP e origem permitida serem revistos explicitamente.
+
+## D-013 — Browser novo associa-se ao perfil existente por canal temporário cifrado
+
+**Estado:** proposto/implementado no PR #193, pendente de integração e validação física.
+
+**Decisão:** um browser sem `SecurityProfile` não deve criar automaticamente outra credencial quando o utilizador já possui um perfil noutro dispositivo. O fluxo principal passa a ser **Associar outro navegador**.
+
+O dispositivo já autorizado cria uma ligação temporária com segredo raiz aleatório de 256 bits. A partir desse segredo são derivados, com contextos criptográficos separados:
+
+- uma chave AES-GCM para cifrar o `SecurityProfile` necessário ao bootstrap;
+- um token HTTP de autenticação do canal temporário.
+
+O segredo raiz permanece apenas na ligação `#pair=...` e não é enviado ao Worker. O Worker recebe o perfil já cifrado, guarda apenas um hash do token e aplica validade de 10 minutos. O payload é eliminado depois de uma redenção bem-sucedida e por alarme quando expira.
+
+O canal temporário não transporta o cofre operacional. Depois de importar o perfil, o novo browser exige o mesmo PIN/palavra-passe existente; só depois deriva a `dataKey` e usa o protocolo normal de sincronização para obter e validar o `EncryptedVaultRecord` remoto.
+
+**Motivo:** `IndexedDB` e `localStorage` são isolados entre browsers. Cloud sync por si só não consegue arrancar num browser vazio porque falta o material criptográfico local necessário para autenticar e desencriptar o cofre. Guardar PIN/palavra-passe no servidor ou permitir bootstrap remoto apenas com um PIN de 6 dígitos aumentaria materialmente o risco de força bruta/offline.
+
+**Consequências:**
+
+- mudar de browser deixa de implicar criar um novo PIN/perfil;
+- a associação continua a ser uma operação explícita uma vez por browser;
+- a ligação temporária deve ser tratada como segredo e não deve ser publicada;
+- é necessária pelo menos uma sincronização remota concluída antes de gerar a ligação;
+- a importação de cópia segura permanece como fallback;
+- não existe fusão automática entre perfis independentes.
