@@ -1,5 +1,28 @@
 # Changelog
 
+## 2026-09-07 — endpoint runtime da sincronização
+
+### Alterado
+
+- `CloudSyncProfileState` passa a aceitar o endpoint público do Worker no próprio perfil.
+- `CloudSyncManager` usa o endpoint do perfil antes do fallback `VITE_SYNC_API_URL`.
+- A área **Privacidade e acesso** permite introduzir, validar e atualizar o endereço do Worker diretamente na aplicação.
+- Uma ligação válida ativa a sincronização e reinicia a base de revisão remota se o servidor tiver mudado.
+- A cópia segura passa a transportar naturalmente o endpoint juntamente com os restantes metadados do perfil.
+
+### Segurança
+
+- Endpoints introduzidos em runtime só são aceites em HTTPS `workers.dev` (ou localhost em desenvolvimento).
+- URLs com credenciais, query string ou fragmento são rejeitados.
+- Antes de guardar, a aplicação chama `/health` e exige `ok: true` e `service: foco-jornada-sync`.
+- O endpoint é configuração pública; PIN, palavra-passe, código de recuperação e `dataKey` continuam sem sair do cliente.
+
+### Testes
+
+- Adicionados testes de normalização/rejeição de endpoint.
+- Adicionados testes de validação da identidade do serviço através de `/health`.
+- PR #192 criado para executar os quality gates antes da integração.
+
 ## 2026-09-07 — sincronização entre dispositivos
 
 ### Adicionado
@@ -29,20 +52,15 @@
 - `connect-src` passa a autorizar a própria origem e endpoints HTTPS `workers.dev`.
 - `.wrangler` e `.dev.vars*` passam a ser ignorados pelo Git.
 
-### Qualidade
+### Qualidade e distribuição
 
 - Workflow GitHub **Qualidade** do PR #191 aprovado com auditoria de dependências, typecheck, lint, testes, build, smoke test e artefacto.
 - Bundle e configuração do Worker aprovados por `wrangler deploy --dry-run`.
-- O check Cloudflare de PR continua a falhar porque a criação inicial da classe Durable Object `SyncVault` altera o ciclo de vida e branches não produtivas usam `wrangler versions upload`, que não aplica esse tipo de alteração.
-- O bootstrap correto passa a ser a integração em `main`, onde Workers Builds usa `wrangler deploy` para a publicação de produção.
+- PR #191 integrado em `main`.
+- Workers Builds do branch de produção concluído com sucesso e Durable Object `SyncVault` publicado.
+- GitHub Pages continua a ser o frontend oficial e foi republicado após a integração.
 
-### Distribuição
-
-- GitHub Pages continua a ser o frontend oficial.
-- O workflow de publicação passa `VITE_SYNC_API_URL` a partir de uma variável do repositório.
-- A sincronização só é considerada operacional depois do Worker de produção publicar, o endpoint ser ligado ao frontend e o fluxo ser validado em dois dispositivos.
-
-## 2026-09-07
+## 2026-09-07 — turnos noturnos
 
 ### Corrigido
 
@@ -64,12 +82,6 @@
 - PR #189 integrado em `main`.
 - Commit: `90d19791f7892e51c5baf2c27967d53e7b464b8c`.
 - Workflow **Publicar Foco & Jornada** / GitHub Pages concluído com sucesso.
-- A distribuição oficial permanece GitHub Pages.
-
-### Observação operacional
-
-- O check externo **Workers Builds: foco-jornada** da integração Cloudflare falhou no PR e no commit integrado.
-- A integração Cloudflare passou posteriormente a ter uma finalidade explícita de backend de sincronização, implementada no PR #191.
 
 ## 2026-09-05
 
