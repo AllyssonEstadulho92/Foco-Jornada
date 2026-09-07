@@ -9,6 +9,7 @@ export type CloudSyncStatus = 'synced' | 'conflict' | 'error'
 
 export interface CloudSyncProfileState {
   enabled: boolean
+  endpoint?: string
   remoteRevision?: number
   lastSyncedFingerprint?: string
   lastSyncedAt?: string
@@ -54,10 +55,20 @@ function normalizeEndpoint(raw: string | undefined): string | null {
     const url = new URL(value)
     const isLocal = url.hostname === 'localhost' || url.hostname === '127.0.0.1'
     if (url.protocol !== 'https:' && !(isLocal && url.protocol === 'http:')) return null
+    if (url.username || url.password || url.search || url.hash) return null
     return `${url.origin}${url.pathname.replace(/\/+$/, '')}`
   } catch {
     return null
   }
+}
+
+export function normalizeCloudSyncEndpoint(raw: string): string | null {
+  const endpoint = normalizeEndpoint(raw)
+  if (!endpoint) return null
+  const url = new URL(endpoint)
+  const isLocal = url.hostname === 'localhost' || url.hostname === '127.0.0.1'
+  if (!isLocal && !url.hostname.endsWith('.workers.dev')) return null
+  return endpoint
 }
 
 function isEncryptedVaultRecord(value: unknown, profileId: string): value is EncryptedVaultRecord {
@@ -85,8 +96,11 @@ function isRemoteVaultEnvelope(value: unknown, profileId: string): value is Remo
     && isEncryptedVaultRecord(envelope.vault, profileId)
 }
 
-export function getCloudSyncEndpoint(): string | null {
-  return normalizeEndpoint(import.meta.env.VITE_SYNC_API_URL)
+export function getCloudSyncEndpoint(profile?: Pick<SecurityProfile, 'cloudSync'>): string | null {
+  const profileEndpoint = profile?.cloudSync?.endpoint
+    ? normalizeCloudSyncEndpoint(profile.cloudSync.endpoint)
+    : null
+  return profileEndpoint ?? normalizeEndpoint(import.meta.env.VITE_SYNC_API_URL)
 }
 
 export async function deriveCloudSyncToken(dataKey: CryptoKey, profileId: string): Promise<string> {
@@ -159,6 +173,27 @@ export class CloudSyncClient {
     }
   }
 
+  async checkHealth(): Promise<void> {
+    const response = await this.fetcher(`${this.endpoint}/health`, {
+      method: 'GET',
+      cache: 'no-store',
+      credentials: 'omit',
+      referrerPolicy: 'no-referrer',
+    })
+    if (!response.ok) throw await parseError(response)
+
+    let value: unknown
+    try {
+      value = await response.json() as unknown
+    } catch {
+      throw new CloudSyncHttpError('O endpoint Cloudflare não devolveu uma resposta de saúde válida.', 502)
+    }
+    const health = value as { ok?: unknown; service?: unknown }
+    if (health?.ok !== true || health.service !== 'foco-jornada-sync') {
+      throw new CloudSyncHttpError('O endereço indicado não corresponde ao serviço de sincronização do Foco Jornada.', 502)
+    }
+  }
+
   async getVault(profileId: string, token: string): Promise<RemoteVaultEnvelope | null> {
     const response = await this.fetcher(this.url(profileId), {
       method: 'GET',
@@ -196,8 +231,12 @@ export class CloudSyncManager {
   private readonly vaults = new EncryptedVaultStore()
   private queue: Promise<void> = Promise.resolve()
 
-  isConfigured(): boolean {
-    return getCloudSyncEndpoint() !== null
+  getEndpoint(profile?: SecurityProfile): string | null {
+    return getCloudSyncEndpoint(profile)
+  }
+
+  isConfigured(profile?: SecurityProfile): boolean {
+    return this.getEndpoint(profile) !== null
   }
 
   private enqueue<T>(operation: () => Promise<T>): Promise<T> {
@@ -251,9 +290,36 @@ export class CloudSyncManager {
     }
   }
 
+  async configureEndpoint(session: SecuritySession, rawEndpoint: string): Promise<SecuritySession> {
+    return this.enqueue(async () => {
+      const endpoint = normalizeCloudSyncEndpoint(rawEndpoint)
+      if (!endpoint) {
+        throw new Error('Indica um endereço HTTPS válido do Worker Cloudflare em workers.dev.')
+      }
+
+      const client = new CloudSyncClient(endpoint)
+      await client.checkHealth()
+
+      const current = await this.profiles.get(session.profile.id)
+      if (!current) throw new Error('Perfil local não encontrado durante a configuração da sincronização.')
+      const previousEndpoint = this.getEndpoint(current)
+      const endpointChanged = previousEndpoint !== endpoint
+      const profile = await this.updateSyncState(session.profile.id, {
+        endpoint,
+        enabled: true,
+        remoteRevision: endpointChanged ? undefined : current.cloudSync?.remoteRevision,
+        lastSyncedFingerprint: endpointChanged ? undefined : current.cloudSync?.lastSyncedFingerprint,
+        lastSyncedAt: endpointChanged ? undefined : current.cloudSync?.lastSyncedAt,
+        lastStatus: endpointChanged ? undefined : current.cloudSync?.lastStatus,
+        lastError: undefined,
+      })
+      return { ...session, profile }
+    })
+  }
+
   async setEnabled(session: SecuritySession, enabled: boolean): Promise<SecuritySession> {
     return this.enqueue(async () => {
-      if (enabled && !this.isConfigured()) {
+      if (enabled && !this.isConfigured(session.profile)) {
         throw new Error('O endereço do serviço de sincronização ainda não está configurado nesta publicação.')
       }
       const profile = await this.updateSyncState(session.profile.id, {
@@ -277,7 +343,7 @@ export class CloudSyncManager {
     let currentSession: SecuritySession = { ...session, profile: currentProfile }
     if (!currentProfile.cloudSync?.enabled) return { action: 'disabled', session: currentSession }
 
-    const endpoint = getCloudSyncEndpoint()
+    const endpoint = this.getEndpoint(currentProfile)
     if (!endpoint) {
       const message = 'O serviço de sincronização não está configurado nesta publicação.'
       const profile = await this.updateSyncState(currentProfile.id, {
