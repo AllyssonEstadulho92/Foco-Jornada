@@ -4,7 +4,7 @@ Atualizado em: 2026-09-07
 
 ## P0 — Sincronização móvel e computador
 
-- [x] Confirmar que o desalinhamento atual resulta de cofres locais independentes por dispositivo.
+- [x] Confirmar que o desalinhamento resultava de cofres locais independentes por dispositivo.
 - [x] Definir Cloudflare Workers como backend de sincronização, mantendo GitHub Pages como frontend oficial.
 - [x] Versionar `wrangler.toml` e Worker com Durable Object por perfil.
 - [x] Manter o payload remoto cifrado; não enviar PIN, palavra-passe, código de recuperação ou `dataKey` original.
@@ -12,20 +12,19 @@ Atualizado em: 2026-09-07
 - [x] Separar revisão remota da revisão local do cofre.
 - [x] Implementar fingerprint da última base sincronizada e deteção de conflito bilateral.
 - [x] Interromper sincronização sem sobrescrita quando local e remoto divergem em simultâneo.
-- [x] Validar a estrutura do envelope remoto antes de o aceitar.
-- [x] Autenticar/desencriptar e validar o snapshot remoto antes de substituir o cofre local.
+- [x] Validar a estrutura e autenticação criptográfica do cofre remoto antes de o aceitar.
 - [x] Reabrir o runtime após receber uma cópia remota para refletir os dados na interface.
 - [x] Disparar sincronização após gravações locais, regresso ao primeiro plano, recuperação de rede e por intervalo.
-- [x] Adicionar controlo **Ativar/Desativar sincronização** nas definições de segurança.
-- [x] Integrar `VITE_SYNC_API_URL` no build GitHub Pages.
-- [x] Restringir CSP do frontend a Workers HTTPS para a ligação remota.
-- [x] Confirmar typecheck, lint, testes, build e smoke test no PR #191.
-- [x] Adicionar `npm run worker:check` e validar `wrangler deploy --dry-run` no workflow **Qualidade**.
-- [x] Identificar que o check Cloudflare de PR usa `wrangler versions upload` e não pode aplicar a criação inicial de `SyncVault`.
-- [ ] Integrar o PR #191 em `main` para executar o bootstrap de produção com `wrangler deploy`.
-- [ ] Confirmar que **Workers Builds: foco-jornada** passa no branch de produção e cria `SyncVault`.
-- [ ] Obter o URL real do Worker publicado e ligar o frontend ao endpoint.
-- [ ] Confirmar nova publicação GitHub Pages com o endpoint de sincronização.
+- [x] Integrar PR #191 em `main`.
+- [x] Confirmar **Workers Builds: foco-jornada** com sucesso no branch de produção.
+- [x] Confirmar nova publicação GitHub Pages após a integração.
+- [x] Criar fallback de configuração do endpoint no próprio perfil para não depender exclusivamente de `VITE_SYNC_API_URL`.
+- [x] Validar endpoint runtime como HTTPS `workers.dev`, sem credenciais/query/hash.
+- [x] Validar `/health` e a identidade `foco-jornada-sync` antes de guardar/ativar a ligação.
+- [x] Fazer o endpoint acompanhar a cópia segura do perfil para o segundo dispositivo.
+- [ ] Confirmar quality gates do PR #192.
+- [ ] Integrar PR #192 em `main` e confirmar nova publicação GitHub Pages.
+- [ ] Introduzir uma vez o endpoint `workers.dev` real do Worker no dispositivo de referência, caso a variável de build continue vazia.
 - [ ] Emparelhar o segundo dispositivo através de cópia segura do perfil de referência.
 - [ ] Validar móvel → computador e computador → móvel com dados reais.
 - [ ] Validar funcionamento offline seguido de sincronização após recuperar ligação.
