@@ -9,7 +9,7 @@ Atualizado em: 2026-09-07
 - Cofre cifrado sobre IndexedDB para persistência operacional local.
 - Vitest para testes automatizados.
 - GitHub Pages como frontend oficial.
-- Cloudflare Worker + Durable Objects como backend de sincronização cifrada.
+- Cloudflare Worker + Durable Objects como backend de sincronização cifrada e associação temporária entre browsers.
 
 ## Sincronização móvel ↔ computador
 
@@ -34,8 +34,6 @@ AppDatabase
 O endpoint pode vir de `SecurityProfile.cloudSync.endpoint`. Se não existir, o cliente tenta `VITE_SYNC_API_URL` injetado no build.
 
 Um endpoint introduzido pela interface é tratado como configuração pública, não como segredo. A aplicação só aceita HTTPS em `workers.dev` (ou localhost em desenvolvimento), rejeita credenciais, query string e fragmentos e chama `GET /health`. A configuração só é guardada quando a resposta identifica explicitamente `foco-jornada-sync`.
-
-O endpoint guardado faz parte do `SecurityProfile` e, por consequência, acompanha a cópia segura do perfil para o segundo dispositivo.
 
 ### Segurança da sincronização
 
@@ -68,11 +66,66 @@ Regras:
 
 A sincronização é tentada no desbloqueio, após gravações locais, no regresso ao primeiro plano, quando a rede regressa e periodicamente. Falhas remotas não anulam gravações locais.
 
-### Primeiro emparelhamento
+## Bootstrap de um navegador novo
 
-Dois dispositivos só sincronizam automaticamente se representarem o mesmo perfil criptográfico. O dispositivo de referência valida/ativa o endpoint e exporta a cópia segura. O segundo dispositivo importa essa cópia, recebendo `profileId`, material de chave protegido, cofre e configuração do endpoint.
+### Problema arquitetural
 
-Perfis criados separadamente não são fundidos automaticamente.
+`SecurityProfile` e a seleção ativa são locais a cada browser. Um browser vazio não possui `profileId`, KDF, `wrappedDataKey` nem configuração de sincronização. Logo, embora o cofre cifrado exista no Worker, esse browser não consegue autenticá-lo/desencriptá-lo apenas com um formulário de PIN vazio.
+
+### Fluxo de associação temporária
+
+```text
+Browser A já autorizado
+  └─ SecuritySettingsPanel
+       └─ BrowserPairingManager.create()
+            ├─ exige cloudSync ativa + remoteRevision confirmada
+            ├─ gera pairingId aleatório
+            ├─ gera segredo raiz de 256 bits
+            ├─ deriva chave AES de associação
+            ├─ deriva token HTTP separado
+            ├─ cifra SecurityProfile
+            └─ PUT /v1/pair/:pairingId
+                 └─ Durable Object SyncVault (namespace pair:)
+                      ├─ ciphertext temporário
+                      ├─ hash do token
+                      └─ expiresAt + alarm (10 min)
+
+Ligação #pair=... aberta no Browser B
+  └─ SecurityGate
+       └─ BrowserPairingManager.redeem()
+            ├─ GET /v1/pair/:pairingId
+            ├─ autentica/desencripta SecurityProfile
+            ├─ SecurityManager.importPairedProfile()
+            ├─ DELETE /v1/pair/:pairingId
+            └─ pede o mesmo PIN/palavra-passe
+                 └─ SecureAppBootstrap
+                      └─ CloudSyncManager.reconcile()
+                           └─ recebe e valida EncryptedVaultRecord remoto
+```
+
+O fragmento `#pair=...` contém endpoint, `pairingId` e segredo raiz. Fragmentos não fazem parte do pedido HTTP normal da página. O segredo raiz não é enviado ao Worker; dele são derivados localmente materiais diferentes para cifragem e autenticação.
+
+O payload temporário contém apenas o `SecurityProfile` necessário para bootstrap, já cifrado pela chave de associação. O cofre de dados não é duplicado nesse canal: depois do mesmo PIN/palavra-passe desbloquear a `dataKey`, o browser usa a sincronização normal para descarregar o cofre remoto.
+
+### Regras de segurança da associação
+
+- segredo raiz aleatório de 256 bits;
+- chave de cifragem e token HTTP derivados com contextos distintos;
+- Worker armazena apenas ciphertext, hash do token e validade;
+- associação expira em 10 minutos;
+- redenção bem-sucedida elimina o payload remoto;
+- alarme do Durable Object elimina associações não usadas após expiração;
+- endpoint permanece restrito a HTTPS `workers.dev`/localhost de desenvolvimento;
+- o PIN/palavra-passe nunca é enviado no fluxo de associação;
+- perfis independentes não são fundidos.
+
+### UX de browser vazio
+
+Quando `profiles.length === 0`, `SecurityGate` abre **Já tens acesso noutro dispositivo?** em vez de **Criar acesso**. O utilizador pode:
+
+- abrir/colar uma ligação temporária;
+- importar uma cópia segura;
+- criar um perfil novo apenas por escolha explícita.
 
 ## Rotas remotas
 
@@ -88,19 +141,43 @@ Lê a última cópia cifrada. Exige `Authorization: Bearer <token derivado>`.
 
 Grava uma nova cópia cifrada quando `expectedRevision` coincide com a revisão remota atual. Divergência devolve conflito e não grava.
 
+### `PUT /v1/pair/:pairingId`
+
+Cria um envelope temporário cifrado de associação. Exige token aleatório derivado do segredo raiz. TTL fixo: 10 minutos.
+
+### `GET /v1/pair/:pairingId`
+
+Lê o envelope temporário quando o token apresentado corresponde ao hash guardado e a associação ainda não expirou.
+
+### `DELETE /v1/pair/:pairingId`
+
+Remove a associação depois de o novo browser autenticar e desencriptar o perfil recebido.
+
 ## Componentes principais
 
 ### `src/security/cloudSync.ts`
 
 Normaliza/valida endpoint, deriva autenticação, calcula fingerprints, implementa cliente HTTP, reconciliação e deteção de conflitos.
 
+### `src/security/browserPairing.ts`
+
+Gera/valida ligações temporárias, deriva material criptográfico separado para autenticação/cifragem, cifra/desencripta o `SecurityProfile` e coordena PUT/GET/DELETE das associações.
+
+### `src/security/SecurityManager.ts`
+
+Mantém criação/desbloqueio/recuperação local e passa a validar/importar um `SecurityProfile` associado sem criar nova credencial nem novo `profileId`.
+
+### `src/security/SecurityGate.tsx`
+
+Distingue browser vazio de utilizador novo. Num browser sem perfil apresenta associação/importação antes da criação de novo acesso e processa automaticamente ligações `#pair=...`.
+
 ### `src/security/SecurityContext.tsx`
 
-Expõe ao UI estado, endpoint, configuração e ativação/desativação da sincronização.
+Expõe ao UI estado, endpoint, configuração de sincronização e criação de associação temporária.
 
 ### `src/security/SecuritySettingsPanel.tsx`
 
-Permite validar/atualizar o endpoint e apresenta o estado da sincronização em **Privacidade e acesso**.
+Permite validar/atualizar o endpoint, gerir sincronização e gerar/partilhar a ligação temporária para outro browser.
 
 ### `src/security/SecureAppBootstrap.tsx`
 
@@ -108,7 +185,7 @@ Reconcilia antes de abrir a base, agenda sincronizações em runtime e reabre o 
 
 ### `cloudflare/sync-worker.js`
 
-Valida origem, autenticação, payload e revisão; delega cada perfil ao Durable Object `SyncVault`.
+Valida origem, autenticação, payload e revisão. Usa o mesmo Durable Object `SyncVault`, com nomes distintos para cofres (`profileId`) e associações (`pair:<pairingId>`), sem introduzir nova classe/migração de Durable Object.
 
 ### `wrangler.toml`
 
@@ -157,5 +234,7 @@ Quality gates obrigatórios: auditoria de dependências, typecheck, lint, testes
 
 - Controlo de sincronização usa texto e estado legível, sem depender apenas de cor.
 - Campo do endpoint usa input de URL compatível com teclado móvel.
-- Ações continuam disponíveis por teclado/rato/toque.
-- `prefers-reduced-motion` e `forced-colors` continuam preservados nas áreas já suportadas.
+- Associação de browser possui formulário utilizável por teclado, toque e rato.
+- Importação de cópia segura permanece disponível como alternativa.
+- Ações destrutivas e estados de erro continuam textuais.
+- `forced-colors` é preservado na nova área de associação.
