@@ -17,11 +17,15 @@
 - Antes de guardar, a aplicação chama `/health` e exige `ok: true` e `service: foco-jornada-sync`.
 - O endpoint é configuração pública; PIN, palavra-passe, código de recuperação e `dataKey` continuam sem sair do cliente.
 
-### Testes
+### Testes e publicação
 
 - Adicionados testes de normalização/rejeição de endpoint.
 - Adicionados testes de validação da identidade do serviço através de `/health`.
-- PR #192 criado para executar os quality gates antes da integração.
+- PR #192 aprovado em auditoria de dependências, typecheck, lint, testes, build, `worker:check` e smoke test.
+- Check **Workers Builds: foco-jornada** do PR #192 concluído com sucesso.
+- PR #192 integrado em `main` no commit `15a580440575142589c577b1dd32a96d51f8326f`.
+- Workers Builds de produção concluído com sucesso após a integração.
+- GitHub Pages republicado com sucesso.
 
 ## 2026-09-07 — sincronização entre dispositivos
 
