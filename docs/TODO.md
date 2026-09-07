@@ -2,6 +2,28 @@
 
 Atualizado em: 2026-09-07
 
+## P0 — Sincronização móvel e computador
+
+- [x] Confirmar que o desalinhamento atual resulta de cofres locais independentes por dispositivo.
+- [x] Definir Cloudflare Workers como backend de sincronização, mantendo GitHub Pages como frontend oficial.
+- [x] Versionar `wrangler.toml` e Worker com Durable Object por perfil.
+- [x] Manter o payload remoto cifrado; não enviar PIN, palavra-passe, código de recuperação ou `dataKey` original.
+- [x] Derivar token de sincronização com contexto próprio e guardar apenas hash no backend.
+- [x] Separar revisão remota da revisão local do cofre.
+- [x] Implementar fingerprint da última base sincronizada e deteção de conflito bilateral.
+- [x] Interromper sincronização sem sobrescrita quando local e remoto divergem em simultâneo.
+- [x] Disparar sincronização após gravações locais, regresso ao primeiro plano, recuperação de rede e por intervalo.
+- [x] Adicionar controlo **Ativar/Desativar sincronização** nas definições de segurança.
+- [x] Integrar `VITE_SYNC_API_URL` no build GitHub Pages.
+- [x] Restringir CSP do frontend a Workers HTTPS para a ligação remota.
+- [ ] Confirmar typecheck, lint, testes, build e smoke test no PR.
+- [ ] Confirmar que **Workers Builds: foco-jornada** passa com `wrangler.toml` versionado.
+- [ ] Obter o URL real do Worker publicado e configurar a variável GitHub `VITE_SYNC_API_URL`.
+- [ ] Emparelhar o segundo dispositivo através de cópia segura do perfil de referência.
+- [ ] Validar móvel → computador e computador → móvel com dados reais.
+- [ ] Validar funcionamento offline seguido de sincronização após recuperar ligação.
+- [ ] Validar conflito simultâneo sem perda de nenhuma cópia.
+
 ## P0 — Correção de turnos noturnos
 
 - [x] Reproduzir logicamente o erro de entrada antecipada num turno **22:00–06:00**.
@@ -16,12 +38,6 @@ Atualizado em: 2026-09-07
 - [ ] Validar manualmente um registo real de turno noturno com entrada antecipada.
 - [ ] Validar manualmente um registo real de turno noturno com saída tardia.
 
-## P1 — Integrações e distribuição
-
-- [ ] Rever o check externo **Workers Builds: foco-jornada**, que falhou no PR #189 e no commit integrado em `main`.
-- [ ] Se Cloudflare Workers não fizer parte da arquitetura pretendida, remover/desativar a integração no serviço para evitar checks falhados sem utilidade.
-- [ ] Se Cloudflare Workers for necessário, consultar os logs do Cloudflare e documentar build, output e estratégia de publicação antes de o considerar caminho suportado.
-
 ## P1 — Validação de interface em dispositivo real
 
 - [ ] Testar o deslize de medicação num iPhone real, incluindo scroll vertical da página.
@@ -33,6 +49,8 @@ Atualizado em: 2026-09-07
 
 ## P2 — Melhoria futura
 
+- [ ] Criar um fluxo explícito de resolução de conflitos apenas depois de validar o comportamento conservador atual em uso real.
+- [ ] Avaliar eliminação autenticada da cópia remota quando um perfil é removido localmente.
 - [ ] Avaliar um indicador discreto de que a linha de medicação admite deslize sem aumentar ruído visual.
 - [ ] Avaliar um filtro adicional por tipo de evento apenas se o volume de histórico funcional justificar.
 - [ ] Acrescentar casos de teste noturnos adicionais se surgirem horários reais próximos do ponto médio entre o fim e o início do turno.
