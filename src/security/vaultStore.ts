@@ -10,6 +10,7 @@ export interface EncryptedVaultRecord extends EncryptedValue {
 const DB_NAME = 'foco-jornada-vault-v1'
 const STORE_NAME = 'vaults'
 const DB_VERSION = 1
+const CLOUD_SYNC_VAULT_SAVED_EVENT = 'foco-jornada:cloud-sync-vault-saved'
 
 function openVaultDb(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
@@ -40,6 +41,11 @@ function transactionDone(transaction: IDBTransaction): Promise<void> {
 
 function context(profileId: string): string {
   return `foco-jornada:vault:${profileId}:v1`
+}
+
+function signalLocalVaultSaved(profileId: string): void {
+  if (typeof window === 'undefined') return
+  window.dispatchEvent(new CustomEvent(CLOUD_SYNC_VAULT_SAVED_EVENT, { detail: { profileId } }))
 }
 
 export class EncryptedVaultStore {
@@ -100,6 +106,7 @@ export class EncryptedVaultStore {
       }
       store.put(record)
       await transactionDone(transaction)
+      signalLocalVaultSaved(profileId)
       return revision
     } finally {
       db.close()
