@@ -8,6 +8,7 @@ import {
   useRef,
   type ReactNode,
 } from 'react'
+import { cloudSyncManager } from './cloudSync'
 import {
   securityManager,
   type SecuritySession,
@@ -25,6 +26,8 @@ interface SecurityContextValue {
     nextType: 'pin' | 'password',
   ) => Promise<void>
   rotateRecoveryCode: () => Promise<string>
+  cloudSyncConfigured: boolean
+  setCloudSyncEnabled: (enabled: boolean) => Promise<void>
 }
 
 const SecurityContext = createContext<SecurityContextValue | null>(null)
@@ -104,6 +107,10 @@ export function SecurityProvider({
       const result = await securityManager.rotateRecoveryCode(session)
       onSessionChange(result.session)
       return result.recoveryCode
+    },
+    cloudSyncConfigured: cloudSyncManager.isConfigured(),
+    setCloudSyncEnabled: async (enabled) => {
+      onSessionChange(await cloudSyncManager.setEnabled(session, enabled))
     },
   }), [lock, onSessionChange, session])
 
