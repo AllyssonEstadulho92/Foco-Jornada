@@ -198,14 +198,14 @@
 /* Tablet e telemóvel. */
 @media(max-width:899px){
   .appTopBar{
-    min-height:54px!important;
+    min-height:calc(64px + env(safe-area-inset-top))!important;
     align-items:center!important;
-    padding:7px max(12px,env(safe-area-inset-right)) 7px max(12px,env(safe-area-inset-left))!important;
+    padding:max(var(--space-2),env(safe-area-inset-top)) max(var(--page-padding-mobile),env(safe-area-inset-right)) var(--space-2) max(var(--page-padding-mobile),env(safe-area-inset-left))!important;
   }
   .mobileMenuButton{
     width: var(--control-height-compact);
     height: var(--control-height-compact);
-    flex-basis:36px;
+    flex-basis:var(--control-height-compact);
     border-radius:11px;
   }
   .mobileMenuButton svg{
