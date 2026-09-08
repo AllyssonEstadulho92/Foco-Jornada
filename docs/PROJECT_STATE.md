@@ -1,6 +1,6 @@
 # Estado do Projeto
 
-Atualizado em: 2026-09-07
+Atualizado em: 2026-09-08
 
 ## Estado atual
 
@@ -184,3 +184,21 @@ Corrigida na branch `fix/mobile-menu-persistent-topbar` a hierarquia do shell m�
 5. validar Android/tablet e viewport web abaixo de 900 px;
 6. validar `focus-visible`, `forced-colors` e `prefers-reduced-motion`;
 7. continuar a validação física da sincronização móvel ↔ computador com o mesmo perfil/cofre.
+
+## Ecrã de arranque com logótipo animado — PR #200
+
+A captura real de iPhone em 2026-09-08 confirmou que o fallback de arranque apresentava apenas **Foco Jornada** e **A carregar a aplicação…**. O projeto já possui `logo-mark.svg`, usado na identidade da aplicação, pelo que não foi criada nova marca nem nova dependência.
+
+Alteração implementada na branch `feat/animated-loading-logo`:
+
+- o `logo-mark.svg` passa a aparecer acima do nome durante o bootstrap;
+- um aro verde roda em torno do símbolo enquanto a aplicação carrega;
+- o logótipo recebe um pulso muito discreto e um halo suave;
+- tema claro e escuro têm contraste próprio;
+- `prefers-reduced-motion` remove as animações e mantém a identidade estática;
+- o fallback continua com `role="status"` e `aria-live="polite"`;
+- a mudança é exclusivamente visual e não altera dados, sincronização, autenticação, rotas, persistência ou regras de negócio.
+
+### Estado mais recente
+
+PR #200 aberto para validação automática. A integração em `main` deve ocorrer apenas depois de a pipeline **Qualidade** ficar verde; depois do merge, o workflow **Publicar Foco & Jornada** regenerará `index.html` e os assets de GitHub Pages a partir de `src/index.html`.
