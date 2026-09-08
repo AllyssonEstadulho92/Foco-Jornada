@@ -1,6 +1,6 @@
 # Arquitetura
 
-Atualizado em: 2026-09-07
+Atualizado em: 2026-09-08
 
 ## Stack confirmada
 
@@ -318,3 +318,17 @@ GitHub Pages continua a distribuir o frontend. Cloudflare Workers serve apenas a
 - estado de sync tem `aria-label`/texto e não depende apenas de cor;
 - dados compactados em células móveis permanecem acessíveis em editores/rotas funcionais;
 - ações essenciais continuam disponíveis por toque, rato e teclado.
+
+## Bootstrap visual de arranque
+
+Antes da montagem do React existe um fallback estático em `src/index.html`. Esse fallback é responsável apenas por comunicar que a aplicação está a arrancar e por mostrar erros de bootstrap através de `src/boot.ts`.
+
+No PR #200, o fallback passa a reutilizar `logo-mark.svg` e aplica animações CSS locais ao estado de carregamento:
+
+- aro rotativo em torno do símbolo;
+- pulso discreto do próprio logótipo;
+- halo suave sem alterar layout ou bloquear interação;
+- variantes de contraste para tema claro/escuro;
+- `prefers-reduced-motion` desativa movimento e mantém o símbolo estático.
+
+Esta camada não depende de React, não cria store, não lê dados operacionais e não participa em autenticação ou sincronização. O workflow `deploy-pages.yml` continua a executar `npm run build` e a publicar o `dist` resultante na raiz de `main`, pelo que a versão de GitHub Pages deriva sempre de `src/index.html`.
