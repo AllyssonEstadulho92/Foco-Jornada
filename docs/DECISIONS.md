@@ -1,6 +1,6 @@
 # Decisões Técnicas
 
-Atualizado em: 2026-09-07
+Atualizado em: 2026-09-08
 
 ## D-001 — Manter o menu `···` além do gesto de deslize
 
@@ -231,3 +231,20 @@ O top bar ocupa a camada superior do shell móvel. Drawer e backdrop passam a co
 - o hambúrguer/X mantém alvo de `44 × 44 px`, ARIA, `forced-colors` e `prefers-reduced-motion`;
 - não é criado novo estado, componente, store ou dependência;
 - não há alteração de dados, sincronização, segurança, rotas, persistência ou schema.
+
+## D-020 — O arranque reutiliza a marca existente com animação CSS progressiva
+
+**Estado:** implementada no PR #200, a aguardar quality gates e integração.
+
+**Decisão:** o fallback de bootstrap deve apresentar o `logo-mark.svg` já oficial da aplicação acima do nome **Foco Jornada**. O feedback de carregamento é produzido apenas com CSS: aro rotativo, pulso discreto do símbolo e halo suave. Não é introduzida biblioteca de animação, JavaScript adicional nem segundo logótipo.
+
+A animação deve respeitar `prefers-reduced-motion`; nesse modo, o símbolo permanece estático e o texto de estado continua suficiente para comunicar o carregamento. Tema claro e escuro mantêm contraste próprio.
+
+**Motivo:** o fallback anterior era funcional, mas apresentava apenas texto e não reforçava a identidade visual durante um estado que pode ser visível em rede lenta ou no primeiro arranque. Reutilizar o asset existente mantém consistência e evita duplicação de identidade.
+
+**Consequências:**
+
+- alteração limitada a `src/index.html` e ao fallback anterior à montagem do React;
+- `role="status"` e `aria-live="polite"` permanecem;
+- nenhuma dependência, rota, store, API, persistência, cifragem ou regra de negócio é alterada;
+- o workflow de publicação continua a gerar a raiz do GitHub Pages a partir do build de `src/index.html`.
