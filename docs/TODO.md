@@ -1,6 +1,6 @@
 # TODO
 
-Atualizado em: 2026-09-07
+Atualizado em: 2026-09-08
 
 ## P0 — Sincronização móvel e computador
 
@@ -175,6 +175,19 @@ Atualizado em: 2026-09-07
 - [x] Confirmar workflow **Qualidade**, integração e publicação.
 - [ ] Validar manualmente um registo real de turno noturno com entrada antecipada.
 - [ ] Validar manualmente um registo real de turno noturno com saída tardia.
+
+## P1 — Ecrã de arranque com logótipo animado (PR #200)
+
+- [x] Confirmar pela captura real que o fallback de arranque mostrava apenas texto.
+- [x] Reutilizar o `logo-mark.svg` oficial em vez de criar novo asset de marca.
+- [x] Adicionar aro rotativo de progresso visual sem JavaScript adicional.
+- [x] Adicionar pulso discreto do logótipo e halo suave.
+- [x] Adaptar contraste ao tema claro e escuro.
+- [x] Preservar `role="status"` e `aria-live="polite"`.
+- [x] Respeitar `prefers-reduced-motion`, mantendo o símbolo estático nesse modo.
+- [ ] Confirmar pipeline **Qualidade** no head final do PR #200.
+- [ ] Integrar PR #200 apenas com CI verde.
+- [ ] Confirmar publicação GitHub Pages e validar no iPhone o carregamento animado real.
 
 ## P1 — Validação de interface em dispositivo real
 
