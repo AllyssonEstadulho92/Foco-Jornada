@@ -1,5 +1,27 @@
 # Changelog
 
+## 2026-09-08 — logótipo animado no arranque (PR #200)
+
+### Alterado
+
+- O fallback mostrado antes da montagem do React passa a apresentar o `logo-mark.svg` oficial acima de **Foco Jornada**.
+- Foi adicionado um aro verde rotativo em torno do símbolo para tornar o estado de carregamento visualmente explícito.
+- O logótipo recebe um pulso discreto e um halo suave durante o bootstrap.
+- O contraste da animação adapta-se ao tema claro e escuro.
+
+### Acessibilidade e preservação
+
+- `prefers-reduced-motion` remove as animações e mantém o logótipo estático.
+- `role="status"`, `aria-live="polite"` e a mensagem **A carregar a aplicação…** permanecem.
+- Não foram adicionadas bibliotecas, dependências, stores ou JavaScript de animação.
+- Sem alterações a dados, repositories, rotas, schema, autenticação, cifragem, API ou sincronização móvel ↔ computador.
+
+### Validação
+
+- Alteração implementada em `src/index.html` na branch `feat/animated-loading-logo`.
+- PR #200 aberto; integração em `main` condicionada à pipeline **Qualidade** verde.
+- Depois do merge, `deploy-pages.yml` regenerará e publicará a raiz do GitHub Pages a partir do build.
+
 ## 2026-09-07 — top bar persistente no menu móvel
 
 ### Corrigido
