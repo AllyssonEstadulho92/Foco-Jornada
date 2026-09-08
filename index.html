@@ -18,21 +18,36 @@
       .appBootFallback { min-height: 100dvh; box-sizing: border-box; display: grid; place-items: center; padding: 32px 24px; background: #f7f8f6; color: #17201b; font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; text-align: center; }
       [data-theme='dark'] .appBootFallback { background: #070a08; color: #f4f6f5; }
       .appBootFallbackInner { display: grid; gap: 10px; justify-items: center; max-width: 340px; }
+      .appBootLogo { position: relative; display: grid; place-items: center; width: 92px; height: 92px; margin-bottom: 8px; isolation: isolate; }
+      .appBootLogo::before { content: ''; position: absolute; inset: 2px; border: 2px solid rgba(86, 169, 106, .18); border-top-color: #56a96a; border-right-color: rgba(86, 169, 106, .62); border-radius: 50%; animation: appBootOrbit 1.15s linear infinite; }
+      .appBootLogo::after { content: ''; position: absolute; inset: 14px; border-radius: 50%; background: rgba(86, 169, 106, .09); filter: blur(2px); animation: appBootHalo 1.8s ease-in-out infinite; z-index: -1; }
+      .appBootLogo img { display: block; width: 68px; height: 68px; animation: appBootPulse 1.8s ease-in-out infinite; }
+      [data-theme='dark'] .appBootLogo::before { border-color: rgba(105, 196, 126, .2); border-top-color: #69c47e; border-right-color: rgba(105, 196, 126, .68); }
+      [data-theme='dark'] .appBootLogo::after { background: rgba(105, 196, 126, .12); }
       .appBootFallback strong { font-size: 1.1rem; }
       .appBootFallback p { margin: 0; color: #66706a; line-height: 1.5; }
       [data-theme='dark'] .appBootFallback p { color: #aeb8b2; }
       .appBootFallback small { display: none; max-width: 100%; overflow-wrap: anywhere; color: #8a4d45; font-size: .78rem; line-height: 1.4; }
       .appBootFallback[data-stalled='true'] small { display: block; }
+      @keyframes appBootOrbit { to { transform: rotate(360deg); } }
+      @keyframes appBootPulse { 0%, 100% { transform: scale(1); opacity: .92; } 50% { transform: scale(1.055); opacity: 1; } }
+      @keyframes appBootHalo { 0%, 100% { transform: scale(.9); opacity: .3; } 50% { transform: scale(1.16); opacity: 1; } }
+      @media (prefers-reduced-motion: reduce) {
+        .appBootLogo::before, .appBootLogo::after, .appBootLogo img { animation: none; }
+      }
     </style>
     <link rel="icon" type="image/svg+xml" href="/Foco-Jornada/icon.svg" />
     <title>Foco & Jornada</title>
-    <script type="module" crossorigin src="/Foco-Jornada/assets/index-qJcltxLy.js"></script>
+    <script type="module" crossorigin src="/Foco-Jornada/assets/index-CjPb4X3S.js"></script>
     <link rel="stylesheet" crossorigin href="/Foco-Jornada/assets/index-c4fo1mhh.css">
   <link rel="manifest" href="/Foco-Jornada/manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="/Foco-Jornada/registerSW.js"></script></head>
   <body>
     <div id="root">
       <div class="appBootFallback" id="app-boot-fallback" role="status" aria-live="polite">
         <div class="appBootFallbackInner">
+          <div class="appBootLogo" aria-hidden="true">
+            <img src="/Foco-Jornada/logo-mark.svg" alt="" />
+          </div>
           <strong>Foco Jornada</strong>
           <p id="app-boot-message">A carregar a aplicação…</p>
           <small id="app-boot-detail"></small>
