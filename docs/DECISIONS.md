@@ -1,6 +1,6 @@
 # Decisões Técnicas
 
-Atualizado em: 2026-09-08
+Atualizado em: 2026-09-10
 
 ## D-001 — Manter o menu `···` além do gesto de deslize
 
@@ -234,7 +234,7 @@ O top bar ocupa a camada superior do shell móvel. Drawer e backdrop passam a co
 
 ## D-020 — O arranque reutiliza a marca existente com animação CSS progressiva
 
-**Estado:** implementada no PR #200, a aguardar quality gates e integração.
+**Estado:** integrada através do PR #200; correção de visibilidade durante bootstrap integrada no PR #201.
 
 **Decisão:** o fallback de bootstrap deve apresentar o `logo-mark.svg` já oficial da aplicação acima do nome **Foco Jornada**. O feedback de carregamento é produzido apenas com CSS: aro rotativo, pulso discreto do símbolo e halo suave. Não é introduzida biblioteca de animação, JavaScript adicional nem segundo logótipo.
 
@@ -244,7 +244,33 @@ A animação deve respeitar `prefers-reduced-motion`; nesse modo, o símbolo per
 
 **Consequências:**
 
-- alteração limitada a `src/index.html` e ao fallback anterior à montagem do React;
+- alteração limitada ao fallback anterior à montagem do React;
 - `role="status"` e `aria-live="polite"` permanecem;
-- nenhuma dependência, rota, store, API, persistência, cifragem ou regra de negócio é alterada;
+- nenhuma rota, store, API, persistência, cifragem ou regra de negócio foi alterada;
 - o workflow de publicação continua a gerar a raiz do GitHub Pages a partir do build de `src/index.html`.
+
+## D-021 — Jornada e pausas reconciliadas pelo `WorkSchedule`; Pomodoro permanece manual
+
+**Estado:** proposta/implementada no PR #202; integração depende dos quality gates e validação final.
+
+**Decisão:** a aplicação passa a reconciliar automaticamente a jornada diária e as pausas ativadas a partir do `WorkSchedule` já persistido. A configuração, e não um contador ou constante nova, é a única autoridade para entrada, saída e janelas de pausa.
+
+Regras de integridade:
+
+- antes da entrada configurada, não iniciar jornada;
+- durante o turno, quando ainda não existe qualquer jornada do dia, criar a jornada com `startedAt` exatamente igual à hora planeada;
+- quando uma jornada está ativa e a saída configurada já foi atingida, encerrá-la com `endedAt` exatamente igual à saída planeada;
+- não criar retroativamente um dia inteiro se a aplicação só for aberta depois da saída sem existir jornada desse dia;
+- não reiniciar uma jornada que o utilizador já terminou manualmente;
+- cada pausa automática usa apenas o seu `startTime`/`endTime` configurado; uma pausa de 60 minutos continua a exigir configuração explícita pelo utilizador;
+- uma pausa planeada pode ser reconstruída após suspensão da PWA com os timestamps exatos da configuração;
+- se existir foco em execução quando começa uma pausa de trabalho, pode ser pausado, mas a automação nunca inicia Pomodoro, foco personalizado ou um ciclo de foco;
+- o encerramento da jornada reutiliza `finishJourneyWithProductivityState`, preservando o tratamento consistente de pausa, atividade e foco abertos.
+
+**Motivo:** o utilizador deve poder definir o seu horário e deixar a aplicação tratar os marcos previsíveis sem depender de tocar repetidamente em iniciar/terminar. Ao mesmo tempo, a PWA não deve falsificar execução em background nem inventar registos quando não existe evidência suficiente de que a jornada foi iniciada.
+
+**Implementação:** `reconcileScheduledWorkday` usa timestamps absolutos e IDs determinísticos para os registos automáticos. `ScheduledWorkdayAutomation` serve apenas como gatilho de reconciliação enquanto o runtime está ativo ou regressa ao primeiro plano. Um evento interno atualiza os controllers e o relatório diário após alterações automáticas, sem criar outro store funcional.
+
+**Limitação:** iOS e outros sistemas podem suspender completamente JavaScript de uma PWA. Por isso, a aplicação não garante que o código execute fisicamente no segundo exato enquanto está encerrada; garante que, ao reconciliar, usa os horários configurados exatos como timestamps e não o instante tardio do callback.
+
+**Segurança e dependências:** durante o primeiro quality gate do PR #202, `npm audit` identificou advisories novos em Vitest e `sharp`. O PR atualiza Vitest para `5.0.0` e força `sharp` `0.35.4`, versões indicadas como corrigidas, sem alterar dependências de runtime da aplicação.
