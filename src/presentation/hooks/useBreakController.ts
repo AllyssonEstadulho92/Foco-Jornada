@@ -5,6 +5,7 @@ import { startBreak } from '../../application/breaks/startBreak'
 import type { BreakRecord, BreakType } from '../../domain/breaks/BreakRecord'
 import { getResolvedScheduledBreaks } from '../../domain/journey/WorkSchedule'
 import { useAppServices } from '../providers/AppServicesProvider'
+import { useAppDataRefresh } from './useAppDataRefresh'
 
 function currentClockMinutes(now: Date): number {
   return now.getHours() * 60 + now.getMinutes()
@@ -33,6 +34,8 @@ export function useBreakController(journeyId?: string) {
     setActiveBreak(active)
     setBreaks(records)
   }, [breakRepository, journeyId])
+
+  useAppDataRefresh(refresh)
 
   useEffect(() => {
     let cancelled = false
