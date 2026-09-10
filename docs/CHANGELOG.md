@@ -1,357 +1,129 @@
 # Changelog
 
-## 2026-09-08 — logótipo animado no arranque (PR #200)
-
-### Alterado
-
-- O fallback mostrado antes da montagem do React passa a apresentar o `logo-mark.svg` oficial acima de **Foco Jornada**.
-- Foi adicionado um aro verde rotativo em torno do símbolo para tornar o estado de carregamento visualmente explícito.
-- O logótipo recebe um pulso discreto e um halo suave durante o bootstrap.
-- O contraste da animação adapta-se ao tema claro e escuro.
-
-### Acessibilidade e preservação
-
-- `prefers-reduced-motion` remove as animações e mantém o logótipo estático.
-- `role="status"`, `aria-live="polite"` e a mensagem **A carregar a aplicação…** permanecem.
-- Não foram adicionadas bibliotecas, dependências, stores ou JavaScript de animação.
-- Sem alterações a dados, repositories, rotas, schema, autenticação, cifragem, API ou sincronização móvel ↔ computador.
-
-### Validação
-
-- Alteração implementada em `src/index.html` na branch `feat/animated-loading-logo`.
-- PR #200 aberto; integração em `main` condicionada à pipeline **Qualidade** verde.
-- Depois do merge, `deploy-pages.yml` regenerará e publicará a raiz do GitHub Pages a partir do build.
-
-## 2026-09-07 — top bar persistente no menu móvel
-
-### Corrigido
-
-- A validação física após o PR #198 mostrou que, ao abrir o menu, desapareciam **Foco Jornada**, relógio, sincronização, bloqueio e notificações, ficando visível apenas o controlo do menu.
-- A causa foi confirmada em `mobile-shell.css`: o estado `appShellMobileMenuOpen` recortava o `appTopBar` com `clip-path` e ocultava explicitamente a identidade com `visibility: hidden`.
-- O top bar passa a permanecer integralmente visível no estado aberto, mantendo a mesma estrutura de duas colunas e a superfície normal da aplicação.
-- Drawer e backdrop passam a começar abaixo dos `64px` do top bar, em vez de ocupar a mesma faixa vertical.
-- O drawer deixa de reservar uma faixa lateral exclusiva para o X, porque o controlo e o painel já não se sobrepõem verticalmente.
-
-### Hierarquia e interação
-
-- O top bar fica na camada superior do shell móvel; drawer e backdrop ficam abaixo dele e acima do conteúdo/bottom navigation.
-- O mesmo botão continua a alternar hambúrguer ↔ X e a fechar o drawer.
-- O alvo de toque continua em `44 × 44 px`, sem caixa ou cápsula visual persistente.
-- `aria-expanded`, `aria-label`, fecho por backdrop, tecla `Escape`, `forced-colors` e `prefers-reduced-motion` permanecem inalterados.
-
-### Preservado
-
-- Sem alterações a dados, repositories, schema, cifragem, API, backend, autenticação ou sincronização móvel ↔ computador.
-- Sem novo componente, store, biblioteca ou dependência.
-- Sidebar desktop e restantes breakpoints funcionais permanecem inalterados.
-
-### Validação pendente
-
-- Quality gates do head final da correção.
-- Integração em `main` e publicação GitHub Pages.
-- Confirmação física no iPhone de que o top bar inteiro permanece visível e o hambúrguer se transforma em X.
-- Confirmação em Android/Chrome, tablet e orientação horizontal.
-
-## 2026-09-07 — superfície transparente do X aberto (PR #198)
-
-### Corrigido
-
-- A superfície branca que permanecia atrás do X com o drawer aberto foi identificada como a zona recortada do próprio `appTopBar`, e não como o `mobileMenuButton`.
-- No estado `appShellMobileMenuOpen`, o top bar continuava acima do backdrop apenas para manter o X interativo, mas a zona recortada passou a ter fundo totalmente transparente.
-- Nesse estado foram removidos `border-bottom`, `box-shadow`, `backdrop-filter` e `-webkit-backdrop-filter`.
-- O X passou a ficar diretamente sobre o backdrop, sem cartão, moldura ou retângulo branco.
-
-### Preservado
-
-- Alvo funcional de `44 × 44 px`, `aria-expanded`, `aria-label`, safe-area e transformação hambúrguer ↔ X.
-- Fecho por X, backdrop, tecla `Escape` e mudança de rota.
-- Superfície normal do top bar quando o drawer estava fechado.
-- Dados, repositories, schema, cifragem, API, backend e sincronização móvel ↔ computador.
-
-### Qualidade, publicação e revalidação
-
-- Auditoria de dependências, typecheck, lint, testes, build, Worker dry-run e smoke test concluíram com sucesso.
-- PR #198 foi integrado em `main`.
-- Workflow **Publicar Foco & Jornada** / GitHub Pages concluiu com sucesso.
-- A captura física posterior confirmou um novo problema: o recorte necessário a essa solução fazia desaparecer a restante barra superior, tratado na correção seguinte.
-
-## 2026-09-07 — hierarquia minimalista do menu móvel (PR #197)
-
-### Alterado
-
-- O controlo hambúrguer/X mantém o alvo funcional de `44 × 44 px`, mas deixa de apresentar caixa, fundo, cápsula, moldura ou sombra persistente.
-- A hierarquia visual passa a depender apenas dos traços do hambúrguer e do X.
-- A zona recortada do top bar quando o drawer está aberto passa a corresponder à safe-area esquerda + 44 px do controlo.
-- A identidade textual é ocultada enquanto o drawer está aberto para impedir fragmentos visuais junto ao X.
-- O iOS deixa de apresentar realce residual de toque através de `-webkit-tap-highlight-color: transparent`.
-
-### Acessibilidade e interação
-
-- `focus-visible` mantém um contorno discreto para navegação por teclado sem reintroduzir uma superfície permanente.
-- `forced-colors` continua a desenhar os traços com cores do sistema.
-- `prefers-reduced-motion` continua a remover a transição sem alterar a funcionalidade.
-- O mesmo `mobileMenuOpen`, `aria-expanded` e `aria-label` continuam a representar o estado real do drawer.
-
-### Preservado
-
-- Fecho por X, backdrop, tecla `Escape` e mudança de rota.
-- Top bar em duas colunas, relógio compacto, indicador de sincronização, bloqueio e notificações.
-- Sem alterações a dados, repositories, schema, cifragem, API, backend ou sincronização móvel ↔ computador.
-
-### Qualidade e publicação
-
-- Auditoria de dependências, typecheck, lint, testes, build, Worker dry-run e smoke test concluídos com sucesso no head final do PR #197.
-- PR #197 integrado em `main` no commit `7fb419372026144b8488f13ba84ea11db10cac2f`.
-- Workflow **Publicar Foco & Jornada** / GitHub Pages concluído com sucesso.
-
-### Validação física posterior
-
-- A revalidação em iPhone confirmou que a estratégia de recortar a barra superior precisava de revisão estrutural, apesar de o próprio botão já não apresentar a caixa branca original.
-- Android/Chrome, tablet e navegação por teclado continuam a exigir validação após a correção estrutural.
-
-## 2026-09-07 — correção do shell móvel (PR #196)
-
-### Corrigido
-
-- Removido o segundo botão **X** do cabeçalho do drawer; o único X visível passa a ser o próprio hambúrguer transformado.
-- Neutralizado o estado verde de `hover/focus-visible` que podia permanecer após toque em iOS e fazer o X parecer selecionado.
-- A terceira linha do hambúrguer passa a ser preservada explicitamente contra regras históricas com shorthand `background: ... !important`.
-- O pseudo-logo/wordmark legado de `prototype-v2.css` deixa de ocupar espaço no top bar móvel; o wordmark completo permanece no drawer.
-- O top bar móvel passa a usar duas colunas (`minmax(0, 1fr)` + `auto`) para separar identidade e estado operacional.
-- O relógio fica mais compacto em ecrãs estreitos, mantendo sempre a hora e ocultando apenas o ícone quando necessário.
-- `Foco Jornada`, hora, indicador de sincronização, bloqueio e notificações deixam de competir pela mesma largura flexível.
-
-### Preservado
-
-- O mesmo `mobileMenuOpen` continua a controlar drawer, backdrop e animação.
-- Mantido fecho por X, backdrop, tecla `Escape` e mudança de rota.
-- Mantidos safe-area, `forced-colors` e `prefers-reduced-motion`.
-- Sem alterações a dados, repositories, schema, cifragem, API ou sincronização móvel ↔ computador.
-
-### Qualidade e publicação
-
-- Quality gates do PR #196 concluídos com sucesso.
-- PR #196 integrado em `main`.
-- Workflow **Publicar Foco & Jornada** / GitHub Pages concluído com sucesso.
-- A validação física posterior revelou a superfície branca do controlo tratada no PR #197.
-
-## 2026-09-07 — menu móvel hambúrguer ↔ X (PR #195)
-
-### Alterado
-
-- O botão do menu no top bar móvel passa a alternar o mesmo estado `mobileMenuOpen`, permitindo abrir e fechar o drawer no mesmo ponto de interação.
-- O hambúrguer passa a ser desenhado em CSS com três linhas de comprimentos progressivos e transforma-se num **X** através de `transform` e `transition`.
-- O alvo de toque do controlo passa a `44 × 44 px`.
-- Enquanto o drawer está aberto, apenas a zona do botão permanece acima do backdrop; o restante top bar fica recortado para não escapar ao escurecimento.
-- O drawer passa a respeitar uma zona lateral reservada ao botão, incluindo `safe-area`, evitando que cubra o **X** em ecrãs pequenos.
-- `aria-expanded` e `aria-label` passam a acompanhar o estado real do drawer.
-
-### Acessibilidade e interação
-
-- Mantido fecho por backdrop, tecla `Escape` e mudança de rota.
-- Qualquer caminho de fecho repõe o hambúrguer e o estado ARIA correspondente.
-- `prefers-reduced-motion` remove as transições do drawer e do ícone sem remover funcionalidade.
-- `forced-colors` mantém as linhas do hambúrguer/**X** através de cores de sistema.
-
-### Preservado
-
-- Sidebar e controlo de recolher/expandir no desktop acima de 899 px.
-- Rotas, dados, repositories, regras de negócio, sincronização móvel ↔ computador e segurança.
-- Sem nova biblioteca de animação, store, persistência ou alteração de schema.
-
-### Qualidade e publicação
-
-- Quality gates do PR #195 concluídos com sucesso.
-- PR #195 integrado em `main`.
-- Workflow **Qualidade** do merge concluído com sucesso.
-- Workflow **Publicar Foco & Jornada** / GitHub Pages concluído com sucesso.
-- A validação física posterior revelou os problemas visuais tratados no PR #196.
-
-## 2026-09-07 — auditoria de consistência móvel ↔ web
-
-### Auditado
-
-- Confirmado que telemóvel e computador executam a mesma PWA React/TypeScript, com as mesmas rotas, páginas, repositories e regras de negócio.
-- Criada matriz factual em `docs/MOBILE-WEB-CONSISTENCY-AUDIT.md` antes das correções desta fase.
-- Revistos IndexedDB, `localStorage`, `sessionStorage`, Zustand, Context, hooks, services, API, endpoint, cache/PWA, ambiente e CSS responsivo.
-- Confirmado que `useWorkHoursStore` e `useNotificationStore` persistem através de `secureStorage` dentro do mesmo cofre cifrado.
-- Confirmado que não existe API/mocks de negócio alternativos por plataforma.
-- Confirmado que a diferença **Jornada ativa** no telemóvel versus **Pronto para começar** no computador representa estado/perfil/cofre diferente e não uma ocultação CSS da mesma jornada.
-
-### Alterado
-
-- `SecureAppBootstrap` passa a agendar reconciliação também quando a janela recupera `focus`.
-- `AppTopBar` passa a apresentar **Sincronizado**, **Pendente**, **Pausada**, **Erro** ou **Conflito** com base no próprio `SecurityProfile.cloudSync`.
-- O indicador adapta a densidade ao mobile e abre diretamente as definições de sincronização.
-- `CloudSyncManager` aceita dependências injetáveis para teste, mantendo `SecurityProfileStore`, `EncryptedVaultStore` e `CloudSyncClient` como defaults de produção.
-
-### Testes
-
-- Adicionado `cloudSyncReplication.test.ts` com duas réplicas lógicas isoladas do mesmo perfil.
-- Validada criação mobile → web, edição web → mobile e eliminação mobile → web.
-- Validada convergência do `secureStorage` na mesma unidade de cofre.
-- Validado conflito simultâneo sem sobrescrever nenhuma das cópias divergentes.
-- No head funcional do PR #194, passaram auditoria de dependências, typecheck, lint, testes, build, `wrangler deploy --dry-run`, smoke test e criação do artefacto.
-- **Workers Builds: foco-jornada** do PR #194 concluiu com sucesso.
-
-### Preservado
-
-- Sem mudança de framework, schema operacional, IndexedDB, cifragem ou protocolo de conflito.
-- Sem reset, migração destrutiva ou eliminação de registos existentes.
-- GitHub Pages continua frontend oficial e Cloudflare Worker continua backend apenas de sync/pairing cifrados.
-- Timezone geral não foi migrado; a dependência do timezone do browser ficou registada para decisão futura.
-
-## 2026-09-07 — associação de browser sem recriar PIN
-
-### Corrigido
-
-- Um navegador sem `SecurityProfile` deixa de abrir diretamente em **Criar acesso** quando o utilizador pode já possuir um perfil noutro dispositivo.
-- O ecrã inicial de um browser vazio passa a mostrar **Já tens acesso noutro dispositivo?**, reduzindo a criação acidental de perfis independentes.
-- Depois de uma associação bem-sucedida, o novo browser utiliza o mesmo PIN/palavra-passe já existente e obtém o cofre através da sincronização cifrada.
+## 2026-09-10 — automação de jornada e pausas (PR #202)
 
 ### Adicionado
 
-- `BrowserPairingManager` para criar e redimir ligações temporárias de associação.
-- Ação **Associar outro navegador** em **Privacidade e acesso → Sincronização móvel ↔ computador**.
-- Ligação `#pair=...` com `pairingId`, endpoint e segredo raiz aleatório de 256 bits.
-- Derivação separada de chave AES-GCM e token HTTP a partir do segredo raiz.
-- `SecurityManager.importPairedProfile()` para validar/importar o perfil criptográfico sem criar nova credencial nem novo `profileId`.
-- Rotas `PUT`, `GET` e `DELETE /v1/pair/:pairingId` no Worker.
-- Expiração fixa de 10 minutos e limpeza por alarme do Durable Object.
-- Eliminação do payload temporário depois de redenção bem-sucedida.
-- Testes de aceitação/rejeição da estrutura das ligações temporárias.
-- Estilos responsivos e compatíveis com `forced-colors` para o novo fluxo.
+- `reconcileScheduledWorkday` para reconciliar jornada e pausas a partir do `WorkSchedule` persistido.
+- `ScheduledWorkdayAutomation` como gatilho global enquanto a PWA está ativa ou regressa ao primeiro plano.
+- Evento interno `foco-jornada:app-data-changed` e hook `useAppDataRefresh` para atualizar jornada, pausas, foco, atividades e relatório após mutações automáticas.
+- IDs determinísticos para jornada/pausas automáticas do mesmo dia.
+- Testes dedicados para entrada, pausa de 60 minutos, saída, abertura tardia e término manual.
 
-### Segurança
+### Comportamento
 
-- O PIN, a palavra-passe, o código de recuperação e a `dataKey` continuam sem ser enviados ao Worker.
-- O segredo raiz de associação não é enviado ao Worker; o servidor recebe apenas um token derivado e guarda o respetivo hash.
-- O `SecurityProfile` é cifrado no cliente antes do envio temporário.
-- O canal de associação não duplica o cofre operacional; os dados continuam a chegar pelo protocolo normal de sincronização, depois de o mesmo PIN/palavra-passe desbloquear a chave.
-- A ligação temporária deve ser tratada como segredo durante os 10 minutos de validade.
-- Endpoints continuam limitados a HTTPS `workers.dev`/localhost de desenvolvimento.
+- Antes da entrada planeada, nenhuma jornada é iniciada.
+- Durante o turno, quando ainda não existe jornada do dia, a aplicação pode iniciar automaticamente com `startedAt` exatamente igual à entrada configurada.
+- A jornada ativa termina com `endedAt` exatamente igual à saída configurada quando o limite é atingido ou ultrapassado.
+- Uma jornada terminada manualmente não é reiniciada no mesmo dia.
+- Se a primeira abertura ocorrer apenas depois da saída e não existir jornada, não é fabricado um dia inteiro retroativo.
+- Pausas ativadas usam apenas `startTime`/`endTime` configurados e podem ser reconstruídas após suspensão da PWA.
+- Uma pausa de 60 minutos continua a depender de configuração explícita pelo utilizador; não foi criado um descanso hardcoded.
+- Foco em execução pode ser pausado quando começa uma pausa laboral.
+- Pomodoro e foco personalizado continuam manuais e nunca são iniciados pela automação.
 
-### Qualidade e publicação
+### Integridade temporal
 
-- Typecheck, lint, testes, build, Worker dry-run e smoke test finais do PR #193 concluídos com sucesso.
-- Workers Builds do PR e de produção concluídos com sucesso.
-- PR #193 integrado em `main` no commit `4e879e6d0abf578981ae09d212f25f43d17232cb`.
-- GitHub Pages republicado com sucesso.
-- Workflow **Qualidade** de produção concluído com sucesso.
+- O tick do runtime serve apenas para detetar marcos; não acumula tempo em memória.
+- Ao retomar depois de suspensão, a aplicação usa os timestamps configurados exatos em vez da hora tardia do callback.
+- O fecho automático reutiliza `finishJourneyWithProductivityState`, mantendo o tratamento existente de pausa, atividade e foco abertos.
+- A limitação de background de PWA está documentada em `docs/TIME-AUTOMATION.md`.
 
-## 2026-09-07 — endpoint runtime da sincronização
+### Segurança de dependências
+
+O primeiro workflow do PR #202 foi bloqueado por `npm audit` devido a advisories novos publicados para dependências de desenvolvimento. A branch foi atualizada sem desativar o gate:
+
+- `vitest` de `3.2.7` para `5.0.0`;
+- `sharp` transitivo forçado para `0.35.4` através de `overrides`.
+
+O PR permanece dependente de novo `npm audit`, typecheck, lint, testes, build, Worker dry-run e smoke test verdes antes da integração.
+
+### Preservado
+
+- schema do cofre, IndexedDB, cifragem, autenticação e associação de browsers;
+- protocolo de sincronização e tratamento conservador de conflitos;
+- rotas e arquitetura responsiva;
+- cálculos existentes de jornada/pausas/atividades/foco;
+- Pomodoro manual.
+
+## 2026-09-08 — logótipo animado no arranque (PR #200 / PR #201)
 
 ### Alterado
 
-- `CloudSyncProfileState` passa a aceitar o endpoint público do Worker no próprio perfil.
-- `CloudSyncManager` usa o endpoint do perfil antes do fallback `VITE_SYNC_API_URL`.
-- A área **Privacidade e acesso** permite introduzir, validar e atualizar o endereço do Worker diretamente na aplicação.
-- Uma ligação válida ativa a sincronização e reinicia a base de revisão remota se o servidor tiver mudado.
-- A cópia segura passa a transportar naturalmente o endpoint juntamente com os restantes metadados do perfil.
+- O fallback de bootstrap passou a apresentar o `logo-mark.svg` oficial, aro rotativo, pulso discreto e halo suave.
+- Tema claro/escuro mantém contraste próprio.
+- `prefers-reduced-motion` remove as animações e mantém o símbolo estático.
+- `role="status"`, `aria-live="polite"` e a mensagem de carregamento permanecem.
+- O PR #201 garantiu que a animação continua visível durante o bootstrap React.
+
+### Preservado
+
+- Sem alteração a dados, repositories, rotas, schema, autenticação, cifragem, API ou sincronização.
+- Sem biblioteca adicional de animação.
+
+## 2026-09-07 — shell e menu móvel (PR #195–#199)
+
+### Corrigido
+
+- O mesmo botão do top bar alterna hambúrguer ↔ X e representa `mobileMenuOpen`.
+- Removido o segundo X do cabeçalho do drawer.
+- Alvo de toque mantido em `44 × 44 px`.
+- Estados verdes residuais de `hover/focus` no iOS foram neutralizados sem remover `focus-visible`.
+- Pseudo-logo/wordmark legado deixou de competir com relógio, sincronização, bloqueio e notificações.
+- Top bar passou a duas colunas (`minmax(0, 1fr)` + `auto`).
+- A superfície visual do controlo tornou-se transparente, mantendo apenas os traços do hambúrguer/X.
+- A correção final manteve o top bar integralmente visível quando o drawer abre e colocou drawer/backdrop abaixo dos `64px` superiores.
+
+### Acessibilidade
+
+- `aria-expanded` e `aria-label` refletem o estado real.
+- Fecho por X, backdrop, `Escape` e mudança de rota permanece.
+- `forced-colors`, safe-area e `prefers-reduced-motion` continuam suportados.
+
+### Preservado
+
+- Sem alterações a dados, repositories, schema, cifragem, API, backend ou sincronização.
+
+## 2026-09-07 — auditoria e sincronização móvel ↔ computador (PR #191–#194)
+
+### Adicionado/corrigido
+
+- Cloudflare Worker + Durable Object como backend de sincronização cifrada, mantendo GitHub Pages como frontend oficial.
+- Token remoto derivado da `dataKey`, revisão remota independente e fingerprint da última base sincronizada.
+- Conflito bilateral sem `last-write-wins` silencioso.
+- Endpoint runtime validado por `/health` quando a variável de build não estiver disponível.
+- Associação temporária de outro navegador sem recriar PIN/palavra-passe nem transportar o cofre operacional no canal de pairing.
+- Reconciliação adicional ao recuperar `window.focus`.
+- Estado de sincronização visível no top bar a partir do próprio `SecurityProfile.cloudSync`.
+- Testes com duas réplicas lógicas cobrindo criação, edição, eliminação e conflito.
 
 ### Segurança
 
-- Endpoints introduzidos em runtime só são aceites em HTTPS `workers.dev` (ou localhost em desenvolvimento).
-- URLs com credenciais, query string ou fragmento são rejeitadas.
-- Antes de guardar, a aplicação chama `/health` e exige `ok: true` e `service: foco-jornada-sync`.
-- O endpoint é configuração pública; PIN, palavra-passe, código de recuperação e `dataKey` continuam sem sair do cliente.
+- PIN, palavra-passe, código de recuperação e `dataKey` original não são enviados ao Worker.
+- O backend guarda ciphertext/IV, revisão, hash do token e metadados técnicos.
+- Cofre remoto é validado/autenticado antes de substituir a réplica local.
+- `cache: no-store`, `credentials: omit` e política de origem restrita permanecem.
 
-### Testes e publicação
-
-- Adicionados testes de normalização/rejeição de endpoint.
-- Adicionados testes de validação da identidade do serviço através de `/health`.
-- PR #192 aprovado em auditoria de dependências, typecheck, lint, testes, build, `worker:check` e smoke test.
-- Check **Workers Builds: foco-jornada** do PR #192 concluído com sucesso.
-- PR #192 integrado em `main` no commit `15a580440575142589c577b1dd32a96d51f8326f`.
-- Workers Builds de produção concluído com sucesso após a integração.
-- GitHub Pages republicado com sucesso.
-
-## 2026-09-07 — sincronização entre dispositivos
-
-### Adicionado
-
-- Cliente `CloudSyncManager` para sincronizar o `EncryptedVaultRecord` sem desencriptar os dados para transporte.
-- Token remoto derivado da `dataKey` com contexto específico de sincronização e SHA-256.
-- Fingerprint SHA-256 da última base sincronizada.
-- Revisão remota independente com compare-and-set.
-- Deteção conservadora de conflito quando móvel e computador têm alterações independentes.
-- Evento de gravação local do cofre para agendar sincronização.
-- Sincronização ao desbloquear, após gravações, ao regressar ao primeiro plano, ao recuperar rede e periodicamente.
-- Reabertura controlada do runtime após receber uma cópia remota, permitindo que a interface passe a ler o cofre recebido.
-- Controlo de ativação da sincronização nas definições de segurança.
-- Cloudflare Worker com Durable Object isolado por `profileId`.
-- `wrangler.toml` com configuração versionada do serviço remoto.
-- Testes do token derivado, protocolo HTTP e rejeição de envelopes remotos incompatíveis.
-- `worker:check` com `wrangler deploy --dry-run` integrado na pipeline **Qualidade**.
-
-### Segurança
-
-- O Worker recebe apenas ciphertext/IV e metadados de revisão; não recebe PIN, palavra-passe, código de recuperação ou a chave AES original.
-- O backend guarda apenas um hash adicional do token usado na autenticação.
-- Escritas remotas exigem a revisão esperada e devolvem conflito em concorrência.
-- Divergência simultânea local/remota não usa política destrutiva de “última escrita vence”.
-- Respostas remotas são validadas estruturalmente antes de serem consideradas cofres válidos.
-- Um cofre remoto é autenticado/desencriptado em memória e o snapshot é validado antes de qualquer substituição do cofre local.
-- `connect-src` passa a autorizar a própria origem e endpoints HTTPS `workers.dev`.
-- `.wrangler` e `.dev.vars*` passam a ser ignorados pelo Git.
-
-### Qualidade e distribuição
-
-- Workflow GitHub **Qualidade** do PR #191 aprovado com auditoria de dependências, typecheck, lint, testes, build, smoke test e artefacto.
-- Bundle e configuração do Worker aprovados por `wrangler deploy --dry-run`.
-- PR #191 integrado em `main`.
-- Workers Builds do branch de produção concluído com sucesso e Durable Object `SyncVault` publicado.
-- GitHub Pages continua a ser o frontend oficial e foi republicado após a integração.
-
-## 2026-09-07 — turnos noturnos
+## 2026-09-07 — turnos noturnos (PR #189)
 
 ### Corrigido
 
 - Normalização de horas reais em turnos que atravessam a meia-noite.
-- Uma entrada antecipada antes da hora planeada deixa de ser deslocada incorretamente para o dia seguinte.
-- Uma saída após o fim planeado continua corretamente associada à manhã seguinte.
-- A interseção entre trabalho realizado e turno planeado deixa de transformar trabalho normal em horas extra ou horas não trabalhadas por erro de alinhamento temporal.
+- Entrada antecipada deixa de ser deslocada incorretamente para o dia seguinte.
+- Saída após o fim planeado continua associada à manhã seguinte.
+- Testes adicionados para turno `22:00–06:00` com entrada `21:00` e saída `07:00`.
 
-### Testes
-
-- Adicionado caso **22:00–06:00** com entrada real às **21:00**.
-- Adicionado caso **22:00–06:00** com saída real às **07:00**.
-- Workflow **Qualidade** do PR #189 concluído com sucesso.
-- Workflow **Qualidade** de `main` após integração concluído com sucesso.
-- Build, lint, typecheck, testes e smoke test aprovados.
-
-### Integração e publicação
-
-- PR #189 integrado em `main`.
-- Commit: `90d19791f7892e51c5baf2c27967d53e7b464b8c`.
-- Workflow **Publicar Foco & Jornada** / GitHub Pages concluído com sucesso.
-
-## 2026-09-05
+## 2026-09-05 — medicação e histórico
 
 ### Adicionado
 
-- Gesto horizontal nas linhas de tomas programadas.
-- Ação oculta **Definir** com edição de hora e quantidade.
-- Ação oculta **Eliminar** com confirmação explícita.
-- `MedicationScheduleService` para versionar e eliminar logicamente horários sem quebrar referências históricas.
-- Campo opcional `deletedAt` em `MedicationSchedule` para tombstone auditável.
-- Histórico compacto com vistas **Resumo** e **Detalhes técnicos**.
-- Paginação progressiva do histórico com **Ver mais eventos / Mostrar menos**.
-- Evento visual **Horário eliminado** e apresentação de versões sucessoras como **Horário alterado**.
-- Diálogo responsivo com comportamento de bottom sheet em ecrãs pequenos.
+- Gesto horizontal nas tomas programadas.
+- Ações **Definir** e **Eliminar** com confirmação explícita.
+- Tombstone lógico `deletedAt` e versionamento de horários sem quebrar referências históricas.
+- Histórico com vistas **Resumo** e **Detalhes técnicos** e paginação progressiva.
 - Suporte a `prefers-reduced-motion` e `forced-colors`.
-- Testes do ciclo de vida, idempotência e eliminação imediata de horários.
 
 ### Alterado
 
-- **Eliminar** passa a remover o horário imediatamente da lista de tomas em vez de o deixar visível como **Termina hoje**.
-- Uma eliminação também neutraliza definições futuras da mesma cadeia (`order`), impedindo que o horário reapareça posteriormente.
-- O resumo do histórico deixa de apresentar checkpoints automáticos de proteção, que permanecem consultáveis em **Detalhes técnicos**.
-- `OperationalPersonalStockService` disponibiliza o histórico completo das versões de horários para construir a apresentação auditável.
-
-### Preservado
-
-- Menu `···`, ações Tomada/Adiar/Não tomada, correções e histórico existentes.
-- Eventos de toma e movimentos de stock existentes.
-- Registos técnicos dos horários eliminados, necessários para manter referências e auditoria.
-- Checkpoints e cópia redundante local; apenas a apresentação padrão deixa de os expor em massa.
+- **Eliminar** remove imediatamente o horário da lista ativa e neutraliza versões futuras da mesma cadeia.
+- Checkpoints técnicos deixam de dominar o resumo normal, permanecendo disponíveis na vista técnica.

@@ -11,6 +11,7 @@ import {
   type PomodoroStep,
 } from '../../domain/focus/FocusSession'
 import { useAppServices } from '../providers/AppServicesProvider'
+import { useAppDataRefresh } from './useAppDataRefresh'
 
 export function useFocusController(journeyId?: string) {
   const { journeyRepository, breakRepository, activityRepository, focusRepository } = useAppServices()
@@ -34,6 +35,8 @@ export function useFocusController(journeyId?: string) {
     setSessions(records)
     setActiveSession(open)
   }, [focusRepository, journeyId])
+
+  useAppDataRefresh(refresh)
 
   useEffect(() => {
     let cancelled = false
