@@ -7,6 +7,7 @@ import { editActivity } from '../../application/activities/editActivity'
 import { startActivity } from '../../application/activities/startActivity'
 import type { Activity } from '../../domain/activities/Activity'
 import { useAppServices } from '../providers/AppServicesProvider'
+import { useAppDataRefresh } from './useAppDataRefresh'
 
 export function useActivityController(journeyId?: string) {
   const { journeyRepository, activityRepository } = useAppServices()
@@ -31,6 +32,8 @@ export function useActivityController(journeyId?: string) {
     setActivities(records)
     setActiveActivity(active)
   }, [activityRepository, journeyId])
+
+  useAppDataRefresh(refresh)
 
   useEffect(() => {
     let cancelled = false
