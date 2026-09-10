@@ -11,13 +11,12 @@ O código publicado em `main` inclui, entre outras correções já integradas:
 - turnos noturnos corrigidos no PR #189;
 - sincronização cifrada e associação de outro navegador nos PR #191–#194;
 - correções do menu móvel e top bar nos PR #195–#199;
-- logótipo animado de bootstrap nos PR #200–#201.
+- logótipo animado de bootstrap nos PR #200–#201;
+- automação de jornada e pausas pelo horário configurado no PR #202.
 
-## Alteração em curso — PR #202
+## PR #202 — integrado e publicado
 
-Branch: `feat/automatic-workday-schedule`
-
-Objetivo: reduzir ações manuais previsíveis na jornada sem alterar o Pomodoro.
+O PR #202 foi integrado em `main` no commit `62b0cb44db31fff957a4486b7ac24634c721e3ea` e publicado pelo GitHub Pages através do commit de deploy `08dc9fae23f683fc7cadf80ada7a54b2545da8b2`.
 
 ### Comportamento implementado
 
@@ -36,8 +35,6 @@ Objetivo: reduzir ações manuais previsíveis na jornada sem alterar o Pomodoro
 
 ### Implementação técnica
 
-Novos elementos:
-
 - `src/application/journey/reconcileScheduledWorkday.ts` — caso de uso de reconciliação temporal;
 - `src/presentation/components/ScheduledWorkdayAutomation.tsx` — gatilho global enquanto o runtime está ativo;
 - `src/presentation/events/appDataChanged.ts` — evento interno após mutações automáticas;
@@ -45,6 +42,26 @@ Novos elementos:
 - testes dedicados em `reconcileScheduledWorkday.test.ts`.
 
 A automação usa timestamps absolutos e IDs determinísticos para registos automáticos do mesmo dia. O intervalo de execução serve apenas para detetar marcos; não é a fonte da verdade temporal.
+
+## Qualidade e segurança
+
+O primeiro workflow do PR #202 foi bloqueado por advisories novos em dependências de desenvolvimento. A correção atualizou `vitest` para `5.0.0`, aplicou `sharp` `0.35.4` por `overrides` e restaurou as dependências diretas do lint (`eslint`, `eslint-plugin-react-hooks`, `eslint-plugin-react-refresh`).
+
+No head final do PR, a pipeline **Qualidade** concluiu com sucesso em todas as etapas:
+
+- instalação de dependências;
+- `npm audit --audit-level=high` com 0 vulnerabilidades;
+- typecheck;
+- lint;
+- testes automatizados;
+- build;
+- `wrangler deploy --dry-run`;
+- smoke test de browser;
+- criação do artefacto.
+
+Depois do merge, o workflow **Qualidade** de `main` voltou a concluir com sucesso e o workflow **Publicar Foco & Jornada** também concluiu com sucesso. O GitHub Pages publicou o commit `08dc9fae23f683fc7cadf80ada7a54b2545da8b2`.
+
+Não foram adicionados segredos, tokens, permissões, endpoints ou dados pessoais. Não houve alteração do schema do cofre, cifragem, autenticação ou protocolo de sincronização.
 
 ## Limitação conhecida da PWA
 
@@ -54,47 +71,23 @@ A regra implementada é de **reconciliação**: quando a aplicação está ativa
 
 Se a aplicação nunca tiver sido aberta durante o turno e só abrir depois da saída, não existe evidência suficiente para criar silenciosamente um dia completo; nesse caso não é criado registo automático retroativo.
 
-## Segurança e qualidade
-
-O primeiro workflow **Qualidade** do PR #202 parou em `npm audit` antes de typecheck/testes. A falha não foi causada pelo código da automação: em 2026-09-10 foram detetados advisories novos nas dependências de desenvolvimento `vitest/@vitest/mocker` e `sharp` transitivo de Wrangler.
-
-Correção adicionada ao PR:
-
-- `vitest` atualizado de `3.2.7` para `5.0.0`;
-- override de `sharp` para `0.35.4`.
-
-A integração permanece bloqueada até um novo workflow confirmar:
-
-- `npm audit --audit-level=high`;
-- typecheck;
-- lint;
-- testes;
-- build;
-- `wrangler deploy --dry-run`;
-- smoke test de browser.
-
-Não foram adicionados segredos, tokens, permissões, endpoints ou dados pessoais. Não houve alteração do schema do cofre, cifragem, autenticação ou protocolo de sincronização.
-
 ## Riscos e validações ainda abertas
 
-1. **CI do PR #202:** confirmar que as atualizações de segurança eliminam os advisories e que Vitest 5 não introduz regressões de testes.
-2. **Execução real hoje:** após publicação, confirmar no dispositivo que o horário configurado é reconhecido e que a jornada reflete a entrada prevista; se a publicação ocorrer depois das 08:00 mas antes das 17:00, a reconciliação deve usar 08:00 como `startedAt`.
-3. **Pausa real de 60 minutos:** definir manualmente o início/fim em **Definições → Pausas** e confirmar início, fim e total acumulado.
-4. **Saída real:** confirmar que a jornada ativa termina com timestamp 17:00 sem exigir toque manual.
-5. **Pomodoro:** confirmar que não é iniciado pela automação e continua dependente de ação explícita.
-6. **Cross-device:** continuar a validação física móvel ↔ computador com o mesmo perfil/cofre; conflitos simultâneos continuam conservadores, sem `last-write-wins`.
-7. **Timezone:** a área geral de jornada continua dependente do timezone local do browser; os dois dispositivos devem usar o mesmo timezone durante validações.
-8. **Android/tablet:** permanecem pendentes validações físicas de alguns ajustes do shell móvel anteriores.
+1. **Dispositivo real:** confirmar no telemóvel e computador que ambos carregam a versão publicada e usam o mesmo perfil/cofre sincronizado.
+2. **Jornada 08:00–17:00:** validar em uso real que a jornada usa 08:00 como entrada planeada e termina com 17:00 como saída.
+3. **Pausa real de 60 minutos:** definir manualmente o início/fim em **Definições → Pausas** e confirmar início, fim e total acumulado automáticos.
+4. **Pomodoro:** confirmar que continua totalmente manual.
+5. **Cross-device:** continuar a validação física móvel ↔ computador com o mesmo perfil/cofre; conflitos simultâneos continuam conservadores, sem `last-write-wins`.
+6. **Timezone:** a área geral de jornada continua dependente do timezone local do browser; os dois dispositivos devem usar o mesmo timezone durante validações.
 
 ## Última alteração
 
-PR #202: implementação de reconciliação automática da jornada e pausas pelo `WorkSchedule`, testes de regressão e atualização das dependências de desenvolvimento sinalizadas pelo `npm audit`.
+PR #202 integrado e publicado: automação de jornada e pausas pelo `WorkSchedule`, dependências de qualidade corrigidas e pipelines de PR/`main` concluídas com sucesso.
 
 ## Próximo passo
 
-1. aguardar e inspecionar o novo workflow **Qualidade** do PR #202;
-2. corrigir qualquer falha de typecheck/lint/teste sem enfraquecer os quality gates;
-3. atualizar `ARCHITECTURE.md`, `TODO.md` e `CHANGELOG.md` com o estado final do PR;
-4. marcar o PR como pronto apenas com CI verde;
-5. integrar em `main` e confirmar o workflow de publicação GitHub Pages;
-6. validar no dispositivo real a jornada 08:00–17:00 e a pausa manual de 60 minutos.
+1. abrir a versão publicada no telemóvel e no computador;
+2. confirmar que ambos apresentam o mesmo perfil/cofre e o estado de sincronização esperado;
+3. definir a pausa real de 60 minutos em **Definições → Pausas**;
+4. validar a jornada 08:00–17:00 em utilização real;
+5. reportar qualquer divergência visual, temporal ou de sincronização com captura e hora observada.

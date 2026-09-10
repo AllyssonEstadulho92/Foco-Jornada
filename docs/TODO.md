@@ -21,14 +21,14 @@ Atualizado em: 2026-09-10
 - [x] Atualizar controllers e relatório após mutações automáticas sem reload da página.
 - [x] Adicionar testes de entrada, pausa, saída, abertura tardia e término manual.
 - [x] Documentar a limitação de background da PWA e a regra de reconciliação.
-- [ ] Obter `npm audit --audit-level=high` verde no PR #202.
-- [ ] Obter typecheck verde.
-- [ ] Obter lint verde.
-- [ ] Obter testes verdes, incluindo regressões existentes.
-- [ ] Obter build, Worker dry-run e smoke test verdes.
-- [ ] Marcar PR #202 como pronto apenas depois dos quality gates.
-- [ ] Integrar PR #202 em `main`.
-- [ ] Confirmar publicação GitHub Pages do merge.
+- [x] Obter `npm audit --audit-level=high` verde no PR #202.
+- [x] Obter typecheck verde.
+- [x] Obter lint verde.
+- [x] Obter testes verdes, incluindo regressões existentes.
+- [x] Obter build, Worker dry-run e smoke test verdes.
+- [x] Marcar PR #202 como pronto depois dos quality gates.
+- [x] Integrar PR #202 em `main`.
+- [x] Confirmar publicação GitHub Pages do merge.
 - [ ] Validar em dispositivo real uma jornada 08:00–17:00.
 - [ ] Definir manualmente uma pausa de 60 minutos em **Definições → Pausas** e validar início/fim automáticos.
 - [ ] Confirmar no dispositivo real que Pomodoro não inicia automaticamente.
@@ -37,12 +37,12 @@ Atualizado em: 2026-09-10
 ## P0 — Segurança de dependências
 
 - [x] Identificar a causa da primeira falha de CI do PR #202 como advisories novos, não erro funcional da automação.
-- [x] Confirmar advisory de Vitest/@vitest/mocker e versão corrigida.
 - [x] Atualizar `vitest` para `5.0.0`.
-- [x] Confirmar advisory de `sharp` e versão corrigida.
 - [x] Forçar `sharp` `0.35.4` através de `overrides`.
-- [ ] Confirmar pelo próximo workflow que `npm audit --audit-level=high` passa sem exceções ou bypass.
-- [ ] Confirmar compatibilidade de Vitest 5 com todos os testes atuais.
+- [x] Restaurar dependências diretas do lint exigidas por `eslint.config.js`.
+- [x] Confirmar `npm audit --audit-level=high` sem vulnerabilidades no head final.
+- [x] Confirmar compatibilidade de Vitest 5 com todos os testes atuais.
+- [x] Confirmar pipeline **Qualidade** verde também após integração em `main`.
 
 ## P0 — Sincronização móvel ↔ computador em dispositivos reais
 

@@ -29,14 +29,22 @@
 - O fecho automático reutiliza `finishJourneyWithProductivityState`, mantendo o tratamento existente de pausa, atividade e foco abertos.
 - A limitação de background de PWA está documentada em `docs/TIME-AUTOMATION.md`.
 
-### Segurança de dependências
+### Segurança e qualidade
 
-O primeiro workflow do PR #202 foi bloqueado por `npm audit` devido a advisories novos publicados para dependências de desenvolvimento. A branch foi atualizada sem desativar o gate:
+O primeiro workflow do PR #202 foi bloqueado por advisories novos em dependências de desenvolvimento. A branch foi corrigida sem enfraquecer os gates:
 
-- `vitest` de `3.2.7` para `5.0.0`;
-- `sharp` transitivo forçado para `0.35.4` através de `overrides`.
+- `vitest` atualizado de `3.2.7` para `5.0.0`;
+- `sharp` transitivo forçado para `0.35.4` através de `overrides`;
+- restauradas as dependências diretas `eslint`, `eslint-plugin-react-hooks` e `eslint-plugin-react-refresh` exigidas pelo `eslint.config.js`.
 
-O PR permanece dependente de novo `npm audit`, typecheck, lint, testes, build, Worker dry-run e smoke test verdes antes da integração.
+No head final do PR, `npm audit`, typecheck, lint, testes, build, Worker dry-run, smoke test e artefacto concluíram com sucesso. Depois do merge, a pipeline **Qualidade** de `main` voltou a passar integralmente.
+
+### Integração e publicação
+
+- PR #202 integrado em `main` no commit `62b0cb44db31fff957a4486b7ac24634c721e3ea`.
+- Workflow **Publicar Foco & Jornada** concluído com sucesso.
+- Build publicado na raiz de `main` no commit `08dc9fae23f683fc7cadf80ada7a54b2545da8b2`.
+- Workflow **pages build and deployment** do commit publicado concluiu com sucesso.
 
 ### Preservado
 
