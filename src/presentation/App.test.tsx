@@ -13,6 +13,7 @@ describe('App', () => {
   it('renderiza o dashboard de referência e a navegação principal', async () => {
     const view = render(
       <App
+        scheduleAutomation={false}
         services={{
           journeyRepository: new InMemoryJourneyRepository(),
           breakRepository: new InMemoryBreakRepository(),
@@ -53,6 +54,7 @@ describe('App', () => {
 
     const view = render(
       <App
+        scheduleAutomation={false}
         services={{
           journeyRepository: new InMemoryJourneyRepository(),
           breakRepository: new InMemoryBreakRepository(),
@@ -76,5 +78,4 @@ describe('App', () => {
 
     view.unmount()
   })
-
 })
