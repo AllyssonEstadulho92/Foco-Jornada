@@ -5,6 +5,7 @@ import { startJourney } from '../../application/journey/startJourney'
 import type { Journey } from '../../domain/journey/Journey'
 import { toLocalDateKey } from '../../shared/utils/dateTime'
 import { useAppServices } from '../providers/AppServicesProvider'
+import { useAppDataRefresh } from './useAppDataRefresh'
 
 export function useJourneyController() {
   const { journeyRepository, breakRepository, activityRepository, focusRepository } = useAppServices()
@@ -24,6 +25,8 @@ export function useJourneyController() {
     setActiveJourney(active)
     setTodayJourneys(journeys)
   }, [journeyRepository])
+
+  useAppDataRefresh(refresh)
 
   useEffect(() => {
     let cancelled = false
