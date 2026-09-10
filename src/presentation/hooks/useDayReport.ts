@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { buildDayReport, type DayReport } from '../../application/reports/buildDayReport'
 import { useAppServices } from '../providers/AppServicesProvider'
+import { useAppDataRefresh } from './useAppDataRefresh'
 
 export function useDayReport(date: string) {
   const services = useAppServices()
@@ -19,6 +20,8 @@ export function useDayReport(date: string) {
     })
     setReport(next)
   }, [date, services])
+
+  useAppDataRefresh(refresh)
 
   useEffect(() => {
     let cancelled = false
