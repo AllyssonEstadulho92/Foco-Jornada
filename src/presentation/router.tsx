@@ -19,6 +19,7 @@ import { SettingsReferencePage } from './pages/SettingsReferencePage'
 import { ShiftMapPage } from './pages/ShiftMapPage'
 import { StatisticsPage } from './pages/StatisticsPage'
 import { SticksStockPage } from './pages/SticksStockPage'
+import { VacationBalancePage } from './pages/VacationBalancePage'
 import { WorkHoursCalculatorPage } from './pages/WorkHoursCalculatorPage'
 
 export const router = createHashRouter([
@@ -43,6 +44,7 @@ export const router = createHashRouter([
       { path: 'vencimento', element: <PayrollReferencePage /> },
       { path: 'vencimento/configurar', element: <PayrollPage /> },
       { path: 'horas', element: <WorkHoursCalculatorPage /> },
+      { path: 'ferias', element: <VacationBalancePage /> },
       { path: 'estatisticas', element: <StatisticsPage /> },
       { path: 'relatorio', element: <ExportDataPage /> },
       { path: 'exportar', element: <ExportDataPage /> },
