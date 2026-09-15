@@ -256,7 +256,7 @@ export function calculateVacationBalance(input: VacationBalanceInput): VacationB
     (monthlyAccrualTargetDays / 12) * currentAccrualMonthProgress,
   )
   const currentAccrualMonthRemainingDays = roundLiveDays(
-    monthlyAccrualTargetDays / 12 - currentAccrualMonthEarnedDays,
+    (monthlyAccrualTargetDays / 12) * (1 - currentAccrualMonthProgress),
   )
   const currentMonthDays = asOf ? daysInMonth(asOf) : 1
   const currentAccrualMonthDailyRate = roundLiveDays(monthlyAccrualTargetDays / 12 / currentMonthDays)
