@@ -2,6 +2,40 @@
 
 Atualizado em: 2026-09-15
 
+## P0 — Acumulação mensal de férias até 28 dias (PR #204)
+
+- [x] Analisar a ferramenta de férias integrada no PR #203 antes de alterar código.
+- [x] Preservar a referência laboral/contratual existente sem transformar a meta pessoal em direito oficial.
+- [x] Adicionar `monthlyAccrualTargetDays` com valor por defeito de 28.
+- [x] Manter compatibilidade com configurações antigas sem o novo campo.
+- [x] Calcular crédito mensal proporcional por `meta / 12`.
+- [x] Creditar apenas meses de calendário concluídos.
+- [x] Garantir março = 7, junho = 14, setembro = 21 e dezembro = 28 para meta 28.
+- [x] Evitar drift: calcular cada marco diretamente a partir da meta anual e arredondar apenas a apresentação.
+- [x] Descontar férias gozadas/registadas do saldo mensal pessoal.
+- [x] Descontar férias futuras planeadas apenas no saldo projetado.
+- [x] Manter transitados e ajustes no saldo pessoal.
+- [x] Criar cronograma de 12 meses com estados concluído/em curso/futuro.
+- [x] Criar testes de fecho mensal, dezembro, precisão e deduplicação já existente.
+- [x] Criar UI responsiva para o cronograma mensal.
+- [x] Guardar a nova preferência no `secureStorage` existente.
+- [x] Não criar novo endpoint, schema, segredo, token ou mecanismo de autenticação.
+- [x] Atualizar `PROJECT_STATE.md`.
+- [ ] Atualizar `ARCHITECTURE.md`.
+- [ ] Atualizar `DECISIONS.md`.
+- [ ] Atualizar `CHANGELOG.md`.
+- [ ] Obter `npm audit --audit-level=high` verde no PR #204.
+- [ ] Obter typecheck verde.
+- [ ] Obter lint verde.
+- [ ] Obter testes verdes, incluindo regressões existentes.
+- [ ] Obter build, Worker dry-run e smoke test verdes.
+- [ ] Marcar PR #204 como pronto apenas depois dos quality gates.
+- [ ] Integrar PR #204 em `main`.
+- [ ] Confirmar publicação GitHub Pages do merge.
+- [ ] Validar em dispositivo real a grelha mensal e o saldo acumulado.
+- [ ] Confirmar mudança de saldo no fecho real de um mês.
+- [ ] Confirmar sincronização de `monthlyAccrualTargetDays` entre telemóvel e computador.
+
 ## P0 — Ferramenta de saldo de férias (PR #203)
 
 - [x] Analisar a arquitetura atual antes de alterar código.

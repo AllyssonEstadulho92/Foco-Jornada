@@ -1,5 +1,41 @@
 # Changelog
 
+## 2026-09-15 — acumulação mensal pessoal de férias (PR #204)
+
+### Adicionado
+
+- Contador mensal automático na rota `#/ferias` com meta anual pessoal configurável e valor por defeito de 28 dias.
+- `monthlyAccrualTargetDays` na configuração existente `foco-jornada-vacation-settings-v1`.
+- Cronograma visual de janeiro a dezembro com estados **Concluído**, **Em curso** e **Futuro**.
+- Cartões para saldo acumulado, acumulado bruto, saldo após férias planeadas e meta anual.
+- `vacation-accrual.css` para o cronograma responsivo em desktop, tablet e smartphone.
+- Testes de fecho mensal, meta de 28 dias, dezembro exato e prevenção de drift por arredondamento.
+
+### Cálculo
+
+- Cada mês só é creditado quando chega ao respetivo último dia.
+- A fórmula é `meta anual × meses concluídos / 12`.
+- O cálculo não soma parcelas arredondadas: cada marco é recalculado a partir da meta anual.
+- Para meta 28: janeiro 2,33; fevereiro 4,67; março 7; junho 14; setembro 21; dezembro 28.
+- O saldo pessoal desconta férias gozadas/registadas e inclui transitados e ajustes confirmados.
+- O saldo projetado desconta também férias futuras planeadas.
+
+### Separação de conceitos
+
+- O contador de 28 dias é apresentado como **projeção pessoal**.
+- `annualEntitlementDays` e as regras laborais existentes do PR #203 permanecem separados.
+- A aplicação não apresenta a meta pessoal de 28 dias como direito legal ou contratual automático.
+
+### Compatibilidade e segurança
+
+- Configurações antigas sem `monthlyAccrualTargetDays` recebem 28 como fallback, sem migração destrutiva.
+- Nenhum novo endpoint, token, segredo, permissão, tabela IndexedDB ou mecanismo de autenticação foi criado.
+- A preferência permanece no `secureStorage` e acompanha o mesmo cofre cifrado/sincronização existente.
+
+### Qualidade
+
+- PR #204 permanece em draft até `npm audit`, typecheck, lint, testes, build, Worker dry-run e smoke test concluírem com sucesso.
+
 ## 2026-09-15 — ferramenta de saldo de férias (PR #203)
 
 ### Adicionado

@@ -4,15 +4,12 @@ Atualizado em: 2026-09-15
 
 ## Objetivo
 
-Adicionar ao **Foco Jornada** uma ferramenta pessoal que mostre, com regras explícitas e auditáveis:
+A área **Férias** do Foco Jornada mantém dois cálculos explicitamente separados:
 
-- direito de férias estimado para o ano em curso;
-- dias transitados confirmados pelo utilizador;
-- férias já gozadas/registadas na aplicação;
-- férias planeadas para datas futuras;
-- saldo disponível hoje;
-- saldo projetado depois das férias planeadas;
-- próxima data normal de vencimento do período anual.
+1. **Referência laboral/contratual** — direito anual configurado, ano de admissão, dias transitados, férias gozadas e planeadas.
+2. **Projeção mensal pessoal** — contador automático que acompanha uma meta anual configurável, por defeito **28 dias**, distribuída pelos meses concluídos.
+
+Esta separação permite acompanhar a progressão pretendida pelo utilizador sem apresentar a meta pessoal de 28 dias como um direito legal ou contratual automaticamente adquirido.
 
 A ferramenta não substitui o mapa oficial de férias, processamento de RH, contrato coletivo ou informação da entidade empregadora.
 
@@ -25,36 +22,33 @@ A ferramenta não substitui o mapa oficial de férias, processamento de RH, cont
 - O mapa de turnos já suporta `kind: "vacation"` / **Férias**.
 - A calculadora de horas já suporta `reason: "ferias"`.
 - O Código do Trabalho prevê, em regra, um mínimo anual de 22 dias úteis e regras especiais no ano de admissão.
+- O utilizador pretende acompanhar uma meta pessoal de 28 dias ao final do ano, somada progressivamente pelos meses.
 
 ### Inferência aplicada
 
 - O saldo deve reutilizar férias já registadas, em vez de obrigar a introduzir os mesmos dias novamente.
 - Dias encontrados simultaneamente no mapa de turnos e na calculadora de horas devem contar uma única vez por data.
+- A progressão mensal pessoal deve ser calculada, não gravada como 12 registos artificiais.
 
-### Recomendação implementada
+### Decisão implementada
 
-- Guardar apenas a configuração adicional da ferramenta em `secureStorage`, evitando migração do schema IndexedDB e preservando o modelo de cofre atual.
-- Separar **saldo hoje** de **saldo após planeadas** para não tratar férias futuras como já gozadas.
-- Não apresentar uma falsa acumulação mensal nos anos normais: o período anual vence, em regra, em 1 de janeiro.
+- Guardar a configuração adicional da ferramenta em `secureStorage`, sem migração do schema IndexedDB.
+- Separar **saldo laboral** de **saldo mensal pessoal**.
+- Separar **saldo acumulado hoje** de **saldo após férias planeadas**.
+- Não descrever a meta pessoal de 28 dias como regra legal: nos anos normais, a referência laboral continua a tratar o período anual como vencendo, em regra, em 1 de janeiro.
+- Creditar a projeção pessoal apenas no fecho de cada mês civil.
 
-### Por definir / depende de confirmação externa
-
-- Dias acima do mínimo legal por contrato, CCT ou política empresarial.
-- Dias transitados do ano anterior e respetiva validade/condições de gozo.
-- Ajustes manuais decorrentes de informação oficial de RH.
-- Situações especiais como impedimento prolongado, cessação do contrato ou regime coletivo específico.
-
-## Regras de cálculo
+## Referência laboral/contratual
 
 ### Ano normal após admissão
 
 `direito do ano = max(22, dias anuais confirmados)`
 
-`saldo hoje = direito do ano + transitados + ajustes - férias gozadas/registadas - férias manuais externas`
+`saldo laboral hoje = direito do ano + transitados + ajustes - férias gozadas/registadas - férias manuais externas`
 
-`saldo após planeadas = saldo hoje - férias futuras registadas`
+`saldo laboral após planeadas = saldo laboral hoje - férias futuras registadas`
 
-O número de dias anuais configurado nunca é aceite abaixo de 22 para o regime geral representado pela ferramenta.
+O número de dias anuais configurado nunca é aceite abaixo de 22 para o regime geral representado pela ferramenta. Um valor superior só deve ser usado quando existir condição mais favorável confirmada.
 
 ### Ano de admissão
 
@@ -64,9 +58,50 @@ A ferramenta usa uma política conservadora e determinística:
 
 O gozo é assinalado como disponível após seis meses completos de execução do contrato.
 
-Existe discussão jurisprudencial sobre a proporcionalidade de meses incompletos no ano de admissão. Para não apresentar como certa uma interpretação discutida, a versão inicial usa **meses completos** e mostra essa limitação na interface.
+Existe discussão jurisprudencial sobre a proporcionalidade de meses incompletos no ano de admissão. Para não apresentar como certa uma interpretação discutida, esta versão usa **meses completos** e mostra essa limitação na interface.
 
-### Dias registados
+## Projeção mensal pessoal de 28 dias
+
+### Regra
+
+Por defeito:
+
+`meta anual pessoal = 28 dias`
+
+`acumulado bruto = meta anual pessoal × meses de calendário concluídos / 12`
+
+`saldo mensal hoje = acumulado bruto + transitados + ajustes - férias gozadas/registadas - férias manuais externas`
+
+`saldo mensal após planeadas = saldo mensal hoje - férias futuras registadas`
+
+O mês corrente só entra no acumulado no respetivo último dia. Assim, em 15 de setembro apenas janeiro a agosto estão concluídos; em 30 de setembro, setembro também passa a contar.
+
+### Marcos com meta de 28 dias
+
+| Mês concluído | Acumulado |
+| --- | ---: |
+| Janeiro | 2,33 dias |
+| Fevereiro | 4,67 dias |
+| Março | 7,00 dias |
+| Abril | 9,33 dias |
+| Maio | 11,67 dias |
+| Junho | 14,00 dias |
+| Julho | 16,33 dias |
+| Agosto | 18,67 dias |
+| Setembro | 21,00 dias |
+| Outubro | 23,33 dias |
+| Novembro | 25,67 dias |
+| Dezembro | 28,00 dias |
+
+### Precisão numérica
+
+A aplicação **não soma 2,33 repetidamente**, porque isso introduziria erro acumulado. Cada marco é recalculado diretamente:
+
+`meta × número do mês / 12`
+
+O resultado é arredondado apenas para apresentação, até duas casas decimais. Desta forma, dezembro termina exatamente em 28 dias quando a meta é 28.
+
+## Dias registados
 
 São agregadas e deduplicadas por `YYYY-MM-DD`:
 
@@ -74,11 +109,11 @@ São agregadas e deduplicadas por `YYYY-MM-DD`:
 2. dias do mapa de turnos com `kind === "vacation"`;
 3. plano de vencimento associado ao mapa com `kind === "vacation"`.
 
-Datas até ao dia atual contam como gozadas/registadas. Datas posteriores, dentro do mesmo ano, contam como planeadas.
+Datas até ao dia atual contam como gozadas/registadas. Datas posteriores, dentro do mesmo ano, contam como planeadas. A mesma data não é descontada duas vezes.
 
 ## Persistência
 
-Chave nova no `secureStorage`:
+Chave no `secureStorage`:
 
 `foco-jornada-vacation-settings-v1`
 
@@ -86,9 +121,12 @@ Conteúdo:
 
 - `employmentStartDate`;
 - `annualEntitlementDays`;
+- `monthlyAccrualTargetDays` — 28 por defeito;
 - `carriedDays`;
 - `manualTakenDays`;
 - `adjustmentDays`.
+
+Configurações anteriores ao PR #204 que não tenham `monthlyAccrualTargetDays` recebem 28 como fallback de leitura. Não existe migração destrutiva.
 
 Não é criado novo endpoint, tabela, token, segredo ou dado em texto simples fora do cofre existente.
 
@@ -98,25 +136,30 @@ Rota: `#/ferias`
 
 A página apresenta:
 
-- cabeçalho com data de referência;
-- cartões de saldo atual, saldo projetado, direito do ano e dias gozados;
-- formulário de configuração com validações numéricas;
-- explicação da regra do ano normal ou do ano de admissão;
-- decomposição do cálculo;
+- data de referência;
+- **Saldo acumulado** pela projeção mensal;
+- **Acumulado bruto** por meses concluídos;
+- **Após planeadas**;
+- **Meta anual**;
+- cronograma de janeiro a dezembro com estados **Concluído**, **Em curso** e **Futuro**;
+- formulário para meta pessoal, data de admissão, referência anual confirmada, transitados, férias externas e ajustes;
+- secção separada de referência laboral;
 - ligação direta ao mapa de turnos e à calculadora de horas;
-- aviso explícito de que o saldo oficial deve ser confirmado com a entidade empregadora;
-- ligações para fontes legais/institucionais.
+- aviso explícito de que o saldo oficial deve ser confirmado com a entidade empregadora.
 
 A interface usa os tokens existentes, mantém alvos adequados a toque, foco por teclado, `forced-colors` e layout responsivo.
 
 ## Segurança e privacidade
 
-- A data de admissão e os valores de férias são guardados no mesmo cofre cifrado já utilizado pela aplicação.
+- A data de admissão, meta pessoal e restantes valores são guardados no mesmo cofre cifrado já utilizado pela aplicação.
 - Nenhum dado novo é enviado diretamente para um backend em texto simples.
 - Não são adicionadas credenciais, segredos ou permissões.
 - A leitura de registos existentes é local e deduplicada antes do cálculo.
+- A projeção mensal é derivada em runtime; não cria 12 eventos persistidos nem exige timer em background.
 
 ## Testes mínimos
+
+### Referência laboral
 
 - período anual normal de 22 dias;
 - valor contratual superior a 22;
@@ -126,24 +169,35 @@ A interface usa os tokens existentes, mantém alvos adequados a toque, foco por 
 - período de espera de seis meses;
 - deduplicação da mesma data em fontes diferentes;
 - separação entre dias passados e dias futuros;
-- data de admissão futura;
-- saldo negativo visível como alerta, sem truncar silenciosamente para zero.
+- data de admissão futura.
+
+### Projeção mensal
+
+- antes do último dia do mês, esse mês não conta;
+- no último dia, o mês passa a contar;
+- 15 de setembro com meta 28 = 18,67 dias brutos;
+- 30 de setembro = 21 dias;
+- 31 de dezembro = 28 dias;
+- os 12 marcos não apresentam drift de arredondamento;
+- férias gozadas reduzem o saldo mensal;
+- férias futuras reduzem apenas o saldo mensal projetado.
 
 ## Critérios de aceitação
 
 1. A rota `#/ferias` abre em mobile e desktop.
-2. O utilizador consegue guardar a configuração sem alterar o schema do cofre.
+2. O utilizador consegue guardar a meta pessoal sem alterar o schema do cofre.
 3. Férias já registadas noutras áreas são detetadas automaticamente e sem duplicação por data.
-4. O saldo atual e o projetado têm fórmulas transparentes.
-5. A ferramenta não descreve o direito anual normal como acumulação mensal.
-6. O ano de admissão é tratado separadamente.
-7. Testes, typecheck, lint e build permanecem verdes.
-8. `PROJECT_STATE.md`, `ARCHITECTURE.md`, `DECISIONS.md`, `TODO.md` e `CHANGELOG.md` são atualizados antes da integração.
+4. O contador mostra claramente o acumulado por meses concluídos.
+5. Com meta 28, dezembro termina exatamente em 28 dias.
+6. A interface distingue projeção pessoal de referência laboral/contratual.
+7. O ano de admissão continua tratado separadamente.
+8. Testes, typecheck, lint, build, Worker dry-run e smoke test permanecem verdes antes da integração.
+9. `PROJECT_STATE.md`, `ARCHITECTURE.md`, `DECISIONS.md`, `TODO.md` e `CHANGELOG.md` permanecem atualizados.
 
-## Fontes oficiais usadas
+## Fontes oficiais da referência laboral
 
 - Código do Trabalho, artigos 237.º a 240.º — Diário da República, versão consolidada em vigor: https://diariodarepublica.pt/dr/legislacao-consolidada/lei/2009-34546475-46747075
 - Artigo 238.º — duração mínima de 22 dias úteis: https://diariodarepublica.pt/dr/legislacao-consolidada/lei/2009-34546475-56360079
 - gov.pt — Trabalhar em Portugal, férias e subsídio de férias: https://www.gov.pt/guias/trabalhar-em-portugal
 
-As fontes confirmam o enquadramento geral. Situações particulares devem ser confrontadas com o contrato, instrumento de regulamentação coletiva aplicável e informação oficial de RH/ACT.
+Estas fontes fundamentam apenas a **referência laboral**. A meta mensal de 28 dias é uma configuração pessoal da aplicação e deve ser confrontada com RH, contrato ou instrumento de regulamentação coletiva quando o utilizador pretender tratá-la como saldo oficial.

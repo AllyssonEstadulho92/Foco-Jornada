@@ -18,7 +18,9 @@ GitHub Pages
        │    ├─ CoffeeRepository
        │    └─ SettingsRepository
        ├─ domínio / casos de uso
-       │    └─ VacationBalance (cálculo puro de férias)
+       │    └─ VacationBalance
+       │         ├─ referência laboral de férias
+       │         └─ projeção mensal pessoal configurável
        └─ cofre local cifrado
             └─ sincronização opcional
                  └─ Cloudflare Worker + Durable Object
@@ -52,8 +54,10 @@ Componentes relevantes:
 - `src/presentation/pages/SettingsReferencePage.tsx` — horário base, fins de semana e pausas;
 - `src/presentation/pages/ShiftMapPage.tsx` — planeamento mensal, incluindo dias de férias;
 - `src/presentation/pages/WorkHoursCalculatorPage.tsx` — ocorrências laborais, incluindo férias;
-- `src/presentation/pages/VacationBalancePage.tsx` — saldo pessoal de férias, configuração e explicação do cálculo;
+- `src/presentation/pages/VacationBalancePage.tsx` — saldo pessoal de férias, acumulação mensal, configuração e explicação dos dois modelos;
 - `src/presentation/providers/AppServicesProvider.tsx` — injeção única de repositories/serviços.
+
+A grelha mensal da área de férias usa `src/styles/vacation-accrual.css`, carregado depois de `vacation.css`. Isto mantém a base visual anterior e isola apenas os estilos específicos do cronograma mensal.
 
 ### Application
 
@@ -86,7 +90,14 @@ Entidades, regras puras e cálculos.
 
 `WorkSchedule` é a autoridade para entrada, saída e pausas planeadas.
 
-`VacationBalance` é a autoridade para o cálculo apresentado na área de férias. O módulo não altera jornadas, turnos ou horas; recebe datas de férias já identificadas e configuração explícita e devolve apenas um resultado calculado.
+`VacationBalance` é a autoridade para os cálculos apresentados na área de férias. O módulo não altera jornadas, turnos ou horas; recebe datas de férias já identificadas e configuração explícita e devolve apenas resultados derivados.
+
+Dentro de `VacationBalance` existem dois conceitos independentes:
+
+1. **referência laboral/contratual** — preserva as regras implementadas no PR #203;
+2. **projeção mensal pessoal** — adicionada no PR #204 para acompanhar uma meta configurável, por defeito 28 dias.
+
+A projeção pessoal não escreve em `annualEntitlementDays` nem substitui o saldo laboral. A separação é estrutural e também visível na UI.
 
 ## Navegação responsiva
 
@@ -136,11 +147,14 @@ Campos:
 
 - `employmentStartDate` — data de admissão indicada pelo utilizador;
 - `annualEntitlementDays` — período anual confirmado, com mínimo lógico de 22 no regime geral suportado;
+- `monthlyAccrualTargetDays` — meta anual da projeção mensal pessoal; valor por defeito 28;
 - `carriedDays` — dias transitados confirmados;
 - `manualTakenDays` — férias já gozadas que não constam nos registos da aplicação;
 - `adjustmentDays` — ajuste documentado positivo ou negativo.
 
-Esta decisão evita uma migração de schema para cinco valores de configuração e mantém os dados dentro do cofre cifrado e do fluxo de sincronização existente.
+Perfis criados antes do PR #204 não possuem `monthlyAccrualTargetDays`; a leitura aplica 28 como fallback. Não existe migração destrutiva nem versão paralela da chave.
+
+Esta decisão mantém os dados dentro do cofre cifrado e do fluxo de sincronização existente.
 
 ## Fontes de dados da ferramenta de férias
 
@@ -159,25 +173,32 @@ Payroll plan por mês
 
 calculateVacationBalance()
         ↓
-  ├─ férias gozadas até hoje
-  ├─ férias futuras planeadas
-  ├─ saldo disponível
-  └─ saldo projetado
+  ├─ referência laboral
+  │    ├─ férias gozadas até hoje
+  │    ├─ férias futuras planeadas
+  │    ├─ saldo disponível
+  │    └─ saldo projetado
+  └─ projeção mensal pessoal
+       ├─ meses de calendário concluídos
+       ├─ acumulado bruto
+       ├─ saldo acumulado
+       ├─ saldo após planeadas
+       └─ cronograma de 12 meses
 ```
 
 A mesma data pode estar representada no mapa e na calculadora porque essas áreas servem finalidades diferentes. A agregação considera a **data** como unidade lógica de um dia de férias e deduplica antes de calcular.
 
-A versão inicial não tenta inferir férias a partir de ausência, baixa, folga ou jornada não iniciada. Apenas estados explicitamente marcados como férias entram na contagem automática.
+A aplicação não tenta inferir férias a partir de ausência, baixa, folga ou jornada não iniciada. Apenas estados explicitamente marcados como férias entram na contagem automática.
 
 ## Regras de férias
 
-### Anos normais
+### Anos normais — referência laboral
 
 No enquadramento geral representado pela ferramenta:
 
 - o direito anual vence, em regra, em 1 de janeiro;
 - o mínimo anual é 22 dias úteis;
-- não se apresenta uma “acumulação mensal” normal ao longo do ano;
+- a referência laboral não é convertida automaticamente numa acumulação mensal;
 - um valor configurado acima de 22 é aceite para permitir condição contratual/coletiva mais favorável confirmada pelo utilizador.
 
 Fórmulas:
@@ -187,9 +208,51 @@ saldoHoje = direitoAno + transitados + ajustes - gozadasRegistadas - gozadasManu
 saldoProjetado = saldoHoje - planeadasFuturas
 ```
 
+### Contador mensal pessoal — PR #204
+
+O contador mensal é uma projeção pessoal separada da referência laboral.
+
+Configuração por defeito:
+
+```text
+metaAnualPessoal = 28
+```
+
+Regras:
+
+```text
+mesesConcluidos = meses de calendário já fechados no ano
+acumuladoMensal = metaAnualPessoal × mesesConcluidos / 12
+saldoMensal = acumuladoMensal + transitados + ajustes - gozadasRegistadas - gozadasManuais
+saldoMensalProjetado = saldoMensal - planeadasFuturas
+```
+
+Um mês só é fechado no respetivo último dia. Em 15 de setembro, por exemplo, existem 8 meses concluídos; em 30 de setembro passam a existir 9.
+
+Para a meta de 28 dias:
+
+| Fecho | Acumulado |
+| --- | ---: |
+| Janeiro | 2,33 |
+| Fevereiro | 4,67 |
+| Março | 7,00 |
+| Abril | 9,33 |
+| Maio | 11,67 |
+| Junho | 14,00 |
+| Julho | 16,33 |
+| Agosto | 18,67 |
+| Setembro | 21,00 |
+| Outubro | 23,33 |
+| Novembro | 25,67 |
+| Dezembro | 28,00 |
+
+Os marcos não são produzidos somando `2,33` repetidamente. Cada valor é recalculado como `meta × mês / 12`; o arredondamento a duas casas é apenas de apresentação. Isto evita drift e garante dezembro exatamente igual à meta.
+
+O cronograma mensal é derivado em runtime; não cria eventos nem um segundo histórico de férias.
+
 ### Ano de admissão
 
-A versão inicial adota uma política conservadora e determinística:
+A referência laboral adota uma política conservadora e determinística:
 
 ```text
 mesesCompletos = meses completos decorridos desde employmentStartDate
@@ -199,6 +262,8 @@ direitoAdmissao = min(20, mesesCompletos × 2)
 O marco de disponibilidade para gozo é a data correspondente a seis meses completos de execução do contrato. A interface separa dias calculados de possibilidade de gozo antes desse marco.
 
 Há divergência interpretativa/jurisprudencial sobre o tratamento de frações de mês no artigo 239.º em contratos que não se enquadram na regra específica de duração inferior a seis meses. A aplicação não esconde essa incerteza: usa meses completos, documenta a opção e recomenda confirmação com RH/ACT quando a diferença for material.
+
+A projeção mensal pessoal de 28 dias continua visualmente identificada como projeção e não substitui esta regra do ano de admissão.
 
 ### Transferência de dias
 
@@ -219,7 +284,7 @@ AppDatabase
                            └─ Durable Object por profileId
 ```
 
-Como `secureStorage` integra o snapshot cifrado, a configuração de férias acompanha o mesmo cofre. A funcionalidade não adiciona API por entidade nem protocolo específico de férias.
+Como `secureStorage` integra o snapshot cifrado, a configuração de férias — incluindo `monthlyAccrualTargetDays` — acompanha o mesmo cofre. A funcionalidade não adiciona API por entidade nem protocolo específico de férias.
 
 ### Regras de segurança
 
@@ -340,13 +405,15 @@ Isto evita criar um store paralelo ou duplicar regras de persistência.
 
 A ferramenta de férias lê o store de horas reidratado e as chaves mensais do `secureStorage` durante o render da rota. Como não mantém um segundo histórico de férias, alterações feitas nas fontes voltam a ser refletidas quando a página é reaberta/renderizada com o estado atualizado.
 
+O cronograma de acumulação mensal é calculado a partir de `asOfDate` e da meta; não depende de timer em background, porque nenhum crédito precisa de ser fisicamente escrito no último dia do mês. Ao abrir a página, o domínio deriva de forma determinística quantos meses já estão concluídos.
+
 ## Datas e timezone
 
 A área geral de jornada usa o timezone local do browser em vários utilitários `Date`/`Intl`. Dispositivos com timezones diferentes podem interpretar o mesmo instante de forma distinta.
 
-O cálculo de férias usa chaves civis `YYYY-MM-DD` e valida/adiciona meses com componentes UTC para não introduzir deriva por DST. A apresentação das datas usa o locale `pt-PT`. Esta escolha não migra timestamps históricos nem resolve o risco global de timezone da jornada.
+O cálculo de férias usa chaves civis `YYYY-MM-DD` e valida/adiciona meses com componentes UTC para não introduzir deriva por DST. A apresentação das datas usa o locale `pt-PT`. O fecho mensal usa o último dia civil de cada mês do ano de referência.
 
-Não foi feita migração automática para um timezone global porque isso poderia alterar históricos. Validações cross-device devem usar o mesmo timezone do sistema.
+Esta escolha não migra timestamps históricos nem resolve o risco global de timezone da jornada. Não foi feita migração automática para um timezone global porque isso poderia alterar históricos. Validações cross-device devem usar o mesmo timezone do sistema.
 
 ## Cache/PWA
 
@@ -357,12 +424,9 @@ Não foi feita migração automática para um timezone global porque isso poderi
 
 ## Segurança de dependências
 
-O quality gate executa `npm audit --audit-level=high` antes de typecheck/testes. Em 2026-09-10 advisories novos bloquearam o PR #202 em dependências de desenvolvimento. A branch atual de `main`:
+O quality gate executa `npm audit --audit-level=high` antes de typecheck/testes. A branch atual usa Node 22 com `npm@11.6.0`, `vitest` `5.0.0` e override de `sharp` `0.35.4`.
 
-- usa `vitest` `5.0.0`, versão corrigida para o advisory do mocker;
-- força `sharp` `0.35.4`, versão corrigida para o advisory em libheif.
-
-A ferramenta de férias não adiciona dependências de runtime ou desenvolvimento.
+O contador mensal de férias não adiciona dependências de runtime ou desenvolvimento.
 
 ## Testes e quality gates
 
@@ -379,7 +443,17 @@ Obrigatórios antes de integrar:
 
 A automação temporal possui testes para entrada, pausa de 60 minutos, saída, não criação depois do turno e não reinício após término manual.
 
-`VacationBalance.test.ts` cobre período anual normal, valor mais favorável, limite mínimo, ano de admissão, limite de 20 dias, marco de seis meses, deduplicação, separação passado/futuro e data de admissão futura.
+`VacationBalance.test.ts` cobre:
+
+- período anual normal e mínimo de 22;
+- valor mais favorável configurado;
+- ano de admissão, limite de 20 e marco de seis meses;
+- deduplicação e separação passado/futuro;
+- meta mensal de 28 dias;
+- mês ainda não concluído vs último dia do mês;
+- setembro = 21 e dezembro = 28;
+- cronograma de 12 marcos sem drift de arredondamento;
+- desconto de férias gozadas e futuras no saldo mensal pessoal.
 
 ## Distribuição
 
