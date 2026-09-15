@@ -20,6 +20,7 @@ GitHub Pages
        ├─ domínio / casos de uso
        │    └─ VacationBalance
        │         ├─ referência laboral de férias
+       │         ├─ filtro de dias úteis padrão
        │         └─ projeção mensal pessoal configurável
        └─ cofre local cifrado
             └─ sincronização opcional
@@ -92,10 +93,11 @@ Entidades, regras puras e cálculos.
 
 `VacationBalance` é a autoridade para os cálculos apresentados na área de férias. O módulo não altera jornadas, turnos ou horas; recebe datas de férias já identificadas e configuração explícita e devolve apenas resultados derivados.
 
-Dentro de `VacationBalance` existem dois conceitos independentes:
+Dentro de `VacationBalance` existem três responsabilidades relacionadas:
 
-1. **referência laboral/contratual** — preserva as regras implementadas no PR #203;
-2. **projeção mensal pessoal** — adicionada no PR #204 para acompanhar uma meta configurável, por defeito 28 dias.
+1. **normalização de datas de férias** — valida, deduplica e aplica o filtro de dias úteis padrão;
+2. **referência laboral/contratual** — preserva as regras implementadas no PR #203;
+3. **projeção mensal pessoal** — adicionada no PR #204 para acompanhar uma meta configurável, por defeito 28 dias.
 
 A projeção pessoal não escreve em `annualEntitlementDays` nem substitui o saldo laboral. A separação é estrutural e também visível na UI.
 
@@ -170,6 +172,9 @@ Payroll plan por mês
 
         ↓ normalizar por YYYY-MM-DD
         ↓ Set<string> / deduplicação
+        ↓ filtro de semana padrão
+          ├─ segunda–sexta → contabilizar
+          └─ sábado/domingo → ignorar no desconto
 
 calculateVacationBalance()
         ↓
@@ -186,9 +191,21 @@ calculateVacationBalance()
        └─ cronograma de 12 meses
 ```
 
-A mesma data pode estar representada no mapa e na calculadora porque essas áreas servem finalidades diferentes. A agregação considera a **data** como unidade lógica de um dia de férias e deduplica antes de calcular.
+A mesma data pode estar representada no mapa e na calculadora porque essas áreas servem finalidades diferentes. A agregação considera a **data** como unidade lógica, deduplica primeiro e só depois decide se essa data é um dia útil padrão contabilizável.
+
+A classificação de data passada/futura é feita apenas sobre as datas úteis já filtradas. `recordedIgnoredWeekendDays` é derivado em runtime para permitir auditoria e testes, sem nova persistência.
 
 A aplicação não tenta inferir férias a partir de ausência, baixa, folga ou jornada não iniciada. Apenas estados explicitamente marcados como férias entram na contagem automática.
+
+### Semana útil padrão suportada
+
+Na regra atual:
+
+- segunda a sexta-feira contam como férias gozadas/planeadas;
+- sábado e domingo não reduzem o saldo, mesmo quando pertencem ao intervalo marcado;
+- exemplo validado: 24/08/2026–06/09/2026 = 14 datas civis, 10 dias úteis contabilizados e 4 dias de fim de semana ignorados.
+
+Esta regra não tenta resolver automaticamente feriados nacionais/municipais, descanso semanal diferente ou escalas especiais. Esses casos exigem calendário laboral confirmado antes de serem automatizados.
 
 ## Regras de férias
 
@@ -411,7 +428,7 @@ O cronograma de acumulação mensal é calculado a partir de `asOfDate` e da met
 
 A área geral de jornada usa o timezone local do browser em vários utilitários `Date`/`Intl`. Dispositivos com timezones diferentes podem interpretar o mesmo instante de forma distinta.
 
-O cálculo de férias usa chaves civis `YYYY-MM-DD` e valida/adiciona meses com componentes UTC para não introduzir deriva por DST. A apresentação das datas usa o locale `pt-PT`. O fecho mensal usa o último dia civil de cada mês do ano de referência.
+O cálculo de férias usa chaves civis `YYYY-MM-DD` e valida/adiciona meses com componentes UTC para não introduzir deriva por DST. A apresentação das datas usa o locale `pt-PT`. O fecho mensal usa o último dia civil de cada mês do ano de referência. O filtro de sábado/domingo também calcula o dia da semana a partir dos componentes UTC da mesma data civil.
 
 Esta escolha não migra timestamps históricos nem resolve o risco global de timezone da jornada. Não foi feita migração automática para um timezone global porque isso poderia alterar históricos. Validações cross-device devem usar o mesmo timezone do sistema.
 
@@ -426,7 +443,7 @@ Esta escolha não migra timestamps históricos nem resolve o risco global de tim
 
 O quality gate executa `npm audit --audit-level=high` antes de typecheck/testes. A branch atual usa Node 22 com `npm@11.6.0`, `vitest` `5.0.0` e override de `sharp` `0.35.4`.
 
-O contador mensal de férias não adiciona dependências de runtime ou desenvolvimento.
+A correção de contagem útil não adiciona dependências de runtime ou desenvolvimento.
 
 ## Testes e quality gates
 
@@ -449,6 +466,8 @@ A automação temporal possui testes para entrada, pausa de 60 minutos, saída, 
 - valor mais favorável configurado;
 - ano de admissão, limite de 20 e marco de seis meses;
 - deduplicação e separação passado/futuro;
+- exclusão de sábado e domingo da contagem automática;
+- intervalo 24/08/2026–06/09/2026 = 10 dias úteis e 4 fins de semana ignorados;
 - meta mensal de 28 dias;
 - mês ainda não concluído vs último dia do mês;
 - setembro = 21 e dezembro = 28;

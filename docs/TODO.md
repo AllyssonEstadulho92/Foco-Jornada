@@ -2,6 +2,20 @@
 
 Atualizado em: 2026-09-15
 
+## P0 — Contagem de dias úteis nas férias
+
+- [x] Confirmar o comportamento pretendido para 24/08/2026–06/09/2026: 10 dias úteis.
+- [x] Manter deduplicação por data antes da contagem.
+- [x] Excluir sábado e domingo do desconto automático no regime semanal padrão.
+- [x] Aplicar a mesma regra a férias já gozadas e férias futuras planeadas.
+- [x] Aplicar a correção ao saldo laboral e ao saldo mensal pessoal.
+- [x] Adicionar teste de regressão com 14 datas civis → 10 dias úteis + 4 fins de semana ignorados.
+- [x] Adicionar teste direto de sábado/domingo ignorados.
+- [x] Documentar a limitação: feriados e escalas especiais ainda não são inferidos automaticamente.
+- [ ] Obter `npm audit --audit-level=high`, typecheck, lint, testes, build, Worker dry-run e smoke test verdes.
+- [ ] Integrar/publicar apenas depois dos quality gates.
+- [ ] Validar em dispositivo real o intervalo 24/08/2026–06/09/2026.
+
 ## P0 — Acumulação mensal de férias até 28 dias (PR #204)
 
 - [x] Analisar a ferramenta de férias integrada no PR #203 antes de alterar código.
@@ -162,6 +176,7 @@ As correções dos PR #195–#199 estão integradas; continuam pendentes testes 
 
 ## P2 — Melhorias futuras
 
+- [ ] Avaliar calendário laboral para excluir automaticamente feriados e suportar descanso semanal diferente sem inferir regras não confirmadas.
 - [ ] Avaliar regras adicionais de férias apenas após confirmar eventual CCT/contrato aplicável; não inferir benefícios específicos.
 - [ ] Avaliar seleção de ano/histórico de férias depois de validar a versão atual em uso real.
 - [ ] Criar fluxo explícito de resolução de conflitos apenas depois de validar o comportamento conservador atual em uso real.

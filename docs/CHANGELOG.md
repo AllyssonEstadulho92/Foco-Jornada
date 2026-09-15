@@ -1,5 +1,24 @@
 # Changelog
 
+## 2026-09-15 — contagem de dias úteis nas férias
+
+### Corrigido
+
+- Dias de férias registados ao sábado ou domingo deixam de reduzir o saldo no regime semanal padrão suportado.
+- A exclusão de fim de semana é aplicada depois da deduplicação por data e antes de separar férias já gozadas de férias futuras planeadas.
+- O mesmo resultado alimenta a referência laboral e o contador mensal pessoal.
+- A contagem continua baseada em datas civis `YYYY-MM-DD` com componentes UTC para evitar deriva de timezone/DST.
+
+### Caso de regressão
+
+- Período 24/08/2026–06/09/2026: 14 datas civis, 10 dias úteis contabilizados e 4 dias de fim de semana ignorados.
+- Foram adicionados testes específicos para o intervalo e para sábado/domingo marcados isoladamente.
+
+### Limite preservado
+
+- Feriados nacionais/municipais, descanso semanal diferente e escalas especiais não são inferidos automaticamente nesta correção.
+- Não foi criado endpoint, schema, token, segredo, permissão, dependência ou migração de dados.
+
 ## 2026-09-15 — acumulação mensal pessoal de férias (PR #204)
 
 ### Adicionado

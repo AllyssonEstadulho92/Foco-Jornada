@@ -262,7 +262,7 @@ Regras de integridade:
 - quando uma jornada está ativa e a saída configurada já foi atingida, encerrá-la com `endedAt` exatamente igual à saída planeada;
 - não criar retroativamente um dia inteiro se a aplicação só for aberta depois da saída sem existir jornada desse dia;
 - não reiniciar uma jornada que o utilizador já terminou manualmente;
-- cada pausa automática usa apenas o seu `startTime`/`endTime` configurado; uma pausa de 60 minutos continua a exigir configuração explícita pelo utilizador;
+- cada pausa automática usa apenas o seu `startTime`/`endTime` configurados; uma pausa de 60 minutos continua a exigir configuração explícita pelo utilizador;
 - uma pausa planeada pode ser reconstruída após suspensão da PWA com os timestamps exatos da configuração;
 - se existir foco em execução quando começa uma pausa de trabalho, pode ser pausado, mas a automação nunca inicia Pomodoro, foco personalizado ou um ciclo de foco;
 - o encerramento da jornada reutiliza `finishJourneyWithProductivityState`, preservando o tratamento consistente de pausa, atividade e foco abertos.
@@ -325,3 +325,24 @@ O saldo pessoal desconta férias já gozadas/registadas e inclui transitados/aju
 - a mesma deduplicação de férias por data continua a alimentar os dois saldos;
 - a interface deve identificar explicitamente o contador de 28 dias como projeção pessoal;
 - nenhum endpoint, segredo, token, permissão, autenticação ou schema operacional novo é introduzido.
+
+## D-024 — Férias registadas descontam apenas dias úteis padrão
+
+**Estado:** implementada na branch `fix/vacation-weekday-count`; integração depende dos quality gates.
+
+**Decisão:** depois de normalizar e deduplicar as datas de férias, o módulo `VacationBalance` deve descontar automaticamente apenas segunda a sexta-feira no regime semanal padrão suportado. Sábado e domingo podem permanecer registados como parte visual de um intervalo, mas não reduzem `recordedTakenDays`, `recordedPlannedDays`, saldo laboral ou saldo mensal pessoal.
+
+O cálculo mantém uma contagem separada de datas de fim de semana ignoradas (`recordedIgnoredWeekendDays`) para tornar o comportamento auditável e testável.
+
+**Caso de aceitação:** o intervalo 24/08/2026–06/09/2026 contém 14 datas civis, mas apenas 10 dias úteis; os dias 29/08, 30/08, 05/09 e 06/09 são ignorados no desconto. O resultado esperado é 10 dias de férias gozados.
+
+**Motivo:** tratar cada data civil marcada como um dia consumido fazia períodos que atravessam fins de semana descontarem mais dias do que a contagem útil pretendida pelo utilizador. O filtro deve acontecer no domínio, não apenas na UI, para que todos os saldos usem a mesma regra.
+
+**Limites:** esta decisão não presume automaticamente feriados, descanso semanal diferente, escalas especiais ou regras de CCT. Esses casos exigem calendário/regra confirmada antes de serem automatizados. Até lá, o ajuste manual permanece o mecanismo explícito para diferenças conhecidas.
+
+**Consequências:**
+
+- a deduplicação por `YYYY-MM-DD` permanece antes do filtro de dias úteis;
+- a classificação passado/futuro ocorre sobre as datas úteis já filtradas;
+- nenhuma persistência adicional é criada para fins de semana ignorados; o valor é derivado em runtime;
+- nenhuma API, schema, segredo, token, permissão ou dependência é alterada.
