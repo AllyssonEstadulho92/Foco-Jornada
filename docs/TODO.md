@@ -16,7 +16,7 @@ Atualizado em: 2026-09-15
 - [x] Preservar `forced-colors` e `prefers-reduced-motion`.
 - [x] Adicionar teste de regressão `vacation-card-containment.test.ts`.
 - [x] Confirmar que a correção não altera cálculo, persistência, API, autenticação, sincronização ou dependências.
-- [ ] Atualizar `PROJECT_STATE.md`, `ARCHITECTURE.md`, `DECISIONS.md`, `TODO.md`, `CHANGELOG.md` e `VACATION-TRACKER.md` no head final.
+- [x] Atualizar `PROJECT_STATE.md`, `ARCHITECTURE.md`, `DECISIONS.md`, `TODO.md`, `CHANGELOG.md` e `VACATION-TRACKER.md` no head final.
 - [ ] Obter `npm audit --audit-level=high` verde.
 - [ ] Obter typecheck verde.
 - [ ] Obter lint verde.
