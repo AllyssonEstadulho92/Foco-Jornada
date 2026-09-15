@@ -22,20 +22,26 @@ Atualizado em: 2026-09-15
 - [x] Não criar novo endpoint, schema IndexedDB, segredo, token ou mecanismo de autenticação.
 - [x] Criar rota `#/ferias` e acesso na navegação desktop/mobile.
 - [x] Criar UI responsiva com foco de teclado, `forced-colors` e mensagens de limitação.
+- [x] Reforçar o contraste do botão principal em tema claro/escuro.
 - [x] Criar `docs/VACATION-TRACKER.md` com especificação e critérios de aceitação.
 - [x] Atualizar `PROJECT_STATE.md` e `ARCHITECTURE.md`.
-- [ ] Atualizar `DECISIONS.md` e `CHANGELOG.md`.
-- [ ] Obter `npm audit --audit-level=high` verde no PR #203.
-- [ ] Obter typecheck verde.
-- [ ] Obter lint verde.
-- [ ] Obter testes verdes, incluindo regressões existentes.
-- [ ] Obter build, Worker dry-run e smoke test verdes.
-- [ ] Marcar PR #203 como pronto apenas depois dos quality gates.
-- [ ] Integrar PR #203 em `main`.
-- [ ] Confirmar publicação GitHub Pages do merge.
-- [ ] Validar em dispositivo real a rota, persistência e responsividade.
+- [x] Atualizar `DECISIONS.md` e `CHANGELOG.md`.
+- [x] Obter `npm audit --audit-level=high` verde no PR #203.
+- [x] Obter typecheck verde.
+- [x] Obter lint verde.
+- [x] Obter testes verdes, incluindo regressões existentes.
+- [x] Obter build, Worker dry-run e smoke test verdes.
+- [x] Corrigir o crash de instalação do npm 10.9.8 sem remover quality gates.
+- [x] Fixar npm 11.6.0 nos workflows de qualidade e publicação.
+- [x] Marcar PR #203 como pronto apenas depois dos quality gates.
+- [x] Integrar PR #203 em `main` no commit `225e808a416ac6e18f23c1b7178e99886d7cecbf`.
+- [x] Confirmar publicação GitHub Pages no commit `d5dee6cd9418eaf4483ca4422c17b8331d915445`.
+- [x] Confirmar pipeline **Qualidade #1098** verde após integração em `main`.
+- [x] Confirmar **pages build and deployment #767** verde para o commit publicado.
+- [ ] Validar em dispositivo real a rota, persistência, tema e responsividade.
 - [ ] Marcar a mesma data como férias em duas fontes e confirmar contagem única em uso real.
 - [ ] Confirmar sincronização da configuração de férias entre telemóvel e computador com o mesmo cofre.
+- [ ] Confirmar com RH/contrato/CCT quaisquer regras mais favoráveis ou dias transitados antes de os introduzir como ajuste.
 
 ## P0 — Automação de jornada e pausas (PR #202)
 
@@ -78,6 +84,8 @@ Atualizado em: 2026-09-15
 - [x] Confirmar `npm audit --audit-level=high` sem vulnerabilidades no head final.
 - [x] Confirmar compatibilidade de Vitest 5 com todos os testes atuais.
 - [x] Confirmar pipeline **Qualidade** verde também após integração em `main`.
+- [x] Isolar o crash `edgesOut` do npm 10.9.8 no runner Node 22.
+- [x] Fixar npm 11.6.0 nos workflows sem reduzir auditoria, testes ou build.
 
 ## P0 — Sincronização móvel ↔ computador em dispositivos reais
 
