@@ -31,6 +31,7 @@ function readVacationSettings(): VacationTrackerSettings {
     return {
       employmentStartDate: String(parsed.employmentStartDate ?? ''),
       annualEntitlementDays: Math.max(22, Math.round(safeNumber(parsed.annualEntitlementDays, 22))),
+      monthlyAccrualTargetDays: Math.max(1, safeNumber(parsed.monthlyAccrualTargetDays, 28)),
       carriedDays: Math.max(0, Math.round(safeNumber(parsed.carriedDays))),
       manualTakenDays: Math.max(0, Math.round(safeNumber(parsed.manualTakenDays))),
       adjustmentDays: Math.round(safeNumber(parsed.adjustmentDays)),
@@ -83,8 +84,16 @@ function formatDate(dateKey: string) {
   }).format(new Date(year, month - 1, day))
 }
 
+function monthLabel(month: number) {
+  return new Intl.DateTimeFormat('pt-PT', { month: 'long' }).format(new Date(2026, month - 1, 1))
+}
+
 function daysLabel(value: number) {
-  return `${value} ${Math.abs(value) === 1 ? 'dia' : 'dias'}`
+  const formatted = new Intl.NumberFormat('pt-PT', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  }).format(value)
+  return `${formatted} ${Math.abs(value - 1) < 0.0001 ? 'dia' : 'dias'}`
 }
 
 export function VacationBalancePage() {
@@ -121,6 +130,10 @@ export function VacationBalancePage() {
     const normalized: VacationTrackerSettings = {
       employmentStartDate: settings.employmentStartDate,
       annualEntitlementDays: Math.max(22, Math.round(safeNumber(settings.annualEntitlementDays, 22))),
+      monthlyAccrualTargetDays: Math.min(
+        60,
+        Math.max(1, safeNumber(settings.monthlyAccrualTargetDays, 28)),
+      ),
       carriedDays: Math.max(0, Math.round(safeNumber(settings.carriedDays))),
       manualTakenDays: Math.max(0, Math.round(safeNumber(settings.manualTakenDays))),
       adjustmentDays: Math.round(safeNumber(settings.adjustmentDays)),
@@ -131,18 +144,19 @@ export function VacationBalancePage() {
   }
 
   const noStartDate = !settings.employmentStartDate || !balance.hasValidEmploymentStartDate
-  const balanceTone = balance.availableBalanceDays < 0 ? ' vacationMetricDanger' : ''
-  const projectedTone = balance.projectedBalanceDays < 0 ? ' vacationMetricDanger' : ''
+  const monthlyBalanceTone = balance.monthlyAvailableBalanceDays < 0 ? ' vacationMetricDanger' : ''
+  const monthlyProjectedTone = balance.monthlyProjectedBalanceDays < 0 ? ' vacationMetricDanger' : ''
 
   return (
     <div className="vacationPage">
       <header className="vacationHero">
         <div>
-          <span className="vacationEyebrow">FÉRIAS · CONTROLO PESSOAL</span>
-          <h1>Saldo de férias</h1>
+          <span className="vacationEyebrow">FÉRIAS · CONTADOR AUTOMÁTICO</span>
+          <h1>Férias acumuladas mês a mês</h1>
           <p>
-            Calcula o direito estimado, o que já foi registado como férias e o saldo que permanece
-            disponível, sem confundir projeção com o registo oficial da entidade empregadora.
+            Acompanha automaticamente uma meta pessoal anual de {daysLabel(balance.monthlyAccrualTargetDays)}.
+            Cada mês de calendário só é creditado quando termina, evitando contar antecipadamente dias que
+            ainda não foram acumulados.
           </p>
         </div>
         <div className="vacationHeroDate" aria-label={`Cálculo à data de ${formatDate(today)}`}>
@@ -154,37 +168,71 @@ export function VacationBalancePage() {
       {noStartDate ? (
         <section className="vacationNotice vacationNoticeWarning" role="status">
           <strong>Falta a data de admissão.</strong>
-          <span>Preenche a data de início do contrato para ativar o cálculo legal do ano de admissão.</span>
+          <span>
+            O contador mensal pessoal continua disponível, mas a referência laboral do ano de admissão só
+            fica completa depois de preencheres a data de início do contrato.
+          </span>
         </section>
       ) : null}
 
-      <section className="vacationMetricGrid" aria-label="Resumo do saldo de férias">
-        <article className={`vacationMetricCard vacationMetricPrimary${balanceTone}`}>
-          <span>Saldo hoje</span>
-          <strong>{daysLabel(balance.availableBalanceDays)}</strong>
-          <small>Direito + transitados + ajustes − férias já gozadas/registadas.</small>
+      <section className="vacationMetricGrid" aria-label="Resumo da acumulação mensal de férias">
+        <article className={`vacationMetricCard vacationMetricPrimary${monthlyBalanceTone}`}>
+          <span>Saldo acumulado</span>
+          <strong>{daysLabel(balance.monthlyAvailableBalanceDays)}</strong>
+          <small>Acumulado mensal + transitados + ajustes − férias já gozadas.</small>
         </article>
-        <article className={`vacationMetricCard${projectedTone}`}>
+        <article className="vacationMetricCard">
+          <span>Acumulado bruto</span>
+          <strong>{daysLabel(balance.monthlyAccruedDays)}</strong>
+          <small>{balance.completedAccrualMonths} de 12 meses concluídos em {balance.year}.</small>
+        </article>
+        <article className={`vacationMetricCard${monthlyProjectedTone}`}>
           <span>Após planeadas</span>
-          <strong>{daysLabel(balance.projectedBalanceDays)}</strong>
-          <small>Desconta também {daysLabel(balance.recordedPlannedDays)} marcados para datas futuras.</small>
+          <strong>{daysLabel(balance.monthlyProjectedBalanceDays)}</strong>
+          <small>Desconta também {daysLabel(balance.recordedPlannedDays)} já marcados para o futuro.</small>
         </article>
         <article className="vacationMetricCard">
-          <span>Direito de {balance.year}</span>
-          <strong>{daysLabel(balance.entitlementDays)}</strong>
-          <small>
-            {balance.isAdmissionYear
-              ? `${balance.completedContractMonths} meses completos considerados.`
-              : 'Período anual configurado, nunca abaixo do mínimo geral de 22 dias.'}
-          </small>
+          <span>Meta anual</span>
+          <strong>{daysLabel(balance.monthlyAccrualTargetDays)}</strong>
+          <small>Cerca de {daysLabel(balance.monthlyAccrualPerMonth)} por mês concluído.</small>
         </article>
-        <article className="vacationMetricCard">
-          <span>Gozadas/registadas</span>
-          <strong>{daysLabel(balance.takenDays)}</strong>
-          <small>
-            {balance.recordedTakenDays} detetados na app + {balance.manualTakenDays} fora do registo.
-          </small>
-        </article>
+      </section>
+
+      <section className="vacationPanel vacationAccrualPanel" aria-labelledby="vacation-accrual-title">
+        <div className="vacationPanelHeader">
+          <div>
+            <span>ACUMULAÇÃO AUTOMÁTICA · {balance.year}</span>
+            <h2 id="vacation-accrual-title">Evolução por mês</h2>
+          </div>
+          <strong>{daysLabel(balance.monthlyAccruedDays)} acumulados</strong>
+        </div>
+
+        <p className="vacationAccrualIntro">
+          O cálculo usa a fração exata da meta anual e arredonda apenas a apresentação a duas casas decimais.
+          Com uma meta de 28 dias, março fecha em 7 dias, junho em 14, setembro em 21 e dezembro em 28.
+        </p>
+
+        <div className="vacationMonthGrid" role="list" aria-label="Acumulação de férias por mês">
+          {balance.monthlyAccrualSchedule.map((item) => {
+            const state = item.completed ? 'Concluído' : item.current ? 'Em curso' : 'Futuro'
+            const stateClass = item.completed
+              ? ' vacationMonthCompleted'
+              : item.current
+                ? ' vacationMonthCurrent'
+                : ''
+
+            return (
+              <article className={`vacationMonthCard${stateClass}`} key={item.month} role="listitem">
+                <div>
+                  <span className="vacationMonthName">{monthLabel(item.month)}</span>
+                  <span className="vacationMonthState">{state}</span>
+                </div>
+                <strong>{daysLabel(item.cumulativeDays)}</strong>
+                <small>Crédito fechado em {formatDate(item.monthEndDate)}</small>
+              </article>
+            )
+          })}
+        </div>
       </section>
 
       <div className="vacationColumns">
@@ -199,6 +247,20 @@ export function VacationBalancePage() {
 
           <div className="vacationFormGrid">
             <label>
+              <span>Meta anual da acumulação mensal</span>
+              <input
+                type="number"
+                min="1"
+                max="60"
+                step="1"
+                inputMode="numeric"
+                value={settings.monthlyAccrualTargetDays}
+                onChange={(event) => update('monthlyAccrualTargetDays', safeNumber(event.target.value, 28))}
+              />
+              <small>Está definida em 28 dias conforme o teu objetivo. É uma projeção pessoal.</small>
+            </label>
+
+            <label>
               <span>Data de admissão</span>
               <input
                 type="date"
@@ -206,7 +268,7 @@ export function VacationBalancePage() {
                 max={today}
                 onChange={(event) => update('employmentStartDate', event.target.value)}
               />
-              <small>Usada para distinguir o ano de admissão dos anos seguintes.</small>
+              <small>Usada na referência laboral e na regra específica do ano de admissão.</small>
             </label>
 
             <label>
@@ -220,7 +282,7 @@ export function VacationBalancePage() {
                 value={settings.annualEntitlementDays}
                 onChange={(event) => update('annualEntitlementDays', safeNumber(event.target.value, 22))}
               />
-              <small>22 é o mínimo geral. Usa um valor superior apenas se contrato/CCT o confirmar.</small>
+              <small>Valor oficial/contratual conhecido. Não é substituído automaticamente pela meta de 28.</small>
             </label>
 
             <label>
@@ -251,7 +313,7 @@ export function VacationBalancePage() {
               <small>Evita perder férias já gozadas que não tenham sido lançadas no Foco Jornada.</small>
             </label>
 
-            <label className="vacationFieldWide">
+            <label>
               <span>Ajuste confirmado</span>
               <input
                 type="number"
@@ -262,9 +324,7 @@ export function VacationBalancePage() {
                 value={settings.adjustmentDays}
                 onChange={(event) => update('adjustmentDays', safeNumber(event.target.value))}
               />
-              <small>
-                Para correções documentadas, dias adicionais ou acertos. Valores negativos reduzem o saldo.
-              </small>
+              <small>Para correções documentadas. Valores negativos reduzem o saldo.</small>
             </label>
           </div>
 
@@ -276,46 +336,44 @@ export function VacationBalancePage() {
         <section className="vacationPanel vacationRules" aria-labelledby="vacation-rules-title">
           <div className="vacationPanelHeader">
             <div>
-              <span>LEITURA CORRETA</span>
-              <h2 id="vacation-rules-title">Como o cálculo funciona</h2>
+              <span>REFERÊNCIA LABORAL</span>
+              <h2 id="vacation-rules-title">Direito e contador pessoal</h2>
             </div>
           </div>
 
+          <div className="vacationRuleHighlight">
+            <strong>O contador de 28 dias é uma projeção pessoal</strong>
+            <p>
+              Serve para veres a progressão mês a mês. Não altera sozinho o número oficial de dias de férias
+              reconhecido pela entidade empregadora, contrato ou instrumento coletivo.
+            </p>
+          </div>
+
           {balance.isAdmissionYear ? (
-            <div className="vacationRuleHighlight">
+            <div className="vacationNotice vacationNoticeWarning">
               <strong>Ano de admissão</strong>
-              <p>
-                A ferramenta usa 2 dias por cada mês completo de contrato, até 20 dias. O gozo do
-                direito do ano de admissão é apresentado como disponível a partir de{' '}
-                <strong>{formatDate(balance.entitlementUsableFromDate)}</strong>.
-              </p>
+              <span>
+                A referência legal separada usa 2 dias por cada mês completo de contrato, até 20 dias, e o
+                marco dos seis meses completos. O contador pessoal de 28 continua identificado à parte.
+              </span>
             </div>
           ) : (
-            <div className="vacationRuleHighlight">
-              <strong>Não existe acumulação mensal normal</strong>
-              <p>
-                Depois do ano de admissão, o período anual vence, em regra, a 1 de janeiro. A próxima
-                referência será <strong>{daysLabel(balance.nextEntitlementDays)}</strong> em{' '}
-                <strong>{formatDate(balance.nextEntitlementDate)}</strong>, salvo regra mais favorável.
-              </p>
+            <div className="vacationNotice">
+              <strong>Referência anual</strong>
+              <span>
+                O cálculo laboral configurado mantém {daysLabel(balance.entitlementDays)} para {balance.year}.
+                A meta mensal de {daysLabel(balance.monthlyAccrualTargetDays)} não substitui esse valor.
+              </span>
             </div>
           )}
 
-          {!balance.canUseCurrentEntitlement && !noStartDate ? (
-            <div className="vacationNotice vacationNoticeWarning">
-              <strong>Período de espera ainda não concluído.</strong>
-              <span>
-                O cálculo separa dias adquiridos da possibilidade de os gozar antes dos seis meses completos.
-              </span>
-            </div>
-          ) : null}
-
           <dl className="vacationBreakdown">
-            <div><dt>Direito do ano</dt><dd>{daysLabel(balance.entitlementDays)}</dd></div>
+            <div><dt>Acumulado mensal bruto</dt><dd>{daysLabel(balance.monthlyAccruedDays)}</dd></div>
             <div><dt>Transitados</dt><dd>{daysLabel(balance.carriedDays)}</dd></div>
             <div><dt>Ajustes</dt><dd>{daysLabel(balance.adjustmentDays)}</dd></div>
             <div><dt>Gozadas até hoje</dt><dd>− {daysLabel(balance.takenDays)}</dd></div>
             <div><dt>Planeadas futuras</dt><dd>− {daysLabel(balance.recordedPlannedDays)}</dd></div>
+            <div><dt>Referência anual configurada</dt><dd>{daysLabel(balance.entitlementDays)}</dd></div>
           </dl>
         </section>
       </div>
@@ -339,18 +397,18 @@ export function VacationBalancePage() {
         </div>
       </section>
 
-      <section className="vacationLegalNote" aria-label="Enquadramento legal e limitações">
+      <section className="vacationLegalNote" aria-label="Precisão e limitações">
         <strong>Precisão e limites</strong>
         <p>
-          Este é um controlo pessoal. O saldo oficial deve ser confirmado com a entidade empregadora,
-          sobretudo em situações de instrumento de regulamentação coletiva, impedimento prolongado,
-          cessação do contrato ou transferência de férias. Em meses incompletos no ano de admissão existe
-          discussão jurisprudencial; por prudência, esta ferramenta usa meses completos e assinala essa regra.
+          O contador mensal foi criado para a tua meta de 28 dias: cada mês completo corresponde a 28 ÷ 12,
+          e o total chega exatamente a 28 no fim de dezembro. O valor intermédio pode ter casas decimais e é
+          apresentado com no máximo duas casas sem acumular erros de arredondamento mês após mês.
         </p>
         <p>
-          Referência geral: Código do Trabalho, artigos 237.º a 240.º. O período anual mínimo é de 22 dias
-          úteis; no ano de admissão aplicam-se regras especiais e a transferência para o ano seguinte depende
-          das condições legalmente previstas.
+          Esta projeção é um controlo pessoal. O saldo oficial deve continuar a ser confirmado com a entidade
+          empregadora quando existirem regras contratuais, CCT, transferências de férias, impedimentos ou outras
+          situações especiais. A referência laboral geral permanece separada para não apresentar a meta de 28
+          como um direito legal automaticamente adquirido.
         </p>
         <div className="vacationLegalLinks">
           <a href="https://diariodarepublica.pt/dr/legislacao-consolidada/lei/2009-34546475-46747075" target="_blank" rel="noreferrer">
