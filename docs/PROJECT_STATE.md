@@ -15,42 +15,44 @@ Em `main` estão integrados, entre outros:
 - automação de jornada/pausas (PR #202);
 - ferramenta de saldo de férias (PR #203);
 - acumulação mensal pessoal de férias com meta de 28 dias por defeito (PR #204);
-- contagem automática de férias apenas em dias úteis padrão segunda–sexta (PR #205).
+- contagem automática de férias apenas em dias úteis padrão segunda–sexta (PR #205);
+- evolução intramensal da projeção pessoal em tempo real (PR #206).
 
-## Alteração em curso — evolução mensal de férias em tempo real
+## PR #206 — evolução mensal de férias em tempo real
 
-Branch: `feat/vacation-live-monthly-progress`.
+Estado: **integrado e publicado**.
 
-PR: **#206**.
+- PR #206 integrado em `main` no commit `15f4df15308a145f9d303cf56d699837f9516303`;
+- **Qualidade #1122** passou integralmente no head final do PR;
+- **Qualidade #1123** passou integralmente após o merge em `main`;
+- **Publicar Foco & Jornada #245** concluiu com sucesso;
+- build publicado na raiz de `main` no commit `05e32a99bd0479fdb417876cb9a31f305a32866d`;
+- **pages build and deployment #790** concluiu com sucesso para o build publicado.
 
-### Objetivo
-
-Aprimorar `#/ferias` para que o mês atual deixe de parecer parado até ao último dia e passe a mostrar a evolução da meta pessoal ao longo do próprio mês.
-
-### Regra implementada
+### Regra entregue
 
 A referência laboral permanece separada e inalterada. A evolução em tempo real aplica-se apenas à projeção pessoal configurável.
 
 - cada mês continua a representar exatamente `meta anual / 12`;
-- meses já terminados mantêm os respetivos marcos fechados;
+- meses terminados mantêm marcos fechados;
 - o mês atual usa a fração de calendário já decorrida, incluindo a fração do dia local;
 - `acumulado vivo = meta × (meses anteriores + progresso do mês atual) / 12`;
 - saldo vivo desconta férias já gozadas e inclui transitados/ajustes;
 - saldo vivo projetado desconta também férias futuras planeadas;
-- o cálculo é derivado diretamente da meta anual e não do último valor mostrado, evitando drift de arredondamento.
+- os cálculos derivam diretamente da meta anual, evitando drift por arredondamentos intermédios.
 
 ### Atualização temporal
 
-A página usa a hora local do dispositivo e:
+A página `#/ferias`:
 
-- atualiza `now` a cada 60 segundos enquanto a página está montada;
+- atualiza a referência temporal a cada 60 segundos enquanto está montada;
 - recalcula imediatamente quando a janela recupera foco;
 - recalcula quando a página volta a ficar visível;
 - não depende de execução contínua em background.
 
-Se iOS/Android suspender a PWA, ao regressar é usado o instante atual real. Não são fabricados ticks que teriam ocorrido enquanto o JavaScript esteve suspenso.
+Se iOS/Android suspender a PWA, ao regressar é usado o instante atual real. Não são fabricados ticks que teriam ocorrido enquanto JavaScript esteve suspenso.
 
-### UI entregue na branch
+### UI entregue
 
 - cartões **Saldo agora**, **Acumulado agora**, **Após planeadas** e **Progresso do mês**;
 - hora da última atualização;
@@ -63,30 +65,13 @@ Se iOS/Android suspender a PWA, ao regressar é usado o instante atual real. Nã
 - valores vivos com até quatro casas decimais;
 - suporte preservado para mobile/tablet/desktop, `forced-colors` e `prefers-reduced-motion`.
 
-### Compatibilidade
+### Compatibilidade e segurança
 
-`monthlyAccruedDays` continua a representar apenas meses fechados. Foram acrescentados campos derivados para a visualização viva, entre eles:
-
-- `monthlyLiveAccruedDays`;
-- `monthlyLiveAvailableBalanceDays`;
-- `monthlyLiveProjectedBalanceDays`;
-- `currentAccrualMonthProgress` / `currentAccrualMonthProgressPercent`;
-- `currentAccrualMonthEarnedDays`;
-- `currentAccrualMonthRemainingDays`;
-- `currentAccrualMonthDailyRate`.
-
-Não foi criada nova configuração persistida, migração, tabela, endpoint, token, segredo ou permissão.
+`monthlyAccruedDays` continua a representar apenas meses fechados. Os valores vivos são derivados em runtime; não foi criada nova configuração persistida, migração, tabela, endpoint, token, segredo, permissão, dependência ou alteração de autenticação/sincronização.
 
 ## Estado da contagem de dias úteis — PR #205
 
 Estado: **integrado e publicado**.
-
-- PR #205 integrado em `main` no commit `2e309975a38e0df975bf1958879fefb3c3b4b514`;
-- build publicado no commit `26e8dcffca10589846dad4577e96ad03ea1e0608`;
-- quality gates em `main` concluídos com sucesso;
-- publicação e GitHub Pages concluídas com sucesso.
-
-Caso de regressão preservado:
 
 - 24/08/2026–06/09/2026 = 14 datas civis;
 - 10 dias úteis contabilizados;
@@ -105,13 +90,13 @@ A meta pessoal continua configurável, com 28 dias por defeito. Os marcos de ref
 - setembro: 21 dias;
 - dezembro: 28 dias.
 
-A evolução em tempo real do PR #206 não substitui estes marcos; apenas interpola o mês atual até ao respetivo marco.
+O PR #206 não substitui estes marcos; interpola apenas o mês atual até ao respetivo marco.
 
 ## Estado da ferramenta de saldo — PR #203
 
 Estado: **integrado e publicado**.
 
-A referência laboral continua a manter:
+A referência laboral mantém:
 
 - anos normais com mínimo geral suportado de 22 dias úteis;
 - valor superior apenas quando explicitamente configurado como condição mais favorável confirmada;
@@ -133,19 +118,7 @@ Stack atual:
 - npm 11.6.0 fixado nos workflows;
 - `npm audit --audit-level=high`, typecheck, lint, testes, build, Worker dry-run e smoke test Chromium como gates.
 
-O PR #206 permanece em draft até o head final, incluindo documentação, concluir todos os gates com sucesso.
-
-## Segurança
-
-A alteração do PR #206:
-
-- não cria novo endpoint;
-- não altera autenticação/autorização;
-- não altera o protocolo de sincronização;
-- não persiste a hora atual nem os valores vivos;
-- não cria segredo, token ou permissão;
-- não adiciona dependência;
-- mantém a configuração de férias dentro de `secureStorage`/cofre cifrado.
+O primeiro ensaio do PR #206 expôs um arredondamento intermédio de 0,0001 dia no valor restante do mês. A causa foi corrigida no domínio: o restante passou a derivar diretamente da taxa mensal e do progresso exato, em vez de subtrair um valor já arredondado. O head final e `main` passaram todos os gates.
 
 ## Limitações conhecidas
 
@@ -169,17 +142,16 @@ A alteração do PR #206:
 
 ## Riscos e validações ainda abertas
 
-1. Concluir os quality gates do PR #206 no head final.
-2. Validar em iPhone real que o valor vivo muda ao longo do tempo e é recalculado ao regressar à PWA.
-3. Validar Android/Chrome e tablet para a nova grelha/barra de progresso.
-4. Confirmar que suspensão e retoma não causam saltos incorretos de data/timezone.
-5. Confirmar sincronização normal da configuração de férias entre telemóvel e computador; a evolução viva não deve exigir dados novos de sync.
-6. Continuar validações físicas pendentes da automação de jornada e sincronização cross-device.
+1. Validar em iPhone real que o valor vivo muda ao longo do tempo e é recalculado ao regressar à PWA.
+2. Validar Android/Chrome e tablet para a nova grelha/barra de progresso.
+3. Confirmar que suspensão e retoma não causam saltos incorretos de data/timezone.
+4. Confirmar sincronização normal da configuração de férias entre telemóvel e computador; a evolução viva não deve exigir estado temporal novo de sync.
+5. Continuar validações físicas pendentes da automação de jornada e sincronização cross-device.
 
 ## Última alteração
 
-Implementada no PR #206 a interpolação do mês atual em tempo real, mantendo os marcos mensais fechados e a referência laboral intacta.
+PR #206 integrado e publicado: evolução mensal de férias em tempo real, mantendo marcos mensais fechados, referência laboral e contagem de dias úteis existentes.
 
 ## Próximo passo
 
-Concluir documentação e quality gates do PR #206; com CI verde, integrar/publicar e validar a evolução viva num dispositivo real.
+Validar a evolução viva em dispositivos reais e, depois, avaliar um calendário laboral explícito para feriados/regimes semanais especiais sem inferir regras não confirmadas.
