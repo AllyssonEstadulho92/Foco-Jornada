@@ -277,17 +277,17 @@ Regras de integridade:
 
 ## D-022 — Férias usam direito vencido e registos existentes, sem falsa acumulação mensal
 
-**Estado:** implementada no PR #203; integração depende dos quality gates.
+**Estado:** aceite, integrada no PR #203 e publicada.
 
-**Decisão:** a área de férias deve apresentar dois conceitos separados: **saldo disponível hoje** e **saldo projetado após férias futuras planeadas**. Nos anos normais, o cálculo parte do período anual vencido/configurado, com mínimo geral de 22 dias úteis; não deve representar o direito como se fossem acumulados `22 / 12` dias a cada mês.
+**Decisão:** a área de férias deve apresentar dois conceitos separados: **saldo disponível hoje** e **saldo projetado após férias futuras planeadas**. Nos anos normais, o cálculo laboral parte do período anual vencido/configurado, com mínimo geral de 22 dias úteis; não deve representar esse direito laboral como se fossem acumulados `22 / 12` dias a cada mês.
 
 No ano de admissão, o cálculo é separado e usa 2 dias por mês completo de contrato, até 20 dias, assinalando o marco de seis meses completos para o gozo. Devido a divergência interpretativa sobre frações de mês, esta versão aplica uma política conservadora de meses completos e comunica a limitação ao utilizador.
 
 Os dias de férias não são duplicados num novo histórico. A página agrega estados já existentes — `reason = ferias` na Calculadora de horas e `kind = vacation` no Mapa de turnos/plano mensal — e deduplica por data civil `YYYY-MM-DD`. Só valores que não podem ser inferidos com segurança ficam em configuração manual: data de admissão, período anual mais favorável confirmado, transitados, férias gozadas fora da aplicação e ajuste documentado.
 
-**Motivo:** férias têm impacto laboral e administrativo; uma ferramenta precisa de distinguir o que está confirmado do que é inferido. Reutilizar registos existentes reduz inconsistências, enquanto separar saldo atual de planeamento evita descontar férias futuras como se já tivessem sido gozadas. Não simular acumulação mensal nos anos normais evita um modelo juridicamente enganador.
+**Motivo:** férias têm impacto laboral e administrativo; uma ferramenta precisa de distinguir o que está confirmado do que é inferido. Reutilizar registos existentes reduz inconsistências, enquanto separar saldo atual de planeamento evita descontar férias futuras como se já tivessem sido gozadas. Não simular acumulação mensal como regra laboral evita um modelo juridicamente enganador.
 
-**Persistência:** os cinco valores adicionais são guardados em `secureStorage` na chave `foco-jornada-vacation-settings-v1`, dentro do cofre cifrado existente. Não é criada tabela, endpoint, token, segredo ou migração de schema.
+**Persistência:** os valores adicionais são guardados em `secureStorage` na chave `foco-jornada-vacation-settings-v1`, dentro do cofre cifrado existente. Não é criada tabela, endpoint, token, segredo ou migração de schema.
 
 **Consequências:**
 
@@ -298,3 +298,30 @@ Os dias de férias não são duplicados num novo histórico. A página agrega es
 - dias transitados não são assumidos automaticamente, porque a sua utilização depende de condições legais/convencionais;
 - a ferramenta é controlo pessoal e não substitui o mapa oficial de férias, RH, contrato ou instrumento de regulamentação coletiva;
 - nenhuma regra existente de jornada, vencimento, sincronização, autenticação ou cifragem é alterada.
+
+## D-023 — A meta mensal de 28 dias é projeção pessoal separada do direito laboral
+
+**Estado:** implementada no PR #204; integração depende dos quality gates.
+
+**Decisão:** a área de férias pode apresentar um **contador mensal pessoal** configurável, com 28 dias como meta padrão solicitada pelo utilizador, desde que esse contador permaneça separado do cálculo laboral/contratual definido em D-022.
+
+A progressão pessoal usa a fórmula:
+
+`acumulado = metaAnual × mesesDeCalendárioConcluídos / 12`
+
+Um mês só é considerado concluído no respetivo último dia. O valor de cada marco é calculado diretamente a partir da meta anual; não se somam valores mensais já arredondados. A interface apresenta no máximo duas casas decimais. Para meta de 28 dias, os marcos exatos incluem 7 dias em março, 14 em junho, 21 em setembro e 28 em dezembro.
+
+O saldo pessoal desconta férias já gozadas/registadas e inclui transitados/ajustes confirmados. O saldo projetado também desconta férias futuras planeadas.
+
+**Motivo:** o utilizador quer acompanhar uma acumulação progressiva ao longo dos meses, mas essa preferência não deve alterar silenciosamente o enquadramento laboral já documentado. Separar os dois números permite satisfazer a necessidade de planeamento pessoal sem apresentar 28 dias como direito legal automático.
+
+**Persistência:** `monthlyAccrualTargetDays` é acrescentado à configuração `foco-jornada-vacation-settings-v1`. Perfis existentes sem o campo recebem 28 como valor por defeito. O mesmo `secureStorage` cifrado e o mesmo protocolo de sincronização são reutilizados.
+
+**Consequências:**
+
+- `annualEntitlementDays` continua independente da meta mensal pessoal;
+- nenhuma migração destrutiva é necessária;
+- o cronograma de 12 meses é derivado em runtime e não cria histórico duplicado;
+- a mesma deduplicação de férias por data continua a alimentar os dois saldos;
+- a interface deve identificar explicitamente o contador de 28 dias como projeção pessoal;
+- nenhum endpoint, segredo, token, permissão, autenticação ou schema operacional novo é introduzido.
