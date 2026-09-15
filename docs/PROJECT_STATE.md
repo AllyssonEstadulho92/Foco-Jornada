@@ -8,6 +8,50 @@ O **Foco Jornada** é uma única PWA React/TypeScript responsiva para telemóvel
 
 Em `main` estão integrados, entre outros, turnos noturnos (PR #189), sincronização cifrada e associação de browsers (PR #191–#194), correções do shell móvel (PR #195–#199), bootstrap animado (PR #200–#201), automação de jornada/pausas (PR #202) e a ferramenta de saldo de férias (PR #203).
 
+## Alteração em curso — acumulação mensal de férias (PR #204)
+
+Branch: `feat/monthly-vacation-accrual-28`.
+
+Objetivo: acrescentar à área de férias um contador mensal automático para a meta pessoal de **28 dias no final do ano**, sem substituir nem adulterar a referência laboral/contratual já existente.
+
+### Regra implementada
+
+- meta mensal pessoal por defeito: 28 dias anuais;
+- crédito proporcional: `meta anual / 12` por mês concluído;
+- o mês só entra no acumulado quando chega ao último dia desse mês;
+- o cálculo não soma valores arredondados mês a mês: usa a fração exata da meta e arredonda apenas o valor apresentado a duas casas decimais;
+- com meta 28: janeiro 2,33; fevereiro 4,67; março 7; junho 14; setembro 21; dezembro 28;
+- saldo acumulado pessoal = acumulado mensal + transitados + ajustes − férias gozadas/registadas;
+- saldo projetado também desconta férias futuras já planeadas;
+- férias já marcadas na Calculadora de horas e no Mapa de turnos continuam deduplicadas por data.
+
+### Separação obrigatória de conceitos
+
+O contador de 28 dias é uma **projeção pessoal** solicitada pelo utilizador. Ele não altera automaticamente `annualEntitlementDays`, não afirma que 28 dias são um direito legal geral e não substitui informação confirmada por RH, contrato ou CCT.
+
+A área mantém em paralelo:
+
+- contador mensal pessoal;
+- referência anual laboral configurada;
+- regra específica do ano de admissão;
+- dias transitados e ajustes confirmados.
+
+### Implementação técnica
+
+Alterados/criados:
+
+- `src/domain/vacation/VacationBalance.ts` — acumulação mensal, saldo pessoal e cronograma de 12 meses;
+- `src/domain/vacation/VacationBalance.test.ts` — testes de fecho mensal, dezembro = 28 e precisão de arredondamento;
+- `src/presentation/pages/VacationBalancePage.tsx` — novos cartões e grelha mensal;
+- `src/styles/vacation-accrual.css` — layout responsivo da grelha de meses;
+- `src/main.tsx` — carregamento da nova folha de estilos.
+
+A configuração acrescenta `monthlyAccrualTargetDays` à mesma chave `foco-jornada-vacation-settings-v1`. Registos antigos sem o novo campo recebem 28 como valor por defeito, sem migração destrutiva.
+
+### Segurança
+
+Não foi criado novo endpoint, tabela IndexedDB, token, segredo, permissão, mecanismo de autenticação ou alteração de protocolo de sincronização. A nova preferência continua dentro do `secureStorage`/cofre cifrado existente.
+
 ## PR #203 — ferramenta de saldo de férias
 
 Estado: **integrado e publicado**.
@@ -19,92 +63,30 @@ Estado: **integrado e publicado**.
 - Workflow **Publicar Foco & Jornada #236** concluiu com sucesso.
 - Workflow **pages build and deployment #767** concluiu build e deploy com sucesso para o commit publicado.
 
-### Objetivo entregue
-
-A rota `#/ferias` apresenta:
-
-- direito estimado do ano;
-- férias já gozadas/registadas;
-- férias futuras planeadas;
-- saldo calculado hoje;
-- saldo projetado após as férias planeadas;
-- próxima referência de vencimento anual;
-- configuração manual apenas para dados que não podem ser inferidos com segurança.
-
-A ferramenta é um controlo pessoal e não substitui o mapa oficial da entidade empregadora, RH, contrato ou instrumento de regulamentação coletiva.
-
-### Regras implementadas
+### Base preservada
 
 - anos normais: período anual configurado nunca inferior ao mínimo geral de 22 dias úteis;
-- valores acima de 22 são aceites apenas como condição mais favorável confirmada pelo utilizador;
+- valores acima de 22 continuam dependentes de condição mais favorável confirmada;
 - ano de admissão: política conservadora de 2 dias por mês completo de contrato, até 20 dias;
-- marco de seis meses completos separado do número de dias calculados no ano de admissão;
-- não existe falsa acumulação mensal nos anos normais: o direito anual é tratado como vencendo, em regra, em 1 de janeiro;
 - férias da Calculadora de horas (`reason = ferias`) e do Mapa de turnos/plano mensal (`kind = vacation`) são reutilizadas;
 - a mesma data encontrada em mais de uma fonte conta apenas uma vez;
-- datas até ao dia atual contam como gozadas/registadas e datas futuras do mesmo ano ficam separadas como planeadas;
 - dias transitados, férias gozadas fora da aplicação e ajustes dependem de confirmação explícita.
-
-### Implementação técnica
-
-Novos elementos principais:
-
-- `src/domain/vacation/VacationBalance.ts`;
-- `src/domain/vacation/VacationBalance.test.ts`;
-- `src/presentation/pages/VacationBalancePage.tsx`;
-- `src/styles/vacation.css`;
-- `docs/VACATION-TRACKER.md`.
-
-Integrações:
-
-- `src/presentation/router.tsx` — rota `/ferias`;
-- `src/presentation/navigation/navigationItems.ts` — navegação desktop/mobile;
-- `src/main.tsx` — estilos da ferramenta;
-- `secureStorage` — configuração adicional cifrada;
-- registos existentes de horas e mapa de turnos — fonte automática dos dias explicitamente marcados como férias.
-
-### Persistência e segurança
-
-A configuração adicional fica em `secureStorage`, chave `foco-jornada-vacation-settings-v1`, dentro do cofre cifrado existente. São guardados apenas: data de admissão, dias anuais confirmados, dias transitados, dias gozados fora da aplicação e ajuste confirmado.
-
-Não foi criado novo endpoint, tabela IndexedDB, token, segredo, permissão, mecanismo de autenticação ou migração de schema. O protocolo de sincronização, autenticação e cifragem permanecem inalterados.
-
-### Enquadramento laboral validado
-
-Em 2026-09-15 foram revistos Código do Trabalho e gov.pt:
-
-- artigo 237.º: o direito a férias vence, em regra, em 1 de janeiro;
-- artigo 238.º: duração mínima anual de 22 dias úteis;
-- artigo 239.º: no ano de admissão, 2 dias úteis por mês de duração do contrato, até 20 dias, com gozo após seis meses completos;
-- artigo 240.º: transferência/cumulação depende das condições legalmente previstas.
-
-Existe divergência interpretativa sobre frações de mês no ano de admissão. A aplicação não transforma essa divergência numa certeza: usa meses completos como política conservadora, documenta a opção e permite ajuste confirmado.
 
 ## Qualidade, CI e dependências
 
-Os dois primeiros runs do PR #203 falharam antes dos testes porque o npm 10.9.8 terminou `npm install` com o crash interno `Cannot read properties of null (reading 'edgesOut')`. O incidente foi isolado como problema do gestor de pacotes, não da funcionalidade.
+Os workflows de qualidade e publicação usam Node 22 com `npm@11.6.0`, mantendo `npm audit --audit-level=high`, typecheck, lint, testes, build, Worker dry-run, smoke test Chromium e artefacto.
 
-Os workflows de qualidade e publicação passam a fixar `npm@11.6.0` sobre Node 22, mantendo todos os gates. Tanto o head final do PR como `main` passaram:
-
-- instalação;
-- `npm audit --audit-level=high`;
-- typecheck;
-- lint;
-- testes, incluindo os novos testes de férias;
-- build;
-- Worker dry-run;
-- smoke test Chromium;
-- artefacto.
+O PR #204 permanece em draft até o head final passar todos estes gates.
 
 ## Limitações conhecidas
 
-### Férias
+### Contador mensal de 28 dias
 
-- é um controlo pessoal, não a fonte oficial de RH;
-- CCT, contrato mais favorável, impedimento prolongado, cessação e outras situações especiais podem alterar o resultado;
-- dias transitados devem ser confirmados;
-- dias explicitamente marcados como férias são tratados como dias de férias; a ferramenta não reinterpreta automaticamente feriados, escalas especiais ou descanso substitutivo;
-- a política de meses completos no ano de admissão é deliberadamente conservadora.
+- é uma projeção pessoal configurável, não um direito legal presumido;
+- o mês corrente não é creditado antes do último dia;
+- valores intermédios podem ter casas decimais porque 28 ÷ 12 não é inteiro;
+- a apresentação usa até duas casas decimais, mas o cálculo de cada marco parte diretamente da meta anual para evitar drift de arredondamento;
+- CCT, contrato, RH, férias transitadas ou regras especiais podem produzir um saldo oficial diferente.
 
 ### PWA/background
 
@@ -112,16 +94,16 @@ A PWA pode ter JavaScript suspenso quando fechada; a automação de jornada mant
 
 ## Riscos e validações ainda abertas
 
-1. Validar `#/ferias` em dispositivo real, incluindo edição, persistência, tema claro/escuro e responsividade.
-2. Marcar a mesma data como férias no mapa e na calculadora e confirmar contagem única em utilização real.
-3. Confirmar sincronização da configuração de férias entre telemóvel e computador com o mesmo cofre.
-4. Confirmar com RH/contrato/CCT quaisquer dias adicionais, dias transitados ou regras especiais antes de os introduzir como ajuste.
-5. Manter as validações físicas ainda pendentes da automação de jornada e da sincronização cross-device.
+1. Concluir os quality gates do PR #204.
+2. Validar visualmente a grelha de 12 meses em iPhone, Android, tablet e desktop.
+3. Confirmar no fim de um mês real que o contador muda apenas após o fecho do mês.
+4. Confirmar que dias marcados como férias reduzem o saldo pessoal sem duplicação entre fontes.
+5. Confirmar persistência/sincronização de `monthlyAccrualTargetDays` entre telemóvel e computador com o mesmo cofre.
 
 ## Última alteração
 
-Ferramenta de saldo de férias integrada no PR #203, validada por CI, publicada por GitHub Pages e documentada. O ambiente de CI/publicação foi estabilizado com npm 11.6.0 sem reduzir os quality gates.
+PR #204 aberto com acumulação mensal automática para uma meta pessoal de 28 dias, preservando separadamente a referência laboral existente.
 
 ## Próximo passo
 
-Validar a nova ferramenta em telemóvel e computador com dados reais confirmados, começando pela data de admissão, dias transitados e uma data de férias registada simultaneamente no Mapa de turnos e na Calculadora de horas para comprovar a deduplicação.
+Concluir CI, corrigir qualquer regressão sem enfraquecer os gates e integrar/publicar apenas depois de todos os testes estarem verdes.
