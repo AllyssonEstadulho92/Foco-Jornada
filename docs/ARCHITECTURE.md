@@ -1,6 +1,6 @@
 # Arquitetura
 
-Atualizado em: 2026-09-10
+Atualizado em: 2026-09-15
 
 ## Visão geral
 
@@ -18,6 +18,7 @@ GitHub Pages
        │    ├─ CoffeeRepository
        │    └─ SettingsRepository
        ├─ domínio / casos de uso
+       │    └─ VacationBalance (cálculo puro de férias)
        └─ cofre local cifrado
             └─ sincronização opcional
                  └─ Cloudflare Worker + Durable Object
@@ -49,6 +50,9 @@ Componentes relevantes:
 - `src/presentation/pages/FocusPage.tsx` — Pomodoro e foco personalizado;
 - `src/presentation/pages/ActivitiesPage.tsx` — atividades;
 - `src/presentation/pages/SettingsReferencePage.tsx` — horário base, fins de semana e pausas;
+- `src/presentation/pages/ShiftMapPage.tsx` — planeamento mensal, incluindo dias de férias;
+- `src/presentation/pages/WorkHoursCalculatorPage.tsx` — ocorrências laborais, incluindo férias;
+- `src/presentation/pages/VacationBalancePage.tsx` — saldo pessoal de férias, configuração e explicação do cálculo;
 - `src/presentation/providers/AppServicesProvider.tsx` — injeção única de repositories/serviços.
 
 ### Application
@@ -62,6 +66,8 @@ Exemplos:
 - casos de uso de foco e atividades;
 - `reconcileScheduledWorkday` — reconciliação automática do horário configurado.
 
+A ferramenta de férias não introduz um serviço application separado nesta versão: a página apenas agrega fontes existentes e entrega um input normalizado à função pura de domínio `calculateVacationBalance`.
+
 ### Domain
 
 Entidades, regras puras e cálculos.
@@ -73,10 +79,14 @@ Entidades, regras puras e cálculos.
 - atividades;
 - foco/Pomodoro;
 - horários de trabalho;
+- horas/ocorrências;
+- férias;
 - stock/medicação;
 - configurações.
 
 `WorkSchedule` é a autoridade para entrada, saída e pausas planeadas.
+
+`VacationBalance` é a autoridade para o cálculo apresentado na área de férias. O módulo não altera jornadas, turnos ou horas; recebe datas de férias já identificadas e configuração explícita e devolve apenas um resultado calculado.
 
 ## Navegação responsiva
 
@@ -84,6 +94,8 @@ Entidades, regras puras e cálculos.
 
 - desktop: sidebar;
 - mobile/tablet: top bar + bottom navigation + drawer.
+
+A ferramenta de férias usa a rota `#/ferias`. Em desktop surge na navegação secundária; em mobile surge no bloco de acesso rápido. Não é criada uma rota ou implementação diferente por plataforma.
 
 `mobileMenuOpen` é estado local e efémero. O mesmo botão alterna hambúrguer ↔ X, atualiza `aria-expanded`/`aria-label` e mantém alvo de toque de `44 × 44 px`.
 
@@ -114,6 +126,84 @@ A hierarquia móvel atual mantém o top bar visível quando o drawer abre. Drawe
 
 `localStorage` é reservado a preferências/boot e compatibilidade de migração; não é a fonte principal dos registos de negócio. Não existe `sessionStorage` operacional.
 
+### Configuração de férias
+
+A ferramenta usa uma única chave no `secureStorage` existente:
+
+`foco-jornada-vacation-settings-v1`
+
+Campos:
+
+- `employmentStartDate` — data de admissão indicada pelo utilizador;
+- `annualEntitlementDays` — período anual confirmado, com mínimo lógico de 22 no regime geral suportado;
+- `carriedDays` — dias transitados confirmados;
+- `manualTakenDays` — férias já gozadas que não constam nos registos da aplicação;
+- `adjustmentDays` — ajuste documentado positivo ou negativo.
+
+Esta decisão evita uma migração de schema para cinco valores de configuração e mantém os dados dentro do cofre cifrado e do fluxo de sincronização existente.
+
+## Fontes de dados da ferramenta de férias
+
+```text
+WorkHours store
+  └─ reason === "ferias"
+
+Shift map por mês
+  └─ kind === "vacation"
+
+Payroll plan por mês
+  └─ kind === "vacation"
+
+        ↓ normalizar por YYYY-MM-DD
+        ↓ Set<string> / deduplicação
+
+calculateVacationBalance()
+        ↓
+  ├─ férias gozadas até hoje
+  ├─ férias futuras planeadas
+  ├─ saldo disponível
+  └─ saldo projetado
+```
+
+A mesma data pode estar representada no mapa e na calculadora porque essas áreas servem finalidades diferentes. A agregação considera a **data** como unidade lógica de um dia de férias e deduplica antes de calcular.
+
+A versão inicial não tenta inferir férias a partir de ausência, baixa, folga ou jornada não iniciada. Apenas estados explicitamente marcados como férias entram na contagem automática.
+
+## Regras de férias
+
+### Anos normais
+
+No enquadramento geral representado pela ferramenta:
+
+- o direito anual vence, em regra, em 1 de janeiro;
+- o mínimo anual é 22 dias úteis;
+- não se apresenta uma “acumulação mensal” normal ao longo do ano;
+- um valor configurado acima de 22 é aceite para permitir condição contratual/coletiva mais favorável confirmada pelo utilizador.
+
+Fórmulas:
+
+```text
+saldoHoje = direitoAno + transitados + ajustes - gozadasRegistadas - gozadasManuais
+saldoProjetado = saldoHoje - planeadasFuturas
+```
+
+### Ano de admissão
+
+A versão inicial adota uma política conservadora e determinística:
+
+```text
+mesesCompletos = meses completos decorridos desde employmentStartDate
+direitoAdmissao = min(20, mesesCompletos × 2)
+```
+
+O marco de disponibilidade para gozo é a data correspondente a seis meses completos de execução do contrato. A interface separa dias calculados de possibilidade de gozo antes desse marco.
+
+Há divergência interpretativa/jurisprudencial sobre o tratamento de frações de mês no artigo 239.º em contratos que não se enquadram na regra específica de duração inferior a seis meses. A aplicação não esconde essa incerteza: usa meses completos, documenta a opção e recomenda confirmação com RH/ACT quando a diferença for material.
+
+### Transferência de dias
+
+A ferramenta não calcula automaticamente a validade de dias transitados. O utilizador introduz apenas o número confirmado. Isto evita assumir que todos os dias remanescentes podem ser usados indefinidamente, porque a transferência/cumulação depende das condições previstas no artigo 240.º e de eventual instrumento coletivo/acordo.
+
 ## Sincronização móvel ↔ computador
 
 ```text
@@ -128,6 +218,8 @@ AppDatabase
                       └─ Cloudflare Worker
                            └─ Durable Object por profileId
 ```
+
+Como `secureStorage` integra o snapshot cifrado, a configuração de férias acompanha o mesmo cofre. A funcionalidade não adiciona API por entidade nem protocolo específico de férias.
 
 ### Regras de segurança
 
@@ -159,7 +251,7 @@ Um browser novo pode receber o `SecurityProfile` através de canal temporário c
 - `GET /v1/pair/:pairingId`;
 - `DELETE /v1/pair/:pairingId`.
 
-Não existe API separada por plataforma ou por entidade de negócio.
+Não existe API separada por plataforma ou por entidade de negócio, incluindo férias.
 
 ## Horário de trabalho e automação temporal
 
@@ -246,9 +338,13 @@ Depois de uma mutação automática, `notifyAppDataChanged()` emite um evento in
 
 Isto evita criar um store paralelo ou duplicar regras de persistência.
 
+A ferramenta de férias lê o store de horas reidratado e as chaves mensais do `secureStorage` durante o render da rota. Como não mantém um segundo histórico de férias, alterações feitas nas fontes voltam a ser refletidas quando a página é reaberta/renderizada com o estado atualizado.
+
 ## Datas e timezone
 
 A área geral de jornada usa o timezone local do browser em vários utilitários `Date`/`Intl`. Dispositivos com timezones diferentes podem interpretar o mesmo instante de forma distinta.
+
+O cálculo de férias usa chaves civis `YYYY-MM-DD` e valida/adiciona meses com componentes UTC para não introduzir deriva por DST. A apresentação das datas usa o locale `pt-PT`. Esta escolha não migra timestamps históricos nem resolve o risco global de timezone da jornada.
 
 Não foi feita migração automática para um timezone global porque isso poderia alterar históricos. Validações cross-device devem usar o mesmo timezone do sistema.
 
@@ -261,12 +357,12 @@ Não foi feita migração automática para um timezone global porque isso poderi
 
 ## Segurança de dependências
 
-O quality gate executa `npm audit --audit-level=high` antes de typecheck/testes. Em 2026-09-10 advisories novos bloquearam o PR #202 em dependências de desenvolvimento. A branch atual:
+O quality gate executa `npm audit --audit-level=high` antes de typecheck/testes. Em 2026-09-10 advisories novos bloquearam o PR #202 em dependências de desenvolvimento. A branch atual de `main`:
 
 - usa `vitest` `5.0.0`, versão corrigida para o advisory do mocker;
 - força `sharp` `0.35.4`, versão corrigida para o advisory em libheif.
 
-Estas mudanças não alteram dependências de runtime da aplicação e permanecem sujeitas ao mesmo workflow completo.
+A ferramenta de férias não adiciona dependências de runtime ou desenvolvimento.
 
 ## Testes e quality gates
 
@@ -282,6 +378,8 @@ Obrigatórios antes de integrar:
 8. integração apenas com CI verde.
 
 A automação temporal possui testes para entrada, pausa de 60 minutos, saída, não criação depois do turno e não reinício após término manual.
+
+`VacationBalance.test.ts` cobre período anual normal, valor mais favorável, limite mínimo, ano de admissão, limite de 20 dias, marco de seis meses, deduplicação, separação passado/futuro e data de admissão futura.
 
 ## Distribuição
 
