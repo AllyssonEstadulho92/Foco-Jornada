@@ -301,7 +301,7 @@ Os dias de férias não são duplicados num novo histórico. A página agrega es
 
 ## D-023 — A meta mensal de 28 dias é projeção pessoal separada do direito laboral
 
-**Estado:** implementada no PR #204; integração depende dos quality gates.
+**Estado:** aceite, integrada no PR #204 e publicada.
 
 **Decisão:** a área de férias pode apresentar um **contador mensal pessoal** configurável, com 28 dias como meta padrão solicitada pelo utilizador, desde que esse contador permaneça separado do cálculo laboral/contratual definido em D-022.
 
