@@ -16,6 +16,8 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: 22
+      - name: Fixar npm compatível
+        run: npm install -g npm@11.6.0 --no-audit --no-fund
       - name: Instalar dependências
         run: npm install
       - name: Auditoria de dependências

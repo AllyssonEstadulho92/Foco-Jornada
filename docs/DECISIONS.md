@@ -1,6 +1,6 @@
 # Decisões Técnicas
 
-Atualizado em: 2026-09-10
+Atualizado em: 2026-09-15
 
 ## D-001 — Manter o menu `···` além do gesto de deslize
 
@@ -251,9 +251,9 @@ A animação deve respeitar `prefers-reduced-motion`; nesse modo, o símbolo per
 
 ## D-021 — Jornada e pausas reconciliadas pelo `WorkSchedule`; Pomodoro permanece manual
 
-**Estado:** proposta/implementada no PR #202; integração depende dos quality gates e validação final.
+**Estado:** aceite, integrada no PR #202 e publicada.
 
-**Decisão:** a aplicação passa a reconciliar automaticamente a jornada diária e as pausas ativadas a partir do `WorkSchedule` já persistido. A configuração, e não um contador ou constante nova, é a única autoridade para entrada, saída e janelas de pausa.
+**Decisão:** a aplicação reconcilia automaticamente a jornada diária e as pausas ativadas a partir do `WorkSchedule` já persistido. A configuração, e não um contador ou constante nova, é a única autoridade para entrada, saída e janelas de pausa.
 
 Regras de integridade:
 
@@ -273,4 +273,28 @@ Regras de integridade:
 
 **Limitação:** iOS e outros sistemas podem suspender completamente JavaScript de uma PWA. Por isso, a aplicação não garante que o código execute fisicamente no segundo exato enquanto está encerrada; garante que, ao reconciliar, usa os horários configurados exatos como timestamps e não o instante tardio do callback.
 
-**Segurança e dependências:** durante o primeiro quality gate do PR #202, `npm audit` identificou advisories novos em Vitest e `sharp`. O PR atualiza Vitest para `5.0.0` e força `sharp` `0.35.4`, versões indicadas como corrigidas, sem alterar dependências de runtime da aplicação.
+**Segurança e dependências:** o PR #202 manteve os quality gates ativos, atualizou Vitest para `5.0.0`, forçou `sharp` `0.35.4` e foi integrado apenas depois de audit, typecheck, lint, testes, build, Worker dry-run e smoke test concluírem com sucesso.
+
+## D-022 — Férias usam direito vencido e registos existentes, sem falsa acumulação mensal
+
+**Estado:** implementada no PR #203; integração depende dos quality gates.
+
+**Decisão:** a área de férias deve apresentar dois conceitos separados: **saldo disponível hoje** e **saldo projetado após férias futuras planeadas**. Nos anos normais, o cálculo parte do período anual vencido/configurado, com mínimo geral de 22 dias úteis; não deve representar o direito como se fossem acumulados `22 / 12` dias a cada mês.
+
+No ano de admissão, o cálculo é separado e usa 2 dias por mês completo de contrato, até 20 dias, assinalando o marco de seis meses completos para o gozo. Devido a divergência interpretativa sobre frações de mês, esta versão aplica uma política conservadora de meses completos e comunica a limitação ao utilizador.
+
+Os dias de férias não são duplicados num novo histórico. A página agrega estados já existentes — `reason = ferias` na Calculadora de horas e `kind = vacation` no Mapa de turnos/plano mensal — e deduplica por data civil `YYYY-MM-DD`. Só valores que não podem ser inferidos com segurança ficam em configuração manual: data de admissão, período anual mais favorável confirmado, transitados, férias gozadas fora da aplicação e ajuste documentado.
+
+**Motivo:** férias têm impacto laboral e administrativo; uma ferramenta precisa de distinguir o que está confirmado do que é inferido. Reutilizar registos existentes reduz inconsistências, enquanto separar saldo atual de planeamento evita descontar férias futuras como se já tivessem sido gozadas. Não simular acumulação mensal nos anos normais evita um modelo juridicamente enganador.
+
+**Persistência:** os cinco valores adicionais são guardados em `secureStorage` na chave `foco-jornada-vacation-settings-v1`, dentro do cofre cifrado existente. Não é criada tabela, endpoint, token, segredo ou migração de schema.
+
+**Consequências:**
+
+- a rota `#/ferias` é única para mobile e desktop;
+- o cálculo é testável isoladamente em `VacationBalance.ts`;
+- dias encontrados em duas fontes contam uma única vez;
+- valores superiores a 22 dias são aceites apenas quando explicitamente configurados como condição mais favorável conhecida pelo utilizador;
+- dias transitados não são assumidos automaticamente, porque a sua utilização depende de condições legais/convencionais;
+- a ferramenta é controlo pessoal e não substitui o mapa oficial de férias, RH, contrato ou instrumento de regulamentação coletiva;
+- nenhuma regra existente de jornada, vencimento, sincronização, autenticação ou cifragem é alterada.

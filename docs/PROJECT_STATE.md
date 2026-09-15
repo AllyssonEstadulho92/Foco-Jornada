@@ -1,93 +1,127 @@
 # Estado do Projeto
 
-Atualizado em: 2026-09-10
+Atualizado em: 2026-09-15
 
 ## Estado atual
 
-O **Foco Jornada** continua a ser uma única PWA React/TypeScript responsiva para telemóvel, tablet e computador, publicada por GitHub Pages. A persistência operacional é local-first num cofre IndexedDB cifrado; a sincronização entre instalações usa Cloudflare Worker/Durable Objects e transporta apenas o cofre cifrado.
+O **Foco Jornada** é uma única PWA React/TypeScript responsiva para telemóvel, tablet e computador, publicada por GitHub Pages. A persistência operacional continua local-first num cofre IndexedDB cifrado; a sincronização entre instalações usa Cloudflare Worker/Durable Objects e transporta apenas o cofre cifrado.
 
-O código publicado em `main` inclui, entre outras correções já integradas:
+Em `main` estão integrados, entre outros, turnos noturnos (PR #189), sincronização cifrada e associação de browsers (PR #191–#194), correções do shell móvel (PR #195–#199), bootstrap animado (PR #200–#201) e automação de jornada/pausas (PR #202).
 
-- turnos noturnos corrigidos no PR #189;
-- sincronização cifrada e associação de outro navegador nos PR #191–#194;
-- correções do menu móvel e top bar nos PR #195–#199;
-- logótipo animado de bootstrap nos PR #200–#201;
-- automação de jornada e pausas pelo horário configurado no PR #202.
+## PR #203 — ferramenta de saldo de férias
 
-## PR #202 — integrado e publicado
+Branch: `feat/vacation-balance-tracker`.
 
-O PR #202 foi integrado em `main` no commit `62b0cb44db31fff957a4486b7ac24634c721e3ea` e publicado pelo GitHub Pages através do commit de deploy `08dc9fae23f683fc7cadf80ada7a54b2545da8b2`.
+Estado: **pronto para integração após o quality gate final do head atual**. Um quality gate completo já passou na branch depois da correção do ambiente npm; a última alteração funcional posterior foi apenas o reforço de contraste do botão principal e volta a ser validada pelo pipeline antes do merge.
+
+### Objetivo
+
+Acrescentar uma área pessoal de férias que mostre:
+
+- direito estimado do ano;
+- férias já gozadas/registadas;
+- férias futuras planeadas;
+- saldo calculado hoje;
+- saldo projetado após as férias planeadas;
+- próxima referência de vencimento anual.
+
+A ferramenta não substitui o mapa oficial da entidade empregadora, RH, contrato ou instrumento de regulamentação coletiva.
 
 ### Comportamento implementado
 
-- `WorkSchedule` continua a ser a fonte única do horário planeado;
-- antes da entrada configurada não é criada jornada;
-- durante o turno, se ainda não existir jornada nesse dia, a aplicação cria-a com `startedAt` exatamente igual à entrada configurada;
-- uma jornada ativa é encerrada com `endedAt` exatamente igual à saída configurada quando esse limite é atingido ou ultrapassado;
-- se o utilizador terminar manualmente a jornada antes da saída, a automação não cria uma segunda jornada nesse dia;
-- se a aplicação for aberta pela primeira vez apenas depois da saída e não existir jornada do dia, não é fabricada uma jornada completa retroativa;
-- pausas ativadas em **Definições → Pausas** usam os respetivos `startTime`/`endTime` e passam a ser reconciliadas automaticamente;
-- uma pausa de 60 minutos continua a ser definida manualmente pelo utilizador através do horário de início/fim; não existe um descanso de 60 minutos hardcoded;
-- se a PWA regressar depois de uma pausa planeada já terminada, o registo pode ser reconstruído com os timestamps configurados;
-- foco em execução pode ser pausado ao entrar numa pausa de trabalho;
-- Pomodoro e foco personalizado permanecem totalmente manuais e nunca são iniciados pela automação;
-- o encerramento automático reutiliza `finishJourneyWithProductivityState`, preservando o tratamento existente de pausa, atividade e foco abertos.
+- nova rota `#/ferias` e acesso na navegação desktop/mobile;
+- cálculo isolado em `src/domain/vacation/VacationBalance.ts`;
+- anos normais: mínimo geral de 22 dias úteis, permitindo valor superior apenas quando explicitamente confirmado/configurado;
+- ano de admissão: política conservadora de 2 dias por mês completo de contrato, até 20 dias, com marco de seis meses completos para o gozo;
+- não existe falsa acumulação mensal nos anos normais: a interface explica que o direito anual vence, em regra, em 1 de janeiro;
+- férias já marcadas na Calculadora de horas (`reason = ferias`) e no Mapa de turnos/plano mensal (`kind = vacation`) são reutilizadas automaticamente;
+- a mesma data encontrada em mais de uma fonte conta apenas uma vez;
+- datas até ao dia atual são tratadas como gozadas/registadas; datas futuras do mesmo ano são separadas como planeadas;
+- dias transitados, férias gozadas fora da aplicação e ajustes dependem de confirmação manual;
+- o botão principal usa contraste reforçado em tema claro e escuro.
 
 ### Implementação técnica
 
-- `src/application/journey/reconcileScheduledWorkday.ts` — caso de uso de reconciliação temporal;
-- `src/presentation/components/ScheduledWorkdayAutomation.tsx` — gatilho global enquanto o runtime está ativo;
-- `src/presentation/events/appDataChanged.ts` — evento interno após mutações automáticas;
-- `src/presentation/hooks/useAppDataRefresh.ts` — atualização dos controllers/relatórios sem reload;
-- testes dedicados em `reconcileScheduledWorkday.test.ts`.
+Novos elementos:
 
-A automação usa timestamps absolutos e IDs determinísticos para registos automáticos do mesmo dia. O intervalo de execução serve apenas para detetar marcos; não é a fonte da verdade temporal.
+- `src/domain/vacation/VacationBalance.ts`;
+- `src/domain/vacation/VacationBalance.test.ts`;
+- `src/presentation/pages/VacationBalancePage.tsx`;
+- `src/styles/vacation.css`;
+- `docs/VACATION-TRACKER.md`.
+
+Alterados:
+
+- `src/presentation/router.tsx`;
+- `src/presentation/navigation/navigationItems.ts`;
+- `src/main.tsx`;
+- `.github/workflows/quality.yml` e `.github/workflows/deploy-pages.yml` por regressão externa do npm 10.9.8.
+
+### Persistência e segurança
+
+A configuração adicional é guardada em `secureStorage` na chave `foco-jornada-vacation-settings-v1`, ficando dentro do cofre cifrado existente. São guardados apenas: data de admissão, dias anuais confirmados, transitados, dias gozados fora da aplicação e ajuste confirmado.
+
+Não foi criado novo endpoint, tabela IndexedDB, token, segredo, permissão, mecanismo de autenticação ou migração de schema. O protocolo de sincronização e a cifragem permanecem inalterados.
+
+### Enquadramento laboral validado
+
+Em 2026-09-15 foram revistos Código do Trabalho e gov.pt:
+
+- artigo 237.º: o direito a férias vence, em regra, em 1 de janeiro;
+- artigo 238.º: duração mínima anual de 22 dias úteis;
+- artigo 239.º: no ano de admissão, 2 dias úteis por mês de duração do contrato, até 20 dias, com gozo após seis meses completos;
+- artigo 240.º: transferência/cumulação depende das condições legalmente previstas.
+
+Existe divergência interpretativa sobre frações de mês no ano de admissão. Para não apresentar uma hipótese como certeza, a versão inicial usa meses completos, documenta a opção e permite ajustes confirmados pelo utilizador.
 
 ## Qualidade e segurança
 
-O primeiro workflow do PR #202 foi bloqueado por advisories novos em dependências de desenvolvimento. A correção atualizou `vitest` para `5.0.0`, aplicou `sharp` `0.35.4` por `overrides` e restaurou as dependências diretas do lint (`eslint`, `eslint-plugin-react-hooks`, `eslint-plugin-react-refresh`).
+O primeiro e o segundo workflow do PR #203 falharam antes dos testes porque o `npm install` do npm 10.9.8 terminou com o crash interno `Cannot read properties of null (reading 'edgesOut')`. Não houve falha funcional da ferramenta. O problema coincide com regressões abertas no npm/CLI em 2026.
 
-No head final do PR, a pipeline **Qualidade** concluiu com sucesso em todas as etapas:
+Foi fixado `npm@11.6.0` nos workflows de qualidade e publicação, preservando Node 22 e todos os gates. Com essa correção, o workflow **Qualidade #1095** concluiu com sucesso em:
 
-- instalação de dependências;
-- `npm audit --audit-level=high` com 0 vulnerabilidades;
+- instalação;
+- `npm audit --audit-level=high`;
 - typecheck;
 - lint;
-- testes automatizados;
+- testes, incluindo os novos testes de férias;
 - build;
-- `wrangler deploy --dry-run`;
-- smoke test de browser;
-- criação do artefacto.
+- Worker dry-run;
+- smoke test Chromium;
+- artefacto.
 
-Depois do merge, o workflow **Qualidade** de `main` voltou a concluir com sucesso e o workflow **Publicar Foco & Jornada** também concluiu com sucesso. O GitHub Pages publicou o commit `08dc9fae23f683fc7cadf80ada7a54b2545da8b2`.
+O head atual volta a executar os mesmos gates depois do ajuste de contraste, antes da integração.
 
-Não foram adicionados segredos, tokens, permissões, endpoints ou dados pessoais. Não houve alteração do schema do cofre, cifragem, autenticação ou protocolo de sincronização.
+## Limitações conhecidas
 
-## Limitação conhecida da PWA
+### Férias
 
-Uma PWA pode ter JavaScript totalmente suspenso quando o sistema a coloca em segundo plano ou quando é encerrada. Assim, não é tecnicamente possível prometer que um callback execute fisicamente às 08:00 ou 17:00 com a aplicação fechada.
+- é um controlo pessoal, não a fonte oficial de RH;
+- CCT, contrato mais favorável, impedimento prolongado, cessação e outras situações especiais podem alterar o resultado;
+- dias transitados devem ser confirmados;
+- dias explicitamente marcados como férias na aplicação são tratados como um dia de férias; a ferramenta não tenta reinterpretar automaticamente feriados, escalas especiais ou descanso substitutivo;
+- a política de meses completos no ano de admissão é deliberadamente conservadora.
 
-A regra implementada é de **reconciliação**: quando a aplicação está ativa ou regressa ao primeiro plano, grava os timestamps exatos configurados. Não usa a hora tardia do callback como substituto do horário planeado.
+### PWA/background
 
-Se a aplicação nunca tiver sido aberta durante o turno e só abrir depois da saída, não existe evidência suficiente para criar silenciosamente um dia completo; nesse caso não é criado registo automático retroativo.
+A PWA pode ter JavaScript suspenso quando fechada; a automação de jornada mantém a regra de reconciliação por timestamps planeados do PR #202.
 
 ## Riscos e validações ainda abertas
 
-1. **Dispositivo real:** confirmar no telemóvel e computador que ambos carregam a versão publicada e usam o mesmo perfil/cofre sincronizado.
-2. **Jornada 08:00–17:00:** validar em uso real que a jornada usa 08:00 como entrada planeada e termina com 17:00 como saída.
-3. **Pausa real de 60 minutos:** definir manualmente o início/fim em **Definições → Pausas** e confirmar início, fim e total acumulado automáticos.
-4. **Pomodoro:** confirmar que continua totalmente manual.
-5. **Cross-device:** continuar a validação física móvel ↔ computador com o mesmo perfil/cofre; conflitos simultâneos continuam conservadores, sem `last-write-wins`.
-6. **Timezone:** a área geral de jornada continua dependente do timezone local do browser; os dois dispositivos devem usar o mesmo timezone durante validações.
+1. concluir o quality gate do head final do PR #203;
+2. validar em dispositivo real a rota, edição, persistência e responsividade;
+3. marcar a mesma data como férias em duas fontes e confirmar contagem única;
+4. confirmar sincronização da configuração de férias entre telemóvel e computador com o mesmo cofre;
+5. manter as validações físicas ainda pendentes do PR #202 e da sincronização cross-device.
 
 ## Última alteração
 
-PR #202 integrado e publicado: automação de jornada e pausas pelo `WorkSchedule`, dependências de qualidade corrigidas e pipelines de PR/`main` concluídas com sucesso.
+PR #203: ferramenta de férias implementada, enquadramento laboral documentado, regressão externa do npm 10.9.8 isolada e workflows ajustados para npm 11.6.0 sem enfraquecer os quality gates.
 
 ## Próximo passo
 
-1. abrir a versão publicada no telemóvel e no computador;
-2. confirmar que ambos apresentam o mesmo perfil/cofre e o estado de sincronização esperado;
-3. definir a pausa real de 60 minutos em **Definições → Pausas**;
-4. validar a jornada 08:00–17:00 em utilização real;
-5. reportar qualquer divergência visual, temporal ou de sincronização com captura e hora observada.
+1. confirmar CI verde no head final;
+2. integrar PR #203 em `main`;
+3. confirmar o workflow de publicação e GitHub Pages;
+4. atualizar este estado com os SHAs finais;
+5. validar a ferramenta em telemóvel e computador com dados reais confirmados.

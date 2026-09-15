@@ -22,6 +22,7 @@ export const primaryNavigation: NavigationItem[] = [
 ]
 
 export const secondaryNavigation: NavigationItem[] = [
+  { label: 'Férias', path: '/ferias', icon: 'calendar' },
   { label: 'Medicação', path: '/medicamentos', icon: 'medication' },
   { label: 'glo', path: '/sticks', icon: 'glo' },
   { label: 'Relatórios', path: '/relatorios', icon: 'stats' },
@@ -29,6 +30,7 @@ export const secondaryNavigation: NavigationItem[] = [
 ]
 
 export const mobileQuickNavigation: QuickNavigationItem[] = [
+  { label: 'Férias', path: '/ferias', icon: 'calendar', description: 'Saldo, direito e planeamento' },
   { label: 'Medicação', path: '/medicamentos', icon: 'medication', description: 'Tomas, horários e stock' },
   { label: 'glo', path: '/sticks', icon: 'glo', description: 'Sessões, ritmo e stock' },
   { label: 'Mapa de turnos', path: '/turnos', icon: 'calendar', description: 'Ver e editar turnos' },

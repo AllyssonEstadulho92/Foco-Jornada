@@ -1,5 +1,46 @@
 # Changelog
 
+## 2026-09-15 — ferramenta de saldo de férias (PR #203)
+
+### Adicionado
+
+- Nova rota `#/ferias` com acesso na navegação desktop e no acesso rápido móvel.
+- `VacationBalance` como módulo de domínio puro para calcular direito estimado, saldo atual e saldo projetado.
+- Testes de domínio para período anual mínimo, condição mais favorável, ano de admissão, limite de 20 dias, seis meses, deduplicação e datas futuras.
+- `VacationBalancePage` com configuração, decomposição do cálculo e ligações às fontes de registo existentes.
+- `vacation.css` com layout responsivo, foco por teclado e suporte a `forced-colors`.
+- `docs/VACATION-TRACKER.md` com especificação funcional, regras, riscos e critérios de aceitação.
+
+### Comportamento
+
+- Nos anos normais, a ferramenta parte do direito anual vencido/configurado e não representa férias como acumulação mensal contínua.
+- O período anual configurado não pode ficar abaixo do mínimo geral de 22 dias úteis; valores superiores podem ser usados quando uma condição mais favorável estiver confirmada.
+- No ano de admissão, a versão inicial usa 2 dias por mês completo de contrato, até 20 dias, e mostra separadamente o marco dos seis meses completos para o gozo.
+- Férias já registadas na Calculadora de horas (`reason = ferias`) e no Mapa de turnos/plano mensal (`kind = vacation`) são agregadas automaticamente.
+- A mesma data encontrada em várias fontes conta uma única vez.
+- Datas passadas/atuais contam como gozadas/registadas; datas futuras do mesmo ano são apresentadas como planeadas.
+- O saldo disponível hoje é separado do saldo projetado após férias futuras.
+- Dias transitados, férias gozadas fora da aplicação e ajustes continuam dependentes de confirmação explícita do utilizador.
+
+### Segurança e integridade
+
+- A nova configuração é guardada em `secureStorage` na chave `foco-jornada-vacation-settings-v1`, permanecendo dentro do cofre cifrado existente.
+- Não foi criado novo endpoint, tabela IndexedDB, token, segredo, permissão ou mecanismo de autenticação.
+- Não existe migração de schema nem alteração do protocolo de sincronização.
+- A ferramenta não infere férias a partir de faltas, doença, folga ou ausência de jornada; só usa estados explicitamente marcados como férias.
+
+### Enquadramento e limitações
+
+- Regras gerais confrontadas com os artigos 237.º a 240.º do Código do Trabalho e gov.pt.
+- A ferramenta é controlo pessoal e não substitui o mapa oficial de férias, RH, contrato ou instrumento de regulamentação coletiva.
+- A política de meses completos no ano de admissão é deliberadamente conservadora e está documentada devido a divergência interpretativa sobre frações de mês.
+- CCT, impedimento prolongado, cessação do contrato e outras situações especiais permanecem fora do cálculo automático até existir informação confirmada.
+
+### Qualidade
+
+- PR #203 aberto em draft.
+- Quality gates ainda pendentes antes de integração: `npm audit`, typecheck, lint, testes, build, Worker dry-run e smoke test.
+
 ## 2026-09-10 — automação de jornada e pausas (PR #202)
 
 ### Adicionado
