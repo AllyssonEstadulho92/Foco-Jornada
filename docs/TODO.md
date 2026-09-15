@@ -1,6 +1,41 @@
 # TODO
 
-Atualizado em: 2026-09-10
+Atualizado em: 2026-09-15
+
+## P0 — Ferramenta de saldo de férias (PR #203)
+
+- [x] Analisar a arquitetura atual antes de alterar código.
+- [x] Confirmar que o Mapa de turnos já possui `kind = vacation` e a Calculadora de horas `reason = ferias`.
+- [x] Validar o enquadramento geral nos artigos 237.º a 240.º do Código do Trabalho e em gov.pt.
+- [x] Separar anos normais do ano de admissão.
+- [x] Não representar o direito anual normal como acumulação mensal.
+- [x] Aplicar mínimo geral de 22 dias úteis nos anos normais suportados.
+- [x] Permitir valor superior a 22 apenas como condição mais favorável explicitamente configurada.
+- [x] No ano de admissão, usar política conservadora de 2 dias por mês completo, máximo 20, documentando a incerteza sobre frações de mês.
+- [x] Separar dias adquiridos do marco de seis meses para gozo no ano de admissão.
+- [x] Reutilizar férias já registadas no mapa de turnos, plano mensal e calculadora de horas.
+- [x] Deduplicar a mesma data entre fontes.
+- [x] Separar férias já gozadas/registadas de férias futuras planeadas.
+- [x] Criar `VacationBalance` como cálculo puro, sem dependência da UI.
+- [x] Adicionar testes para regras normais, admissão, limites, datas futuras e deduplicação.
+- [x] Guardar apenas a configuração adicional no `secureStorage` existente.
+- [x] Não criar novo endpoint, schema IndexedDB, segredo, token ou mecanismo de autenticação.
+- [x] Criar rota `#/ferias` e acesso na navegação desktop/mobile.
+- [x] Criar UI responsiva com foco de teclado, `forced-colors` e mensagens de limitação.
+- [x] Criar `docs/VACATION-TRACKER.md` com especificação e critérios de aceitação.
+- [x] Atualizar `PROJECT_STATE.md` e `ARCHITECTURE.md`.
+- [ ] Atualizar `DECISIONS.md` e `CHANGELOG.md`.
+- [ ] Obter `npm audit --audit-level=high` verde no PR #203.
+- [ ] Obter typecheck verde.
+- [ ] Obter lint verde.
+- [ ] Obter testes verdes, incluindo regressões existentes.
+- [ ] Obter build, Worker dry-run e smoke test verdes.
+- [ ] Marcar PR #203 como pronto apenas depois dos quality gates.
+- [ ] Integrar PR #203 em `main`.
+- [ ] Confirmar publicação GitHub Pages do merge.
+- [ ] Validar em dispositivo real a rota, persistência e responsividade.
+- [ ] Marcar a mesma data como férias em duas fontes e confirmar contagem única em uso real.
+- [ ] Confirmar sincronização da configuração de férias entre telemóvel e computador com o mesmo cofre.
 
 ## P0 — Automação de jornada e pausas (PR #202)
 
@@ -86,6 +121,8 @@ As correções dos PR #195–#199 estão integradas; continuam pendentes testes 
 
 ## P2 — Melhorias futuras
 
+- [ ] Avaliar regras adicionais de férias apenas após confirmar eventual CCT/contrato aplicável; não inferir benefícios específicos.
+- [ ] Avaliar seleção de ano/histórico de férias depois de validar a versão atual em uso real.
 - [ ] Criar fluxo explícito de resolução de conflitos apenas depois de validar o comportamento conservador atual em uso real.
 - [ ] Avaliar eliminação autenticada da cópia remota quando um perfil é removido localmente.
 - [ ] Avaliar revogação/listagem de browsers associados apenas se surgir necessidade operacional.
