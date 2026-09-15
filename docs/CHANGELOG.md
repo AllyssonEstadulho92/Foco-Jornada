@@ -28,9 +28,23 @@
 - Valores vivos podem mostrar até quatro casas decimais; marcos fechados mantêm até duas.
 - `forced-colors`, `prefers-reduced-motion` e breakpoints responsivos permanecem suportados.
 
+### Precisão
+
+- Um primeiro teste expôs diferença de `0,0001` dia causada por subtrair um valor intermédio já arredondado.
+- O valor restante do mês passou a ser calculado diretamente a partir da parcela mensal e do progresso exato, eliminando esse arredondamento intermédio.
+
 ### Limite temporal
 
 - A PWA não depende de timers em background. iOS/Android podem suspender JavaScript; ao regressar à aplicação, a evolução é recalculada a partir do relógio local atual.
+
+### Qualidade, integração e publicação
+
+- Workflow **Qualidade #1122** no head final do PR concluiu integralmente com sucesso.
+- PR #206 integrado em `main` no commit `15f4df15308a145f9d303cf56d699837f9516303`.
+- Workflow **Qualidade #1123** após o merge concluiu com sucesso: auditoria, typecheck, lint, testes, build, Worker dry-run, smoke test Chromium e artefacto.
+- Workflow **Publicar Foco & Jornada #245** concluiu com sucesso.
+- Build publicado na raiz de `main` no commit `05e32a99bd0479fdb417876cb9a31f305a32866d`.
+- Workflow **pages build and deployment #790** concluiu com sucesso para o build publicado.
 
 ## 2026-09-15 — contagem de dias úteis nas férias (PR #205)
 
