@@ -1,6 +1,6 @@
 # Changelog
 
-## 2026-09-15 — contagem de dias úteis nas férias
+## 2026-09-15 — contagem de dias úteis nas férias (PR #205)
 
 ### Corrigido
 
@@ -18,6 +18,15 @@
 
 - Feriados nacionais/municipais, descanso semanal diferente e escalas especiais não são inferidos automaticamente nesta correção.
 - Não foi criado endpoint, schema, token, segredo, permissão, dependência ou migração de dados.
+
+### Qualidade, integração e publicação
+
+- Workflow **Qualidade #1113** no head final do PR concluiu com sucesso: instalação, `npm audit --audit-level=high`, typecheck, lint, testes, build, Worker dry-run, smoke test Chromium e artefacto.
+- PR #205 integrado em `main` no commit `2e309975a38e0df975bf1958879fefb3c3b4b514`.
+- Workflow **Qualidade #1114** após o merge concluiu integralmente com sucesso.
+- Workflow **Publicar Foco & Jornada #244** concluiu com sucesso.
+- Build publicado na raiz de `main` no commit `26e8dcffca10589846dad4577e96ad03ea1e0608`.
+- Workflow **pages build and deployment #785** concluiu com sucesso para o build publicado.
 
 ## 2026-09-15 — acumulação mensal pessoal de férias (PR #204)
 
