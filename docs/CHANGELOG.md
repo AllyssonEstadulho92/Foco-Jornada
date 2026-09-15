@@ -1,5 +1,23 @@
 # Changelog
 
+## 2026-09-15 — contenção visual dos cartões mensais de férias (PR #207)
+
+### Corrigido
+
+- O badge de estado/percentagem do mês atual deixa de ultrapassar a borda do cartão quando não existe largura suficiente.
+- Cabeçalhos dos 12 cartões passam a permitir quebra de linha e redistribuição do conteúdo.
+- Nome do mês, estado, valores e descrições ficam limitados à largura disponível com `min-width: 0`, `max-width: 100%` e quebra segura.
+- A barra de progresso fica limitada a 100% da largura do respetivo cartão.
+- O resumo e o cabeçalho da secção **Evolução por mês** recebem a mesma proteção contra overflow.
+- Em ecrãs abaixo de 520 px, a grelha mensal e o resumo passam para uma coluna e o cabeçalho do cartão organiza mês/estado verticalmente.
+- Removido o truncamento por reticências do estado mensal: a informação permanece visível dentro do cartão.
+
+### Regressão e acessibilidade
+
+- Adicionado `src/styles/vacation-card-containment.test.ts` para proteger as regras de contenção.
+- `forced-colors` e `prefers-reduced-motion` permanecem suportados.
+- A alteração é exclusivamente visual; não modifica cálculo de férias, dados, persistência, sincronização, autenticação, API ou dependências.
+
 ## 2026-09-15 — evolução mensal de férias em tempo real (PR #206)
 
 ### Adicionado
