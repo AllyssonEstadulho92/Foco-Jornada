@@ -1,5 +1,37 @@
 # Changelog
 
+## 2026-09-15 — evolução mensal de férias em tempo real (PR #206)
+
+### Adicionado
+
+- Evolução intramensal em tempo real para a projeção pessoal de férias.
+- `asOfDayProgress` opcional no cálculo de domínio para representar a fração do dia local já decorrida.
+- Campos derivados `monthlyLiveAccruedDays`, `monthlyLiveAvailableBalanceDays` e `monthlyLiveProjectedBalanceDays`.
+- Progresso, ganho, restante, ritmo diário e meta acumulada de fecho do mês atual.
+- Barras de progresso mensais na grelha de janeiro a dezembro.
+- Relógio local com atualização a cada minuto enquanto a página está ativa e reconciliação ao recuperar foco/visibilidade.
+- Testes dedicados à interpolação do mês atual e ao comportamento do último dia antes do fecho real.
+
+### Compatibilidade
+
+- `monthlyAccruedDays` continua a representar apenas meses efetivamente fechados.
+- Os marcos mensais continuam calculados diretamente por `meta × mês / 12`, sem drift.
+- A referência laboral/contratual do PR #203 permanece separada.
+- A regra de segunda a sexta-feira do PR #205 permanece aplicada a férias gozadas e planeadas.
+- Nenhum novo campo de configuração, endpoint, schema, segredo, token, permissão ou dependência foi criado.
+
+### UI/UX e acessibilidade
+
+- Novos cartões **Saldo agora**, **Acumulado agora**, **Após planeadas** e **Progresso do mês**.
+- Resumo do mês atual com valor ganho, valor restante, ritmo diário e meta ao fecho.
+- O mês atual mostra acumulado vivo e percentagem; meses fechados mantêm o marco final; meses futuros mostram a meta prevista.
+- Valores vivos podem mostrar até quatro casas decimais; marcos fechados mantêm até duas.
+- `forced-colors`, `prefers-reduced-motion` e breakpoints responsivos permanecem suportados.
+
+### Limite temporal
+
+- A PWA não depende de timers em background. iOS/Android podem suspender JavaScript; ao regressar à aplicação, a evolução é recalculada a partir do relógio local atual.
+
 ## 2026-09-15 — contagem de dias úteis nas férias (PR #205)
 
 ### Corrigido

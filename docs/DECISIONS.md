@@ -4,345 +4,230 @@ Atualizado em: 2026-09-15
 
 ## D-001 — Manter o menu `···` além do gesto de deslize
 
-**Decisão:** o deslize acrescenta atalhos, mas não substitui o menu existente.
+**Estado:** aceite.
 
-**Motivo:** o gesto não é descobrível por todos os utilizadores e não deve ser o único caminho para quem usa teclado, rato ou tecnologias de apoio.
+**Decisão:** gestos de deslize acrescentam atalhos, mas não substituem o menu explícito.
 
-## D-002 — Eliminação imediata na interface com tombstone lógico
+**Motivo:** o gesto não é igualmente descobrível/acessível para teclado, rato e tecnologias de apoio.
 
-**Decisão:** a ação visual **Eliminar** remove o horário da agenda ativa no próprio momento, mas não executa `delete()` físico na tabela `medicationSchedules`. O registo recebe `deletedAt` e uma validade encerrada antes do dia da eliminação.
-
-**Motivo:** para o utilizador, “Eliminar” deve significar que o horário desaparece imediatamente e não volta a gerar tomas. Internamente, eventos de toma e correções dependem do `scheduleId`; manter um tombstone preserva integridade referencial, backups e auditoria.
-
-## D-003 — Alterações de definição entram em vigor no dia seguinte
-
-**Decisão:** **Definir** encerra o horário atual no dia de hoje e cria um sucessor válido a partir de amanhã.
-
-**Motivo:** evita alterar retroativamente uma ocorrência que já existe no contexto do dia atual e mantém a relação entre a toma de hoje e a configuração que a originou.
-
-## D-004 — Pointer Events com `touch-action: pan-y`
-
-**Decisão:** o gesto usa Pointer Events e só assume controlo quando o movimento horizontal ultrapassa um limiar.
-
-**Motivo:** permite funcionar em toque, caneta e rato sem bloquear a deslocação vertical normal da página.
-
-## D-005 — Ação destrutiva com confirmação explícita
-
-**Decisão:** tocar em **Eliminar** abre um diálogo de confirmação antes de alterar os dados.
-
-**Motivo:** reduz eliminações acidentais e explica que o horário deixa a lista ativa, mas os registos anteriores permanecem protegidos.
-
-## D-006 — Separar histórico funcional de auditoria técnica
-
-**Decisão:** o separador Histórico abre em **Resumo**, excluindo checkpoints automáticos. Os pontos de proteção permanecem disponíveis em **Detalhes técnicos** e ambas as vistas usam paginação progressiva.
-
-**Motivo:** checkpoints repetidos são importantes para auditoria, mas não devem dominar a leitura normal.
-
-## D-007 — Eliminar toda a cadeia futura da mesma definição
-
-**Decisão:** ao eliminar uma versão ativa, todas as versões futuras não eliminadas com o mesmo `order` também recebem o tombstone.
-
-**Motivo:** preservar versões futuras faria o horário eliminado reaparecer automaticamente, contrariando a ação explícita do utilizador.
-
-## D-008 — Normalizar horas noturnas pela proximidade ao turno planeado
-
-**Estado:** aceite, integrada no PR #189 e publicada em GitHub Pages.
-
-**Decisão:** quando o turno planeado atravessa a meia-noite, uma hora civil real, de pausa ou de ocorrência é representada no dia inicial ou no dia seguinte conforme a opção mais próxima do intervalo planeado.
-
-**Motivo:** evita deslocar incorretamente entradas antecipadas para o dia seguinte e mantém horas após a meia-noite associadas à manhã seguinte.
-
-## D-009 — GitHub Pages é a distribuição oficial; integrações externas só contam quando documentadas
+## D-002 — Eliminação imediata na UI com tombstone lógico
 
 **Estado:** aceite.
 
-**Decisão:** a publicação suportada do frontend permanece GitHub Pages. Serviços externos só integram a arquitetura quando têm finalidade, configuração versionada, limites de segurança e responsabilidade operacional documentados.
+**Decisão:** eliminar um horário de medicação remove-o imediatamente da agenda ativa, mas preserva o registo com `deletedAt`.
 
-**Motivo:** um check externo por si só não define arquitetura nem deve mascarar o estado do pipeline oficial.
+**Motivo:** mantém integridade referencial e auditoria de eventos históricos sem fazer o horário reaparecer.
 
-## D-010 — Cloudflare Workers como backend de sincronização cifrada
+## D-003 — Alterações de definição entram em vigor no dia seguinte
 
-**Estado:** aceite e integrada em produção através do PR #191.
+**Estado:** aceite.
 
-**Decisão:** utilizar Cloudflare Workers exclusivamente como serviço remoto de sincronização, mantendo GitHub Pages como frontend oficial. O Worker guarda apenas o `EncryptedVaultRecord` já cifrado no cliente e metadados técnicos de concorrência. O estado de cada perfil é isolado num Durable Object.
+**Decisão:** editar uma definição encerra a versão atual no dia de hoje e cria a sucessora válida a partir de amanhã.
 
-A autenticação do protocolo é derivada da chave de dados desbloqueada no cliente através de SHA-256 com contexto específico. A chave AES original não é enviada ao servidor. A revisão remota é independente da revisão local e cada escrita exige a revisão remota esperada.
+**Motivo:** evita reescrever retroativamente o contexto que originou eventos do próprio dia.
 
-Quando existem alterações independentes nos dois dispositivos, nenhuma cópia é escolhida automaticamente.
+## D-004 — Pointer Events com `touch-action: pan-y`
 
-**Motivo:** móvel e computador precisam de uma fonte remota comum sem transformar o backend numa fonte de dados pessoais em texto simples.
+**Estado:** aceite.
 
-## D-011 — Bootstrap inicial de Durable Object através do branch de produção
+**Decisão:** gestos horizontais usam Pointer Events e só assumem controlo após limiar horizontal.
+
+**Motivo:** suporta toque/caneta/rato sem bloquear o scroll vertical normal.
+
+## D-005 — Ações destrutivas exigem confirmação explícita
+
+**Estado:** aceite.
+
+**Decisão:** eliminar abre confirmação antes da mutação.
+
+**Motivo:** reduz eliminações acidentais e torna a consequência clara.
+
+## D-006 — Separar histórico funcional de auditoria técnica
+
+**Estado:** aceite.
+
+**Decisão:** Histórico abre em **Resumo** e checkpoints técnicos ficam em **Detalhes técnicos**.
+
+**Motivo:** informação de auditoria é preservada sem dominar a leitura normal.
+
+## D-007 — Eliminar toda a cadeia futura da mesma definição
+
+**Estado:** aceite.
+
+**Decisão:** eliminar uma versão ativa também encerra versões futuras da mesma cadeia lógica.
+
+**Motivo:** impede que uma definição explicitamente eliminada reapareça automaticamente.
+
+## D-008 — Normalizar horas noturnas pela proximidade ao turno planeado
+
+**Estado:** aceite, integrada no PR #189 e publicada.
+
+**Decisão:** em turnos que atravessam a meia-noite, horas reais são associadas ao dia inicial/seguinte pela posição relativa ao turno planeado.
+
+**Motivo:** evita deslocar incorretamente entradas antecipadas e preserva saídas da madrugada no turno certo.
+
+## D-009 — GitHub Pages é a distribuição oficial do frontend
+
+**Estado:** aceite.
+
+**Decisão:** GitHub Pages continua a ser o canal oficial de publicação do frontend; serviços externos só entram na arquitetura quando finalidade e segurança estão documentadas.
+
+**Motivo:** um check externo não deve redefinir silenciosamente a arquitetura suportada.
+
+## D-010 — Cloudflare Worker/Durable Object para sincronização cifrada
+
+**Estado:** aceite, integrada no PR #191 e publicada.
+
+**Decisão:** sincronização remota transporta apenas o `EncryptedVaultRecord` e metadados técnicos; cada perfil é isolado num Durable Object.
+
+**Motivo:** permitir convergência móvel/computador sem expor dados funcionais em texto simples no backend.
+
+## D-011 — Bootstrap inicial do Durable Object através de produção
 
 **Estado:** concluído no PR #191.
 
-**Decisão:** a primeira criação da classe `SyncVault` foi integrada em `main` depois de o código, frontend e bundle do Worker passarem nos quality gates. O Workers Builds de produção executou com sucesso.
+**Decisão:** alterações de ciclo de vida do Durable Object são aplicadas no deploy de produção, não simuladas como se `versions upload` tivesse o mesmo efeito.
 
-**Motivo:** branches não produtivas usam `wrangler versions upload`, que não aplica alterações de ciclo de vida de Durable Objects; produção usa `wrangler deploy`.
+**Motivo:** o ciclo de vida do Durable Object depende do mecanismo de deploy suportado pela Cloudflare.
 
-## D-012 — Endpoint de sincronização pode ser configurado no próprio perfil
+## D-012 — Endpoint de sincronização pode ser configurado no perfil
 
 **Estado:** aceite, integrada no PR #192 e publicada.
 
-**Decisão:** manter `VITE_SYNC_API_URL` como configuração automática de build, mas permitir um endpoint runtime guardado em `SecurityProfile.cloudSync.endpoint` quando a publicação não tiver essa variável disponível.
+**Decisão:** manter `VITE_SYNC_API_URL`, mas permitir endpoint runtime validado por HTTPS/identidade `/health` quando a variável de build não estiver disponível.
 
-O endpoint runtime só é aceite se for HTTPS em `workers.dev` (ou localhost em desenvolvimento), sem credenciais, query string ou fragmento. Antes de guardar, o cliente chama `/health` e exige a identidade `foco-jornada-sync`. Uma alteração de endpoint limpa a revisão remota e a fingerprint conhecidas antes de nova reconciliação.
+**Motivo:** a ausência de variável de build não deve inutilizar um backend legítimo já publicado.
 
-**Motivo:** o Worker de produção pode estar publicado sem que o seu subdomínio `workers.dev` esteja disponível ao pipeline GitHub. Bloquear toda a sincronização por falta de uma variável de build mantém móvel e computador desalinhados apesar de o backend existir.
-
-**Consequências:**
-
-- o endereço é configuração pública, não segredo;
-- a cópia segura do perfil transporta o mesmo endpoint para o segundo dispositivo;
-- o utilizador só precisa de introduzir o endpoint uma vez no dispositivo de referência quando a variável de build estiver ausente;
-- um endpoint falso ou incompatível não é guardado porque precisa de responder corretamente a `/health`;
-- custom domains continuam fora deste fluxo até CSP e origem permitida serem revistos explicitamente.
-
-## D-013 — Browser novo associa-se ao perfil existente por canal temporário cifrado
+## D-013 — Browser novo associa-se ao perfil por canal temporário cifrado
 
 **Estado:** aceite, integrada no PR #193 e publicada.
 
-**Decisão:** um browser sem `SecurityProfile` não deve criar automaticamente outra credencial quando o utilizador já possui um perfil noutro dispositivo. O fluxo principal passa a ser **Associar outro navegador**.
+**Decisão:** associação transfere apenas o material de bootstrap cifrado; o segredo raiz fica no fragmento `#pair=...`, expira e não é enviado ao Worker.
 
-O dispositivo já autorizado cria uma ligação temporária com segredo raiz aleatório de 256 bits. A partir desse segredo são derivados, com contextos criptográficos separados:
+**Motivo:** um browser vazio precisa de bootstrap sem colocar PIN/palavra-passe/chave de dados no servidor.
 
-- uma chave AES-GCM para cifrar o `SecurityProfile` necessário ao bootstrap;
-- um token HTTP de autenticação do canal temporário.
+## D-014 — Uma aplicação responsiva, um modelo de dados
 
-O segredo raiz permanece apenas na ligação `#pair=...` e não é enviado ao Worker. O Worker recebe o perfil já cifrado, guarda apenas um hash do token e aplica validade de 10 minutos. O payload é eliminado depois de uma redenção bem-sucedida e por alarme quando expira.
+**Estado:** aceite no PR #194.
 
-O canal temporário não transporta o cofre operacional. Depois de importar o perfil, o novo browser exige o mesmo PIN/palavra-passe existente; só depois deriva a `dataKey` e usa o protocolo normal de sincronização para obter e validar o `EncryptedVaultRecord` remoto.
+**Decisão:** mobile e desktop são réplicas da mesma PWA e do mesmo cofre, sem APIs/regras duplicadas por plataforma.
 
-**Motivo:** `IndexedDB` e `localStorage` são isolados entre browsers. Cloud sync por si só não consegue arrancar num browser vazio porque falta o material criptográfico local necessário para autenticar e desencriptar o cofre. Guardar PIN/palavra-passe no servidor ou permitir bootstrap remoto apenas com um PIN de 6 dígitos aumentaria materialmente o risco de força bruta/offline.
+**Motivo:** o problema cross-device é de convergência e identidade do perfil, não de duas aplicações diferentes.
 
-**Consequências:**
-
-- mudar de browser deixa de implicar criar um novo PIN/perfil;
-- a associação continua a ser uma operação explícita uma vez por browser;
-- a ligação temporária deve ser tratada como segredo e não deve ser publicada;
-- é necessária pelo menos uma sincronização remota concluída antes de gerar a ligação;
-- a importação de cópia segura permanece como fallback;
-- não existe fusão automática entre perfis independentes.
-
-## D-014 — Uma aplicação responsiva, um modelo de dados, sincronização proporcional
-
-**Estado:** aceite no PR #194 após auditoria móvel ↔ web.
-
-**Decisão:** tratar telemóvel e computador como duas réplicas da mesma PWA e do mesmo perfil, não como produtos com regras ou APIs separadas. A unidade lógica cross-device continua a ser o cofre cifrado; a revisão remota do Worker coordena a convergência e o cofre IndexedDB permanece réplica de trabalho offline.
-
-Não é introduzido WebSocket/realtime. A reconciliação existente é suficiente e passa também a ser agendada quando a janela recupera `focus`, além de gravações locais, `online`, `visibilitychange`, desbloqueio e intervalo periódico.
-
-O estado de sincronização passa a ser visível no top bar a partir de `SecurityProfile.cloudSync`; não é criado um segundo estado de sync. `CloudSyncManager` aceita dependências injetáveis apenas para tornar testável, de forma isolada, a convergência entre duas réplicas.
-
-**Motivo:** a auditoria confirmou que mobile e desktop já partilham rotas, componentes, repositories, regras e schema. O problema não exige reconstrução nem API por entidade; exige garantir que ambos usam o mesmo perfil/cofre e tornar a convergência verificável e observável.
-
-**Consequências:**
-
-- nenhuma alteração de framework, schema operacional, base de dados ou cifragem;
-- nenhum reset ou migração destrutiva;
-- estados de `Sincronizado`, `Pendente`, `Pausada`, `Erro` e `Conflito` ficam observáveis na navegação normal;
-- edições simultâneas continuam a parar em conflito em vez de usar `last-write-wins` silencioso;
-- timezone geral continua dependente do ambiente do browser e fica registado como risco a validar separadamente antes de qualquer migração temporal.
-
-## D-015 — O mesmo controlo móvel abre e fecha o drawer com animação CSS
+## D-015 — O mesmo controlo móvel abre e fecha o drawer
 
 **Estado:** aceite no PR #195 e publicada.
 
-**Decisão:** o botão hambúrguer do top bar móvel deve representar o estado real do drawer. Quando fechado, apresenta três linhas; ao abrir, as linhas transformam-se num **X** e o mesmo controlo passa a fechar o drawer. React/TypeScript mantém apenas `mobileMenuOpen`; a transformação visual é executada em CSS.
+**Decisão:** o mesmo botão alterna hambúrguer ↔ X a partir de `mobileMenuOpen`; a animação é CSS.
 
-O controlo usa alvo de toque `44 × 44 px`, atualiza `aria-expanded` e `aria-label`, mantém o botão visível acima do backdrop e reserva lateralmente a zona necessária para que o drawer não o cubra. O resto do top bar é recortado enquanto o drawer está aberto. `prefers-reduced-motion` elimina a transição e `forced-colors` mantém contraste funcional.
+**Motivo:** o estado aberto/fechado deve ser legível e reversível no mesmo ponto de interação.
 
-**Motivo:** o estado aberto/fechado deve ser imediatamente legível e reversível no mesmo ponto de interação, sem criar dois comportamentos visuais diferentes entre a PWA instalada e a versão web responsiva. CSS é suficiente para o movimento e evita dependência adicional de animação.
+## D-016 — Um único X e orçamento explícito de largura no top bar
 
-**Consequências:**
+**Estado:** aceite no PR #196 e publicada.
 
-- não existe novo store, persistência ou regra de negócio;
-- sidebar desktop continua inalterada;
-- backdrop, `Escape` e mudança de rota continuam caminhos válidos de fecho;
-- qualquer caminho de fecho repõe `mobileMenuOpen = false`, o hambúrguer e o estado ARIA.
+**Decisão:** não existe segundo botão X no drawer; identidade e indicadores operacionais usam colunas com largura controlada.
 
-## D-016 — Um único X e orçamento explícito de largura no top bar móvel
+**Motivo:** elimina duplicação visual e competição entre marca, relógio, sync, bloqueio e notificações.
 
-**Estado:** aceite no PR #196, integrada e publicada.
+## D-017 — Área de toque sem superfície visual do botão
 
-**Decisão:** quando o drawer está aberto, não deve existir um segundo botão **Fechar** dentro do cabeçalho. O único X visível é o próprio botão hambúrguer transformado, que continua a alternar `mobileMenuOpen`.
+**Estado:** integrada no PR #197.
 
-No top bar móvel, a identidade e o grupo operacional passam a ocupar duas colunas explícitas: `minmax(0, 1fr)` para a identidade e `auto` para relógio/sync/bloqueio/notificações. O pseudo-logo/wordmark legado de `prototype-v2.css` é neutralizado no top bar; o wordmark completo permanece no drawer. Em ecrãs estreitos, o relógio pode ocultar o ícone mas não a hora.
+**Decisão:** o botão mantém alvo semântico de `44 × 44 px`, mas sem cápsula/borda/sombra visual permanente.
 
-O estado visual do menu não deve depender de `hover` verde persistente. As regras finais de `mobile-shell.css` preservam as três linhas do hambúrguer e mantêm o X em cor neutra, inclusive quando regras históricas usam `!important`.
+**Motivo:** preservar acessibilidade sem transformar o ícone de navegação num cartão concorrente.
 
-**Motivo:** as capturas reais mostraram dois X simultâneos, um X com aparência de selecionado e competição de largura entre marca e estado operacional. A correção deve reduzir ruído sem criar outro estado ou remover informação funcional.
+## D-018 — Elevar o controlo, não a superfície do top bar
 
-**Consequências:**
+**Estado:** integrada no PR #198; detalhes visuais posteriores foram refinados por D-019.
 
-- o drawer mantém o wordmark completo, mas deixa de ter um segundo X;
-- o top bar usa uma identidade textual compacta e previsível;
-- relógio, sync, bloqueio e sino ficam isolados do crescimento da marca;
-- nenhum dado, regra de negócio, persistência, API ou mecanismo de sincronização é alterado;
-- validação física em iPhone/Android continua obrigatória antes de considerar a correção visual encerrada.
+**Decisão:** a interatividade do X não deve obrigar uma superfície branca recortada sobre o backdrop.
 
-## D-017 — O controlo do menu mantém a área de toque, mas não uma superfície visual
+**Motivo:** o artefacto visual vinha do elemento pai elevado, não apenas do botão.
 
-**Estado:** implementada no PR #197.
+## D-019 — Top bar móvel persistente; drawer começa abaixo
 
-**Decisão:** o controlo hambúrguer/X continua semanticamente a ser um botão de `44 × 44 px`, mas a sua superfície visual deve ser transparente. `border`, fundo, cápsula e sombra não fazem parte da hierarquia normal; o utilizador deve perceber o controlo através dos próprios traços do ícone.
+**Estado:** aceite e publicada.
 
-Quando o drawer está aberto, a zona recortada do top bar corresponde apenas à safe-area esquerda mais os 44 px do controlo. O texto da identidade é ocultado durante esse estado para impedir fragmentos junto ao X. Em toque, `-webkit-tap-highlight-color` é removido; em teclado, `focus-visible` mantém um contorno discreto e explícito. `forced-colors` continua a desenhar os traços com cores do sistema e `prefers-reduced-motion` continua a desativar a transição.
+**Decisão:** abrir o drawer mantém `Foco Jornada`, relógio, sync, bloqueio e notificações no top bar; drawer/backdrop começam abaixo dele.
 
-**Motivo:** a validação física no iPhone mostrou que, apesar de existir apenas um X, a caixa branca do botão continuava a competir visualmente com a marca e com o drawer. A interface deve manter acessibilidade e área de toque sem transformar um ícone de navegação primário num cartão independente.
+**Motivo:** preserva continuidade visual e hierarquia global durante a navegação móvel.
 
-**Consequências:**
+## D-020 — Bootstrap reutiliza a marca existente com animação CSS
 
-- o alvo de toque e os atributos ARIA permanecem inalterados;
-- o mesmo `mobileMenuOpen` continua a controlar hambúrguer, X, drawer e backdrop;
-- não é criada nova biblioteca, componente, store ou persistência;
-- alterações limitam-se a apresentação e hierarquia visual do shell móvel.
+**Estado:** integrada nos PR #200–#201 e publicada.
 
-## D-018 — O estado aberto eleva o controlo, não a superfície do top bar
+**Decisão:** o fallback inicial usa `logo-mark.svg` e animação CSS progressiva, respeitando `prefers-reduced-motion`.
 
-**Estado:** implementada no PR #198.
+**Motivo:** reforçar identidade sem nova biblioteca, segundo logótipo ou JavaScript de animação.
 
-**Decisão:** quando o drawer está aberto, o `appTopBar` continua acima do backdrop apenas para manter o X interativo, mas a zona recortada desse top bar deve ser completamente transparente. Nesse estado são removidos `background`, `border-bottom`, `box-shadow` e `backdrop-filter` da superfície recortada.
-
-**Motivo:** tornar apenas o `mobileMenuButton` transparente não elimina a pintura do seu elemento pai. A captura real mostrou que o fundo branco visível vinha da superfície do próprio top bar elevada e recortada, não do botão.
-
-**Consequências:**
-
-- o X fica diretamente sobre o backdrop, sem cartão ou retângulo branco;
-- o alvo de toque de `44 × 44 px`, os estados ARIA, safe-area e animação permanecem inalterados;
-- o top bar fechado mantém a superfície normal;
-- nenhuma rota, dado, persistência, sincronização ou regra de segurança é alterada.
-
-## D-019 — O top bar móvel é persistente e o drawer começa abaixo dele
-
-**Estado:** implementada na branch `fix/mobile-menu-persistent-topbar`; substitui apenas os detalhes de recorte/ocultação definidos em D-015, D-017 e D-018.
-
-**Decisão:** abrir o drawer não deve remover nem recortar a barra superior da aplicação. `Foco Jornada`, relógio, estado de sincronização, bloqueio e notificações permanecem visíveis no mesmo top bar. O mesmo botão hambúrguer continua a transformar-se em X e a representar `mobileMenuOpen`.
-
-O top bar ocupa a camada superior do shell móvel. Drawer e backdrop passam a começar abaixo da sua altura de `64px`, ficando sobre o conteúdo e a bottom navigation, mas não sobre a barra superior. O drawer deixa de reservar uma faixa lateral específica para o X, porque os dois elementos já não disputam a mesma faixa vertical.
-
-**Motivo:** as capturas físicas após o PR #198 mostraram que o recorte do top bar corrigia a superfície branca à custa de apagar a restante estrutura da aplicação. Isso quebra continuidade visual e faz o estado aberto parecer uma página diferente. A hierarquia correta é manter a navegação global estável e sobrepor apenas o conteúdo que o drawer deve substituir temporariamente.
-
-**Consequências:**
-
-- o estado aberto conserva identidade e indicadores operacionais;
-- desaparecem `clip-path` e `visibility: hidden` usados para reduzir a barra ao controlo;
-- backdrop e drawer deixam de cobrir o top bar;
-- o hambúrguer/X mantém alvo de `44 × 44 px`, ARIA, `forced-colors` e `prefers-reduced-motion`;
-- não é criado novo estado, componente, store ou dependência;
-- não há alteração de dados, sincronização, segurança, rotas, persistência ou schema.
-
-## D-020 — O arranque reutiliza a marca existente com animação CSS progressiva
-
-**Estado:** integrada através do PR #200; correção de visibilidade durante bootstrap integrada no PR #201.
-
-**Decisão:** o fallback de bootstrap deve apresentar o `logo-mark.svg` já oficial da aplicação acima do nome **Foco Jornada**. O feedback de carregamento é produzido apenas com CSS: aro rotativo, pulso discreto do símbolo e halo suave. Não é introduzida biblioteca de animação, JavaScript adicional nem segundo logótipo.
-
-A animação deve respeitar `prefers-reduced-motion`; nesse modo, o símbolo permanece estático e o texto de estado continua suficiente para comunicar o carregamento. Tema claro e escuro mantêm contraste próprio.
-
-**Motivo:** o fallback anterior era funcional, mas apresentava apenas texto e não reforçava a identidade visual durante um estado que pode ser visível em rede lenta ou no primeiro arranque. Reutilizar o asset existente mantém consistência e evita duplicação de identidade.
-
-**Consequências:**
-
-- alteração limitada ao fallback anterior à montagem do React;
-- `role="status"` e `aria-live="polite"` permanecem;
-- nenhuma rota, store, API, persistência, cifragem ou regra de negócio foi alterada;
-- o workflow de publicação continua a gerar a raiz do GitHub Pages a partir do build de `src/index.html`.
-
-## D-021 — Jornada e pausas reconciliadas pelo `WorkSchedule`; Pomodoro permanece manual
+## D-021 — Jornada e pausas reconciliadas pelo `WorkSchedule`
 
 **Estado:** aceite, integrada no PR #202 e publicada.
 
-**Decisão:** a aplicação reconcilia automaticamente a jornada diária e as pausas ativadas a partir do `WorkSchedule` já persistido. A configuração, e não um contador ou constante nova, é a única autoridade para entrada, saída e janelas de pausa.
+**Decisão:** entrada, saída e pausas automáticas derivam exclusivamente de `WorkSchedule`; Pomodoro/foco personalizado permanecem manuais.
 
-Regras de integridade:
+**Motivo:** automatizar marcos previsíveis sem inventar atividade nem fingir execução garantida em background.
 
-- antes da entrada configurada, não iniciar jornada;
-- durante o turno, quando ainda não existe qualquer jornada do dia, criar a jornada com `startedAt` exatamente igual à hora planeada;
-- quando uma jornada está ativa e a saída configurada já foi atingida, encerrá-la com `endedAt` exatamente igual à saída planeada;
-- não criar retroativamente um dia inteiro se a aplicação só for aberta depois da saída sem existir jornada desse dia;
-- não reiniciar uma jornada que o utilizador já terminou manualmente;
-- cada pausa automática usa apenas o seu `startTime`/`endTime` configurados; uma pausa de 60 minutos continua a exigir configuração explícita pelo utilizador;
-- uma pausa planeada pode ser reconstruída após suspensão da PWA com os timestamps exatos da configuração;
-- se existir foco em execução quando começa uma pausa de trabalho, pode ser pausado, mas a automação nunca inicia Pomodoro, foco personalizado ou um ciclo de foco;
-- o encerramento da jornada reutiliza `finishJourneyWithProductivityState`, preservando o tratamento consistente de pausa, atividade e foco abertos.
+**Consequência:** quando a PWA retoma depois de suspensão, reconcilia usando timestamps planeados exatos.
 
-**Motivo:** o utilizador deve poder definir o seu horário e deixar a aplicação tratar os marcos previsíveis sem depender de tocar repetidamente em iniciar/terminar. Ao mesmo tempo, a PWA não deve falsificar execução em background nem inventar registos quando não existe evidência suficiente de que a jornada foi iniciada.
-
-**Implementação:** `reconcileScheduledWorkday` usa timestamps absolutos e IDs determinísticos para os registos automáticos. `ScheduledWorkdayAutomation` serve apenas como gatilho de reconciliação enquanto o runtime está ativo ou regressa ao primeiro plano. Um evento interno atualiza os controllers e o relatório diário após alterações automáticas, sem criar outro store funcional.
-
-**Limitação:** iOS e outros sistemas podem suspender completamente JavaScript de uma PWA. Por isso, a aplicação não garante que o código execute fisicamente no segundo exato enquanto está encerrada; garante que, ao reconciliar, usa os horários configurados exatos como timestamps e não o instante tardio do callback.
-
-**Segurança e dependências:** o PR #202 manteve os quality gates ativos, atualizou Vitest para `5.0.0`, forçou `sharp` `0.35.4` e foi integrado apenas depois de audit, typecheck, lint, testes, build, Worker dry-run e smoke test concluírem com sucesso.
-
-## D-022 — Férias usam direito vencido e registos existentes, sem falsa acumulação mensal
+## D-022 — Férias usam referência laboral separada da projeção pessoal
 
 **Estado:** aceite, integrada no PR #203 e publicada.
 
-**Decisão:** a área de férias deve apresentar dois conceitos separados: **saldo disponível hoje** e **saldo projetado após férias futuras planeadas**. Nos anos normais, o cálculo laboral parte do período anual vencido/configurado, com mínimo geral de 22 dias úteis; não deve representar esse direito laboral como se fossem acumulados `22 / 12` dias a cada mês.
+**Decisão:** referência laboral e planeamento pessoal são conceitos distintos. Nos anos normais, a referência parte do direito anual configurado com mínimo geral suportado de 22 dias úteis; no ano de admissão usa política conservadora de 2 dias por mês completo, até 20, e marco de seis meses.
 
-No ano de admissão, o cálculo é separado e usa 2 dias por mês completo de contrato, até 20 dias, assinalando o marco de seis meses completos para o gozo. Devido a divergência interpretativa sobre frações de mês, esta versão aplica uma política conservadora de meses completos e comunica a limitação ao utilizador.
+**Motivo:** evitar apresentar uma simulação mensal como direito laboral automaticamente adquirido.
 
-Os dias de férias não são duplicados num novo histórico. A página agrega estados já existentes — `reason = ferias` na Calculadora de horas e `kind = vacation` no Mapa de turnos/plano mensal — e deduplica por data civil `YYYY-MM-DD`. Só valores que não podem ser inferidos com segurança ficam em configuração manual: data de admissão, período anual mais favorável confirmado, transitados, férias gozadas fora da aplicação e ajuste documentado.
+**Persistência:** configuração adicional fica em `secureStorage` dentro do cofre cifrado existente.
 
-**Motivo:** férias têm impacto laboral e administrativo; uma ferramenta precisa de distinguir o que está confirmado do que é inferido. Reutilizar registos existentes reduz inconsistências, enquanto separar saldo atual de planeamento evita descontar férias futuras como se já tivessem sido gozadas. Não simular acumulação mensal como regra laboral evita um modelo juridicamente enganador.
-
-**Persistência:** os valores adicionais são guardados em `secureStorage` na chave `foco-jornada-vacation-settings-v1`, dentro do cofre cifrado existente. Não é criada tabela, endpoint, token, segredo ou migração de schema.
-
-**Consequências:**
-
-- a rota `#/ferias` é única para mobile e desktop;
-- o cálculo é testável isoladamente em `VacationBalance.ts`;
-- dias encontrados em duas fontes contam uma única vez;
-- valores superiores a 22 dias são aceites apenas quando explicitamente configurados como condição mais favorável conhecida pelo utilizador;
-- dias transitados não são assumidos automaticamente, porque a sua utilização depende de condições legais/convencionais;
-- a ferramenta é controlo pessoal e não substitui o mapa oficial de férias, RH, contrato ou instrumento de regulamentação coletiva;
-- nenhuma regra existente de jornada, vencimento, sincronização, autenticação ou cifragem é alterada.
-
-## D-023 — A meta mensal de 28 dias é projeção pessoal separada do direito laboral
+## D-023 — Meta de 28 dias é projeção pessoal configurável
 
 **Estado:** aceite, integrada no PR #204 e publicada.
 
-**Decisão:** a área de férias pode apresentar um **contador mensal pessoal** configurável, com 28 dias como meta padrão solicitada pelo utilizador, desde que esse contador permaneça separado do cálculo laboral/contratual definido em D-022.
+**Decisão:** a área de férias pode mostrar meta anual pessoal, 28 dias por defeito, com marcos `meta × mês / 12`, sem alterar `annualEntitlementDays`.
 
-A progressão pessoal usa a fórmula:
+**Motivo:** permitir acompanhamento mensal sem afirmar que 28 dias são direito legal geral.
 
-`acumulado = metaAnual × mesesDeCalendárioConcluídos / 12`
-
-Um mês só é considerado concluído no respetivo último dia. O valor de cada marco é calculado diretamente a partir da meta anual; não se somam valores mensais já arredondados. A interface apresenta no máximo duas casas decimais. Para meta de 28 dias, os marcos exatos incluem 7 dias em março, 14 em junho, 21 em setembro e 28 em dezembro.
-
-O saldo pessoal desconta férias já gozadas/registadas e inclui transitados/ajustes confirmados. O saldo projetado também desconta férias futuras planeadas.
-
-**Motivo:** o utilizador quer acompanhar uma acumulação progressiva ao longo dos meses, mas essa preferência não deve alterar silenciosamente o enquadramento laboral já documentado. Separar os dois números permite satisfazer a necessidade de planeamento pessoal sem apresentar 28 dias como direito legal automático.
-
-**Persistência:** `monthlyAccrualTargetDays` é acrescentado à configuração `foco-jornada-vacation-settings-v1`. Perfis existentes sem o campo recebem 28 como valor por defeito. O mesmo `secureStorage` cifrado e o mesmo protocolo de sincronização são reutilizados.
-
-**Consequências:**
-
-- `annualEntitlementDays` continua independente da meta mensal pessoal;
-- nenhuma migração destrutiva é necessária;
-- o cronograma de 12 meses é derivado em runtime e não cria histórico duplicado;
-- a mesma deduplicação de férias por data continua a alimentar os dois saldos;
-- a interface deve identificar explicitamente o contador de 28 dias como projeção pessoal;
-- nenhum endpoint, segredo, token, permissão, autenticação ou schema operacional novo é introduzido.
+**Consequência:** marcos são recalculados diretamente da meta, evitando drift; dezembro termina exatamente na meta configurada.
 
 ## D-024 — Férias registadas descontam apenas dias úteis padrão
 
-**Estado:** implementada na branch `fix/vacation-weekday-count`; integração depende dos quality gates.
+**Estado:** aceite, integrada no PR #205 e publicada.
 
-**Decisão:** depois de normalizar e deduplicar as datas de férias, o módulo `VacationBalance` deve descontar automaticamente apenas segunda a sexta-feira no regime semanal padrão suportado. Sábado e domingo podem permanecer registados como parte visual de um intervalo, mas não reduzem `recordedTakenDays`, `recordedPlannedDays`, saldo laboral ou saldo mensal pessoal.
+**Decisão:** depois de validar/deduplicar datas, `VacationBalance` desconta segunda–sexta no regime padrão; sábado/domingo não reduzem saldo e são contados separadamente em `recordedIgnoredWeekendDays`.
 
-O cálculo mantém uma contagem separada de datas de fim de semana ignoradas (`recordedIgnoredWeekendDays`) para tornar o comportamento auditável e testável.
+**Caso de aceitação:** 24/08/2026–06/09/2026 contém 14 datas civis e 10 dias úteis contabilizados.
 
-**Caso de aceitação:** o intervalo 24/08/2026–06/09/2026 contém 14 datas civis, mas apenas 10 dias úteis; os dias 29/08, 30/08, 05/09 e 06/09 são ignorados no desconto. O resultado esperado é 10 dias de férias gozados.
+**Motivo:** intervalos que atravessam fins de semana não devem consumir dias adicionais na regra padrão pretendida.
 
-**Motivo:** tratar cada data civil marcada como um dia consumido fazia períodos que atravessam fins de semana descontarem mais dias do que a contagem útil pretendida pelo utilizador. O filtro deve acontecer no domínio, não apenas na UI, para que todos os saldos usem a mesma regra.
+**Limite:** feriados, descanso semanal diferente e escalas especiais exigem calendário/regra confirmada.
 
-**Limites:** esta decisão não presume automaticamente feriados, descanso semanal diferente, escalas especiais ou regras de CCT. Esses casos exigem calendário/regra confirmada antes de serem automatizados. Até lá, o ajuste manual permanece o mecanismo explícito para diferenças conhecidas.
+## D-025 — O mês atual evolui em tempo real sem substituir os marcos fechados
+
+**Estado:** implementada no PR #206; integração depende dos quality gates.
+
+**Decisão:** preservar `monthlyAccruedDays` como acumulado de meses fechados e acrescentar uma camada derivada de evolução intramensal para a projeção pessoal.
+
+A progressão viva usa:
+
+`progressoDoMes = (diaDoMes - 1 + fracaoDoDiaLocal) / diasNoMes`
+
+`acumuladoVivo = metaAnual × (mesesAnteriores + progressoDoMes) / 12`
+
+O relógio da página é efémero. `VacationBalancePage` atualiza a referência temporal a cada minuto enquanto está ativa e também em `focus`/`visibilitychange`. Se a PWA for suspensa, não tenta reproduzir ticks perdidos; recalcula pelo instante atual quando volta ao primeiro plano.
+
+**Motivo:** o utilizador quer perceber a evolução do mês atual em vez de ver o valor parado até ao último dia, sem perder a precisão dos marcos mensais nem confundir a projeção pessoal com direito laboral.
+
+**Precisão:** marcos fechados mantêm duas casas de apresentação; valores vivos podem mostrar até quatro. O valor vivo é sempre derivado diretamente da meta anual e da fração temporal atual, nunca do último valor arredondado mostrado.
+
+**Persistência e segurança:** nenhum valor vivo, relógio ou progresso temporal é persistido/sincronizado. Não há novo endpoint, schema, token, segredo, permissão, dependência ou mecanismo de autenticação.
 
 **Consequências:**
 
-- a deduplicação por `YYYY-MM-DD` permanece antes do filtro de dias úteis;
-- a classificação passado/futuro ocorre sobre as datas úteis já filtradas;
-- nenhuma persistência adicional é criada para fins de semana ignorados; o valor é derivado em runtime;
-- nenhuma API, schema, segredo, token, permissão ou dependência é alterada.
+- mobile e desktop calculam o valor vivo a partir da respetiva hora local;
+- a configuração continua a sincronizar pelo cofre existente;
+- os saldos vivos reutilizam a mesma deduplicação e filtro de dias úteis das férias registadas;
+- a referência laboral definida em D-022 permanece inalterada;
+- validação física de timezone/suspensão da PWA continua necessária antes de encerrar a tarefa operacionalmente.

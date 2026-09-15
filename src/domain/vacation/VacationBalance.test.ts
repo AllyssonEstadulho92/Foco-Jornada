@@ -84,6 +84,66 @@ describe('calculateVacationBalance', () => {
     expect(result.monthlyAvailableBalanceDays).toBe(18.67)
   })
 
+  it('interpola o mês atual em tempo real sem alterar os marcos mensais fechados', () => {
+    const result = calculateVacationBalance({
+      ...base,
+      asOfDate: '2026-09-15',
+      asOfDayProgress: 0.5,
+      recordedVacationDates: [],
+    })
+
+    expect(result.completedAccrualMonths).toBe(8)
+    expect(result.monthlyAccruedDays).toBe(18.67)
+    expect(result.currentAccrualMonthProgress).toBeCloseTo(0.4833333333, 8)
+    expect(result.currentAccrualMonthProgressPercent).toBe(48.33)
+    expect(result.currentAccrualMonthEarnedDays).toBe(1.1278)
+    expect(result.currentAccrualMonthRemainingDays).toBe(1.2056)
+    expect(result.currentAccrualMonthDailyRate).toBe(0.0778)
+    expect(result.currentAccrualMonthTargetCumulativeDays).toBe(21)
+    expect(result.monthlyLiveAccruedDays).toBe(19.7944)
+  })
+
+  it('não fecha o mês antes do instante real do fim do último dia', () => {
+    const duringLastDay = calculateVacationBalance({
+      ...base,
+      asOfDate: '2026-09-30',
+      asOfDayProgress: 0.5,
+      recordedVacationDates: [],
+    })
+    const atMonthClose = calculateVacationBalance({
+      ...base,
+      asOfDate: '2026-09-30',
+      asOfDayProgress: 1,
+      recordedVacationDates: [],
+    })
+
+    expect(duringLastDay.completedAccrualMonths).toBe(8)
+    expect(duringLastDay.monthlyAccruedDays).toBe(18.67)
+    expect(duringLastDay.currentAccrualMonthProgressPercent).toBe(98.33)
+    expect(duringLastDay.monthlyLiveAccruedDays).toBe(20.9611)
+
+    expect(atMonthClose.completedAccrualMonths).toBe(9)
+    expect(atMonthClose.monthlyAccruedDays).toBe(21)
+    expect(atMonthClose.monthlyLiveAccruedDays).toBe(21)
+  })
+
+  it('aplica férias gozadas e planeadas ao saldo mensal em tempo real', () => {
+    const result = calculateVacationBalance({
+      ...base,
+      asOfDate: '2026-09-15',
+      asOfDayProgress: 0.5,
+      carriedDays: 1,
+      adjustmentDays: 1,
+      manualTakenDays: 1,
+      recordedVacationDates: ['2026-08-24', '2026-10-02'],
+    })
+
+    expect(result.monthlyLiveAccruedDays).toBe(19.7944)
+    expect(result.takenDays).toBe(2)
+    expect(result.monthlyLiveAvailableBalanceDays).toBe(19.7944)
+    expect(result.monthlyLiveProjectedBalanceDays).toBe(18.7944)
+  })
+
   it('fecha setembro em 21 dias acumulados e dezembro exatamente em 28', () => {
     const september = calculateVacationBalance({
       ...base,
@@ -144,6 +204,24 @@ describe('calculateVacationBalance', () => {
     expect(result.monthlyAccrualSchedule[7].completed).toBe(true)
     expect(result.monthlyAccrualSchedule[8].current).toBe(true)
     expect(result.monthlyAccrualSchedule[8].completed).toBe(false)
+  })
+
+  it('expõe progresso e acumulado vivo no cartão do mês atual', () => {
+    const result = calculateVacationBalance({
+      ...base,
+      asOfDate: '2026-09-15',
+      asOfDayProgress: 0.5,
+      recordedVacationDates: [],
+    })
+    const september = result.monthlyAccrualSchedule[8]
+
+    expect(september.current).toBe(true)
+    expect(september.completed).toBe(false)
+    expect(september.progressPercent).toBe(48.33)
+    expect(september.earnedDays).toBe(1.1278)
+    expect(september.remainingDays).toBe(1.2056)
+    expect(september.liveCumulativeDays).toBe(19.7944)
+    expect(september.cumulativeDays).toBe(21)
   })
 
   it('desconta férias já gozadas e futuras também no saldo de acumulação mensal', () => {

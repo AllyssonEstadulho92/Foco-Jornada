@@ -7,7 +7,7 @@ Atualizado em: 2026-09-15
 A área **Férias** do Foco Jornada mantém dois cálculos explicitamente separados:
 
 1. **Referência laboral/contratual** — direito anual configurado, ano de admissão, dias transitados, férias gozadas e planeadas.
-2. **Projeção mensal pessoal** — contador automático que acompanha uma meta anual configurável, por defeito **28 dias**, distribuída pelos meses concluídos.
+2. **Projeção mensal pessoal** — contador automático que acompanha uma meta anual configurável, por defeito **28 dias**, com marcos mensais e evolução do mês atual em tempo real.
 
 Esta separação permite acompanhar a progressão pretendida pelo utilizador sem apresentar a meta pessoal de 28 dias como um direito legal ou contratual automaticamente adquirido.
 
@@ -22,22 +22,26 @@ A ferramenta não substitui o mapa oficial de férias, processamento de RH, cont
 - O mapa de turnos já suporta `kind: "vacation"` / **Férias**.
 - A calculadora de horas já suporta `reason: "ferias"`.
 - O Código do Trabalho prevê, em regra, um mínimo anual de 22 dias úteis e regras especiais no ano de admissão.
-- O utilizador pretende acompanhar uma meta pessoal de 28 dias ao final do ano, somada progressivamente pelos meses.
+- O utilizador pretende acompanhar uma meta pessoal de 28 dias ao final do ano.
+- O utilizador pretende também ver a evolução do mês corrente sem esperar pelo fecho do mês.
 - Para a contagem padrão de dias gozados, sábado e domingo não devem ser descontados como dias úteis de férias.
 
 ### Inferência aplicada
 
 - O saldo deve reutilizar férias já registadas, em vez de obrigar a introduzir os mesmos dias novamente.
 - Dias encontrados simultaneamente no mapa de turnos e na calculadora de horas devem contar uma única vez por data.
-- A progressão mensal pessoal deve ser calculada, não gravada como 12 registos artificiais.
+- A progressão pessoal deve ser calculada em runtime, não gravada como eventos artificiais.
 
 ### Decisão implementada
 
-- Guardar a configuração adicional da ferramenta em `secureStorage`, sem migração do schema IndexedDB.
+- Guardar apenas a configuração da ferramenta em `secureStorage`, sem migração do schema IndexedDB.
 - Separar **saldo laboral** de **saldo mensal pessoal**.
-- Separar **saldo acumulado hoje** de **saldo após férias planeadas**.
-- Não descrever a meta pessoal de 28 dias como regra legal: nos anos normais, a referência laboral continua a tratar o período anual como vencendo, em regra, em 1 de janeiro.
-- Creditar a projeção pessoal apenas no fecho de cada mês civil.
+- Separar **saldo acumulado agora** de **saldo após férias planeadas**.
+- Não descrever a meta pessoal de 28 dias como regra legal.
+- Manter os marcos mensais exatos em `meta × número do mês / 12`.
+- Interpolar apenas o mês atual pela fração do mês já decorrida, incluindo a fração do dia local.
+- Atualizar o valor vivo a cada minuto enquanto a página está ativa e recalcular ao recuperar foco/visibilidade.
+- Não depender de timers em background para manter precisão.
 - Deduplicar as datas registadas e, no regime semanal padrão suportado, descontar apenas segunda a sexta-feira; sábado e domingo permanecem reconhecidos como datas registadas, mas não reduzem o saldo.
 
 ## Referência laboral/contratual
@@ -62,25 +66,25 @@ O gozo é assinalado como disponível após seis meses completos de execução d
 
 Existe discussão jurisprudencial sobre a proporcionalidade de meses incompletos no ano de admissão. Para não apresentar como certa uma interpretação discutida, esta versão usa **meses completos** e mostra essa limitação na interface.
 
-## Projeção mensal pessoal de 28 dias
+## Projeção mensal pessoal em tempo real
 
-### Regra
+### Marcos mensais
 
 Por defeito:
 
 `meta anual pessoal = 28 dias`
 
-`acumulado bruto = meta anual pessoal × meses de calendário concluídos / 12`
+Cada mês corresponde a exatamente:
 
-`saldo mensal hoje = acumulado bruto + transitados + ajustes - férias gozadas/registadas - férias manuais externas`
+`parcela mensal = meta anual pessoal / 12`
 
-`saldo mensal após planeadas = saldo mensal hoje - férias futuras registadas`
+Os marcos de fecho continuam a ser calculados diretamente:
 
-O mês corrente só entra no acumulado no respetivo último dia. Assim, em 15 de setembro apenas janeiro a agosto estão concluídos; em 30 de setembro, setembro também passa a contar.
+`marco do mês = meta anual pessoal × número do mês / 12`
 
-### Marcos com meta de 28 dias
+Para meta de 28 dias:
 
-| Mês concluído | Acumulado |
+| Fecho | Marco acumulado |
 | --- | ---: |
 | Janeiro | 2,33 dias |
 | Fevereiro | 4,67 dias |
@@ -95,13 +99,50 @@ O mês corrente só entra no acumulado no respetivo último dia. Assim, em 15 de
 | Novembro | 25,67 dias |
 | Dezembro | 28,00 dias |
 
+### Evolução do mês atual
+
+A versão em tempo real preserva os marcos acima, mas não deixa o mês atual visualmente parado até ao último dia.
+
+Para a data/hora local atual:
+
+`progressoDoMes = (dias completos já decorridos + fração do dia atual) / número de dias do mês`
+
+`ganhoNoMesAtual = parcela mensal × progressoDoMes`
+
+`acumuladoVivo = meta anual × (meses anteriores + progressoDoMes) / 12`
+
+`saldoVivo = acumuladoVivo + transitados + ajustes - férias gozadas/registadas - férias manuais externas`
+
+`saldoVivoApósPlaneadas = saldoVivo - férias futuras registadas`
+
+Exemplo estrutural para setembro:
+
+- janeiro a agosto permanecem como meses fechados;
+- setembro progride de 0% a 100% ao longo do próprio mês;
+- o marco de setembro continua a ser exatamente 21 dias para uma meta anual de 28;
+- antes do instante real do fim do mês, o valor vivo aproxima-se do marco sem o ultrapassar;
+- no fecho, o valor vivo e o marco fechado coincidem.
+
 ### Precisão numérica
 
-A aplicação **não soma 2,33 repetidamente**, porque isso introduziria erro acumulado. Cada marco é recalculado diretamente:
+A aplicação não soma parcelas arredondadas. Tanto os marcos como o valor vivo derivam diretamente da meta anual.
 
-`meta × número do mês / 12`
+- marcos mensais: apresentação até duas casas decimais;
+- valores em tempo real: apresentação até quatro casas decimais;
+- percentagem do mês: apresentação até duas casas decimais;
+- cálculos vivos: recalculados a partir da meta, não do valor apresentado anteriormente.
 
-O resultado é arredondado apenas para apresentação, até duas casas decimais. Desta forma, dezembro termina exatamente em 28 dias quando a meta é 28.
+Isto evita drift e garante que dezembro fecha exatamente na meta anual configurada.
+
+## Atualização temporal da PWA
+
+A página `#/ferias` mantém um relógio local apenas enquanto está montada:
+
+- atualização periódica: **1 minuto**;
+- atualização imediata ao recuperar `window.focus`;
+- atualização imediata quando `document.visibilityState` volta a ativo.
+
+A aplicação não afirma executar continuamente em segundo plano. iOS e outros sistemas podem suspender JavaScript de PWAs. Quando a página volta ao primeiro plano, o cálculo é reconstruído a partir da data/hora atual; não depende de callbacks que deveriam ter ocorrido durante a suspensão.
 
 ## Dias registados
 
@@ -128,7 +169,7 @@ Datas até ao dia atual contam como gozadas/registadas. Datas posteriores, dentr
 
 ### Limite desta regra
 
-A exclusão automática implementada é apenas para sábado/domingo na semana padrão. Feriados nacionais/municipais, descanso semanal diferente, turnos especiais e outras regras de calendário ainda não são reinterpretados automaticamente pelo módulo. Quando esses casos alterarem o saldo oficial, deve ser usado um ajuste confirmado ou feita uma evolução específica do calendário laboral antes de automatizar.
+A exclusão automática implementada é apenas para sábado/domingo na semana padrão. Feriados nacionais/municipais, descanso semanal diferente, turnos especiais e outras regras de calendário ainda não são reinterpretados automaticamente pelo módulo.
 
 ## Persistência
 
@@ -145,6 +186,8 @@ Conteúdo:
 - `manualTakenDays`;
 - `adjustmentDays`.
 
+A evolução em tempo real não acrescenta campos persistidos. `asOfDayProgress`, percentagens, ritmos e saldos vivos são valores derivados em runtime.
+
 Configurações anteriores ao PR #204 que não tenham `monthlyAccrualTargetDays` recebem 28 como fallback de leitura. Não existe migração destrutiva.
 
 Não é criado novo endpoint, tabela, token, segredo ou dado em texto simples fora do cofre existente.
@@ -155,30 +198,35 @@ Rota: `#/ferias`
 
 A página apresenta:
 
-- data de referência;
-- **Saldo acumulado** pela projeção mensal;
-- **Acumulado bruto** por meses concluídos;
+- data e hora da última atualização local;
+- **Saldo agora**;
+- **Acumulado agora**;
 - **Após planeadas**;
-- **Meta anual**;
+- **Progresso do mês atual**;
+- meta acumulada no fecho do mês;
+- ganho já obtido no mês;
+- valor restante no mês;
+- ritmo diário aproximado;
 - cronograma de janeiro a dezembro com estados **Concluído**, **Em curso** e **Futuro**;
+- barra de progresso por mês;
+- no mês atual, acumulado vivo, percentagem, ganho e restante;
 - formulário para meta pessoal, data de admissão, referência anual confirmada, transitados, férias externas e ajustes;
 - secção separada de referência laboral;
-- ligação direta ao mapa de turnos e à calculadora de horas;
-- aviso explícito de que o saldo oficial deve ser confirmado com a entidade empregadora.
+- ligação direta ao mapa de turnos e à calculadora de horas.
 
-A interface usa os tokens existentes, mantém alvos adequados a toque, foco por teclado, `forced-colors` e layout responsivo.
+A interface usa os tokens existentes, mantém alvos adequados a toque, foco por teclado, `forced-colors`, `prefers-reduced-motion` e layout responsivo.
 
 ## Segurança e privacidade
 
-- A data de admissão, meta pessoal e restantes valores são guardados no mesmo cofre cifrado já utilizado pela aplicação.
+- A data de admissão, meta pessoal e restantes valores continuam no mesmo cofre cifrado.
+- O relógio local e os valores vivos não são persistidos nem enviados como nova telemetria.
 - Nenhum dado novo é enviado diretamente para um backend em texto simples.
-- Não são adicionadas credenciais, segredos ou permissões.
+- Não são adicionadas credenciais, segredos, permissões ou dependências.
 - A leitura de registos existentes é local e deduplicada antes do cálculo.
-- A projeção mensal é derivada em runtime; não cria 12 eventos persistidos nem exige timer em background.
 
 ## Testes mínimos
 
-### Referência laboral
+### Referência laboral e dias úteis
 
 - período anual normal de 22 dias;
 - valor contratual superior a 22;
@@ -194,14 +242,14 @@ A interface usa os tokens existentes, mantém alvos adequados a toque, foco por 
 
 ### Projeção mensal
 
-- antes do último dia do mês, esse mês não conta;
-- no último dia, o mês passa a contar;
-- 15 de setembro com meta 28 = 18,67 dias brutos;
-- 30 de setembro = 21 dias;
-- 31 de dezembro = 28 dias;
-- os 12 marcos não apresentam drift de arredondamento;
-- férias gozadas reduzem o saldo mensal;
-- férias futuras reduzem apenas o saldo mensal projetado.
+- os marcos fechados continuam sem drift;
+- 30 de setembro no fecho = 21 dias para meta 28;
+- 31 de dezembro no fecho = 28 dias;
+- o mês atual expõe percentagem e ganho proporcional;
+- o último dia não é tratado como completamente fechado antes do fim real do dia quando existe informação horária;
+- saldo vivo desconta férias já gozadas;
+- saldo vivo projetado desconta também férias futuras;
+- o cartão do mês atual expõe acumulado vivo e meta de fecho separadamente.
 
 ## Critérios de aceitação
 
@@ -210,12 +258,13 @@ A interface usa os tokens existentes, mantém alvos adequados a toque, foco por 
 3. Férias já registadas noutras áreas são detetadas automaticamente e sem duplicação por data.
 4. Um intervalo 24/08/2026–06/09/2026 desconta 10 dias úteis, não 14 dias civis.
 5. Sábado e domingo marcados como férias não reduzem o saldo na semana padrão.
-6. O contador mostra claramente o acumulado por meses concluídos.
-7. Com meta 28, dezembro termina exatamente em 28 dias.
-8. A interface distingue projeção pessoal de referência laboral/contratual.
-9. O ano de admissão continua tratado separadamente.
-10. Testes, typecheck, lint, build, Worker dry-run e smoke test permanecem verdes antes da integração.
-11. `PROJECT_STATE.md`, `ARCHITECTURE.md`, `DECISIONS.md`, `TODO.md` e `CHANGELOG.md` permanecem atualizados.
+6. A evolução do mês atual é visível antes do fecho do mês.
+7. O valor vivo atualiza a cada minuto quando a página está ativa e é reconciliado ao regressar à app.
+8. Os marcos mensais permanecem exatos; dezembro termina exatamente na meta anual.
+9. A interface distingue projeção pessoal de referência laboral/contratual.
+10. Nenhum novo dado sensível ou estado temporal é persistido para suportar o relógio vivo.
+11. Testes, typecheck, lint, build, Worker dry-run e smoke test permanecem verdes antes da integração.
+12. `PROJECT_STATE.md`, `ARCHITECTURE.md`, `DECISIONS.md`, `TODO.md` e `CHANGELOG.md` permanecem atualizados.
 
 ## Fontes oficiais da referência laboral
 
@@ -223,4 +272,4 @@ A interface usa os tokens existentes, mantém alvos adequados a toque, foco por 
 - Artigo 238.º — duração mínima de 22 dias úteis: https://diariodarepublica.pt/dr/legislacao-consolidada/lei/2009-34546475-56360079
 - gov.pt — Trabalhar em Portugal, férias e subsídio de férias: https://www.gov.pt/guias/trabalhar-em-portugal
 
-Estas fontes fundamentam apenas a **referência laboral**. A meta mensal de 28 dias é uma configuração pessoal da aplicação e deve ser confrontada com RH, contrato ou instrumento de regulamentação coletiva quando o utilizador pretender tratá-la como saldo oficial.
+Estas fontes fundamentam apenas a **referência laboral**. A meta mensal de 28 dias e a interpolação em tempo real são funcionalidades de controlo pessoal da aplicação e devem ser confrontadas com RH, contrato ou instrumento de regulamentação coletiva quando o utilizador pretender tratá-las como saldo oficial.

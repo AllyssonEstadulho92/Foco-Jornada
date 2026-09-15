@@ -9,6 +9,7 @@ export interface VacationTrackerSettings {
 
 export interface VacationBalanceInput extends VacationTrackerSettings {
   asOfDate: string
+  asOfDayProgress?: number
   recordedVacationDates: string[]
 }
 
@@ -18,6 +19,11 @@ export interface VacationMonthlyAccrualMonth {
   cumulativeDays: number
   completed: boolean
   current: boolean
+  progress: number
+  progressPercent: number
+  earnedDays: number
+  remainingDays: number
+  liveCumulativeDays: number
 }
 
 export interface VacationBalance {
@@ -46,6 +52,16 @@ export interface VacationBalance {
   monthlyAccruedDays: number
   monthlyAvailableBalanceDays: number
   monthlyProjectedBalanceDays: number
+  monthlyLiveAccruedDays: number
+  monthlyLiveAvailableBalanceDays: number
+  monthlyLiveProjectedBalanceDays: number
+  currentAccrualMonthProgress: number
+  currentAccrualMonthProgressPercent: number
+  currentAccrualMonthEarnedDays: number
+  currentAccrualMonthRemainingDays: number
+  currentAccrualMonthDailyRate: number
+  currentAccrualMonthEndDate: string
+  currentAccrualMonthTargetCumulativeDays: number
   monthlyAccrualSchedule: VacationMonthlyAccrualMonth[]
 }
 
@@ -132,31 +148,77 @@ function safeDecimalDays(value: number, fallback: number, minimum = 0) {
   return Math.max(minimum, value)
 }
 
+function clampUnit(value: number) {
+  if (!Number.isFinite(value)) return 0
+  return Math.min(1, Math.max(0, value))
+}
+
 function roundDays(value: number) {
   return Math.round((value + Number.EPSILON) * 100) / 100
 }
 
-function completedCalendarMonths(asOf: DateParts) {
-  const lastDayOfMonth = new Date(Date.UTC(asOf.year, asOf.month, 0)).getUTCDate()
-  return Math.min(12, asOf.month - 1 + (asOf.day >= lastDayOfMonth ? 1 : 0))
+function roundLiveDays(value: number) {
+  return Math.round((value + Number.EPSILON) * 10_000) / 10_000
+}
+
+function roundPercent(value: number) {
+  return Math.round((value + Number.EPSILON) * 100) / 100
+}
+
+function resolvedDayProgress(value: number | undefined) {
+  return value === undefined ? 1 : clampUnit(value)
+}
+
+function daysInMonth(parts: DateParts) {
+  return new Date(Date.UTC(parts.year, parts.month, 0)).getUTCDate()
+}
+
+function completedCalendarMonths(asOf: DateParts, dayProgress: number) {
+  const lastDayOfMonth = daysInMonth(asOf)
+  const currentMonthCompleted = asOf.day >= lastDayOfMonth && dayProgress >= 1
+  return Math.min(12, asOf.month - 1 + (currentMonthCompleted ? 1 : 0))
+}
+
+function currentMonthProgress(asOf: DateParts, dayProgress: number) {
+  const totalDays = daysInMonth(asOf)
+  const elapsedCalendarDays = asOf.day - 1 + dayProgress
+  return clampUnit(elapsedCalendarDays / totalDays)
 }
 
 function buildMonthlyAccrualSchedule(
   asOf: DateParts,
   targetDays: number,
+  dayProgress: number,
 ): VacationMonthlyAccrualMonth[] {
-  const completedMonths = completedCalendarMonths(asOf)
+  const completedMonths = completedCalendarMonths(asOf, dayProgress)
+  const currentProgress = currentMonthProgress(asOf, dayProgress)
+  const monthlyRate = targetDays / 12
 
   return Array.from({ length: 12 }, (_, index) => {
     const month = index + 1
     const lastDay = new Date(Date.UTC(asOf.year, month, 0)).getUTCDate()
+    const current = month === asOf.month
+    const completed = month <= completedMonths
+    const progress = completed ? 1 : current ? currentProgress : 0
+    const earnedDays = roundLiveDays(monthlyRate * progress)
+    const remainingDays = roundLiveDays(monthlyRate * (1 - progress))
+    const liveCumulativeDays = completed
+      ? roundLiveDays((targetDays * month) / 12)
+      : current
+        ? roundLiveDays((targetDays * (month - 1 + progress)) / 12)
+        : 0
 
     return {
       month,
       monthEndDate: dateKey({ year: asOf.year, month, day: lastDay }),
       cumulativeDays: roundDays((targetDays * month) / 12),
-      completed: month <= completedMonths,
-      current: month === asOf.month,
+      completed,
+      current,
+      progress,
+      progressPercent: roundPercent(progress * 100),
+      earnedDays,
+      remainingDays,
+      liveCumulativeDays,
     }
   })
 }
@@ -178,16 +240,40 @@ export function calculateVacationBalance(input: VacationBalanceInput): VacationB
   const asOf = parseDateKey(input.asOfDate)
   const start = parseDateKey(input.employmentStartDate)
   const year = asOf?.year ?? new Date().getFullYear()
+  const dayProgress = resolvedDayProgress(input.asOfDayProgress)
   const annualEntitlementDays = safeWholeDays(input.annualEntitlementDays, 22)
   const monthlyAccrualTargetDays = safeDecimalDays(input.monthlyAccrualTargetDays, 28, 1)
   const carriedDays = safeWholeDays(input.carriedDays)
   const manualTakenDays = safeWholeDays(input.manualTakenDays)
   const adjustmentDays = Number.isFinite(input.adjustmentDays) ? Math.round(input.adjustmentDays) : 0
   const nextEntitlementDate = `${year + 1}-01-01`
-  const completedAccrualMonths = asOf ? completedCalendarMonths(asOf) : 0
+  const completedAccrualMonths = asOf ? completedCalendarMonths(asOf, dayProgress) : 0
   const monthlyAccrualPerMonth = roundDays(monthlyAccrualTargetDays / 12)
   const monthlyAccruedDays = roundDays((monthlyAccrualTargetDays * completedAccrualMonths) / 12)
-  const monthlyAccrualSchedule = asOf ? buildMonthlyAccrualSchedule(asOf, monthlyAccrualTargetDays) : []
+  const currentAccrualMonthProgress = asOf ? currentMonthProgress(asOf, dayProgress) : 0
+  const currentAccrualMonthProgressPercent = roundPercent(currentAccrualMonthProgress * 100)
+  const currentAccrualMonthEarnedDays = roundLiveDays(
+    (monthlyAccrualTargetDays / 12) * currentAccrualMonthProgress,
+  )
+  const currentAccrualMonthRemainingDays = roundLiveDays(
+    (monthlyAccrualTargetDays / 12) * (1 - currentAccrualMonthProgress),
+  )
+  const currentMonthDays = asOf ? daysInMonth(asOf) : 1
+  const currentAccrualMonthDailyRate = roundLiveDays(monthlyAccrualTargetDays / 12 / currentMonthDays)
+  const currentAccrualMonthEndDate = asOf
+    ? dateKey({ year: asOf.year, month: asOf.month, day: currentMonthDays })
+    : `${year}-12-31`
+  const currentAccrualMonthTargetCumulativeDays = asOf
+    ? roundDays((monthlyAccrualTargetDays * asOf.month) / 12)
+    : 0
+  const monthlyLiveAccruedDays = asOf
+    ? roundLiveDays(
+        (monthlyAccrualTargetDays * (asOf.month - 1 + currentAccrualMonthProgress)) / 12,
+      )
+    : 0
+  const monthlyAccrualSchedule = asOf
+    ? buildMonthlyAccrualSchedule(asOf, monthlyAccrualTargetDays, dayProgress)
+    : []
   const currentYearVacationDates = uniqueVacationDatesForYear(input.recordedVacationDates, year)
   const standardWorkingVacationDates = currentYearVacationDates.filter(isStandardWeekday)
   const recordedIgnoredWeekendDays = currentYearVacationDates.length - standardWorkingVacationDates.length
@@ -198,6 +284,12 @@ export function calculateVacationBalance(input: VacationBalanceInput): VacationB
     ? standardWorkingVacationDates.filter((date) => compareDateKeys(date, input.asOfDate) > 0).length
     : 0
   const takenDays = recordedTakenDays + manualTakenDays
+  const monthlyLiveAvailableBalanceDays = roundLiveDays(
+    monthlyLiveAccruedDays + carriedDays + adjustmentDays - takenDays,
+  )
+  const monthlyLiveProjectedBalanceDays = roundLiveDays(
+    monthlyLiveAvailableBalanceDays - recordedPlannedDays,
+  )
 
   if (!asOf || !start || compareDateKeys(input.asOfDate, input.employmentStartDate) < 0) {
     const monthlyAvailableBalanceDays = roundDays(
@@ -230,6 +322,16 @@ export function calculateVacationBalance(input: VacationBalanceInput): VacationB
       monthlyAccruedDays,
       monthlyAvailableBalanceDays,
       monthlyProjectedBalanceDays: roundDays(monthlyAvailableBalanceDays - recordedPlannedDays),
+      monthlyLiveAccruedDays,
+      monthlyLiveAvailableBalanceDays,
+      monthlyLiveProjectedBalanceDays,
+      currentAccrualMonthProgress,
+      currentAccrualMonthProgressPercent,
+      currentAccrualMonthEarnedDays,
+      currentAccrualMonthRemainingDays,
+      currentAccrualMonthDailyRate,
+      currentAccrualMonthEndDate,
+      currentAccrualMonthTargetCumulativeDays,
       monthlyAccrualSchedule,
     }
   }
@@ -280,6 +382,16 @@ export function calculateVacationBalance(input: VacationBalanceInput): VacationB
     monthlyAccruedDays,
     monthlyAvailableBalanceDays,
     monthlyProjectedBalanceDays,
+    monthlyLiveAccruedDays,
+    monthlyLiveAvailableBalanceDays,
+    monthlyLiveProjectedBalanceDays,
+    currentAccrualMonthProgress,
+    currentAccrualMonthProgressPercent,
+    currentAccrualMonthEarnedDays,
+    currentAccrualMonthRemainingDays,
+    currentAccrualMonthDailyRate,
+    currentAccrualMonthEndDate,
+    currentAccrualMonthTargetCumulativeDays,
     monthlyAccrualSchedule,
   }
 }

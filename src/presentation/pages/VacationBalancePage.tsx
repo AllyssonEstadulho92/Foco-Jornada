@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import {
   calculateVacationBalance,
@@ -12,6 +12,7 @@ import { useWorkHoursStore } from '../store/useWorkHoursStore'
 const VACATION_SETTINGS_KEY = 'foco-jornada-vacation-settings-v1'
 const SHIFT_MAP_PREFIX = 'foco-jornada-shift-map-v1-'
 const PAYROLL_PLAN_PREFIX = 'foco-jornada-payroll-plan-v1-'
+const DAY_MS = 24 * 60 * 60 * 1000
 
 interface VacationLikeRecord {
   date?: string
@@ -84,6 +85,22 @@ function formatDate(dateKey: string) {
   }).format(new Date(year, month - 1, day))
 }
 
+function formatTime(value: Date) {
+  return new Intl.DateTimeFormat('pt-PT', {
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(value)
+}
+
+function localDayProgress(value: Date) {
+  const elapsedMs =
+    value.getHours() * 60 * 60 * 1000 +
+    value.getMinutes() * 60 * 1000 +
+    value.getSeconds() * 1000 +
+    value.getMilliseconds()
+  return Math.min(1, Math.max(0, elapsedMs / DAY_MS))
+}
+
 function monthLabel(month: number) {
   return new Intl.DateTimeFormat('pt-PT', { month: 'long' }).format(new Date(2026, month - 1, 1))
 }
@@ -96,12 +113,45 @@ function daysLabel(value: number) {
   return `${formatted} ${Math.abs(value - 1) < 0.0001 ? 'dia' : 'dias'}`
 }
 
+function preciseDaysLabel(value: number) {
+  const formatted = new Intl.NumberFormat('pt-PT', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 4,
+  }).format(value)
+  return `${formatted} ${Math.abs(value - 1) < 0.0001 ? 'dia' : 'dias'}`
+}
+
+function percentLabel(value: number) {
+  return new Intl.NumberFormat('pt-PT', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  }).format(value)
+}
+
 export function VacationBalancePage() {
   const entries = useWorkHoursStore((state) => state.entries)
-  const today = toLocalDateKey(new Date())
+  const [now, setNow] = useState(() => new Date())
+  const today = toLocalDateKey(now)
   const year = Number(today.slice(0, 4))
   const [settings, setSettings] = useState<VacationTrackerSettings>(readVacationSettings)
   const [savedAt, setSavedAt] = useState<string | null>(null)
+
+  useEffect(() => {
+    const refreshNow = () => setNow(new Date())
+    const intervalId = window.setInterval(refreshNow, 60_000)
+    const handleVisibility = () => {
+      if (!document.hidden) refreshNow()
+    }
+
+    window.addEventListener('focus', refreshNow)
+    document.addEventListener('visibilitychange', handleVisibility)
+
+    return () => {
+      window.clearInterval(intervalId)
+      window.removeEventListener('focus', refreshNow)
+      document.removeEventListener('visibilitychange', handleVisibility)
+    }
+  }, [])
 
   const recordedVacationDates = useMemo(
     () => collectVacationDates(year, entries),
@@ -113,9 +163,10 @@ export function VacationBalancePage() {
       calculateVacationBalance({
         ...settings,
         asOfDate: today,
+        asOfDayProgress: localDayProgress(now),
         recordedVacationDates,
       }),
-    [recordedVacationDates, settings, today],
+    [now, recordedVacationDates, settings, today],
   )
 
   function update<K extends keyof VacationTrackerSettings>(
@@ -144,24 +195,31 @@ export function VacationBalancePage() {
   }
 
   const noStartDate = !settings.employmentStartDate || !balance.hasValidEmploymentStartDate
-  const monthlyBalanceTone = balance.monthlyAvailableBalanceDays < 0 ? ' vacationMetricDanger' : ''
-  const monthlyProjectedTone = balance.monthlyProjectedBalanceDays < 0 ? ' vacationMetricDanger' : ''
+  const monthlyBalanceTone =
+    balance.monthlyLiveAvailableBalanceDays < 0 ? ' vacationMetricDanger' : ''
+  const monthlyProjectedTone =
+    balance.monthlyLiveProjectedBalanceDays < 0 ? ' vacationMetricDanger' : ''
+  const currentMonthName = monthLabel(Number(today.slice(5, 7)))
 
   return (
     <div className="vacationPage">
       <header className="vacationHero">
         <div>
-          <span className="vacationEyebrow">FÉRIAS · CONTADOR AUTOMÁTICO</span>
+          <span className="vacationEyebrow">FÉRIAS · EVOLUÇÃO EM TEMPO REAL</span>
           <h1>Férias acumuladas mês a mês</h1>
           <p>
-            Acompanha automaticamente uma meta pessoal anual de {daysLabel(balance.monthlyAccrualTargetDays)}.
-            Cada mês de calendário só é creditado quando termina, evitando contar antecipadamente dias que
-            ainda não foram acumulados.
+            Acompanha uma meta pessoal anual de {daysLabel(balance.monthlyAccrualTargetDays)}. Os meses já
+            terminados ficam fechados e o mês atual evolui proporcionalmente ao tempo decorrido, sem esperar
+            pelo último dia para veres a progressão.
           </p>
         </div>
-        <div className="vacationHeroDate" aria-label={`Cálculo à data de ${formatDate(today)}`}>
-          <span>À data de</span>
+        <div
+          className="vacationHeroDate vacationLiveClock"
+          aria-label={`Cálculo atualizado em ${formatDate(today)} às ${formatTime(now)}`}
+        >
+          <span>Atualizado</span>
           <strong>{formatDate(today)}</strong>
+          <small>{formatTime(now)} · atualização automática a cada minuto</small>
         </div>
       </header>
 
@@ -177,24 +235,28 @@ export function VacationBalancePage() {
 
       <section className="vacationMetricGrid" aria-label="Resumo da acumulação mensal de férias">
         <article className={`vacationMetricCard vacationMetricPrimary${monthlyBalanceTone}`}>
-          <span>Saldo acumulado</span>
-          <strong>{daysLabel(balance.monthlyAvailableBalanceDays)}</strong>
-          <small>Acumulado mensal + transitados + ajustes − férias já gozadas.</small>
+          <span>Saldo agora</span>
+          <strong>{preciseDaysLabel(balance.monthlyLiveAvailableBalanceDays)}</strong>
+          <small>Acumulação em tempo real + transitados + ajustes − férias já gozadas.</small>
         </article>
         <article className="vacationMetricCard">
-          <span>Acumulado bruto</span>
-          <strong>{daysLabel(balance.monthlyAccruedDays)}</strong>
-          <small>{balance.completedAccrualMonths} de 12 meses concluídos em {balance.year}.</small>
+          <span>Acumulado agora</span>
+          <strong>{preciseDaysLabel(balance.monthlyLiveAccruedDays)}</strong>
+          <small>
+            {daysLabel(balance.monthlyAccruedDays)} fechados + {preciseDaysLabel(balance.currentAccrualMonthEarnedDays)} em {currentMonthName}.
+          </small>
         </article>
         <article className={`vacationMetricCard${monthlyProjectedTone}`}>
           <span>Após planeadas</span>
-          <strong>{daysLabel(balance.monthlyProjectedBalanceDays)}</strong>
+          <strong>{preciseDaysLabel(balance.monthlyLiveProjectedBalanceDays)}</strong>
           <small>Desconta também {daysLabel(balance.recordedPlannedDays)} já marcados para o futuro.</small>
         </article>
-        <article className="vacationMetricCard">
-          <span>Meta anual</span>
-          <strong>{daysLabel(balance.monthlyAccrualTargetDays)}</strong>
-          <small>Cerca de {daysLabel(balance.monthlyAccrualPerMonth)} por mês concluído.</small>
+        <article className="vacationMetricCard vacationMetricProgress">
+          <span>Progresso de {currentMonthName}</span>
+          <strong>{percentLabel(balance.currentAccrualMonthProgressPercent)}%</strong>
+          <small>
+            +{preciseDaysLabel(balance.currentAccrualMonthEarnedDays)} de cerca de {daysLabel(balance.monthlyAccrualPerMonth)} neste mês.
+          </small>
         </article>
       </section>
 
@@ -204,22 +266,50 @@ export function VacationBalancePage() {
             <span>ACUMULAÇÃO AUTOMÁTICA · {balance.year}</span>
             <h2 id="vacation-accrual-title">Evolução por mês</h2>
           </div>
-          <strong>{daysLabel(balance.monthlyAccruedDays)} acumulados</strong>
+          <strong>{preciseDaysLabel(balance.monthlyLiveAccruedDays)} agora</strong>
         </div>
 
         <p className="vacationAccrualIntro">
-          O cálculo usa a fração exata da meta anual e arredonda apenas a apresentação a duas casas decimais.
-          Com uma meta de 28 dias, março fecha em 7 dias, junho em 14, setembro em 21 e dezembro em 28.
+          Cada mês vale exatamente 1/12 da meta anual. Os meses concluídos mantêm o marco fechado; no mês em
+          curso, a aplicação calcula a fração do mês já decorrida e atualiza o acumulado enquanto a página está
+          aberta ou quando regressas à aplicação. O cálculo parte sempre da meta anual, sem somar valores já
+          arredondados.
         </p>
+
+        <div className="vacationLiveSummary" aria-label={`Progresso atual de ${currentMonthName}`}>
+          <div>
+            <span>Meta no fecho de {currentMonthName}</span>
+            <strong>{daysLabel(balance.currentAccrualMonthTargetCumulativeDays)}</strong>
+          </div>
+          <div>
+            <span>Ganho neste mês</span>
+            <strong>+{preciseDaysLabel(balance.currentAccrualMonthEarnedDays)}</strong>
+          </div>
+          <div>
+            <span>Falta neste mês</span>
+            <strong>{preciseDaysLabel(balance.currentAccrualMonthRemainingDays)}</strong>
+          </div>
+          <div>
+            <span>Ritmo diário aproximado</span>
+            <strong>{preciseDaysLabel(balance.currentAccrualMonthDailyRate)}/dia</strong>
+          </div>
+        </div>
 
         <div className="vacationMonthGrid" role="list" aria-label="Acumulação de férias por mês">
           {balance.monthlyAccrualSchedule.map((item) => {
-            const state = item.completed ? 'Concluído' : item.current ? 'Em curso' : 'Futuro'
+            const state = item.completed
+              ? 'Concluído'
+              : item.current
+                ? `Em curso · ${percentLabel(item.progressPercent)}%`
+                : 'Futuro'
             const stateClass = item.completed
               ? ' vacationMonthCompleted'
               : item.current
                 ? ' vacationMonthCurrent'
                 : ''
+            const displayedDays = item.current && !item.completed
+              ? preciseDaysLabel(item.liveCumulativeDays)
+              : daysLabel(item.cumulativeDays)
 
             return (
               <article className={`vacationMonthCard${stateClass}`} key={item.month} role="listitem">
@@ -227,8 +317,31 @@ export function VacationBalancePage() {
                   <span className="vacationMonthName">{monthLabel(item.month)}</span>
                   <span className="vacationMonthState">{state}</span>
                 </div>
-                <strong>{daysLabel(item.cumulativeDays)}</strong>
-                <small>Crédito fechado em {formatDate(item.monthEndDate)}</small>
+                <strong>{displayedDays}</strong>
+                <div
+                  className="vacationMonthProgressTrack"
+                  role="progressbar"
+                  aria-label={`Progresso de ${monthLabel(item.month)}`}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-valuenow={Math.round(item.progressPercent)}
+                >
+                  <span style={{ width: `${item.progressPercent}%` }} />
+                </div>
+                {item.current && !item.completed ? (
+                  <>
+                    <small>
+                      +{preciseDaysLabel(item.earnedDays)} neste mês · meta acumulada de {daysLabel(item.cumulativeDays)}.
+                    </small>
+                    <small>
+                      Faltam {preciseDaysLabel(item.remainingDays)} até {formatDate(item.monthEndDate)}.
+                    </small>
+                  </>
+                ) : item.completed ? (
+                  <small>Marco fechado em {formatDate(item.monthEndDate)}.</small>
+                ) : (
+                  <small>Meta prevista no fecho de {formatDate(item.monthEndDate)}.</small>
+                )}
               </article>
             )
           })}
@@ -344,8 +457,9 @@ export function VacationBalancePage() {
           <div className="vacationRuleHighlight">
             <strong>O contador de 28 dias é uma projeção pessoal</strong>
             <p>
-              Serve para veres a progressão mês a mês. Não altera sozinho o número oficial de dias de férias
-              reconhecido pela entidade empregadora, contrato ou instrumento coletivo.
+              Serve para veres a progressão mês a mês, incluindo a evolução do mês atual. Não altera sozinho
+              o número oficial de dias de férias reconhecido pela entidade empregadora, contrato ou instrumento
+              coletivo.
             </p>
           </div>
 
@@ -368,7 +482,8 @@ export function VacationBalancePage() {
           )}
 
           <dl className="vacationBreakdown">
-            <div><dt>Acumulado mensal bruto</dt><dd>{daysLabel(balance.monthlyAccruedDays)}</dd></div>
+            <div><dt>Acumulado em tempo real</dt><dd>{preciseDaysLabel(balance.monthlyLiveAccruedDays)}</dd></div>
+            <div><dt>Meses já fechados</dt><dd>{daysLabel(balance.monthlyAccruedDays)}</dd></div>
             <div><dt>Transitados</dt><dd>{daysLabel(balance.carriedDays)}</dd></div>
             <div><dt>Ajustes</dt><dd>{daysLabel(balance.adjustmentDays)}</dd></div>
             <div><dt>Gozadas até hoje</dt><dd>− {daysLabel(balance.takenDays)}</dd></div>
@@ -400,9 +515,15 @@ export function VacationBalancePage() {
       <section className="vacationLegalNote" aria-label="Precisão e limitações">
         <strong>Precisão e limites</strong>
         <p>
-          O contador mensal foi criado para a tua meta de 28 dias: cada mês completo corresponde a 28 ÷ 12,
-          e o total chega exatamente a 28 no fim de dezembro. O valor intermédio pode ter casas decimais e é
-          apresentado com no máximo duas casas sem acumular erros de arredondamento mês após mês.
+          A meta anual continua distribuída em 12 partes exatas. No mês atual, essa parcela é multiplicada pela
+          fração do mês já decorrida, incluindo a fração do dia local. O resultado vivo usa até quatro casas
+          decimais na apresentação e é recalculado diretamente a partir da meta, evitando drift de arredondamento.
+        </p>
+        <p>
+          A atualização automática ocorre a cada minuto enquanto a página está ativa e também quando regressas
+          à aplicação. Como qualquer PWA, o sistema operativo pode suspender JavaScript em segundo plano; por
+          isso, a aplicação recalcula imediatamente a partir da hora atual quando volta ao primeiro plano, em vez
+          de depender de um timer que tenha continuado a executar em background.
         </p>
         <p>
           Esta projeção é um controlo pessoal. O saldo oficial deve continuar a ser confirmado com a entidade
