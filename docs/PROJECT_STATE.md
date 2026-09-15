@@ -8,6 +8,36 @@ O **Foco Jornada** é uma única PWA React/TypeScript responsiva para telemóvel
 
 Em `main` estão integrados, entre outros, turnos noturnos (PR #189), sincronização cifrada e associação de browsers (PR #191–#194), correções do shell móvel (PR #195–#199), bootstrap animado (PR #200–#201), automação de jornada/pausas (PR #202), a ferramenta de saldo de férias (PR #203) e a acumulação mensal pessoal de férias (PR #204).
 
+## Alteração em curso — contar apenas dias úteis padrão nas férias
+
+Branch: `fix/vacation-weekday-count`.
+
+Objetivo: corrigir o desconto dos períodos de férias para que, no regime semanal padrão suportado, sábado e domingo não reduzam o saldo apenas por estarem incluídos no intervalo marcado.
+
+### Regra implementada
+
+- as datas de férias continuam agregadas e deduplicadas por `YYYY-MM-DD`;
+- segunda a sexta-feira entram como dias de férias gozados/planeados;
+- sábado e domingo ficam identificados como datas de fim de semana e não reduzem o saldo;
+- a classificação passado/futuro é aplicada depois do filtro de dias úteis;
+- o cálculo usa componentes UTC da data civil para evitar deriva de timezone/DST;
+- o resultado é aplicado tanto ao saldo laboral como ao saldo mensal pessoal.
+
+### Caso de aceitação confirmado
+
+Período **24/08/2026 a 06/09/2026**, inclusive:
+
+- 14 dias de calendário;
+- 10 dias úteis de segunda a sexta-feira;
+- 4 dias de fim de semana ignorados: 29/08, 30/08, 05/09 e 06/09;
+- resultado esperado: **10 dias de férias descontados**.
+
+Foram acrescentados testes dedicados para este intervalo e para a exclusão direta de sábado/domingo.
+
+### Limite conhecido
+
+A correção atual trata apenas a semana padrão segunda–sexta. Feriados nacionais/municipais, descanso semanal diferente, turnos especiais e outros calendários laborais ainda não são reinterpretados automaticamente; quando forem relevantes, exigem regra confirmada/calendário próprio antes de automatizar.
+
 ## PR #204 — acumulação mensal pessoal de férias
 
 Estado: **integrado e publicado**.
@@ -89,7 +119,7 @@ Estado: **integrado e publicado**.
 
 Os workflows de qualidade e publicação usam Node 22 com `npm@11.6.0`, mantendo `npm audit --audit-level=high`, typecheck, lint, testes, build, Worker dry-run, smoke test Chromium e artefacto.
 
-O PR #204 passou todos estes gates antes da integração e novamente em `main` depois do merge.
+A correção de dias úteis só deve ser integrada depois de o head final passar os mesmos gates.
 
 ## Limitações conhecidas
 
@@ -101,22 +131,28 @@ O PR #204 passou todos estes gates antes da integração e novamente em `main` d
 - a apresentação usa até duas casas decimais, mas o cálculo de cada marco parte diretamente da meta anual para evitar drift de arredondamento;
 - CCT, contrato, RH, férias transitadas ou regras especiais podem produzir um saldo oficial diferente.
 
+### Contagem de dias úteis
+
+- sábado/domingo são excluídos automaticamente da contagem padrão;
+- feriados e regimes semanais especiais ainda exigem confirmação/ajuste específico;
+- dias manuais continuam a ser responsabilidade do valor confirmado introduzido pelo utilizador.
+
 ### PWA/background
 
 A projeção mensal é derivada quando a página é calculada e não depende de timers em background. A automação de jornada continua sujeita às limitações de suspensão da PWA e usa a reconciliação por timestamps planeados do PR #202.
 
 ## Riscos e validações ainda abertas
 
-1. Validar visualmente a grelha de 12 meses em iPhone, Android, tablet e desktop.
-2. Confirmar no fim de um mês real que o contador muda apenas após o fecho do mês.
-3. Confirmar que dias marcados como férias reduzem o saldo pessoal sem duplicação entre fontes.
+1. Concluir os quality gates da correção de contagem útil.
+2. Validar em dispositivo real que 24/08/2026–06/09/2026 apresenta 10 dias descontados quando o intervalo está marcado.
+3. Confirmar visualmente a grelha de 12 meses em iPhone, Android, tablet e desktop.
 4. Confirmar persistência/sincronização de `monthlyAccrualTargetDays` entre telemóvel e computador com o mesmo cofre.
 5. Continuar as validações físicas pendentes da automação de jornada e da sincronização cross-device.
 
 ## Última alteração
 
-PR #204 integrado e publicado: contador mensal pessoal de férias com meta padrão de 28 dias, cronograma anual, cálculo sem drift de arredondamento e separação explícita da referência laboral.
+Implementada na branch `fix/vacation-weekday-count` a exclusão de sábado/domingo da contagem automática de férias, com caso de regressão 24/08/2026–06/09/2026 = 10 dias úteis.
 
 ## Próximo passo
 
-Validar a nova área **Férias** em dispositivo real e confirmar a contagem com os dados de férias efetivamente marcados pelo utilizador.
+Executar os quality gates, integrar/publicar a correção apenas com CI verde e depois validar o intervalo real na PWA.
