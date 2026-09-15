@@ -16,16 +16,18 @@ Atualizado em: 2026-09-15
 - [x] Preservar `forced-colors` e `prefers-reduced-motion`.
 - [x] Adicionar teste de regressão `vacation-card-containment.test.ts`.
 - [x] Confirmar que a correção não altera cálculo, persistência, API, autenticação, sincronização ou dependências.
-- [x] Atualizar `PROJECT_STATE.md`, `ARCHITECTURE.md`, `DECISIONS.md`, `TODO.md`, `CHANGELOG.md` e `VACATION-TRACKER.md` no head final.
-- [ ] Obter `npm audit --audit-level=high` verde.
-- [ ] Obter typecheck verde.
-- [ ] Obter lint verde.
-- [ ] Obter testes verdes, incluindo a nova regressão visual estrutural.
-- [ ] Obter build, Worker dry-run e smoke test Chromium verdes.
-- [ ] Marcar PR #207 como pronto apenas depois dos quality gates.
-- [ ] Integrar PR #207 em `main`.
-- [ ] Confirmar qualidade em `main` após o merge.
-- [ ] Confirmar publicação e GitHub Pages.
+- [x] Atualizar `PROJECT_STATE.md`, `ARCHITECTURE.md`, `DECISIONS.md`, `TODO.md`, `CHANGELOG.md` e `VACATION-TRACKER.md`.
+- [x] Obter `npm audit --audit-level=high` verde.
+- [x] Obter typecheck verde.
+- [x] Obter lint verde.
+- [x] Obter testes verdes, incluindo a nova regressão visual estrutural.
+- [x] Obter build, Worker dry-run e smoke test Chromium verdes.
+- [x] Marcar PR #207 como pronto depois dos quality gates.
+- [x] Integrar PR #207 em `main` no commit `3a564251eece4a4c2870982ed3127c1638a68482`.
+- [x] Confirmar **Qualidade #1132** verde em `main` após o merge.
+- [x] Confirmar **Publicar Foco & Jornada #246** verde.
+- [x] Confirmar publicação no commit `ce2242b0f90fc4e884764df6d3c31c7dd43a60e9`.
+- [x] Confirmar **pages build and deployment #796** verde.
 - [ ] Validar visualmente em iPhone que nenhum mês ultrapassa a respetiva borda.
 - [ ] Validar Android/Chrome, tablet e desktop, incluindo aumento de texto/zoom.
 
