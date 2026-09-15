@@ -2,7 +2,7 @@
 
 Atualizado em: 2026-09-15
 
-## P0 — Contagem de dias úteis nas férias
+## P0 — Contagem de dias úteis nas férias (PR #205)
 
 - [x] Confirmar o comportamento pretendido para 24/08/2026–06/09/2026: 10 dias úteis.
 - [x] Manter deduplicação por data antes da contagem.
@@ -12,8 +12,12 @@ Atualizado em: 2026-09-15
 - [x] Adicionar teste de regressão com 14 datas civis → 10 dias úteis + 4 fins de semana ignorados.
 - [x] Adicionar teste direto de sábado/domingo ignorados.
 - [x] Documentar a limitação: feriados e escalas especiais ainda não são inferidos automaticamente.
-- [ ] Obter `npm audit --audit-level=high`, typecheck, lint, testes, build, Worker dry-run e smoke test verdes.
-- [ ] Integrar/publicar apenas depois dos quality gates.
+- [x] Obter `npm audit --audit-level=high`, typecheck, lint, testes, build, Worker dry-run e smoke test verdes no **Qualidade #1113**.
+- [x] Integrar PR #205 em `main` no commit `2e309975a38e0df975bf1958879fefb3c3b4b514`.
+- [x] Confirmar **Qualidade #1114** verde após o merge.
+- [x] Confirmar **Publicar Foco & Jornada #244** verde.
+- [x] Confirmar build publicado no commit `26e8dcffca10589846dad4577e96ad03ea1e0608`.
+- [x] Confirmar **pages build and deployment #785** verde para o build publicado.
 - [ ] Validar em dispositivo real o intervalo 24/08/2026–06/09/2026.
 
 ## P0 — Acumulação mensal de férias até 28 dias (PR #204)
