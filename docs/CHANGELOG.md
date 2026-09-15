@@ -8,7 +8,7 @@
 - `VacationBalance` como módulo de domínio puro para calcular direito estimado, saldo atual e saldo projetado.
 - Testes de domínio para período anual mínimo, condição mais favorável, ano de admissão, limite de 20 dias, seis meses, deduplicação e datas futuras.
 - `VacationBalancePage` com configuração, decomposição do cálculo e ligações às fontes de registo existentes.
-- `vacation.css` com layout responsivo, foco por teclado e suporte a `forced-colors`.
+- `vacation.css` com layout responsivo, foco por teclado, suporte a `forced-colors` e contraste reforçado do botão principal.
 - `docs/VACATION-TRACKER.md` com especificação funcional, regras, riscos e critérios de aceitação.
 
 ### Comportamento
@@ -36,10 +36,19 @@
 - A política de meses completos no ano de admissão é deliberadamente conservadora e está documentada devido a divergência interpretativa sobre frações de mês.
 - CCT, impedimento prolongado, cessação do contrato e outras situações especiais permanecem fora do cálculo automático até existir informação confirmada.
 
-### Qualidade
+### CI e qualidade
 
-- PR #203 aberto em draft.
-- Quality gates ainda pendentes antes de integração: `npm audit`, typecheck, lint, testes, build, Worker dry-run e smoke test.
+- Os dois primeiros runs do PR falharam antes dos testes por um crash interno do npm 10.9.8: `Cannot read properties of null (reading 'edgesOut')`.
+- Os workflows de qualidade e publicação passaram a fixar `npm@11.6.0` em Node 22, mantendo todos os gates.
+- **Qualidade #1097**, no head final do PR: instalação, `npm audit --audit-level=high`, typecheck, lint, testes, build, Worker dry-run, smoke test Chromium e artefacto concluídos com sucesso.
+- **Qualidade #1098**, depois do merge em `main`: todos os mesmos gates concluídos com sucesso.
+
+### Integração e publicação
+
+- PR #203 integrado em `main` no commit `225e808a416ac6e18f23c1b7178e99886d7cecbf`.
+- Workflow **Publicar Foco & Jornada #236** concluído com sucesso.
+- Build publicado na raiz de `main` no commit `d5dee6cd9418eaf4483ca4422c17b8331d915445`.
+- Workflow **pages build and deployment #767** concluiu build e deploy com sucesso para o commit publicado.
 
 ## 2026-09-10 — automação de jornada e pausas (PR #202)
 
