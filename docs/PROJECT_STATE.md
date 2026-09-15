@@ -18,6 +18,31 @@ Em `main` estão integrados, entre outros:
 - contagem automática de férias apenas em dias úteis padrão segunda–sexta (PR #205);
 - evolução intramensal da projeção pessoal em tempo real (PR #206).
 
+## PR #207 — contenção visual dos cartões mensais de férias
+
+Estado: **em validação** na branch `fix/vacation-card-containment`.
+
+### Problema confirmado
+
+Na grelha **Evolução por mês**, o cabeçalho de um cartão podia exceder a respetiva largura quando o nome do mês e o badge de estado/percentagem competiam pelo mesmo espaço. O caso observado em setembro mostrava `Em curso · xx%` a ultrapassar visualmente a borda do cartão.
+
+### Correção implementada
+
+- todos os cartões mensais permitem quebra segura no cabeçalho;
+- nome do mês, estado, percentagem, valor, descrições e barra de progresso ficam limitados à largura do cartão;
+- `min-width: 0` e `max-width: 100%` são aplicados nos elementos flex/grid relevantes;
+- o badge deixa de usar `white-space: nowrap` e passa a poder quebrar sem truncar informação;
+- removida a estratégia de `text-overflow: ellipsis` no estado mensal;
+- o resumo superior da própria secção e o cabeçalho do painel também ficam protegidos contra overflow;
+- abaixo de 520 px a grelha mensal e o resumo passam para uma coluna, preservando legibilidade;
+- `forced-colors` e `prefers-reduced-motion` permanecem suportados.
+
+### Regressão
+
+Foi adicionado `src/styles/vacation-card-containment.test.ts` para impedir o regresso de regras que forcem o conteúdo para fora dos cartões ou voltem a truncar o estado mensal.
+
+Não há alteração em cálculos, dados, persistência, sincronização, autenticação, API ou dependências.
+
 ## PR #206 — evolução mensal de férias em tempo real
 
 Estado: **integrado e publicado**.
@@ -142,16 +167,17 @@ O primeiro ensaio do PR #206 expôs um arredondamento intermédio de 0,0001 dia 
 
 ## Riscos e validações ainda abertas
 
-1. Validar em iPhone real que o valor vivo muda ao longo do tempo e é recalculado ao regressar à PWA.
-2. Validar Android/Chrome e tablet para a nova grelha/barra de progresso.
-3. Confirmar que suspensão e retoma não causam saltos incorretos de data/timezone.
-4. Confirmar sincronização normal da configuração de férias entre telemóvel e computador; a evolução viva não deve exigir estado temporal novo de sync.
-5. Continuar validações físicas pendentes da automação de jornada e sincronização cross-device.
+1. Concluir os quality gates do PR #207 e validar visualmente que nenhum mês extravasa a respetiva secção em desktop, tablet e telemóvel.
+2. Validar em iPhone real que o valor vivo muda ao longo do tempo e é recalculado ao regressar à PWA.
+3. Validar Android/Chrome e tablet para a grelha/barra de progresso.
+4. Confirmar que suspensão e retoma não causam saltos incorretos de data/timezone.
+5. Confirmar sincronização normal da configuração de férias entre telemóvel e computador; a evolução viva não deve exigir estado temporal novo de sync.
+6. Continuar validações físicas pendentes da automação de jornada e sincronização cross-device.
 
 ## Última alteração
 
-PR #206 integrado e publicado: evolução mensal de férias em tempo real, mantendo marcos mensais fechados, referência laboral e contagem de dias úteis existentes.
+PR #207 em validação: correção de contenção para impedir nome, badge, percentagem, valor ou texto de qualquer cartão mensal de ultrapassar a respetiva secção.
 
 ## Próximo passo
 
-Validar a evolução viva em dispositivos reais e, depois, avaliar um calendário laboral explícito para feriados/regimes semanais especiais sem inferir regras não confirmadas.
+Concluir CI do PR #207, integrar/publicar com gates verdes e validar visualmente a grelha mensal em iPhone, Android/tablet e desktop.

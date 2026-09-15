@@ -25,6 +25,7 @@ A ferramenta não substitui o mapa oficial de férias, processamento de RH, cont
 - O utilizador pretende acompanhar uma meta pessoal de 28 dias ao final do ano.
 - O utilizador pretende também ver a evolução do mês corrente sem esperar pelo fecho do mês.
 - Para a contagem padrão de dias gozados, sábado e domingo não devem ser descontados como dias úteis de férias.
+- Todo o conteúdo da grelha mensal deve permanecer dentro da respetiva secção e cartão, sem cortar percentagens ou informação textual.
 
 ### Inferência aplicada
 
@@ -43,6 +44,7 @@ A ferramenta não substitui o mapa oficial de férias, processamento de RH, cont
 - Atualizar o valor vivo a cada minuto enquanto a página está ativa e recalcular ao recuperar foco/visibilidade.
 - Não depender de timers em background para manter precisão.
 - Deduplicar as datas registadas e, no regime semanal padrão suportado, descontar apenas segunda a sexta-feira; sábado e domingo permanecem reconhecidos como datas registadas, mas não reduzem o saldo.
+- Permitir que cabeçalhos, badges e valores dos cartões mensais façam reflow dentro da própria largura, em vez de extravasarem ou serem truncados.
 
 ## Referência laboral/contratual
 
@@ -214,6 +216,18 @@ A página apresenta:
 - secção separada de referência laboral;
 - ligação direta ao mapa de turnos e à calculadora de horas.
 
+### Contenção dos cartões mensais
+
+A grelha mensal deve manter toda a informação dentro da própria secção, inclusive com zoom ou texto ampliado.
+
+- cabeçalho de cada cartão pode quebrar linha;
+- badge `Concluído` / `Em curso · xx%` / `Futuro` não força largura externa ao cartão;
+- nomes, valores e descrições usam limites de largura e quebra segura;
+- não se usa `text-overflow: ellipsis` para esconder percentagem/estado;
+- a barra de progresso fica limitada à largura do cartão;
+- abaixo de 520 px a grelha fica em uma coluna e o cabeçalho organiza mês/estado verticalmente;
+- os 12 meses usam a mesma regra de contenção, não apenas o mês corrente.
+
 A interface usa os tokens existentes, mantém alvos adequados a toque, foco por teclado, `forced-colors`, `prefers-reduced-motion` e layout responsivo.
 
 ## Segurança e privacidade
@@ -223,6 +237,7 @@ A interface usa os tokens existentes, mantém alvos adequados a toque, foco por 
 - Nenhum dado novo é enviado diretamente para um backend em texto simples.
 - Não são adicionadas credenciais, segredos, permissões ou dependências.
 - A leitura de registos existentes é local e deduplicada antes do cálculo.
+- A correção de contenção do PR #207 é apenas CSS/testes e não modifica dados ou regras de domínio.
 
 ## Testes mínimos
 
@@ -251,6 +266,14 @@ A interface usa os tokens existentes, mantém alvos adequados a toque, foco por 
 - saldo vivo projetado desconta também férias futuras;
 - o cartão do mês atual expõe acumulado vivo e meta de fecho separadamente.
 
+### Regressão visual estrutural
+
+- cabeçalho mensal contém `flex-wrap`;
+- badge mensal permite quebra e não usa `white-space: nowrap`;
+- valor/texto/barra respeitam `max-width: 100%`;
+- grelha passa a uma coluna abaixo de 520 px;
+- não existe `text-overflow: ellipsis` no estado mensal.
+
 ## Critérios de aceitação
 
 1. A rota `#/ferias` abre em mobile e desktop.
@@ -262,9 +285,11 @@ A interface usa os tokens existentes, mantém alvos adequados a toque, foco por 
 7. O valor vivo atualiza a cada minuto quando a página está ativa e é reconciliado ao regressar à app.
 8. Os marcos mensais permanecem exatos; dezembro termina exatamente na meta anual.
 9. A interface distingue projeção pessoal de referência laboral/contratual.
-10. Nenhum novo dado sensível ou estado temporal é persistido para suportar o relógio vivo.
-11. Testes, typecheck, lint, build, Worker dry-run e smoke test permanecem verdes antes da integração.
-12. `PROJECT_STATE.md`, `ARCHITECTURE.md`, `DECISIONS.md`, `TODO.md` e `CHANGELOG.md` permanecem atualizados.
+10. Nenhum nome de mês, badge, percentagem, valor, descrição ou barra de progresso ultrapassa a borda do respetivo cartão.
+11. O estado mensal permanece legível sem ser truncado com reticências.
+12. Nenhum novo dado sensível ou estado temporal é persistido para suportar o relógio vivo.
+13. Testes, typecheck, lint, build, Worker dry-run e smoke test permanecem verdes antes da integração.
+14. `PROJECT_STATE.md`, `ARCHITECTURE.md`, `DECISIONS.md`, `TODO.md` e `CHANGELOG.md` permanecem atualizados.
 
 ## Fontes oficiais da referência laboral
 

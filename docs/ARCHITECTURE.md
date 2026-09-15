@@ -65,6 +65,23 @@ Componentes relevantes:
 
 A página de férias usa `vacation.css` para a base e `vacation-accrual.css` para a grelha mensal, progresso e resumo vivo.
 
+#### Contenção responsiva da grelha mensal
+
+`vacation-accrual.css` é também a autoridade para impedir que conteúdo dos cartões mensais ultrapasse a respetiva secção.
+
+Regras estruturais do PR #207:
+
+- elementos flex/grid da secção mensal usam `min-width: 0` para poder encolher dentro da coluna;
+- conteúdo textual relevante usa `max-width: 100%` e `overflow-wrap: anywhere` quando necessário;
+- o cabeçalho de cada cartão permite `flex-wrap`;
+- o badge de estado não usa `white-space: nowrap` nem `text-overflow: ellipsis`;
+- a barra de progresso é limitada a `width/max-width: 100%`;
+- a grelha passa de 4 → 3 → 2 → 1 coluna conforme a largura disponível, usando 520 px como breakpoint para uma coluna;
+- abaixo de 520 px, mês e estado são organizados verticalmente no cabeçalho do cartão;
+- `forced-colors` e `prefers-reduced-motion` continuam aplicados.
+
+Esta contenção é exclusivamente visual. Não altera `VacationBalance`, dados persistidos, semântica de cálculo ou fontes de férias.
+
 ### Application
 
 Coordena casos de uso e repositories, sem conter regras visuais.
@@ -134,7 +151,7 @@ Campos persistidos:
 - `manualTakenDays`;
 - `adjustmentDays`.
 
-A evolução em tempo real do PR #206 não acrescenta novos campos persistidos. Hora atual, progresso do dia, progresso do mês, ritmos e saldos vivos são derivados em runtime.
+A evolução em tempo real do PR #206 não acrescenta novos campos persistidos. Hora atual, progresso do dia, progresso do mês, ritmos e saldos vivos são derivados em runtime. O PR #207 é apenas visual e também não altera persistência.
 
 ## Fontes de dados das férias
 
@@ -288,7 +305,7 @@ Princípios preservados:
 - backend recebe apenas cofre cifrado e metadados técnicos;
 - inputs persistidos de férias passam pela normalização já existente;
 - nenhum HTML não confiável é injetado pela nova UI;
-- nenhum endpoint, token, segredo, permissão ou dependência é criado pelo PR #206;
+- nenhum endpoint, token, segredo, permissão ou dependência é criado pelos PR #206–#207;
 - nenhum dado temporal vivo é persistido ou enviado como nova telemetria;
 - links externos mantêm `rel="noreferrer"`.
 
@@ -308,4 +325,4 @@ Workflow `Qualidade`:
 10. smoke test Chromium;
 11. artefacto do build.
 
-Alterações só devem ser integradas em `main` depois de todos os gates do head final estarem verdes.
+O PR #207 acrescenta `src/styles/vacation-card-containment.test.ts` para proteger estruturalmente as regras de contenção. Alterações só devem ser integradas em `main` depois de todos os gates do head final estarem verdes.

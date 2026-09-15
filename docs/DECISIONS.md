@@ -231,3 +231,22 @@ O relógio da página é efémero. `VacationBalancePage` atualiza a referência 
 - os saldos vivos reutilizam a mesma deduplicação e filtro de dias úteis das férias registadas;
 - a referência laboral definida em D-022 permanece inalterada;
 - validação física de timezone/suspensão da PWA continua necessária antes de encerrar a tarefa operacionalmente.
+
+## D-026 — Conteúdo dos cartões mensais deve refluír dentro do próprio cartão
+
+**Estado:** implementada no PR #207; integração depende dos quality gates.
+
+**Decisão:** a grelha de evolução mensal não deve resolver falta de espaço deixando badges/textos ultrapassarem a borda nem escondendo informação com reticências. Todos os cartões usam contenção explícita de flex/grid (`min-width: 0`, `max-width: 100%`) e permitem quebra de linha segura no cabeçalho, estado, valor e descrições.
+
+O badge de estado deixa de usar `white-space: nowrap`. Em ecrãs estreitos, o layout passa progressivamente de 4 para 3, 2 e finalmente 1 coluna; abaixo de 520 px o cabeçalho do cartão organiza mês e estado em coluna.
+
+**Motivo:** a captura real mostrou setembro com `Em curso · xx%` a sair visualmente da secção. Cortar o conteúdo ou esconder a percentagem resolveria apenas o sintoma; o comportamento correto é reflow responsivo mantendo toda a informação legível.
+
+**Acessibilidade:** `forced-colors` e `prefers-reduced-motion` permanecem ativos. A correção não depende de hover, não reduz informação semântica e suporta zoom/aumento de texto melhor do que `nowrap`/ellipsis.
+
+**Consequências:**
+
+- a correção é exclusivamente de apresentação;
+- cálculos de férias e tempo real permanecem inalterados;
+- não há alteração de persistência, API, autenticação, sincronização ou dependências;
+- foi adicionado teste CSS de regressão para impedir o regresso de nowrap/ellipsis e ausência de limites de largura.
