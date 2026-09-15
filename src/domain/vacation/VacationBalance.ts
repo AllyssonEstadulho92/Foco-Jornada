@@ -27,6 +27,7 @@ export interface VacationBalance {
   adjustmentDays: number
   recordedTakenDays: number
   recordedPlannedDays: number
+  recordedIgnoredWeekendDays: number
   manualTakenDays: number
   takenDays: number
   availableBalanceDays: number
@@ -165,6 +166,14 @@ function uniqueVacationDatesForYear(dates: string[], year: number) {
   return [...new Set(dates.filter((date) => parseDateKey(date) && date.startsWith(prefix)))]
 }
 
+function isStandardWeekday(date: string) {
+  const parts = parseDateKey(date)
+  if (!parts) return false
+
+  const weekday = new Date(Date.UTC(parts.year, parts.month - 1, parts.day)).getUTCDay()
+  return weekday !== 0 && weekday !== 6
+}
+
 export function calculateVacationBalance(input: VacationBalanceInput): VacationBalance {
   const asOf = parseDateKey(input.asOfDate)
   const start = parseDateKey(input.employmentStartDate)
@@ -179,10 +188,20 @@ export function calculateVacationBalance(input: VacationBalanceInput): VacationB
   const monthlyAccrualPerMonth = roundDays(monthlyAccrualTargetDays / 12)
   const monthlyAccruedDays = roundDays((monthlyAccrualTargetDays * completedAccrualMonths) / 12)
   const monthlyAccrualSchedule = asOf ? buildMonthlyAccrualSchedule(asOf, monthlyAccrualTargetDays) : []
+  const currentYearVacationDates = uniqueVacationDatesForYear(input.recordedVacationDates, year)
+  const standardWorkingVacationDates = currentYearVacationDates.filter(isStandardWeekday)
+  const recordedIgnoredWeekendDays = currentYearVacationDates.length - standardWorkingVacationDates.length
+  const recordedTakenDays = asOf
+    ? standardWorkingVacationDates.filter((date) => compareDateKeys(date, input.asOfDate) <= 0).length
+    : 0
+  const recordedPlannedDays = asOf
+    ? standardWorkingVacationDates.filter((date) => compareDateKeys(date, input.asOfDate) > 0).length
+    : 0
+  const takenDays = recordedTakenDays + manualTakenDays
 
   if (!asOf || !start || compareDateKeys(input.asOfDate, input.employmentStartDate) < 0) {
     const monthlyAvailableBalanceDays = roundDays(
-      monthlyAccruedDays + carriedDays + adjustmentDays - manualTakenDays,
+      monthlyAccruedDays + carriedDays + adjustmentDays - takenDays,
     )
 
     return {
@@ -190,12 +209,13 @@ export function calculateVacationBalance(input: VacationBalanceInput): VacationB
       entitlementDays: 0,
       carriedDays,
       adjustmentDays,
-      recordedTakenDays: 0,
-      recordedPlannedDays: 0,
+      recordedTakenDays,
+      recordedPlannedDays,
+      recordedIgnoredWeekendDays,
       manualTakenDays,
-      takenDays: manualTakenDays,
-      availableBalanceDays: carriedDays + adjustmentDays - manualTakenDays,
-      projectedBalanceDays: carriedDays + adjustmentDays - manualTakenDays,
+      takenDays,
+      availableBalanceDays: carriedDays + adjustmentDays - takenDays,
+      projectedBalanceDays: carriedDays + adjustmentDays - takenDays - recordedPlannedDays,
       nextEntitlementDate,
       nextEntitlementDays: annualEntitlementDays,
       entitlementUsableFromDate: input.employmentStartDate || `${year}-01-01`,
@@ -209,7 +229,7 @@ export function calculateVacationBalance(input: VacationBalanceInput): VacationB
       completedAccrualMonths,
       monthlyAccruedDays,
       monthlyAvailableBalanceDays,
-      monthlyProjectedBalanceDays: monthlyAvailableBalanceDays,
+      monthlyProjectedBalanceDays: roundDays(monthlyAvailableBalanceDays - recordedPlannedDays),
       monthlyAccrualSchedule,
     }
   }
@@ -227,14 +247,6 @@ export function calculateVacationBalance(input: VacationBalanceInput): VacationB
     ? Math.min(20, completedContractMonths * 2)
     : annualEntitlementDays
 
-  const currentYearVacationDates = uniqueVacationDatesForYear(input.recordedVacationDates, year)
-  const recordedTakenDays = currentYearVacationDates.filter(
-    (date) => compareDateKeys(date, input.asOfDate) <= 0,
-  ).length
-  const recordedPlannedDays = currentYearVacationDates.filter(
-    (date) => compareDateKeys(date, input.asOfDate) > 0,
-  ).length
-  const takenDays = recordedTakenDays + manualTakenDays
   const availableBalanceDays = entitlementDays + carriedDays + adjustmentDays - takenDays
   const projectedBalanceDays = availableBalanceDays - recordedPlannedDays
   const monthlyAvailableBalanceDays = roundDays(
@@ -249,6 +261,7 @@ export function calculateVacationBalance(input: VacationBalanceInput): VacationB
     adjustmentDays,
     recordedTakenDays,
     recordedPlannedDays,
+    recordedIgnoredWeekendDays,
     manualTakenDays,
     takenDays,
     availableBalanceDays,
