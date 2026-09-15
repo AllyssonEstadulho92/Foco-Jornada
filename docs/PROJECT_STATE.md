@@ -16,17 +16,25 @@ Em `main` estão integrados, entre outros:
 - ferramenta de saldo de férias (PR #203);
 - acumulação mensal pessoal de férias com meta de 28 dias por defeito (PR #204);
 - contagem automática de férias apenas em dias úteis padrão segunda–sexta (PR #205);
-- evolução intramensal da projeção pessoal em tempo real (PR #206).
+- evolução intramensal da projeção pessoal em tempo real (PR #206);
+- contenção responsiva dos cartões mensais de férias (PR #207).
 
 ## PR #207 — contenção visual dos cartões mensais de férias
 
-Estado: **em validação** na branch `fix/vacation-card-containment`.
+Estado: **integrado, validado por CI e publicado**.
+
+- PR #207 integrado em `main` no commit `3a564251eece4a4c2870982ed3127c1638a68482`;
+- **Qualidade #1131** passou integralmente no head final do PR;
+- **Qualidade #1132** passou integralmente após o merge em `main`;
+- **Publicar Foco & Jornada #246** concluiu com sucesso;
+- build publicado na raiz de `main` no commit `ce2242b0f90fc4e884764df6d3c31c7dd43a60e9`;
+- **pages build and deployment #796** concluiu com sucesso para o build publicado.
 
 ### Problema confirmado
 
 Na grelha **Evolução por mês**, o cabeçalho de um cartão podia exceder a respetiva largura quando o nome do mês e o badge de estado/percentagem competiam pelo mesmo espaço. O caso observado em setembro mostrava `Em curso · xx%` a ultrapassar visualmente a borda do cartão.
 
-### Correção implementada
+### Correção entregue
 
 - todos os cartões mensais permitem quebra segura no cabeçalho;
 - nome do mês, estado, percentagem, valor, descrições e barra de progresso ficam limitados à largura do cartão;
@@ -41,7 +49,7 @@ Na grelha **Evolução por mês**, o cabeçalho de um cartão podia exceder a re
 
 Foi adicionado `src/styles/vacation-card-containment.test.ts` para impedir o regresso de regras que forcem o conteúdo para fora dos cartões ou voltem a truncar o estado mensal.
 
-Não há alteração em cálculos, dados, persistência, sincronização, autenticação, API ou dependências.
+Não houve alteração em cálculos, dados, persistência, sincronização, autenticação, API ou dependências.
 
 ## PR #206 — evolução mensal de férias em tempo real
 
@@ -143,7 +151,7 @@ Stack atual:
 - npm 11.6.0 fixado nos workflows;
 - `npm audit --audit-level=high`, typecheck, lint, testes, build, Worker dry-run e smoke test Chromium como gates.
 
-O primeiro ensaio do PR #206 expôs um arredondamento intermédio de 0,0001 dia no valor restante do mês. A causa foi corrigida no domínio: o restante passou a derivar diretamente da taxa mensal e do progresso exato, em vez de subtrair um valor já arredondado. O head final e `main` passaram todos os gates.
+O PR #207 e o merge em `main` passaram integralmente estes gates, incluindo o novo teste estrutural de contenção dos cartões mensais.
 
 ## Limitações conhecidas
 
@@ -167,17 +175,17 @@ O primeiro ensaio do PR #206 expôs um arredondamento intermédio de 0,0001 dia 
 
 ## Riscos e validações ainda abertas
 
-1. Concluir os quality gates do PR #207 e validar visualmente que nenhum mês extravasa a respetiva secção em desktop, tablet e telemóvel.
-2. Validar em iPhone real que o valor vivo muda ao longo do tempo e é recalculado ao regressar à PWA.
-3. Validar Android/Chrome e tablet para a grelha/barra de progresso.
+1. Validar visualmente no iPhone real que nenhum mês, badge, percentagem, valor ou texto extravasa a respetiva secção, incluindo zoom/aumento de texto.
+2. Validar Android/Chrome, tablet e desktop para a nova contenção responsiva.
+3. Validar em iPhone real que o valor vivo muda ao longo do tempo e é recalculado ao regressar à PWA.
 4. Confirmar que suspensão e retoma não causam saltos incorretos de data/timezone.
 5. Confirmar sincronização normal da configuração de férias entre telemóvel e computador; a evolução viva não deve exigir estado temporal novo de sync.
 6. Continuar validações físicas pendentes da automação de jornada e sincronização cross-device.
 
 ## Última alteração
 
-PR #207 em validação: correção de contenção para impedir nome, badge, percentagem, valor ou texto de qualquer cartão mensal de ultrapassar a respetiva secção.
+PR #207 integrado e publicado: todos os cartões da evolução mensal passam a conter o respetivo nome, estado, percentagem, valor, descrição e barra de progresso dentro da própria secção, com reflow responsivo em ecrãs estreitos.
 
 ## Próximo passo
 
-Concluir CI do PR #207, integrar/publicar com gates verdes e validar visualmente a grelha mensal em iPhone, Android/tablet e desktop.
+Validar visualmente a versão publicada no iPhone e depois confirmar Android/tablet/desktop, incluindo aumento de texto e zoom.
