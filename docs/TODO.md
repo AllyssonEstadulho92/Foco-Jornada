@@ -19,17 +19,18 @@ Atualizado em: 2026-09-15
 - [x] Adicionar testes de interpolação intramensal e último dia do mês.
 - [x] Confirmar que férias gozadas/planeadas continuam a afetar os saldos vivos corretamente.
 - [x] Não criar persistência, endpoint, token, segredo, permissão ou dependência nova.
-- [x] Atualizar `VACATION-TRACKER.md` e `PROJECT_STATE.md`.
-- [ ] Atualizar `ARCHITECTURE.md`, `DECISIONS.md`, `TODO.md` e `CHANGELOG.md` no head final.
-- [ ] Obter `npm audit --audit-level=high` verde.
-- [ ] Obter typecheck verde.
-- [ ] Obter lint verde.
-- [ ] Obter testes verdes, incluindo regressões anteriores.
-- [ ] Obter build, Worker dry-run e smoke test Chromium verdes.
-- [ ] Marcar PR #206 como pronto apenas depois dos quality gates.
-- [ ] Integrar PR #206 em `main`.
-- [ ] Confirmar qualidade em `main` após o merge.
-- [ ] Confirmar publicação e GitHub Pages.
+- [x] Atualizar `VACATION-TRACKER.md`, `PROJECT_STATE.md`, `ARCHITECTURE.md`, `DECISIONS.md`, `TODO.md` e `CHANGELOG.md`.
+- [x] Obter `npm audit --audit-level=high` verde.
+- [x] Obter typecheck verde.
+- [x] Obter lint verde.
+- [x] Obter testes verdes, incluindo regressões anteriores.
+- [x] Obter build, Worker dry-run e smoke test Chromium verdes.
+- [x] Marcar PR #206 como pronto apenas depois dos quality gates.
+- [x] Integrar PR #206 em `main` no commit `15f4df15308a145f9d303cf56d699837f9516303`.
+- [x] Confirmar **Qualidade #1123** verde em `main` após o merge.
+- [x] Confirmar **Publicar Foco & Jornada #245** verde.
+- [x] Confirmar publicação no commit `05e32a99bd0479fdb417876cb9a31f305a32866d`.
+- [x] Confirmar **pages build and deployment #790** verde.
 - [ ] Validar em iPhone real a atualização viva e a reconciliação ao regressar à PWA.
 - [ ] Validar Android/Chrome e tablet.
 - [ ] Confirmar que a configuração continua a sincronizar entre telemóvel e computador sem novo estado temporal persistido.
