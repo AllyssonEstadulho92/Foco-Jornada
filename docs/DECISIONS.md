@@ -234,7 +234,7 @@ O relógio da página é efémero. `VacationBalancePage` atualiza a referência 
 
 ## D-026 — Conteúdo dos cartões mensais deve refluír dentro do próprio cartão
 
-**Estado:** implementada no PR #207; integração depende dos quality gates.
+**Estado:** aceite, integrada no PR #207 e publicada.
 
 **Decisão:** a grelha de evolução mensal não deve resolver falta de espaço deixando badges/textos ultrapassarem a borda nem escondendo informação com reticências. Todos os cartões usam contenção explícita de flex/grid (`min-width: 0`, `max-width: 100%`) e permitem quebra de linha segura no cabeçalho, estado, valor e descrições.
 
