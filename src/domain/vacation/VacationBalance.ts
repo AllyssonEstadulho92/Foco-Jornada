@@ -1,6 +1,7 @@
 export interface VacationTrackerSettings {
   employmentStartDate: string
   annualEntitlementDays: number
+  monthlyAccrualTargetDays: number
   carriedDays: number
   manualTakenDays: number
   adjustmentDays: number
@@ -9,6 +10,14 @@ export interface VacationTrackerSettings {
 export interface VacationBalanceInput extends VacationTrackerSettings {
   asOfDate: string
   recordedVacationDates: string[]
+}
+
+export interface VacationMonthlyAccrualMonth {
+  month: number
+  monthEndDate: string
+  cumulativeDays: number
+  completed: boolean
+  current: boolean
 }
 
 export interface VacationBalance {
@@ -30,11 +39,19 @@ export interface VacationBalance {
   completedContractMonths: number
   usesCompletedMonthPolicy: boolean
   hasValidEmploymentStartDate: boolean
+  monthlyAccrualTargetDays: number
+  monthlyAccrualPerMonth: number
+  completedAccrualMonths: number
+  monthlyAccruedDays: number
+  monthlyAvailableBalanceDays: number
+  monthlyProjectedBalanceDays: number
+  monthlyAccrualSchedule: VacationMonthlyAccrualMonth[]
 }
 
 export const defaultVacationTrackerSettings: VacationTrackerSettings = {
   employmentStartDate: '',
   annualEntitlementDays: 22,
+  monthlyAccrualTargetDays: 28,
   carriedDays: 0,
   manualTakenDays: 0,
   adjustmentDays: 0,
@@ -109,6 +126,40 @@ function safeWholeDays(value: number, minimum = 0) {
   return Math.max(minimum, Math.round(value))
 }
 
+function safeDecimalDays(value: number, fallback: number, minimum = 0) {
+  if (!Number.isFinite(value)) return fallback
+  return Math.max(minimum, value)
+}
+
+function roundDays(value: number) {
+  return Math.round((value + Number.EPSILON) * 100) / 100
+}
+
+function completedCalendarMonths(asOf: DateParts) {
+  const lastDayOfMonth = new Date(Date.UTC(asOf.year, asOf.month, 0)).getUTCDate()
+  return Math.min(12, asOf.month - 1 + (asOf.day >= lastDayOfMonth ? 1 : 0))
+}
+
+function buildMonthlyAccrualSchedule(
+  asOf: DateParts,
+  targetDays: number,
+): VacationMonthlyAccrualMonth[] {
+  const completedMonths = completedCalendarMonths(asOf)
+
+  return Array.from({ length: 12 }, (_, index) => {
+    const month = index + 1
+    const lastDay = new Date(Date.UTC(asOf.year, month, 0)).getUTCDate()
+
+    return {
+      month,
+      monthEndDate: dateKey({ year: asOf.year, month, day: lastDay }),
+      cumulativeDays: roundDays((targetDays * month) / 12),
+      completed: month <= completedMonths,
+      current: month === asOf.month,
+    }
+  })
+}
+
 function uniqueVacationDatesForYear(dates: string[], year: number) {
   const prefix = `${year}-`
   return [...new Set(dates.filter((date) => parseDateKey(date) && date.startsWith(prefix)))]
@@ -119,12 +170,21 @@ export function calculateVacationBalance(input: VacationBalanceInput): VacationB
   const start = parseDateKey(input.employmentStartDate)
   const year = asOf?.year ?? new Date().getFullYear()
   const annualEntitlementDays = safeWholeDays(input.annualEntitlementDays, 22)
+  const monthlyAccrualTargetDays = safeDecimalDays(input.monthlyAccrualTargetDays, 28, 1)
   const carriedDays = safeWholeDays(input.carriedDays)
   const manualTakenDays = safeWholeDays(input.manualTakenDays)
   const adjustmentDays = Number.isFinite(input.adjustmentDays) ? Math.round(input.adjustmentDays) : 0
   const nextEntitlementDate = `${year + 1}-01-01`
+  const completedAccrualMonths = asOf ? completedCalendarMonths(asOf) : 0
+  const monthlyAccrualPerMonth = roundDays(monthlyAccrualTargetDays / 12)
+  const monthlyAccruedDays = roundDays((monthlyAccrualTargetDays * completedAccrualMonths) / 12)
+  const monthlyAccrualSchedule = asOf ? buildMonthlyAccrualSchedule(asOf, monthlyAccrualTargetDays) : []
 
   if (!asOf || !start || compareDateKeys(input.asOfDate, input.employmentStartDate) < 0) {
+    const monthlyAvailableBalanceDays = roundDays(
+      monthlyAccruedDays + carriedDays + adjustmentDays - manualTakenDays,
+    )
+
     return {
       year,
       entitlementDays: 0,
@@ -144,6 +204,13 @@ export function calculateVacationBalance(input: VacationBalanceInput): VacationB
       completedContractMonths: 0,
       usesCompletedMonthPolicy: false,
       hasValidEmploymentStartDate: Boolean(start),
+      monthlyAccrualTargetDays,
+      monthlyAccrualPerMonth,
+      completedAccrualMonths,
+      monthlyAccruedDays,
+      monthlyAvailableBalanceDays,
+      monthlyProjectedBalanceDays: monthlyAvailableBalanceDays,
+      monthlyAccrualSchedule,
     }
   }
 
@@ -170,6 +237,10 @@ export function calculateVacationBalance(input: VacationBalanceInput): VacationB
   const takenDays = recordedTakenDays + manualTakenDays
   const availableBalanceDays = entitlementDays + carriedDays + adjustmentDays - takenDays
   const projectedBalanceDays = availableBalanceDays - recordedPlannedDays
+  const monthlyAvailableBalanceDays = roundDays(
+    monthlyAccruedDays + carriedDays + adjustmentDays - takenDays,
+  )
+  const monthlyProjectedBalanceDays = roundDays(monthlyAvailableBalanceDays - recordedPlannedDays)
 
   return {
     year,
@@ -190,5 +261,12 @@ export function calculateVacationBalance(input: VacationBalanceInput): VacationB
     completedContractMonths,
     usesCompletedMonthPolicy: isAdmissionYear,
     hasValidEmploymentStartDate: true,
+    monthlyAccrualTargetDays,
+    monthlyAccrualPerMonth,
+    completedAccrualMonths,
+    monthlyAccruedDays,
+    monthlyAvailableBalanceDays,
+    monthlyProjectedBalanceDays,
+    monthlyAccrualSchedule,
   }
 }
