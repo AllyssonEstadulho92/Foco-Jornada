@@ -23,6 +23,7 @@ A ferramenta não substitui o mapa oficial de férias, processamento de RH, cont
 - A calculadora de horas já suporta `reason: "ferias"`.
 - O Código do Trabalho prevê, em regra, um mínimo anual de 22 dias úteis e regras especiais no ano de admissão.
 - O utilizador pretende acompanhar uma meta pessoal de 28 dias ao final do ano, somada progressivamente pelos meses.
+- Para a contagem padrão de dias gozados, sábado e domingo não devem ser descontados como dias úteis de férias.
 
 ### Inferência aplicada
 
@@ -37,6 +38,7 @@ A ferramenta não substitui o mapa oficial de férias, processamento de RH, cont
 - Separar **saldo acumulado hoje** de **saldo após férias planeadas**.
 - Não descrever a meta pessoal de 28 dias como regra legal: nos anos normais, a referência laboral continua a tratar o período anual como vencendo, em regra, em 1 de janeiro.
 - Creditar a projeção pessoal apenas no fecho de cada mês civil.
+- Deduplicar as datas registadas e, no regime semanal padrão suportado, descontar apenas segunda a sexta-feira; sábado e domingo permanecem reconhecidos como datas registadas, mas não reduzem o saldo.
 
 ## Referência laboral/contratual
 
@@ -109,7 +111,24 @@ São agregadas e deduplicadas por `YYYY-MM-DD`:
 2. dias do mapa de turnos com `kind === "vacation"`;
 3. plano de vencimento associado ao mapa com `kind === "vacation"`.
 
+Depois da deduplicação, o cálculo aplica a semana útil padrão suportada nesta versão:
+
+- segunda a sexta-feira: entram na contagem de férias gozadas/planeadas;
+- sábado e domingo: não reduzem o saldo, mesmo quando fazem parte de um intervalo de férias marcado na aplicação.
+
+Exemplo validado para 2026:
+
+- período marcado: **24 de agosto a 6 de setembro**, inclusive;
+- 14 datas civis no intervalo;
+- 10 dias úteis de segunda a sexta-feira;
+- 4 dias de fim de semana ignorados: 29 e 30 de agosto, 5 e 6 de setembro;
+- resultado: **10 dias de férias descontados**.
+
 Datas até ao dia atual contam como gozadas/registadas. Datas posteriores, dentro do mesmo ano, contam como planeadas. A mesma data não é descontada duas vezes.
+
+### Limite desta regra
+
+A exclusão automática implementada é apenas para sábado/domingo na semana padrão. Feriados nacionais/municipais, descanso semanal diferente, turnos especiais e outras regras de calendário ainda não são reinterpretados automaticamente pelo módulo. Quando esses casos alterarem o saldo oficial, deve ser usado um ajuste confirmado ou feita uma evolução específica do calendário laboral antes de automatizar.
 
 ## Persistência
 
@@ -169,7 +188,9 @@ A interface usa os tokens existentes, mantém alvos adequados a toque, foco por 
 - período de espera de seis meses;
 - deduplicação da mesma data em fontes diferentes;
 - separação entre dias passados e dias futuros;
-- data de admissão futura.
+- data de admissão futura;
+- exclusão de sábado e domingo da contagem automática;
+- período 24/08/2026–06/09/2026 com 14 datas civis resulta em 10 dias úteis descontados e 4 dias de fim de semana ignorados.
 
 ### Projeção mensal
 
@@ -187,12 +208,14 @@ A interface usa os tokens existentes, mantém alvos adequados a toque, foco por 
 1. A rota `#/ferias` abre em mobile e desktop.
 2. O utilizador consegue guardar a meta pessoal sem alterar o schema do cofre.
 3. Férias já registadas noutras áreas são detetadas automaticamente e sem duplicação por data.
-4. O contador mostra claramente o acumulado por meses concluídos.
-5. Com meta 28, dezembro termina exatamente em 28 dias.
-6. A interface distingue projeção pessoal de referência laboral/contratual.
-7. O ano de admissão continua tratado separadamente.
-8. Testes, typecheck, lint, build, Worker dry-run e smoke test permanecem verdes antes da integração.
-9. `PROJECT_STATE.md`, `ARCHITECTURE.md`, `DECISIONS.md`, `TODO.md` e `CHANGELOG.md` permanecem atualizados.
+4. Um intervalo 24/08/2026–06/09/2026 desconta 10 dias úteis, não 14 dias civis.
+5. Sábado e domingo marcados como férias não reduzem o saldo na semana padrão.
+6. O contador mostra claramente o acumulado por meses concluídos.
+7. Com meta 28, dezembro termina exatamente em 28 dias.
+8. A interface distingue projeção pessoal de referência laboral/contratual.
+9. O ano de admissão continua tratado separadamente.
+10. Testes, typecheck, lint, build, Worker dry-run e smoke test permanecem verdes antes da integração.
+11. `PROJECT_STATE.md`, `ARCHITECTURE.md`, `DECISIONS.md`, `TODO.md` e `CHANGELOG.md` permanecem atualizados.
 
 ## Fontes oficiais da referência laboral
 
