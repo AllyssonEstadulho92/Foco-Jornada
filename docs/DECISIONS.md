@@ -206,7 +206,7 @@ Atualizado em: 2026-09-15
 
 ## D-025 — O mês atual evolui em tempo real sem substituir os marcos fechados
 
-**Estado:** implementada no PR #206; integração depende dos quality gates.
+**Estado:** aceite, integrada no PR #206 e publicada.
 
 **Decisão:** preservar `monthlyAccruedDays` como acumulado de meses fechados e acrescentar uma camada derivada de evolução intramensal para a projeção pessoal.
 
