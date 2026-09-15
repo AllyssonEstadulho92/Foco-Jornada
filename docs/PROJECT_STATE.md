@@ -6,28 +6,40 @@ Atualizado em: 2026-09-15
 
 O **Foco Jornada** é uma única PWA React/TypeScript responsiva para telemóvel, tablet e computador, publicada por GitHub Pages. A persistência operacional continua local-first num cofre IndexedDB cifrado; a sincronização entre instalações usa Cloudflare Worker/Durable Objects e transporta apenas o cofre cifrado.
 
-Em `main` estão integrados, entre outros, turnos noturnos (PR #189), sincronização cifrada e associação de browsers (PR #191–#194), correções do shell móvel (PR #195–#199), bootstrap animado (PR #200–#201), automação de jornada/pausas (PR #202) e a ferramenta de saldo de férias (PR #203).
+Em `main` estão integrados, entre outros, turnos noturnos (PR #189), sincronização cifrada e associação de browsers (PR #191–#194), correções do shell móvel (PR #195–#199), bootstrap animado (PR #200–#201), automação de jornada/pausas (PR #202), a ferramenta de saldo de férias (PR #203) e a acumulação mensal pessoal de férias (PR #204).
 
-## Alteração em curso — acumulação mensal de férias (PR #204)
+## PR #204 — acumulação mensal pessoal de férias
 
-Branch: `feat/monthly-vacation-accrual-28`.
+Estado: **integrado e publicado**.
 
-Objetivo: acrescentar à área de férias um contador mensal automático para a meta pessoal de **28 dias no final do ano**, sem substituir nem adulterar a referência laboral/contratual já existente.
+- PR integrado em `main` no commit `131e6a721f03c3f5d9e22f1ebea885593607c315`.
+- Build publicado na raiz de `main` no commit `9629239c2ccde1cac925d00a3197d645cc8ed308`.
+- Workflow **Qualidade #1105** passou integralmente no head final do PR.
+- Workflow **Qualidade #1106** passou integralmente depois do merge em `main`.
+- Workflow **Publicar Foco & Jornada #237** concluiu com sucesso.
+- Workflow **pages build and deployment #772** concluiu com sucesso para o commit publicado.
+
+### Objetivo entregue
+
+A área `#/ferias` inclui agora um contador mensal automático para uma meta pessoal anual configurável, com **28 dias por defeito**.
 
 ### Regra implementada
 
-- meta mensal pessoal por defeito: 28 dias anuais;
-- crédito proporcional: `meta anual / 12` por mês concluído;
-- o mês só entra no acumulado quando chega ao último dia desse mês;
-- o cálculo não soma valores arredondados mês a mês: usa a fração exata da meta e arredonda apenas o valor apresentado a duas casas decimais;
+- meta pessoal por defeito: 28 dias anuais;
+- crédito proporcional: `meta anual / 12` por mês de calendário concluído;
+- o mês corrente só entra no acumulado no respetivo último dia;
+- o cálculo não soma parcelas arredondadas: cada marco deriva diretamente da meta anual;
+- a apresentação usa no máximo duas casas decimais;
 - com meta 28: janeiro 2,33; fevereiro 4,67; março 7; junho 14; setembro 21; dezembro 28;
-- saldo acumulado pessoal = acumulado mensal + transitados + ajustes − férias gozadas/registadas;
-- saldo projetado também desconta férias futuras já planeadas;
-- férias já marcadas na Calculadora de horas e no Mapa de turnos continuam deduplicadas por data.
+- saldo mensal pessoal = acumulado bruto + transitados + ajustes − férias gozadas/registadas − férias manuais externas;
+- saldo mensal projetado também desconta férias futuras planeadas;
+- dias de férias vindos de várias áreas continuam deduplicados por data.
+
+Em 15 de setembro, por exemplo, janeiro a agosto estão concluídos: a projeção bruta é **18,67 dias**. Em 30 de setembro passa para **21 dias**.
 
 ### Separação obrigatória de conceitos
 
-O contador de 28 dias é uma **projeção pessoal** solicitada pelo utilizador. Ele não altera automaticamente `annualEntitlementDays`, não afirma que 28 dias são um direito legal geral e não substitui informação confirmada por RH, contrato ou CCT.
+O contador de 28 dias é uma **projeção pessoal configurável**. Ele não altera automaticamente `annualEntitlementDays`, não afirma que 28 dias são um direito legal geral e não substitui informação confirmada por RH, contrato ou CCT.
 
 A área mantém em paralelo:
 
@@ -44,7 +56,8 @@ Alterados/criados:
 - `src/domain/vacation/VacationBalance.test.ts` — testes de fecho mensal, dezembro = 28 e precisão de arredondamento;
 - `src/presentation/pages/VacationBalancePage.tsx` — novos cartões e grelha mensal;
 - `src/styles/vacation-accrual.css` — layout responsivo da grelha de meses;
-- `src/main.tsx` — carregamento da nova folha de estilos.
+- `src/main.tsx` — carregamento da nova folha de estilos;
+- `docs/VACATION-TRACKER.md` — especificação atualizada com a separação entre projeção pessoal e referência laboral.
 
 A configuração acrescenta `monthlyAccrualTargetDays` à mesma chave `foco-jornada-vacation-settings-v1`. Registos antigos sem o novo campo recebem 28 como valor por defeito, sem migração destrutiva.
 
@@ -63,7 +76,7 @@ Estado: **integrado e publicado**.
 - Workflow **Publicar Foco & Jornada #236** concluiu com sucesso.
 - Workflow **pages build and deployment #767** concluiu build e deploy com sucesso para o commit publicado.
 
-### Base preservada
+### Base laboral preservada
 
 - anos normais: período anual configurado nunca inferior ao mínimo geral de 22 dias úteis;
 - valores acima de 22 continuam dependentes de condição mais favorável confirmada;
@@ -76,7 +89,7 @@ Estado: **integrado e publicado**.
 
 Os workflows de qualidade e publicação usam Node 22 com `npm@11.6.0`, mantendo `npm audit --audit-level=high`, typecheck, lint, testes, build, Worker dry-run, smoke test Chromium e artefacto.
 
-O PR #204 permanece em draft até o head final passar todos estes gates.
+O PR #204 passou todos estes gates antes da integração e novamente em `main` depois do merge.
 
 ## Limitações conhecidas
 
@@ -90,20 +103,20 @@ O PR #204 permanece em draft até o head final passar todos estes gates.
 
 ### PWA/background
 
-A PWA pode ter JavaScript suspenso quando fechada; a automação de jornada mantém a reconciliação por timestamps planeados implementada no PR #202.
+A projeção mensal é derivada quando a página é calculada e não depende de timers em background. A automação de jornada continua sujeita às limitações de suspensão da PWA e usa a reconciliação por timestamps planeados do PR #202.
 
 ## Riscos e validações ainda abertas
 
-1. Concluir os quality gates do PR #204.
-2. Validar visualmente a grelha de 12 meses em iPhone, Android, tablet e desktop.
-3. Confirmar no fim de um mês real que o contador muda apenas após o fecho do mês.
-4. Confirmar que dias marcados como férias reduzem o saldo pessoal sem duplicação entre fontes.
-5. Confirmar persistência/sincronização de `monthlyAccrualTargetDays` entre telemóvel e computador com o mesmo cofre.
+1. Validar visualmente a grelha de 12 meses em iPhone, Android, tablet e desktop.
+2. Confirmar no fim de um mês real que o contador muda apenas após o fecho do mês.
+3. Confirmar que dias marcados como férias reduzem o saldo pessoal sem duplicação entre fontes.
+4. Confirmar persistência/sincronização de `monthlyAccrualTargetDays` entre telemóvel e computador com o mesmo cofre.
+5. Continuar as validações físicas pendentes da automação de jornada e da sincronização cross-device.
 
 ## Última alteração
 
-PR #204 aberto com acumulação mensal automática para uma meta pessoal de 28 dias, preservando separadamente a referência laboral existente.
+PR #204 integrado e publicado: contador mensal pessoal de férias com meta padrão de 28 dias, cronograma anual, cálculo sem drift de arredondamento e separação explícita da referência laboral.
 
 ## Próximo passo
 
-Concluir CI, corrigir qualquer regressão sem enfraquecer os gates e integrar/publicar apenas depois de todos os testes estarem verdes.
+Validar a nova área **Férias** em dispositivo real e confirmar a contagem com os dados de férias efetivamente marcados pelo utilizador.
