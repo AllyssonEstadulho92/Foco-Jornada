@@ -198,7 +198,7 @@
   padding: 0 var(--space-5);
   border: 1px solid transparent;
   border-radius: var(--control-radius);
-  background: var(--primary);
+  background: var(--primary-strong);
   color: var(--surface);
   font: inherit;
   font-weight: var(--weight-bold);
