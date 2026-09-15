@@ -4,124 +4,124 @@ Atualizado em: 2026-09-15
 
 ## Estado atual
 
-O **Foco Jornada** continua a ser uma única PWA React/TypeScript responsiva para telemóvel, tablet e computador, publicada por GitHub Pages. A persistência operacional é local-first num cofre IndexedDB cifrado; a sincronização entre instalações usa Cloudflare Worker/Durable Objects e transporta apenas o cofre cifrado.
+O **Foco Jornada** é uma única PWA React/TypeScript responsiva para telemóvel, tablet e computador, publicada por GitHub Pages. A persistência operacional continua local-first num cofre IndexedDB cifrado; a sincronização entre instalações usa Cloudflare Worker/Durable Objects e transporta apenas o cofre cifrado.
 
-O código publicado em `main` inclui, entre outras correções já integradas:
+Em `main` estão integrados, entre outros, turnos noturnos (PR #189), sincronização cifrada e associação de browsers (PR #191–#194), correções do shell móvel (PR #195–#199), bootstrap animado (PR #200–#201) e automação de jornada/pausas (PR #202).
 
-- turnos noturnos corrigidos no PR #189;
-- sincronização cifrada e associação de outro navegador nos PR #191–#194;
-- correções do menu móvel e top bar nos PR #195–#199;
-- logótipo animado de bootstrap nos PR #200–#201;
-- automação de jornada e pausas pelo horário configurado no PR #202.
-
-## Alteração em curso — ferramenta de saldo de férias (PR #203)
+## PR #203 — ferramenta de saldo de férias
 
 Branch: `feat/vacation-balance-tracker`.
 
-Objetivo: acrescentar uma área pessoal de férias que mostre o direito estimado do ano, férias já registadas, férias futuras planeadas, saldo disponível e saldo projetado, sem confundir o cálculo com o registo oficial da entidade empregadora.
+Estado: **pronto para integração após o quality gate final do head atual**. Um quality gate completo já passou na branch depois da correção do ambiente npm; a última alteração funcional posterior foi apenas o reforço de contraste do botão principal e volta a ser validada pelo pipeline antes do merge.
+
+### Objetivo
+
+Acrescentar uma área pessoal de férias que mostre:
+
+- direito estimado do ano;
+- férias já gozadas/registadas;
+- férias futuras planeadas;
+- saldo calculado hoje;
+- saldo projetado após as férias planeadas;
+- próxima referência de vencimento anual.
+
+A ferramenta não substitui o mapa oficial da entidade empregadora, RH, contrato ou instrumento de regulamentação coletiva.
 
 ### Comportamento implementado
 
-- nova rota `#/ferias` e acesso na navegação desktop e no acesso rápido móvel;
-- cálculo de domínio separado em `src/domain/vacation/VacationBalance.ts`;
-- período anual normal nunca inferior a 22 dias úteis, permitindo valor superior apenas quando configurado pelo utilizador por existir condição mais favorável confirmada;
-- no ano de admissão, política conservadora de 2 dias por mês completo de contrato, até 20 dias, com indicação do marco de seis meses completos para o gozo;
-- férias já lançadas na Calculadora de horas (`reason = ferias`) e no Mapa de turnos/Plano de vencimento (`kind = vacation`) são reutilizadas automaticamente;
+- nova rota `#/ferias` e acesso na navegação desktop/mobile;
+- cálculo isolado em `src/domain/vacation/VacationBalance.ts`;
+- anos normais: mínimo geral de 22 dias úteis, permitindo valor superior apenas quando explicitamente confirmado/configurado;
+- ano de admissão: política conservadora de 2 dias por mês completo de contrato, até 20 dias, com marco de seis meses completos para o gozo;
+- não existe falsa acumulação mensal nos anos normais: a interface explica que o direito anual vence, em regra, em 1 de janeiro;
+- férias já marcadas na Calculadora de horas (`reason = ferias`) e no Mapa de turnos/plano mensal (`kind = vacation`) são reutilizadas automaticamente;
 - a mesma data encontrada em mais de uma fonte conta apenas uma vez;
-- datas até ao dia atual são tratadas como gozadas/registadas; datas futuras do mesmo ano são mostradas separadamente como planeadas;
-- dias transitados, férias gozadas fora da aplicação e ajustes confirmados podem ser introduzidos manualmente;
-- saldo atual e saldo após férias planeadas são apresentados separadamente;
-- não é apresentada uma falsa acumulação mensal nos anos normais: a interface explica que o período anual vence, em regra, em 1 de janeiro;
-- a ferramenta mostra de forma explícita que é um controlo pessoal e que o saldo oficial deve ser confirmado com RH/entidade empregadora quando existirem CCT, impedimentos, cessação ou outras regras especiais.
+- datas até ao dia atual são tratadas como gozadas/registadas; datas futuras do mesmo ano são separadas como planeadas;
+- dias transitados, férias gozadas fora da aplicação e ajustes dependem de confirmação manual;
+- o botão principal usa contraste reforçado em tema claro e escuro.
 
 ### Implementação técnica
 
 Novos elementos:
 
-- `src/domain/vacation/VacationBalance.ts` — cálculo puro e validação de datas;
-- `src/domain/vacation/VacationBalance.test.ts` — testes do domínio;
-- `src/presentation/pages/VacationBalancePage.tsx` — página funcional e integração dos registos existentes;
-- `src/styles/vacation.css` — layout responsivo e estados de acessibilidade;
-- `docs/VACATION-TRACKER.md` — especificação funcional, regras, riscos e critérios de aceitação.
+- `src/domain/vacation/VacationBalance.ts`;
+- `src/domain/vacation/VacationBalance.test.ts`;
+- `src/presentation/pages/VacationBalancePage.tsx`;
+- `src/styles/vacation.css`;
+- `docs/VACATION-TRACKER.md`.
 
 Alterados:
 
-- `src/presentation/router.tsx` — rota `/ferias`;
-- `src/presentation/navigation/navigationItems.ts` — entrada desktop e acesso rápido móvel;
-- `src/main.tsx` — carregamento dos estilos da ferramenta.
+- `src/presentation/router.tsx`;
+- `src/presentation/navigation/navigationItems.ts`;
+- `src/main.tsx`;
+- `.github/workflows/quality.yml` e `.github/workflows/deploy-pages.yml` por regressão externa do npm 10.9.8.
 
 ### Persistência e segurança
 
-A configuração adicional é guardada em `secureStorage` na chave `foco-jornada-vacation-settings-v1`, ficando dentro do cofre cifrado já existente. Não foi criado novo endpoint, tabela IndexedDB, token, segredo, permissão ou mecanismo de autenticação.
+A configuração adicional é guardada em `secureStorage` na chave `foco-jornada-vacation-settings-v1`, ficando dentro do cofre cifrado existente. São guardados apenas: data de admissão, dias anuais confirmados, transitados, dias gozados fora da aplicação e ajuste confirmado.
 
-A funcionalidade apenas lê os registos de férias já existentes e guarda cinco campos de configuração: data de admissão, dias anuais confirmados, dias transitados, dias gozados fora da aplicação e ajuste confirmado.
-
-Não existe alteração do protocolo de sincronização, do schema do cofre, da cifragem ou da associação de browsers.
+Não foi criado novo endpoint, tabela IndexedDB, token, segredo, permissão, mecanismo de autenticação ou migração de schema. O protocolo de sincronização e a cifragem permanecem inalterados.
 
 ### Enquadramento laboral validado
 
-A regra geral foi confrontada em 2026-09-15 com o Código do Trabalho e gov.pt:
+Em 2026-09-15 foram revistos Código do Trabalho e gov.pt:
 
 - artigo 237.º: o direito a férias vence, em regra, em 1 de janeiro;
 - artigo 238.º: duração mínima anual de 22 dias úteis;
 - artigo 239.º: no ano de admissão, 2 dias úteis por mês de duração do contrato, até 20 dias, com gozo após seis meses completos;
-- artigo 240.º: transferência/cumulação de férias depende das condições legalmente previstas.
+- artigo 240.º: transferência/cumulação depende das condições legalmente previstas.
 
-Existe discussão interpretativa sobre meses incompletos no ano de admissão. A versão inicial usa meses completos, documenta essa opção e não a apresenta como regra universal incontestada.
-
-## PR #202 — integrado e publicado
-
-O PR #202 foi integrado em `main` no commit `62b0cb44db31fff957a4486b7ac24634c721e3ea` e publicado pelo GitHub Pages através do commit de deploy `08dc9fae23f683fc7cadf80ada7a54b2545da8b2`.
-
-### Comportamento preservado
-
-- `WorkSchedule` continua a ser a fonte única do horário planeado;
-- antes da entrada configurada não é criada jornada;
-- durante o turno, se ainda não existir jornada nesse dia, a aplicação cria-a com `startedAt` exatamente igual à entrada configurada;
-- uma jornada ativa é encerrada com `endedAt` exatamente igual à saída configurada quando esse limite é atingido ou ultrapassado;
-- se o utilizador terminar manualmente a jornada antes da saída, a automação não cria uma segunda jornada nesse dia;
-- se a aplicação for aberta pela primeira vez apenas depois da saída e não existir jornada do dia, não é fabricada uma jornada completa retroativa;
-- pausas ativadas em **Definições → Pausas** usam os respetivos `startTime`/`endTime` e passam a ser reconciliadas automaticamente;
-- Pomodoro e foco personalizado permanecem totalmente manuais.
+Existe divergência interpretativa sobre frações de mês no ano de admissão. Para não apresentar uma hipótese como certeza, a versão inicial usa meses completos, documenta a opção e permite ajustes confirmados pelo utilizador.
 
 ## Qualidade e segurança
 
-No PR #202 e em `main`, a pipeline **Qualidade** concluiu com sucesso em instalação, `npm audit --audit-level=high`, typecheck, lint, testes, build, Worker dry-run, smoke test e artefacto.
+O primeiro e o segundo workflow do PR #203 falharam antes dos testes porque o `npm install` do npm 10.9.8 terminou com o crash interno `Cannot read properties of null (reading 'edgesOut')`. Não houve falha funcional da ferramenta. O problema coincide com regressões abertas no npm/CLI em 2026.
 
-Para o PR #203, os testes de domínio já foram adicionados, mas os quality gates do PR ainda têm de concluir antes de qualquer integração. O PR permanece em draft até essa validação.
+Foi fixado `npm@11.6.0` nos workflows de qualidade e publicação, preservando Node 22 e todos os gates. Com essa correção, o workflow **Qualidade #1095** concluiu com sucesso em:
+
+- instalação;
+- `npm audit --audit-level=high`;
+- typecheck;
+- lint;
+- testes, incluindo os novos testes de férias;
+- build;
+- Worker dry-run;
+- smoke test Chromium;
+- artefacto.
+
+O head atual volta a executar os mesmos gates depois do ajuste de contraste, antes da integração.
 
 ## Limitações conhecidas
 
-### PWA/background
-
-Uma PWA pode ter JavaScript totalmente suspenso quando o sistema a coloca em segundo plano ou quando é encerrada. A automação de jornada continua a usar reconciliação e timestamps planeados, não timers falsificados.
-
 ### Férias
 
-- a ferramenta é estimativa pessoal, não fonte oficial de RH;
-- CCT, contrato mais favorável, impedimento prolongado, cessação do contrato e outras situações especiais podem alterar o resultado;
-- dias transitados devem ser confirmados pelo utilizador;
-- a política de meses completos no ano de admissão é conservadora e está documentada devido a divergência interpretativa sobre frações de mês.
+- é um controlo pessoal, não a fonte oficial de RH;
+- CCT, contrato mais favorável, impedimento prolongado, cessação e outras situações especiais podem alterar o resultado;
+- dias transitados devem ser confirmados;
+- dias explicitamente marcados como férias na aplicação são tratados como um dia de férias; a ferramenta não tenta reinterpretar automaticamente feriados, escalas especiais ou descanso substitutivo;
+- a política de meses completos no ano de admissão é deliberadamente conservadora.
+
+### PWA/background
+
+A PWA pode ter JavaScript suspenso quando fechada; a automação de jornada mantém a regra de reconciliação por timestamps planeados do PR #202.
 
 ## Riscos e validações ainda abertas
 
-1. **PR #203:** concluir audit, typecheck, lint, testes, build, Worker dry-run e smoke test.
-2. **Férias em dispositivo real:** validar a rota, edição dos campos, persistência e responsividade em telemóvel e computador.
-3. **Deduplicação real:** marcar a mesma data como férias no mapa e na calculadora e confirmar contagem única.
-4. **Cross-device:** confirmar que a configuração de férias converge com o mesmo perfil/cofre sincronizado.
-5. **Jornada 08:00–17:00:** permanece pendente validação física da automação do PR #202.
-6. **Pausa real de 60 minutos:** permanece pendente validação física.
-7. **Timezone:** a área geral de jornada continua dependente do timezone local do browser; os dois dispositivos devem usar o mesmo timezone durante validações.
+1. concluir o quality gate do head final do PR #203;
+2. validar em dispositivo real a rota, edição, persistência e responsividade;
+3. marcar a mesma data como férias em duas fontes e confirmar contagem única;
+4. confirmar sincronização da configuração de férias entre telemóvel e computador com o mesmo cofre;
+5. manter as validações físicas ainda pendentes do PR #202 e da sincronização cross-device.
 
 ## Última alteração
 
-PR #203 aberto em draft com a ferramenta de saldo de férias, domínio testável, reutilização dos registos existentes, persistência cifrada e documentação de enquadramento laboral.
+PR #203: ferramenta de férias implementada, enquadramento laboral documentado, regressão externa do npm 10.9.8 isolada e workflows ajustados para npm 11.6.0 sem enfraquecer os quality gates.
 
 ## Próximo passo
 
-1. concluir os quality gates do PR #203;
-2. corrigir qualquer falha sem enfraquecer os testes ou as regras de segurança;
-3. atualizar o estado documental com os resultados finais;
-4. integrar em `main` apenas com CI verde;
-5. confirmar publicação GitHub Pages;
-6. validar a ferramenta em telemóvel e computador com dados reais confirmados.
+1. confirmar CI verde no head final;
+2. integrar PR #203 em `main`;
+3. confirmar o workflow de publicação e GitHub Pages;
+4. atualizar este estado com os SHAs finais;
+5. validar a ferramenta em telemóvel e computador com dados reais confirmados.
