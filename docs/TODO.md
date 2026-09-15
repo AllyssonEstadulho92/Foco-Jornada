@@ -2,6 +2,33 @@
 
 Atualizado em: 2026-09-15
 
+## P0 — Conter conteúdo dos cartões mensais de férias (PR #207)
+
+- [x] Reproduzir o problema visual a partir da captura: badge `Em curso · xx%` ultrapassa o cartão de setembro.
+- [x] Rever `VacationBalancePage.tsx`, `vacation.css` e `vacation-accrual.css` antes de alterar estilos.
+- [x] Aplicar `min-width: 0`/`max-width: 100%` aos elementos relevantes da secção mensal.
+- [x] Permitir quebra de linha no cabeçalho de todos os cartões mensais.
+- [x] Remover `white-space: nowrap` do estado mensal.
+- [x] Remover truncamento por reticências do badge para manter a informação visível.
+- [x] Garantir quebra segura de nome, valor, descrições e resumo da secção.
+- [x] Garantir que a barra de progresso nunca ultrapassa 100% da largura do cartão.
+- [x] Passar a grelha para uma coluna abaixo de 520 px.
+- [x] Preservar `forced-colors` e `prefers-reduced-motion`.
+- [x] Adicionar teste de regressão `vacation-card-containment.test.ts`.
+- [x] Confirmar que a correção não altera cálculo, persistência, API, autenticação, sincronização ou dependências.
+- [ ] Atualizar `PROJECT_STATE.md`, `ARCHITECTURE.md`, `DECISIONS.md`, `TODO.md`, `CHANGELOG.md` e `VACATION-TRACKER.md` no head final.
+- [ ] Obter `npm audit --audit-level=high` verde.
+- [ ] Obter typecheck verde.
+- [ ] Obter lint verde.
+- [ ] Obter testes verdes, incluindo a nova regressão visual estrutural.
+- [ ] Obter build, Worker dry-run e smoke test Chromium verdes.
+- [ ] Marcar PR #207 como pronto apenas depois dos quality gates.
+- [ ] Integrar PR #207 em `main`.
+- [ ] Confirmar qualidade em `main` após o merge.
+- [ ] Confirmar publicação e GitHub Pages.
+- [ ] Validar visualmente em iPhone que nenhum mês ultrapassa a respetiva borda.
+- [ ] Validar Android/Chrome, tablet e desktop, incluindo aumento de texto/zoom.
+
 ## P0 — Evolução mensal de férias em tempo real (PR #206)
 
 - [x] Analisar o cálculo mensal existente antes de alterar a semântica.
