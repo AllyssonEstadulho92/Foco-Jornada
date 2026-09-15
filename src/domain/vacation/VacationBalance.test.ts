@@ -21,7 +21,7 @@ describe('calculateVacationBalance', () => {
         '2026-08-25',
         '2026-08-26',
         '2026-10-02',
-        '2026-10-03',
+        '2026-10-05',
       ],
     })
 
@@ -30,6 +30,44 @@ describe('calculateVacationBalance', () => {
     expect(result.recordedPlannedDays).toBe(2)
     expect(result.availableBalanceDays).toBe(21)
     expect(result.projectedBalanceDays).toBe(19)
+  })
+
+  it('conta 10 dias úteis entre 24 de agosto e 6 de setembro de 2026', () => {
+    const result = calculateVacationBalance({
+      ...base,
+      asOfDate: '2026-09-15',
+      recordedVacationDates: [
+        '2026-08-24',
+        '2026-08-25',
+        '2026-08-26',
+        '2026-08-27',
+        '2026-08-28',
+        '2026-08-29',
+        '2026-08-30',
+        '2026-08-31',
+        '2026-09-01',
+        '2026-09-02',
+        '2026-09-03',
+        '2026-09-04',
+        '2026-09-05',
+        '2026-09-06',
+      ],
+    })
+
+    expect(result.recordedTakenDays).toBe(10)
+    expect(result.recordedIgnoredWeekendDays).toBe(4)
+    expect(result.takenDays).toBe(10)
+  })
+
+  it('não desconta sábado ou domingo quando estão marcados como férias', () => {
+    const result = calculateVacationBalance({
+      ...base,
+      asOfDate: '2026-09-15',
+      recordedVacationDates: ['2026-09-04', '2026-09-05', '2026-09-06', '2026-09-07'],
+    })
+
+    expect(result.recordedTakenDays).toBe(2)
+    expect(result.recordedIgnoredWeekendDays).toBe(2)
   })
 
   it('acumula a meta pessoal de 28 dias apenas por meses de calendário concluídos', () => {
