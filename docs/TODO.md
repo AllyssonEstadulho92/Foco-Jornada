@@ -20,18 +20,17 @@ Atualizado em: 2026-09-15
 - [x] Criar UI responsiva para o cronograma mensal.
 - [x] Guardar a nova preferência no `secureStorage` existente.
 - [x] Não criar novo endpoint, schema, segredo, token ou mecanismo de autenticação.
-- [x] Atualizar `PROJECT_STATE.md`.
-- [ ] Atualizar `ARCHITECTURE.md`.
-- [ ] Atualizar `DECISIONS.md`.
-- [ ] Atualizar `CHANGELOG.md`.
-- [ ] Obter `npm audit --audit-level=high` verde no PR #204.
-- [ ] Obter typecheck verde.
-- [ ] Obter lint verde.
-- [ ] Obter testes verdes, incluindo regressões existentes.
-- [ ] Obter build, Worker dry-run e smoke test verdes.
-- [ ] Marcar PR #204 como pronto apenas depois dos quality gates.
-- [ ] Integrar PR #204 em `main`.
-- [ ] Confirmar publicação GitHub Pages do merge.
+- [x] Atualizar `PROJECT_STATE.md`, `ARCHITECTURE.md`, `DECISIONS.md`, `TODO.md`, `CHANGELOG.md` e `VACATION-TRACKER.md`.
+- [x] Obter `npm audit --audit-level=high` verde no PR #204.
+- [x] Obter typecheck verde.
+- [x] Obter lint verde.
+- [x] Obter testes verdes, incluindo regressões existentes.
+- [x] Obter build, Worker dry-run e smoke test verdes.
+- [x] Marcar PR #204 como pronto depois dos quality gates.
+- [x] Integrar PR #204 em `main` no commit `131e6a721f03c3f5d9e22f1ebea885593607c315`.
+- [x] Confirmar pipeline **Qualidade #1106** verde após integração em `main`.
+- [x] Confirmar publicação GitHub Pages no commit `9629239c2ccde1cac925d00a3197d645cc8ed308`.
+- [x] Confirmar **pages build and deployment #772** verde para o commit publicado.
 - [ ] Validar em dispositivo real a grelha mensal e o saldo acumulado.
 - [ ] Confirmar mudança de saldo no fecho real de um mês.
 - [ ] Confirmar sincronização de `monthlyAccrualTargetDays` entre telemóvel e computador.
