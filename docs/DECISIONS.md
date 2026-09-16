@@ -108,10 +108,20 @@ Atualizado em: 2026-09-16
 
 ## D-032 — Cabeçalho do planeamento usa altura intrínseca e orçamento de largura próprio
 
-**Estado:** proposto no PR #213, integração condicionada aos quality gates finais.
+**Estado:** aceite; PR #213 integrado, CI e publicação confirmadas.
 
 **Decisão:** substituir `vacationPanelHeader` na vista de planeamento por `header.vacationPlannerHero` com texto curto e badge informativa contida; grelha 1fr + 12,5rem, quebra de linha e apenas uma coluna até 820px. Trocar o painel autónomo de grelha para coluna flex de altura intrínseca, impedindo a primeira linha de crescer verticalmente. Reutilizar as sugestões e simulação sem modificar nenhum cálculo.
 
 **Motivo:** screenshot real mostrou o estado «Pré-visualização…» fora da borda e uma área branca excessiva no cabeçalho. O espaço deve corresponder à altura do conteúdo, e nenhum texto pode ultrapassar o cartão.
 
-**Risco/limite:** o CSS do PR #212 continua a ocultar a vista inativa sem desmontar React. O teste estrutural não substitui inspeção visual num iPhone real com zoom e texto aumentado. Nenhuma mudança em dados, persistência, sync, autenticação, autorização, dependências, API ou regras de férias. Especificação `docs/VACATION-PLANNER-HEADER.md`.
+**Risco/limite:** o CSS do PR #212 continua a ocultar a vista inativa sem desmontar React. O teste estrutural não substitui inspeção visual num iPhone real com zoom e texto aumentado. Nenhuma mudança em dados, persistência, sync, autenticação, autorização, dependências, API ou regras de férias. Especificação `docs/VACATION-PLANNER-HEADER.md`. **Entrega:** Qualidade #1172/#1173, Publicar #252, Pages #832, merge `88099b5200b371081822e19197d15f723a8c3f14`.
+
+## D-033 — Resumo vivo do planeamento reutiliza relógio e função de domínio
+
+**Estado:** proposto no PR #214, integração condicionada aos quality gates finais.
+
+**Decisão:** `VacationPlannerPanel` usa os `today`/`asOfDayProgress` recebidos de `VacationBalancePage` para invocar `calculateVacationBalance` com as mesmas datas/configuração. Exibe acumulado, saldo após gozadas, saldo após férias já planeadas e previsão dezembro, com hora ao minuto do cálculo; a simulação futura não entra no saldo «após planeadas». Sem timer adicional, backend realtime ou armazenamento; vista oculta continua montada. CSS isolado e teste estrutural.
+
+**Motivo:** permitir consultar a posição atual antes de escolher datas, mantendo um único algoritmo de férias, valores responsivos e sem apresentar simulação como férias efetivamente marcadas.
+
+**Limites/segurança:** atualização local a cada minuto e em foco/visibilidade; o SO pode suspender a PWA; não garante replicação instantânea. Direito laboral e meta pessoal separados, feriados/escala/aprovação não inferidos. Sem API, dependência, token, segredo, permissão, schema, telemetria ou gravação. `docs/VACATION-PLANNER-LIVE.md`; validação física pendente.
