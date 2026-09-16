@@ -14,68 +14,78 @@ Em `main` estão integrados, entre outros:
 - bootstrap animado (PR #200–#201);
 - automação de jornada/pausas (PR #202);
 - ferramenta de saldo de férias (PR #203);
-- acumulação mensal pessoal de férias com meta de 28 dias por defeito (PR #204);
-- contagem automática de férias apenas em dias úteis padrão segunda–sexta (PR #205);
-- evolução intramensal da projeção pessoal em tempo real (PR #206);
-- contenção responsiva dos cartões mensais de férias (PR #207);
+- acumulação mensal pessoal com meta de 28 dias por defeito (PR #204);
+- contagem padrão de férias em dias úteis segunda–sexta (PR #205);
+- evolução intramensal em tempo real (PR #206);
+- contenção responsiva dos cartões mensais (PR #207);
 - hierarquia visual adaptativa da evolução mensal (PR #208).
 
-## PR #208 — hierarquia visual da evolução mensal
+## PR #209 — painel avançado de leitura de férias
 
-Estado: **integrado, validado por CI e publicado**.
+Estado: **em validação** na branch `feat/vacation-insights-dashboard`.
 
-- PR #208 integrado em `main` no commit `a41a0c3b9fdef1b0e5d67bc29ce6b453dbcbc4cf`;
-- **Qualidade #1138** passou integralmente no head final do PR;
-- **Qualidade #1139** passou integralmente após o merge em `main`;
-- **Publicar Foco & Jornada #247** concluiu com sucesso;
-- build publicado na raiz de `main` no commit `a5a17750ffa43f506c9feb5af78a167f3b1f0f5c`;
-- **pages build and deployment #801** concluiu com sucesso para o build publicado.
+### Objetivo
 
-### Objetivo entregue
+Dar mais informação útil sem obrigar o utilizador a interpretar manualmente números dispersos. A nova camada continua a usar a projeção pessoal existente e não altera a referência laboral.
 
-Depois de eliminar o overflow no PR #207, a secção **Evolução por mês** foi refinada para melhorar leitura, equilíbrio e adaptação entre desktop, tablet e smartphone sem alterar cálculo, dados ou semântica.
+### Funções implementadas
 
-### Alteração entregue
+A rota `#/ferias` passa a mostrar, além do saldo e evolução mensal já existentes:
 
-- grelha mensal usa `repeat(auto-fit, minmax(...))`, ajustando automaticamente a quantidade de colunas à largura real disponível;
-- o resumo vivo também usa `auto-fit`, evitando cartões excessivamente comprimidos;
-- mês, estado, valor, barra e texto auxiliar recebem hierarquia tipográfica e espaçamento mais consistentes;
-- cartões têm borda superior de estado e estrutura uniforme;
-- mês atual recebe destaque específico, com superfície e valor reforçados;
-- meses concluídos ficam visualmente distintos do mês atual e dos meses futuros;
-- em ecrãs estreitos a grelha passa para uma coluna e o estado move-se para baixo do nome do mês;
-- a altura mínima usada no desktop é libertada em mobile para evitar espaço vazio;
-- contenção do PR #207 continua ativa com `min-width: 0`, `max-width: 100%`, `overflow-wrap` e `overflow: hidden`;
-- `forced-colors` e `prefers-reduced-motion` permanecem suportados.
+- progresso anual da meta pessoal em percentagem;
+- valor que ainda falta acumular até à meta anual;
+- próximo marco de acumulação em dias inteiros e data estimada pelo modelo mensal atual;
+- férias já gozadas, com separação entre dias detetados na app e dias introduzidos manualmente;
+- férias futuras planeadas;
+- total comprometido `gozadas + planeadas` e percentagem da meta pessoal;
+- previsão de saldo pessoal em 31 de dezembro;
+- número de fins de semana registados como férias e ignorados no desconto padrão;
+- próximo fecho mensal e respetivo marco acumulado;
+- falta de acumulação no mês atual e ritmo diário aproximado.
 
-### Regressão
+### Regras de cálculo novas, apenas derivadas
 
-`src/styles/vacation-card-containment.test.ts` foi ampliado para validar:
+Nenhum novo evento é criado. Os indicadores são derivados em `VacationBalance` a partir dos dados já existentes.
 
-- grelha `auto-fit/minmax`;
-- contenção de valores/textos/progresso;
-- distinção estrutural do mês atual e concluído;
-- uma coluna no breakpoint móvel;
-- ausência de truncamento por reticências.
+```text
+progressoAnual% = acumuladoVivo / metaAnual × 100
+faltaAnual = max(0, metaAnual - acumuladoVivo)
+comprometido = gozadas + planeadas
+previsaoFimAno = metaAnual + transitados + ajustes - comprometido
+```
+
+O próximo marco procura o próximo dia inteiro ainda não alcançado pela projeção e calcula a data em que o modelo `meta / 12` o cruza. Para uma meta de 28 dias, por exemplo, um acumulado entre 19 e 20 mostra **20 dias** como próximo marco.
 
 ### Segurança e compatibilidade
 
-Não houve alteração em `VacationBalance`, cálculos, férias registadas, cofre, sincronização, autenticação, API, dependências, dados pessoais ou configuração persistida.
+- não há novo campo persistido;
+- não há migração IndexedDB;
+- não há novo endpoint, token, segredo, permissão ou dependência;
+- os novos indicadores seguem o mesmo cofre cifrado porque derivam da configuração e dos registos já existentes;
+- o cálculo oficial/contratual permanece separado da projeção pessoal;
+- `vacation-insights.css` isola o novo painel visual sem modificar os estilos globais.
 
-## PR #207 — contenção visual dos cartões mensais
+### Testes adicionados
 
-Estado: **integrado, validado por CI e publicado**.
+- progresso anual e falta até à meta;
+- próximo marco e respetiva data;
+- projeção para 31 de dezembro depois de férias gozadas/planeadas;
+- caso real de 24/08/2026–06/09/2026 mantendo 10 dias úteis e projeção final de 18 dias com meta 28 sem outros ajustes;
+- estado final quando a meta anual já foi atingida;
+- regressão CSS para grelha fluida, contenção, mobile, `forced-colors` e `prefers-reduced-motion`.
 
-- merge: `3a564251eece4a4c2870982ed3127c1638a68482`;
-- Qualidade #1131 no head final: sucesso;
-- Qualidade #1132 em `main`: sucesso;
-- Publicar Foco & Jornada #246: sucesso;
-- build publicado: `ce2242b0f90fc4e884764df6d3c31c7dd43a60e9`;
-- pages build and deployment #796: sucesso.
+## Estado publicado anterior — PR #208
 
-O PR #207 corrigiu o caso real em que `Em curso · xx%` ultrapassava a borda do cartão. Nome, estado, percentagem, valor, descrição e barra passaram a ficar contidos no próprio cartão.
+PR #208 está **integrado, validado por CI e publicado**.
 
-## Férias — regras funcionais atuais
+- merge: `a41a0c3b9fdef1b0e5d67bc29ce6b453dbcbc4cf`;
+- Qualidade #1138 no head: sucesso;
+- Qualidade #1139 em `main`: sucesso;
+- Publicar Foco & Jornada #247: sucesso;
+- build publicado: `a5a17750ffa43f506c9feb5af78a167f3b1f0f5c`;
+- pages build and deployment #801: sucesso.
+
+## Regras funcionais atuais de férias
 
 ### Referência laboral
 
@@ -90,7 +100,7 @@ O PR #207 corrigiu o caso real em que `Em curso · xx%` ultrapassava a borda do 
 - meta anual configurável, 28 dias por defeito;
 - marcos exatos: março 7, junho 14, setembro 21, dezembro 28;
 - mês atual progride em tempo real pela fração do calendário já decorrida;
-- atualização enquanto a página está ativa: 60 segundos;
+- atualização normal enquanto a página está ativa: 60 segundos;
 - `focus` e `visibilitychange` reconciliam imediatamente o relógio atual;
 - não existe dependência de timers em background.
 
@@ -126,20 +136,20 @@ Gates obrigatórios:
 7. smoke test Chromium;
 8. artefacto do build.
 
-O head final do PR #208 e o merge em `main` passaram integralmente estes gates.
-
 ## Limitações e validações abertas
 
-1. Validar no iPhone real a nova hierarquia visual, especialmente setembro, percentagens longas e aumento de texto.
-2. Validar Android/Chrome, tablet e desktop, incluindo zoom.
-3. Confirmar atualização viva e reconciliação ao regressar à PWA em dispositivo real.
-4. Confirmar sincronização da configuração de férias entre telemóvel e computador.
-5. Validar fisicamente a automação de jornada e a sincronização cross-device.
+1. Concluir os gates do head final do PR #209 antes de integrar.
+2. Validar no iPhone real o painel avançado e a legibilidade dos novos indicadores.
+3. Validar Android/Chrome, tablet e desktop, incluindo zoom e aumento de texto.
+4. Confirmar atualização viva e reconciliação ao regressar à PWA em dispositivo real.
+5. Confirmar sincronização da configuração de férias entre telemóvel e computador.
+6. Avaliar calendário laboral para feriados e regimes de descanso diferentes antes de alterar a contagem padrão.
+7. Continuar validações físicas pendentes da automação de jornada e sincronização cross-device.
 
 ## Última alteração
 
-PR #208 integrado e publicado: a secção **Evolução por mês** usa agora grelha fluida `auto-fit`, hierarquia visual consistente e destaque do mês atual, preservando a contenção e toda a lógica funcional existente.
+PR #209 em validação: novo painel **O que tens, o que falta e o que vem a seguir**, com indicadores derivados para progresso anual, próximos marcos, férias usadas/planeadas e previsão de fim do ano.
 
 ## Próximo passo
 
-Validar visualmente a versão publicada no iPhone e confirmar o mesmo comportamento em Android/tablet/desktop, incluindo zoom e aumento de texto.
+Concluir CI do PR #209, integrar/publicar apenas com todos os gates verdes e validar o novo painel num dispositivo real.
