@@ -6,15 +6,17 @@ Atualizado em: 2026-09-16
 
 O **Foco Jornada** é uma PWA React/TypeScript única e responsiva para telemóvel, tablet e computador, publicada em GitHub Pages. Persistência local-first em IndexedDB/cofre cifrado; sincronização opcional por Cloudflare Worker/Durable Objects transporta apenas o cofre cifrado.
 
-Em `main` estão integrados turnos noturnos (#189), sincronização/associação cifrada de browsers (#191–#194), shell móvel (#195–#199), bootstrap animado (#200–#201), automação de jornada/pausas (#202), ferramenta/evolução de férias (#203–#209), simulador de períodos (#210), sugestões visuais (#211) e **separação das áreas de consulta e planeamento (#212)**.
+Em `main` estão integrados turnos noturnos (#189), sincronização/associação cifrada de browsers (#191–#194), shell móvel (#195–#199), bootstrap animado (#200–#201), automação de jornada/pausas (#202), ferramenta/evolução de férias (#203–#209), simulador de períodos (#210), sugestões visuais (#211), separação das áreas de consulta/planeamento (#212) e correção do cabeçalho do planeamento (#213).
 
 ## PR #213 — corrigir corte e espaço vazio no cabeçalho do planeamento
 
-**Estado: alteração no branch `fix/vacation-planner-hero-spacing`, em validação; ainda não integrada/publicada nesta revisão.** A captura real mostra «Pré-visualização…» cortada à direita e uma caixa de cabeçalho demasiado alta. Causa provável no código: o painel de planeamento usa `display:grid`, que pode esticar a linha do cabeçalho, e partilha o estilo flexível de outros cabeçalhos sem orçamento próprio de largura.
+**Estado: integrado, CI e publicação confirmadas.** PR #213 integrado no commit `88099b5200b371081822e19197d15f723a8c3f14`; Qualidade #1172 (head final) e Qualidade #1173 em `main` passaram auditoria, TypeScript, lint, Vitest, build, Worker dry-run, smoke Chromium e artefacto. Publicar Foco & Jornada #252 concluiu com sucesso; build `ddbdced0c2b380e546a8e0da29dbe5819a74d4f8` e GitHub Pages #832 concluíram com sucesso.
 
-Correção: `VacationPlannerPanel.tsx` passa a usar um `header.vacationPlannerHero` com título, explicação curta e badge contida; `vacation-planner.css` limita as colunas, permite quebra de texto e muda a vista dedicada para coluna flex de altura intrínseca. Em ecrãs até 820px a badge desce para a linha seguinte. Teste estrutural em `vacation-workspace.test.ts`. Não se alteraram fórmulas, 10 dias úteis de 24/08–06/09, meta pessoal de 28, fontes de dados, cofre, sync, API ou permissões. Especificação em `docs/VACATION-PLANNER-HEADER.md`.
+**Facto observado na captura:** «Pré-visualização…» cortada à direita e caixa de cabeçalho demasiado alta. **Causa provável no código:** painel de planeamento em grid esticava a primeira linha e o cabeçalho genérico não limitava adequadamente a segunda coluna. Não foi possível verificar o CSS computado do iPhone.
 
-**Próximo passo imediato:** validar head final no GitHub Actions, integrar apenas se passar, verificar Qualidade de `main`, publicação e Pages, e confirmar no iPhone com nova captura que a badge e a altura ficaram corretas. CI estrutural não equivale a teste visual físico.
+**Correção publicada:** `VacationPlannerPanel.tsx` usa `header.vacationPlannerHero` com título, descrição curta e badge informativa. `vacation-planner.css` limita colunas e permite quebra segura; até 820px a badge desce para linha própria. O painel autónomo usa coluna flex e cabeçalho de altura intrínseca para não esticar a caixa. Teste estrutural em `vacation-workspace.test.ts`; detalhes em `docs/VACATION-PLANNER-HEADER.md`.
+
+**Sem alterações** a fórmulas, dez dias úteis de 24/08–06/09, meta pessoal de 28, fontes, registos, cofre, autenticação, sync, API ou permissões. **Pendente:** validar visualmente o cabeçalho publicado no iPhone real, com nova captura, zoom e texto ampliado; CI não substitui teste físico.
 
 ## PR #212 — separar evolução e planeamento, melhorar largura e espaçamento
 
@@ -52,7 +54,7 @@ Integrado/publicado: merge `73a6c0f43caf40219a98b1224113bdddaaec420b`, Qualidade
 
 ## Qualidade
 
-React 19, TypeScript 5.9, Vite 7, Vitest 5, Node 22, npm 11.6.0. Gates: `npm audit --audit-level=high`, typecheck, lint, Vitest, build, Worker dry-run, smoke Chromium e artefacto. PR #212 passou no head final e em `main`; Publicar #251/Pages #826 bem-sucedidos. PR #213 aguarda gates finais.
+React 19, TypeScript 5.9, Vite 7, Vitest 5, Node 22, npm 11.6.0. Gates: `npm audit --audit-level=high`, typecheck, lint, Vitest, build, Worker dry-run, smoke Chromium e artefacto. PR #213 passou no head final e em `main`; Publicar #252/Pages #832 bem-sucedidos.
 
 ## Limitações e validações abertas
 
@@ -64,8 +66,8 @@ React 19, TypeScript 5.9, Vite 7, Vitest 5, Node 22, npm 11.6.0. Gates: `npm aud
 
 ## Última alteração
 
-PR #213 em validação: novo cabeçalho compacto e planeador em coluna de altura intrínseca; código do domínio e dados intactos.
+PR #213 integrado e publicado: cabeçalho compacto e planeador de altura intrínseca. Build `ddbdced0c2b380e546a8e0da29dbe5819a74d4f8`, Pages #832 sucesso; domínio e dados intactos.
 
 ## Próximo passo
 
-Confirmar CI, integrar/publicar PR #213 e pedir captura do iPhone atualizado; se persistir espaço vazio, recolher dimensões e inspecionar CSS computado no dispositivo. Não introduzir marcação automática sem confirmação explícita e verificação do direito oficial.
+Verificar uma nova captura no iPhone atualizado; se persistir espaço vazio, recolher dimensões e inspecionar CSS computado no dispositivo. Não introduzir marcação automática sem confirmação explícita e verificação do direito oficial.
