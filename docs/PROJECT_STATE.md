@@ -17,17 +17,25 @@ Em `main` estão integrados, entre outros:
 - acumulação mensal pessoal de férias com meta de 28 dias por defeito (PR #204);
 - contagem automática de férias apenas em dias úteis padrão segunda–sexta (PR #205);
 - evolução intramensal da projeção pessoal em tempo real (PR #206);
-- contenção responsiva dos cartões mensais de férias (PR #207).
+- contenção responsiva dos cartões mensais de férias (PR #207);
+- hierarquia visual adaptativa da evolução mensal (PR #208).
 
 ## PR #208 — hierarquia visual da evolução mensal
 
-Estado: **em validação** na branch `feat/vacation-cards-visual-hierarchy`.
+Estado: **integrado, validado por CI e publicado**.
 
-### Objetivo
+- PR #208 integrado em `main` no commit `a41a0c3b9fdef1b0e5d67bc29ce6b453dbcbc4cf`;
+- **Qualidade #1138** passou integralmente no head final do PR;
+- **Qualidade #1139** passou integralmente após o merge em `main`;
+- **Publicar Foco & Jornada #247** concluiu com sucesso;
+- build publicado na raiz de `main` no commit `a5a17750ffa43f506c9feb5af78a167f3b1f0f5c`;
+- **pages build and deployment #801** concluiu com sucesso para o build publicado.
 
-Depois de eliminar o overflow no PR #207, melhorar a leitura e a estabilidade visual dos 12 cartões sem alterar cálculo, dados ou semântica.
+### Objetivo entregue
 
-### Alteração implementada
+Depois de eliminar o overflow no PR #207, a secção **Evolução por mês** foi refinada para melhorar leitura, equilíbrio e adaptação entre desktop, tablet e smartphone sem alterar cálculo, dados ou semântica.
+
+### Alteração entregue
 
 - grelha mensal usa `repeat(auto-fit, minmax(...))`, ajustando automaticamente a quantidade de colunas à largura real disponível;
 - o resumo vivo também usa `auto-fit`, evitando cartões excessivamente comprimidos;
@@ -52,7 +60,7 @@ Depois de eliminar o overflow no PR #207, melhorar a leitura e a estabilidade vi
 
 ### Segurança e compatibilidade
 
-Não há alteração em `VacationBalance`, cálculos, férias registadas, cofre, sincronização, autenticação, API, dependências, dados pessoais ou configuração persistida.
+Não houve alteração em `VacationBalance`, cálculos, férias registadas, cofre, sincronização, autenticação, API, dependências, dados pessoais ou configuração persistida.
 
 ## PR #207 — contenção visual dos cartões mensais
 
@@ -118,19 +126,20 @@ Gates obrigatórios:
 7. smoke test Chromium;
 8. artefacto do build.
 
+O head final do PR #208 e o merge em `main` passaram integralmente estes gates.
+
 ## Limitações e validações abertas
 
-1. Concluir os quality gates do head final do PR #208.
-2. Validar no iPhone real a nova hierarquia visual, especialmente setembro e percentagens longas.
-3. Validar Android/Chrome, tablet e desktop, incluindo zoom/aumento de texto.
-4. Confirmar atualização viva e reconciliação ao regressar à PWA em dispositivo real.
-5. Confirmar sincronização da configuração de férias entre telemóvel e computador.
-6. Validar fisicamente a automação de jornada e a sincronização cross-device.
+1. Validar no iPhone real a nova hierarquia visual, especialmente setembro, percentagens longas e aumento de texto.
+2. Validar Android/Chrome, tablet e desktop, incluindo zoom.
+3. Confirmar atualização viva e reconciliação ao regressar à PWA em dispositivo real.
+4. Confirmar sincronização da configuração de férias entre telemóvel e computador.
+5. Validar fisicamente a automação de jornada e a sincronização cross-device.
 
 ## Última alteração
 
-PR #208 em validação: refinamento visual da secção **Evolução por mês**, com grelha fluida `auto-fit`, hierarquia consistente e destaque do mês atual, preservando a contenção e toda a lógica existente.
+PR #208 integrado e publicado: a secção **Evolução por mês** usa agora grelha fluida `auto-fit`, hierarquia visual consistente e destaque do mês atual, preservando a contenção e toda a lógica funcional existente.
 
 ## Próximo passo
 
-Concluir CI do PR #208, integrar/publicar apenas com gates verdes e validar a nova grelha em dispositivo real.
+Validar visualmente a versão publicada no iPhone e confirmar o mesmo comportamento em Android/tablet/desktop, incluindo zoom e aumento de texto.
