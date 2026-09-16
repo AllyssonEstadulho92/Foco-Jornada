@@ -21,77 +21,61 @@ Em `main` estão integrados, entre outros:
 - hierarquia visual adaptativa da evolução mensal (PR #208);
 - painel avançado de leitura de férias (PR #209).
 
-## PR #209 — painel avançado de leitura de férias
+## PR #210 — simulação de períodos de férias
 
-Estado: **integrado, validado por CI e publicado**.
+**Estado:** em validação na branch `feat/vacation-period-planner`, PR #210 em draft. O primeiro conjunto de código passou **Qualidade #1143**; validar novamente o head final após a documentação antes de integrar. Não afirmar que está publicado antes de confirmar build e Pages.
 
-- PR #209 integrado em `main` no commit `8b7b6fc68c3330714b081865992de9adb5243d4c`;
-- **Qualidade #1140** passou integralmente no head final do PR;
-- **Qualidade #1141** passou integralmente após o merge em `main`;
-- **Publicar Foco & Jornada #248** concluiu com sucesso;
-- build publicado na raiz de `main` no commit `ac121c3f687f86149d90e1bd78c4788b8c86d0a6`;
-- **pages build and deployment #807** concluiu com sucesso para o build publicado.
+### Alteração em desenvolvimento
 
-### Objetivo entregue
+A rota existente `#/ferias` recebe o painel **Simula as próximas férias** entre os indicadores anuais e a evolução mensal. O utilizador escolhe início e fim de um período futuro no ano atual e obtém:
 
-Dar mais informação útil sem obrigar o utilizador a interpretar manualmente números dispersos. A nova camada usa a projeção pessoal já existente e não altera a referência laboral.
+- dias de calendário, dias úteis padrão (segunda–sexta) e dias de fim de semana;
+- dias úteis já registados no mesmo intervalo, sem desconto duplicado;
+- número de dias úteis adicionais que a simulação consumiria;
+- saldo pessoal estimado no início e fim do período;
+- previsão pessoal de 31 de dezembro antes e depois da simulação;
+- mensagens para datas inválidas, só fins de semana, intervalo já integralmente marcado ou previsão negativa;
+- lista dos próximos grupos de dias úteis futuros marcados, agrupando sexta e segunda sem contar sábado/domingo;
+- ligação ao mapa de turnos para o registo explícito, se o utilizador decidir avançar.
 
-### Funções entregues
+A simulação **não grava nem reserva férias**. Reutiliza o mesmo `calculateVacationBalance` para os saldos temporais, sem criar nova fórmula de acumulação ou campo persistido. O contador de 28 dias é projeção pessoal, não declaração de direito legal adquirido.
 
-A rota `#/ferias` passa a mostrar, além do saldo e da evolução mensal já existentes:
+### Código e documentação
 
-- progresso anual da meta pessoal em percentagem;
-- valor que ainda falta acumular até à meta anual;
-- próximo marco de acumulação em dias inteiros e data estimada pelo modelo mensal atual;
-- férias já gozadas, com separação entre dias detetados na app e dias introduzidos manualmente;
-- férias futuras planeadas;
-- total comprometido `gozadas + planeadas` e percentagem da meta pessoal;
-- previsão de saldo pessoal em 31 de dezembro;
-- número de fins de semana registados como férias e ignorados no desconto padrão;
-- próximo fecho mensal e respetivo marco acumulado;
-- falta de acumulação no mês atual e ritmo diário aproximado.
+- `src/domain/vacation/VacationPlanner.ts` — domínio puro de períodos, sobreposições e previsão;
+- `src/domain/vacation/VacationPlanner.test.ts` — datas, dias úteis, 24/08–06/09, sobreposições e projeções;
+- `src/presentation/pages/VacationPlannerPanel.tsx` — formulário, resultados e próximos períodos;
+- `src/styles/vacation-planner.css` e `.test.ts` — layout responsivo e regressão de acessibilidade;
+- `src/presentation/pages/VacationBalancePage.tsx` — montagem do painel com a configuração e os registos existentes;
+- `docs/VACATION-PLANNER.md` — semântica, limites e testes.
 
-### Regras de cálculo derivadas
+### Riscos e limites
 
-Nenhum novo evento é criado. Os indicadores são derivados em `VacationBalance` a partir dos dados já existentes.
-
-```text
-progressoAnual% = acumuladoVivo / metaAnual × 100
-faltaAnual = max(0, metaAnual - acumuladoVivo)
-comprometido = gozadas + planeadas
-previsaoFimAno = metaAnual + transitados + ajustes - comprometido
-```
-
-O próximo marco procura o próximo dia inteiro ainda não alcançado pela projeção e calcula a data em que o modelo `meta / 12` o cruza. Para uma meta de 28 dias, um acumulado entre 19 e 20 mostra **20 dias** como próximo marco.
-
-### Caso de regressão importante
-
-O intervalo 24/08/2026–06/09/2026 continua a produzir:
-
-- 14 datas civis registadas;
-- 10 dias úteis descontados;
-- 4 fins de semana ignorados;
-- projeção pessoal de **18 dias** em 31 de dezembro para meta 28, sem transitados, ajustes ou outras férias futuras.
+- apenas períodos futuros dentro do ano civil atual; passagem de ano exige política explícita;
+- regra atual exclui sábado/domingo, mas não infere feriados, descanso alternado ou CCT;
+- dias não registados noutras áreas não são tratados como efetivamente gozados;
+- valor antes/depois e previsão de dezembro continuam **projeções pessoais**, não aprovação de RH;
+- validação visual no iPhone, Android/tablet/desktop e teste de sincronização em dispositivos reais continuam pendentes.
 
 ### Segurança e compatibilidade
 
-- não há novo campo persistido;
-- não há migração IndexedDB;
-- não há novo endpoint, token, segredo, permissão ou dependência;
-- os indicadores derivam da configuração e dos registos já existentes no cofre cifrado;
-- o cálculo oficial/contratual permanece separado da projeção pessoal;
-- `vacation-insights.css` isola o novo painel visual sem modificar os estilos globais.
+Nenhuma alteração ao cofre cifrado, schema, autenticação, autorização, Worker, sincronização, API, dependências, segredos ou telemetria. O novo módulo não escreve dados.
 
-## Estado publicado anterior — PR #208
+## PR #209 — painel avançado de leitura de férias
 
-PR #208 está **integrado, validado por CI e publicado**.
+**Estado:** integrado, validado e publicado.
 
-- merge: `a41a0c3b9fdef1b0e5d67bc29ce6b453dbcbc4cf`;
-- Qualidade #1138 no head: sucesso;
-- Qualidade #1139 em `main`: sucesso;
-- Publicar Foco & Jornada #247: sucesso;
-- build publicado: `a5a17750ffa43f506c9feb5af78a167f3b1f0f5c`;
-- pages build and deployment #801: sucesso.
+- merge `8b7b6fc68c3330714b081865992de9adb5243d4c`;
+- Qualidade #1140 no head final e Qualidade #1141 após o merge: sucesso;
+- Publicar Foco & Jornada #248: sucesso;
+- build `ac121c3f687f86149d90e1bd78c4788b8c86d0a6`;
+- pages build and deployment #807: sucesso.
+
+Entrega: progresso anual da meta pessoal, dias em falta, próximo marco/data estimada, gozadas, planeadas, total comprometido, projeção para dezembro, fins de semana ignorados e resumo de fecho mensal. Os indicadores são derivados de `VacationBalance`; não existe novo estado persistido.
+
+## Estado anterior — PR #208
+
+Integrado/publicado; merge `a41a0c3b9fdef1b0e5d67bc29ce6b453dbcbc4cf`, Qualidade #1138/#1139, Publicar #247 e Pages #801 verdes, build `a5a17750ffa43f506c9feb5af78a167f3b1f0f5c`. A grelha de evolução mensal adaptou colunas à largura e conteve badges/textos.
 
 ## Regras funcionais atuais de férias
 
@@ -107,58 +91,38 @@ PR #208 está **integrado, validado por CI e publicado**.
 
 - meta anual configurável, 28 dias por defeito;
 - marcos exatos: março 7, junho 14, setembro 21, dezembro 28;
-- mês atual progride em tempo real pela fração do calendário já decorrida;
-- atualização normal enquanto a página está ativa: 60 segundos;
-- `focus` e `visibilitychange` reconciliam imediatamente o relógio atual;
-- não existe dependência de timers em background.
+- mês atual progride pela fração do calendário já decorrida;
+- a página atualiza a cada 60 segundos enquanto ativa, recalculando em `focus` e `visibilitychange`;
+- a PWA não promete execução contínua em background.
 
 ### Dias gozados/planeados
 
-- férias são agregadas do mapa de turnos, plano mensal e calculadora de horas;
+- férias vêm do mapa de turnos, plano mensal e calculadora de horas;
 - datas são deduplicadas;
-- segunda–sexta contam no regime padrão;
-- sábado/domingo não reduzem saldo;
-- 24/08/2026–06/09/2026 resulta em 10 dias contabilizados e 4 fins de semana ignorados.
+- segunda–sexta contam no regime padrão; sábado/domingo não reduzem saldo;
+- 24/08/2026–06/09/2026 = 14 dias civis, 10 dias úteis, quatro dias de fim de semana ignorados.
 
-Limite conhecido: feriados, descanso semanal diferente e escalas especiais ainda não são inferidos automaticamente.
+Feriados, descanso semanal diferente e escalas especiais ainda não são inferidos automaticamente.
 
 ## Qualidade, CI e dependências
 
-Stack atual:
+Stack: React 19, TypeScript 5.9, Vite 7, Vitest 5, Node 22 e npm 11.6.0 no CI.
 
-- React 19;
-- TypeScript 5.9;
-- Vite 7;
-- Vitest 5;
-- Node 22 no CI;
-- npm 11.6.0 fixado nos workflows.
-
-Gates obrigatórios:
-
-1. `npm audit --audit-level=high`;
-2. typecheck;
-3. lint;
-4. testes;
-5. build;
-6. Worker dry-run;
-7. smoke test Chromium;
-8. artefacto do build.
-
-O head final do PR #209 e o merge em `main` passaram integralmente todos estes gates.
+Gates obrigatórios: `npm audit --audit-level=high`, typecheck, lint, Vitest, build, Worker dry-run, smoke test Chromium e artefacto do build. O código inicial do PR #210 passou esses gates em Qualidade #1143; o head final deve voltar a passar antes do merge.
 
 ## Limitações e validações abertas
 
-1. Validar no iPhone real o painel avançado, a barra anual e a legibilidade dos novos indicadores.
-2. Validar Android/Chrome, tablet e desktop, incluindo zoom e aumento de texto.
-3. Confirmar atualização viva e reconciliação ao regressar à PWA em dispositivo real.
-4. Confirmar sincronização da configuração de férias entre telemóvel e computador.
-5. Avaliar calendário laboral para feriados e regimes de descanso diferentes antes de alterar a contagem padrão.
-6. Continuar validações físicas pendentes da automação de jornada e sincronização cross-device.
+1. Confirmar CI final do PR #210, integrar apenas após sucesso e verificar publicação/Pages.
+2. Validar visualmente o simulador e a lista de períodos em iPhone, Android, tablet e desktop, incluindo zoom e aumento de texto.
+3. Confirmar nos dispositivos reais a contagem 24/08–06/09 = dez dias e atualização viva ao regressar à PWA.
+4. Confirmar sincronização das configurações entre telemóvel e computador.
+5. Avaliar calendário laboral (feriados e descanso diferente) só com regras confirmadas.
+6. Continuar validação física da automação de jornada e sincronização cross-device.
 
 ## Última alteração
 
-PR #209 integrado e publicado: novo painel **O que tens, o que falta e o que vem a seguir**, com progresso anual, próximo marco, férias usadas/planeadas, fins de semana ignorados e previsão pessoal de fim do ano.
+PR #210 em validação: simulação de períodos futuros, saldos pessoais antes/depois e prevenção de desconto duplicado, sem mutações de dados.
 
 ## Próximo passo
 
-Validar a versão publicada no iPhone e depois confirmar Android/tablet/desktop. Qualquer nova função deverá reutilizar os mesmos cálculos e dados derivados, sem duplicar estado ou confundir projeção pessoal com direito laboral.
+Validar o head final do PR #210, integrar/publicar se todos os gates estiverem verdes e verificar em dispositivo real. Não introduzir marcação automática sem fluxo explícito e seguro.

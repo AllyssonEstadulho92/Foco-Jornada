@@ -8,6 +8,7 @@ import {
 import { secureStorage } from '../../security/secureStorage'
 import { toLocalDateKey } from '../../shared/utils/dateTime'
 import { useWorkHoursStore } from '../store/useWorkHoursStore'
+import { VacationPlannerPanel } from './VacationPlannerPanel'
 
 const VACATION_SETTINGS_KEY = 'foco-jornada-vacation-settings-v1'
 const SHIFT_MAP_PREFIX = 'foco-jornada-shift-map-v1-'
@@ -355,6 +356,16 @@ export function VacationBalancePage() {
           {' '}com <strong>{preciseDaysLabel(balance.yearEndProjectedBalanceDays)}</strong> depois dos dias já gozados e planeados.
         </p>
       </section>
+
+      <VacationPlannerPanel
+        today={today}
+        asOfDayProgress={localDayProgress(now)}
+        settings={settings}
+        recordedVacationDates={recordedVacationDates}
+        formatDate={formatDate}
+        daysLabel={daysLabel}
+        preciseDaysLabel={preciseDaysLabel}
+      />
 
       <section className="vacationPanel vacationAccrualPanel" aria-labelledby="vacation-accrual-title">
         <div className="vacationPanelHeader">
