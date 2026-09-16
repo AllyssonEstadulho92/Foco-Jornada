@@ -1,0 +1,246 @@
+.vacationPlannerPanel {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.vacationPlannerPanel,
+.vacationPlannerPanel * {
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+.vacationPlannerPanel .vacationPanelHeader {
+  flex-wrap: wrap;
+}
+
+.vacationPlannerPanel .vacationPanelHeader > div {
+  flex: 1 1 16rem;
+}
+
+.vacationPlannerPanel .vacationPanelHeader > strong {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.vacationPlannerIntro,
+.vacationPlannerUpcoming > p,
+.vacationPlannerFooter > span {
+  margin: 0;
+  color: var(--muted);
+  line-height: var(--line-height-relaxed);
+  overflow-wrap: anywhere;
+}
+
+.vacationPlannerForm {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  gap: var(--space-3);
+  margin: var(--space-4) 0;
+}
+
+.vacationPlannerForm label {
+  display: grid;
+  gap: var(--space-2);
+  color: var(--text);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+}
+
+.vacationPlannerForm input {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-height: 44px;
+  padding: var(--space-3);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--text);
+  color-scheme: light dark;
+  font: inherit;
+}
+
+.vacationPlannerForm input:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.vacationPlannerResults {
+  margin: var(--space-4) 0;
+}
+
+.vacationPlannerGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+  gap: var(--space-3);
+}
+
+.vacationPlannerResult {
+  display: grid;
+  align-content: start;
+  gap: var(--space-2);
+  min-width: 0;
+  max-width: 100%;
+  padding: var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+}
+
+.vacationPlannerResult span {
+  color: var(--muted);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+}
+
+.vacationPlannerResult strong {
+  color: var(--text);
+  font-size: clamp(1.2rem, 2.4vw, 1.8rem);
+  font-variant-numeric: tabular-nums;
+  line-height: var(--line-height-tight);
+}
+
+.vacationPlannerResult small {
+  color: var(--muted);
+  line-height: var(--line-height-relaxed);
+}
+
+.vacationPlannerResult span,
+.vacationPlannerResult strong,
+.vacationPlannerResult small {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.vacationPlannerResultAccent,
+.vacationPlannerYearEnd {
+  border-color: color-mix(in srgb, var(--primary) 35%, var(--line));
+  background: color-mix(in srgb, var(--primary-soft) 50%, var(--surface));
+}
+
+.vacationPlannerNegative strong {
+  color: var(--danger);
+}
+
+.vacationPlannerNotice {
+  margin: var(--space-3) 0;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  color: var(--text);
+  line-height: var(--line-height-relaxed);
+  overflow-wrap: anywhere;
+}
+
+.vacationPlannerWarning {
+  border-color: var(--danger);
+}
+
+.vacationPlannerUpcoming {
+  display: grid;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--line);
+}
+
+.vacationPlannerUpcoming h3 {
+  margin: 0;
+  color: var(--text);
+  font-size: var(--text-md);
+}
+
+.vacationPlannerPeriodList {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.vacationPlannerPeriodList li {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+}
+
+.vacationPlannerPeriodList li span,
+.vacationPlannerPeriodList li strong {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.vacationPlannerPeriodList li strong {
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.vacationPlannerFooter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.vacationPlannerFooter > span {
+  flex: 1 1 18rem;
+  font-size: var(--text-sm);
+}
+
+.vacationPlannerFooter a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  max-width: 100%;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-md);
+  color: var(--text);
+  font-weight: var(--weight-semibold);
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 560px) {
+  .vacationPlannerForm,
+  .vacationPlannerGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .vacationPlannerPanel .vacationPanelHeader > strong {
+    flex-basis: 100%;
+  }
+}
+
+@media (forced-colors: active) {
+  .vacationPlannerResult,
+  .vacationPlannerResultAccent,
+  .vacationPlannerYearEnd,
+  .vacationPlannerNotice,
+  .vacationPlannerPeriodList li {
+    border-color: CanvasText;
+    background: Canvas;
+  }
+
+  .vacationPlannerNegative strong {
+    color: CanvasText;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vacationPlannerPanel * {
+    scroll-behavior: auto;
+    transition: none;
+  }
+}
