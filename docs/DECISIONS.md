@@ -1,6 +1,6 @@
 # Decisões Técnicas
 
-Atualizado em: 2026-09-15
+Atualizado em: 2026-09-16
 
 ## D-001 — Manter o menu `···` além do gesto de deslize
 
@@ -210,43 +210,50 @@ Atualizado em: 2026-09-15
 
 **Decisão:** preservar `monthlyAccruedDays` como acumulado de meses fechados e acrescentar uma camada derivada de evolução intramensal para a projeção pessoal.
 
-A progressão viva usa:
-
 `progressoDoMes = (diaDoMes - 1 + fracaoDoDiaLocal) / diasNoMes`
 
 `acumuladoVivo = metaAnual × (mesesAnteriores + progressoDoMes) / 12`
 
-O relógio da página é efémero. `VacationBalancePage` atualiza a referência temporal a cada minuto enquanto está ativa e também em `focus`/`visibilitychange`. Se a PWA for suspensa, não tenta reproduzir ticks perdidos; recalcula pelo instante atual quando volta ao primeiro plano.
+O relógio é efémero. A página atualiza a cada minuto e também em `focus`/`visibilitychange`; após suspensão recalcula pelo instante atual.
 
-**Motivo:** o utilizador quer perceber a evolução do mês atual em vez de ver o valor parado até ao último dia, sem perder a precisão dos marcos mensais nem confundir a projeção pessoal com direito laboral.
+**Motivo:** mostrar evolução do mês atual sem perder precisão dos marcos mensais nem confundir projeção pessoal com direito laboral.
 
-**Precisão:** marcos fechados mantêm duas casas de apresentação; valores vivos podem mostrar até quatro. O valor vivo é sempre derivado diretamente da meta anual e da fração temporal atual, nunca do último valor arredondado mostrado.
+**Persistência e segurança:** valores vivos não são persistidos/sincronizados e não criam endpoint, schema, token, segredo, permissão ou dependência.
 
-**Persistência e segurança:** nenhum valor vivo, relógio ou progresso temporal é persistido/sincronizado. Não há novo endpoint, schema, token, segredo, permissão, dependência ou mecanismo de autenticação.
-
-**Consequências:**
-
-- mobile e desktop calculam o valor vivo a partir da respetiva hora local;
-- a configuração continua a sincronizar pelo cofre existente;
-- os saldos vivos reutilizam a mesma deduplicação e filtro de dias úteis das férias registadas;
-- a referência laboral definida em D-022 permanece inalterada;
-- validação física de timezone/suspensão da PWA continua necessária antes de encerrar a tarefa operacionalmente.
-
-## D-026 — Conteúdo dos cartões mensais deve refluír dentro do próprio cartão
+## D-026 — Conteúdo dos cartões mensais deve refluir dentro do próprio cartão
 
 **Estado:** aceite, integrada no PR #207 e publicada.
 
-**Decisão:** a grelha de evolução mensal não deve resolver falta de espaço deixando badges/textos ultrapassarem a borda nem escondendo informação com reticências. Todos os cartões usam contenção explícita de flex/grid (`min-width: 0`, `max-width: 100%`) e permitem quebra de linha segura no cabeçalho, estado, valor e descrições.
+**Decisão:** a grelha mensal não resolve falta de espaço deixando badges/textos ultrapassarem a borda nem escondendo informação com reticências. Usa contenção explícita (`min-width: 0`, `max-width: 100%`), quebra segura e barra limitada a 100%.
 
-O badge de estado deixa de usar `white-space: nowrap`. Em ecrãs estreitos, o layout passa progressivamente de 4 para 3, 2 e finalmente 1 coluna; abaixo de 520 px o cabeçalho do cartão organiza mês e estado em coluna.
+**Motivo:** a captura real mostrou setembro com `Em curso · xx%` fora do cartão.
 
-**Motivo:** a captura real mostrou setembro com `Em curso · xx%` a sair visualmente da secção. Cortar o conteúdo ou esconder a percentagem resolveria apenas o sintoma; o comportamento correto é reflow responsivo mantendo toda a informação legível.
+**Acessibilidade:** `forced-colors` e `prefers-reduced-motion` permanecem ativos.
 
-**Acessibilidade:** `forced-colors` e `prefers-reduced-motion` permanecem ativos. A correção não depende de hover, não reduz informação semântica e suporta zoom/aumento de texto melhor do que `nowrap`/ellipsis.
+## D-027 — A grelha mensal deve adaptar a quantidade de colunas ao espaço real
 
-**Consequências:**
+**Estado:** proposta no PR #208; integração depende dos quality gates.
 
-- a correção é exclusivamente de apresentação;
-- cálculos de férias e tempo real permanecem inalterados;
-- não há alteração de persistência, API, autenticação, sincronização ou dependências;
-- foi adicionado teste CSS de regressão para impedir o regresso de nowrap/ellipsis e ausência de limites de largura.
+**Decisão:** depois de corrigido o overflow, a grelha mensal passa a usar `auto-fit/minmax` em vez de depender apenas de breakpoints rígidos. O cartão mensal mantém uma largura mínima confortável no desktop/tablet e cai naturalmente para menos colunas à medida que o espaço diminui.
+
+A regra principal é:
+
+`repeat(auto-fit, minmax(min(100%, 15rem), 1fr))`
+
+O resumo vivo usa a mesma estratégia com base mínima de `13rem`.
+
+**Hierarquia visual:**
+
+- mês + estado formam o cabeçalho;
+- valor acumulado é o elemento tipográfico dominante;
+- progresso mantém posição e largura previsíveis;
+- texto auxiliar permanece secundário;
+- mês atual recebe destaque estrutural por borda superior/superfície/valor;
+- concluídos e futuros continuam visualmente distinguíveis;
+- no mobile, cabeçalho passa para uma coluna e a altura mínima do desktop é removida.
+
+**Motivo:** apenas impedir overflow não garante boa leitura. A secção deve permanecer equilibrada em larguras intermédias, zoom e aumento de texto, sem comprimir excessivamente os cartões.
+
+**Acessibilidade e compatibilidade:** não se remove informação, não se depende de hover e continuam ativos `forced-colors` e `prefers-reduced-motion`.
+
+**Segurança/dados:** alteração exclusivamente visual; não modifica domínio, persistência, sincronização, autenticação, API, dependências ou dados pessoais.
