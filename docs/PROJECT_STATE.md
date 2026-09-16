@@ -18,19 +18,27 @@ Em `main` estão integrados, entre outros:
 - contagem padrão de férias em dias úteis segunda–sexta (PR #205);
 - evolução intramensal em tempo real (PR #206);
 - contenção responsiva dos cartões mensais (PR #207);
-- hierarquia visual adaptativa da evolução mensal (PR #208).
+- hierarquia visual adaptativa da evolução mensal (PR #208);
+- painel avançado de leitura de férias (PR #209).
 
 ## PR #209 — painel avançado de leitura de férias
 
-Estado: **em validação** na branch `feat/vacation-insights-dashboard`.
+Estado: **integrado, validado por CI e publicado**.
 
-### Objetivo
+- PR #209 integrado em `main` no commit `8b7b6fc68c3330714b081865992de9adb5243d4c`;
+- **Qualidade #1140** passou integralmente no head final do PR;
+- **Qualidade #1141** passou integralmente após o merge em `main`;
+- **Publicar Foco & Jornada #248** concluiu com sucesso;
+- build publicado na raiz de `main` no commit `ac121c3f687f86149d90e1bd78c4788b8c86d0a6`;
+- **pages build and deployment #807** concluiu com sucesso para o build publicado.
 
-Dar mais informação útil sem obrigar o utilizador a interpretar manualmente números dispersos. A nova camada continua a usar a projeção pessoal existente e não altera a referência laboral.
+### Objetivo entregue
 
-### Funções implementadas
+Dar mais informação útil sem obrigar o utilizador a interpretar manualmente números dispersos. A nova camada usa a projeção pessoal já existente e não altera a referência laboral.
 
-A rota `#/ferias` passa a mostrar, além do saldo e evolução mensal já existentes:
+### Funções entregues
+
+A rota `#/ferias` passa a mostrar, além do saldo e da evolução mensal já existentes:
 
 - progresso anual da meta pessoal em percentagem;
 - valor que ainda falta acumular até à meta anual;
@@ -43,7 +51,7 @@ A rota `#/ferias` passa a mostrar, além do saldo e evolução mensal já existe
 - próximo fecho mensal e respetivo marco acumulado;
 - falta de acumulação no mês atual e ritmo diário aproximado.
 
-### Regras de cálculo novas, apenas derivadas
+### Regras de cálculo derivadas
 
 Nenhum novo evento é criado. Os indicadores são derivados em `VacationBalance` a partir dos dados já existentes.
 
@@ -54,25 +62,25 @@ comprometido = gozadas + planeadas
 previsaoFimAno = metaAnual + transitados + ajustes - comprometido
 ```
 
-O próximo marco procura o próximo dia inteiro ainda não alcançado pela projeção e calcula a data em que o modelo `meta / 12` o cruza. Para uma meta de 28 dias, por exemplo, um acumulado entre 19 e 20 mostra **20 dias** como próximo marco.
+O próximo marco procura o próximo dia inteiro ainda não alcançado pela projeção e calcula a data em que o modelo `meta / 12` o cruza. Para uma meta de 28 dias, um acumulado entre 19 e 20 mostra **20 dias** como próximo marco.
+
+### Caso de regressão importante
+
+O intervalo 24/08/2026–06/09/2026 continua a produzir:
+
+- 14 datas civis registadas;
+- 10 dias úteis descontados;
+- 4 fins de semana ignorados;
+- projeção pessoal de **18 dias** em 31 de dezembro para meta 28, sem transitados, ajustes ou outras férias futuras.
 
 ### Segurança e compatibilidade
 
 - não há novo campo persistido;
 - não há migração IndexedDB;
 - não há novo endpoint, token, segredo, permissão ou dependência;
-- os novos indicadores seguem o mesmo cofre cifrado porque derivam da configuração e dos registos já existentes;
+- os indicadores derivam da configuração e dos registos já existentes no cofre cifrado;
 - o cálculo oficial/contratual permanece separado da projeção pessoal;
 - `vacation-insights.css` isola o novo painel visual sem modificar os estilos globais.
-
-### Testes adicionados
-
-- progresso anual e falta até à meta;
-- próximo marco e respetiva data;
-- projeção para 31 de dezembro depois de férias gozadas/planeadas;
-- caso real de 24/08/2026–06/09/2026 mantendo 10 dias úteis e projeção final de 18 dias com meta 28 sem outros ajustes;
-- estado final quando a meta anual já foi atingida;
-- regressão CSS para grelha fluida, contenção, mobile, `forced-colors` e `prefers-reduced-motion`.
 
 ## Estado publicado anterior — PR #208
 
@@ -136,20 +144,21 @@ Gates obrigatórios:
 7. smoke test Chromium;
 8. artefacto do build.
 
+O head final do PR #209 e o merge em `main` passaram integralmente todos estes gates.
+
 ## Limitações e validações abertas
 
-1. Concluir os gates do head final do PR #209 antes de integrar.
-2. Validar no iPhone real o painel avançado e a legibilidade dos novos indicadores.
-3. Validar Android/Chrome, tablet e desktop, incluindo zoom e aumento de texto.
-4. Confirmar atualização viva e reconciliação ao regressar à PWA em dispositivo real.
-5. Confirmar sincronização da configuração de férias entre telemóvel e computador.
-6. Avaliar calendário laboral para feriados e regimes de descanso diferentes antes de alterar a contagem padrão.
-7. Continuar validações físicas pendentes da automação de jornada e sincronização cross-device.
+1. Validar no iPhone real o painel avançado, a barra anual e a legibilidade dos novos indicadores.
+2. Validar Android/Chrome, tablet e desktop, incluindo zoom e aumento de texto.
+3. Confirmar atualização viva e reconciliação ao regressar à PWA em dispositivo real.
+4. Confirmar sincronização da configuração de férias entre telemóvel e computador.
+5. Avaliar calendário laboral para feriados e regimes de descanso diferentes antes de alterar a contagem padrão.
+6. Continuar validações físicas pendentes da automação de jornada e sincronização cross-device.
 
 ## Última alteração
 
-PR #209 em validação: novo painel **O que tens, o que falta e o que vem a seguir**, com indicadores derivados para progresso anual, próximos marcos, férias usadas/planeadas e previsão de fim do ano.
+PR #209 integrado e publicado: novo painel **O que tens, o que falta e o que vem a seguir**, com progresso anual, próximo marco, férias usadas/planeadas, fins de semana ignorados e previsão pessoal de fim do ano.
 
 ## Próximo passo
 
-Concluir CI do PR #209, integrar/publicar apenas com todos os gates verdes e validar o novo painel num dispositivo real.
+Validar a versão publicada no iPhone e depois confirmar Android/tablet/desktop. Qualquer nova função deverá reutilizar os mesmos cálculos e dados derivados, sem duplicar estado ou confundir projeção pessoal com direito laboral.
