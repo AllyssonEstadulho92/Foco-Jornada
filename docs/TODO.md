@@ -9,8 +9,10 @@ Atualizado em: 2026-09-16
 - [x] Usar quebra segura, duas colunas limitadas e passagem para uma coluna até 820px.
 - [x] Manter sugestões, simulador, cálculos, registos e segurança intactos.
 - [x] Adicionar teste estrutural de regressão e `docs/VACATION-PLANNER-HEADER.md`.
-- [ ] Confirmar Quality Gates do head final, integrar PR #213 e confirmar CI em `main`.
-- [ ] Confirmar publicação e Pages; verificar visualmente no iPhone real e com zoom/texto ampliado.
+- [x] Confirmar Qualidade #1172 no head final e #1173 após merge em `main`, incluindo audit, tipos, lint, testes, build, Worker e smoke Chromium.
+- [x] Integrar PR #213: merge `88099b5200b371081822e19197d15f723a8c3f14`.
+- [x] Confirmar Publicar Foco & Jornada #252, build `ddbdced0c2b380e546a8e0da29dbe5819a74d4f8` e GitHub Pages #832 com sucesso.
+- [ ] Verificar visualmente o cabeçalho no iPhone real, com zoom/texto ampliado e nova captura; comparar Android/tablet/desktop.
 
 ## P0 — Separação do planeamento e refinamento de layout (PR #212)
 
@@ -74,6 +76,7 @@ Atualizado em: 2026-09-16
 - [x] PR #210 — simulação futura sem desconto duplicado.
 - [x] PR #211 — sugestões por critérios, comparação de meses e calendário.
 - [x] PR #212 — vista de planeamento separada e layout equilibrado, Quality #1165 e Pages #826 verdes.
+- [x] PR #213 — cabeçalho compacto e contido, Quality #1173 e Pages #832 verdes.
 
 ## P0 — Automação de jornada e pausas
 
