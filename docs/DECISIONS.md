@@ -257,3 +257,40 @@ O resumo vivo usa a mesma estratégia com base mínima de `13rem`.
 **Acessibilidade e compatibilidade:** não se remove informação, não se depende de hover e continuam ativos `forced-colors` e `prefers-reduced-motion`.
 
 **Segurança/dados:** alteração exclusivamente visual; não modifica domínio, persistência, sincronização, autenticação, API, dependências ou dados pessoais.
+
+## D-028 — Indicadores avançados de férias são derivados e não criam novo estado persistido
+
+**Estado:** proposta no PR #209; integração depende dos quality gates.
+
+**Decisão:** acrescentar um painel de leitura rápida com informação derivada da projeção pessoal já existente, sem gravar percentagens, previsões ou marcos futuros no cofre.
+
+Indicadores suportados:
+
+- progresso anual da meta pessoal;
+- dias ainda por acumular;
+- próximo marco inteiro e data estimada;
+- gozadas, planeadas e total comprometido;
+- percentagem da meta pessoal já comprometida;
+- previsão do saldo pessoal em 31 de dezembro;
+- fins de semana ignorados pelo filtro padrão;
+- próximo fecho mensal, falta no mês e ritmo diário.
+
+**Fórmulas principais:**
+
+`progressoAnual = acumuladoVivo / metaAnual`
+
+`faltaAnual = max(0, metaAnual - acumuladoVivo)`
+
+`comprometido = gozadas + planeadas`
+
+`previsaoFimAno = metaAnual + transitados + ajustes - comprometido`
+
+O próximo marco é `min(metaAnual, floor(acumuladoVivo) + 1)` enquanto a meta não estiver atingida. A data é obtida pelo mesmo modelo de `meta / 12`, localizando em que mês/fração mensal esse patamar é cruzado.
+
+**Motivo:** o utilizador quer saber não apenas quanto acumulou, mas também quanto falta, o que já consumiu/planeou, qual o próximo patamar e qual a projeção no fim do ano.
+
+**Separação semântica:** estes indicadores continuam a ser uma projeção pessoal. Não substituem a referência laboral, RH, contrato ou CCT e não devem ser apresentados como aquisição legal diária de férias.
+
+**Persistência e segurança:** nenhum novo campo persistido, tabela, endpoint, token, segredo, permissão, dependência ou telemetria. O painel usa apenas valores já disponíveis em `VacationBalance` e dados existentes no cofre cifrado.
+
+**UI/UX:** o painel usa `vacation-insights.css`, grelha `auto-fit/minmax`, barra anual acessível, contenção responsiva, `forced-colors` e `prefers-reduced-motion`.
