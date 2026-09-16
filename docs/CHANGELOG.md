@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-09-16 — cabeçalho compacto do planeamento (PR #213)
+
+- Corrigido o cabeçalho de `#/ferias/planeamento` após captura real com «Pré-visualização…» cortada e grande espaço branco: rótulo do ano, título, descrição breve e badge informativa ficam dentro de um `header.vacationPlannerHero` com largura limitada.
+- Grelha do cabeçalho com coluna de texto flexível e badge até 12,5rem; abaixo de 820px a badge ocupa linha própria. Texto pode quebrar sem ultrapassar a borda; tipografia e padding fluidos.
+- Painel da vista dedicada usa coluna flex e altura intrínseca em vez de grelha com primeiro filho potencialmente esticado. Sem alterar sugestões, calendário, simulação, dias úteis, meta 28 ou qualquer registo.
+- `vacation-workspace.test.ts` reforçado para proteger estrutura, badge, limites e disposição; detalhes em `VACATION-PLANNER-HEADER.md`. Sem novos schema, dependências, backend, endpoint, permissão, segredo, telemetria ou alterações ao cofre/sync.
+- Validação de qualidade do head final, integração, publicação e verificação visual no iPhone ainda pendentes nesta revisão. Testes automatizados não substituem a captura física.
+
 ## 2026-09-16 — áreas de férias separadas e layout fluido (PR #212)
 
 ### Interface e navegação
