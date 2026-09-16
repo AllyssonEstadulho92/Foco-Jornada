@@ -94,12 +94,14 @@ Atualizado em: 2026-09-16
 
 ## D-031 — Separar o planeamento visualmente da leitura mensal numa rota própria
 
-**Estado:** proposta no PR #212; integrar só após gates finais.
+**Estado:** aceite, integrada no PR #212 e publicada.
 
-**Decisão:** preservar `#/ferias` para leitura de evolução mês a mês (hero → métricas → meses → indicadores → configurações/referência) e criar `#/ferias/planeamento` exclusivamente para sugestões, calendário e simulador. Navegação entre vistas por `NavLink` com estado ativo/foco visível; manter o único `VacationBalancePage`/agregação, sem alterar fórmula/dados. CSS de âmbito limitado decide a região visível em cada rota e controla largura máxima de 80rem, espaçamento `clamp`, grelhas fluidas e contenção nos cartões.
+**Decisão:** preservar `#/ferias` para leitura da evolução mês a mês (hero → métricas → meses → indicadores → configurações/referência) e criar `#/ferias/planeamento` exclusivamente para sugestões, calendário e simulador. Navegação entre vistas por `NavLink` com estado ativo/foco visível; manter o único `VacationBalancePage`/agregação, sem alterar fórmula/dados. CSS de âmbito limitado decide a região visível em cada rota e controla largura máxima de 80rem, espaçamento `clamp`, grelhas fluidas e contenção nos cartões.
 
 **Motivo:** o planeamento interrompia a leitura do saldo e havia excesso de elementos comprimidos na mesma página. A nova organização distingue consulta, interpretação e ação futura sem exigir migração de dados nem duplicar cálculos.
 
 **Trade-off documentado:** a vista não apresentada fica oculta com `display:none`, mas os componentes ainda são montados em React. Um refactor posterior poderá extrair hook/componentes comuns e desmontar regiões não ativas, mediante testes de regressão. Não afirmar que a nova rota elimina computação oculta.
 
-**Compatibilidade/segurança:** link antigo preservado, novas rotas só de apresentação; configurações e registos continuam no cofre cifrado. Sem novos endpoints, permissões, tokens, segredos, migrações, dependências ou telemetria. Preservar `forced-colors`, `prefers-reduced-motion`, labels e testes no iPhone/Android/desktop. Detalhes em `docs/VACATION-WORKSPACE.md`.
+**Compatibilidade/segurança:** link antigo preservado, novas rotas só de apresentação; configurações e registos continuam no cofre cifrado. Sem novos endpoints, permissões, tokens, segredos, migrações, dependências ou telemetria. Mantidos `forced-colors`, `prefers-reduced-motion`, labels e testes estruturais; testes físicos no iPhone/Android/desktop ainda pendentes. Detalhes em `docs/VACATION-WORKSPACE.md`.
+
+**Entrega:** Qualidade #1158 (código inicial), #1164 (head final) e #1165 em `main` concluídas com sucesso; PR #212 integrado `732bfea2e518a5651a71bc347fa9782f574584b0`, Publicar Foco & Jornada #251, GitHub Pages #826 e build `2ff90745e506e48009347e10e19e90cea2ad5322` confirmados com sucesso.
