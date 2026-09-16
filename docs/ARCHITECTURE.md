@@ -57,11 +57,17 @@ A separação atual é **de apresentação por CSS**: `display:none` oculta a zo
 
 Layout `vacation-workspace.css`: contentor fluido `min(100%, 80rem)`, gaps/padding `clamp`, cartões e textos com `min-width:0`, `max-width:100%`, `overflow-wrap:anywhere`, grelha de métricas `auto-fit/minmax(min(100%,15rem),1fr)`, navegação 2→1 colunas até 560px. Planeamento recebe cabeçalho autónomo, grelhas fluidas, respiro e sem borda/padding duplicados do painel externo. `focus-visible`, `forced-colors` e `prefers-reduced-motion`. Mais detalhes em `docs/VACATION-WORKSPACE.md`.
 
+## Cabeçalho de planeamento de altura intrínseca — PR #213
+
+A captura física revelou a badge cortada à direita e um cabeçalho demasiado alto. `VacationPlannerPanel` usa agora `header.vacationPlannerHero` em vez da classe transversal `vacationPanelHeader`, com rótulo, h2, texto curto e badge informativa. Em `vacation-planner.css`, a grelha limita a segunda coluna a 12,5rem e usa `minmax(0, 1fr)` para o texto; até 820px fica uma coluna. O conteúdo quebra dentro das caixas e o cabeçalho tem altura automática, alinhamento ao topo e linhas `min-content`.
+
+Para evitar o esticamento do primeiro filho observado na vista dedicada, `.vacationWorkspace--planning .vacationPage > .vacationPlannerPanel` substitui o layout de grelha do PR #212 por coluna flex de altura intrínseca e o cabeçalho tem `flex: 0 0 auto`. O cálculo e os outros cartões não mudam. Teste de regressão estrutural em `vacation-workspace.test.ts`; especificação `docs/VACATION-PLANNER-HEADER.md`. Validar visualmente após publicação num iPhone real: CI não comprova geometria de um dispositivo específico.
+
 ## Persistência e fronteira de segurança
 
 `foco-jornada-security-v1`: perfil/KDF/chaves/metadados sync. `foco-jornada-vault-v1`: `EncryptedVaultRecord` cifrado. Configuração de férias em `secureStorage`, chave `foco-jornada-vacation-settings-v1`, campos `employmentStartDate`, `annualEntitlementDays`, `monthlyAccrualTargetDays`, `carriedDays`, `manualTakenDays`, `adjustmentDays`.
 
-PR #210/#211/#212 não acrescentam campos, migrações, férias artificiais nem alterações ao cofre. Filtros de sugestões são estado React efémero. PIN, palavra-passe, código recuperação e dataKey original não são enviados ao Worker; backend recebe cofre cifrado/metadados. Nenhum HTML não confiável é injetado no planeador; PR #212 não acrescenta endpoint, token, segredo, permissão, dependência, telemetria ou mutação.
+PR #210/#211/#212/#213 não acrescentam campos, migrações, férias artificiais nem alterações ao cofre. Filtros de sugestões são estado React efémero. PIN, palavra-passe, código recuperação e dataKey original não são enviados ao Worker; backend recebe cofre cifrado/metadados. Nenhum HTML não confiável é injetado no planeador; PR #213 não acrescenta endpoint, token, segredo, permissão, dependência, telemetria ou mutação.
 
 ## Fontes e cálculo de férias
 
@@ -109,4 +115,4 @@ Indicadores PR #209: `annualAccrualProgressPercent`, `annualAccrualRemainingDays
 
 ## Qualidade
 
-Workflow `Qualidade`: Node 22/npm 11.6.0, `npm audit --audit-level=high`, typecheck, lint, Vitest, build, Worker dry-run, smoke Chromium e artefacto. Head final tem de estar verde antes de integrar. PR #212 acrescenta `vacation-workspace.test.ts`; validação física real ainda pendente.
+Workflow `Qualidade`: Node 22/npm 11.6.0, `npm audit --audit-level=high`, typecheck, lint, Vitest, build, Worker dry-run, smoke Chromium e artefacto. Head final tem de estar verde antes de integrar. PR #213 alarga `vacation-workspace.test.ts`; validação física real ainda pendente.
