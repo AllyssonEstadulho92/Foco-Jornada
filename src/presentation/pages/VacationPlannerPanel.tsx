@@ -50,13 +50,14 @@ export function VacationPlannerPanel({
 
   return (
     <section className="vacationPanel vacationPlannerPanel" aria-labelledby="vacation-planner-title">
-      <div className="vacationPanelHeader">
-        <div>
-          <span>PLANEAMENTO · {today.slice(0, 4)}</span>
+      <header className="vacationPlannerHero">
+        <div className="vacationPlannerHeroCopy">
+          <span className="vacationPlannerEyebrow">PLANEAMENTO · {today.slice(0, 4)}</span>
           <h2 id="vacation-planner-title">Planeia as próximas férias</h2>
+          <p>Compara períodos, consulta o saldo previsto e simula as datas antes de as marcares.</p>
         </div>
-        <strong>Pré-visualização sem guardar</strong>
-      </div>
+        <span className="vacationPlannerPreview">Pré-visualização · sem guardar</span>
+      </header>
 
       <VacationSuggestionsPanel
         today={today}
