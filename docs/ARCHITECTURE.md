@@ -4,25 +4,23 @@ Atualizado em: 2026-09-16
 
 ## Visão geral
 
-O **Foco Jornada** é uma única PWA responsiva. Telemóvel, tablet e computador usam o mesmo bundle React/TypeScript, as mesmas rotas, regras de domínio e persistência. As diferenças entre breakpoints são de apresentação e navegação, não de regra de negócio.
+O **Foco Jornada** é uma única PWA responsiva. Telemóvel, tablet e computador usam o mesmo bundle React/TypeScript, as mesmas rotas, regras de domínio e persistência. As diferenças de breakpoints são visuais, não de regra de negócio.
 
 ```text
 GitHub Pages
   └─ React 19 + TypeScript + Vite
        ├─ Router / AppShell responsivo
        ├─ Presentation
-       │    ├─ Today / jornada
-       │    ├─ Foco / atividades
-       │    ├─ Turnos / horas
+       │    ├─ Today / jornada, Foco / atividades, Turnos / horas
        │    ├─ Férias
        │    │    ├─ resumo vivo e indicadores
-       │    │    ├─ sugestão de períodos (PR #211)
-       │    │    ├─ simulação de períodos futuros (PR #210)
+       │    │    ├─ sugestões de períodos (PR #211)
+       │    │    ├─ simulação de períodos (PR #210)
        │    │    └─ evolução mensal
        │    └─ Definições
        ├─ Application: casos de uso / reconciliações
        ├─ Domain
-       │    ├─ VacationBalance: direito configurado e projeção pessoal
+       │    ├─ VacationBalance: referência laboral e projeção pessoal
        │    ├─ VacationPlanner: simulação pura
        │    └─ VacationSuggestions: opções por critério, sem escrita
        └─ Persistência cifrada
@@ -33,42 +31,35 @@ GitHub Pages
 
 ## Stack confirmada
 
-React 19, TypeScript 5.9, Vite 7, React Router, IndexedDB/Dexie, cofre cifrado AES-GCM, Zustand onde necessário, Vitest 5, GitHub Pages, Cloudflare Worker/Durable Objects; Node 22 e npm 11.6.0 nos workflows.
+React 19, TypeScript 5.9, Vite 7, React Router, IndexedDB/Dexie, cofre AES-GCM, Zustand onde necessário, Vitest 5, GitHub Pages, Cloudflare Worker/Durable Objects; Node 22 e npm 11.6.0 em CI.
 
 ## Camadas
 
 ### Presentation
 
-Componentes relevantes: `src/presentation/layouts/AppShell.tsx`, `src/presentation/pages/TodayReferencePage.tsx`, `FocusPage.tsx`, `ActivitiesPage.tsx`, `ShiftMapPage.tsx`, `WorkHoursCalculatorPage.tsx`, `VacationBalancePage.tsx`, `VacationPlannerPanel.tsx`, `VacationSuggestionsPanel.tsx`, `SettingsReferencePage.tsx` e `src/presentation/providers/AppServicesProvider.tsx`.
+Componentes: `src/presentation/layouts/AppShell.tsx`, páginas `TodayReferencePage.tsx`, `FocusPage.tsx`, `ActivitiesPage.tsx`, `ShiftMapPage.tsx`, `WorkHoursCalculatorPage.tsx`, `VacationBalancePage.tsx`, `VacationPlannerPanel.tsx`, `VacationSuggestionsPanel.tsx`, `SettingsReferencePage.tsx` e `src/presentation/providers/AppServicesProvider.tsx`.
 
-A página de férias usa `src/styles/vacation.css` (base), `vacation-accrual.css` (grelha mensal), `vacation-insights.css` (indicadores), `vacation-planner.css` (simulador) e `vacation-suggestions.css` (protótipo de sugestões, isolado). Os testes `vacation-card-containment.test.ts`, `vacation-insights.test.ts`, `vacation-planner.test.ts` e `vacation-suggestions.test.ts` protegem estruturas visuais. Indicadores e simulações não guardam snapshots de progresso, datas estimadas nem períodos novos.
+Férias: `src/styles/vacation.css` (base), `vacation-accrual.css` (grelha mensal), `vacation-insights.css` (indicadores), `vacation-planner.css` (simulador) e `vacation-suggestions.css` (sugestões isoladas). Testes `vacation-card-containment.test.ts`, `vacation-insights.test.ts`, `vacation-planner.test.ts` e `vacation-suggestions.test.ts` protegem elementos estruturais visuais. Não se guardam snapshots derivados nem cenários novos.
 
 ### Application
 
-Coordena casos de uso e repositories, sem regras visuais: entrada/saída, pausas, foco/atividades e `reconcileScheduledWorkday` com base no `WorkSchedule`. A página de férias agrega as fontes existentes e envia datas/configuração normalizadas a `calculateVacationBalance`. O planeador e o painel de sugestões recebem **o mesmo conjunto** por props, sem reler ou duplicar a agregação. O painel de sugestões entrega um par início/fim ao formulário do simulador existente; não chama mutações.
+Coordena casos de uso e repositories, não regras visuais: entrada/saída, pausas, foco/atividades e `reconcileScheduledWorkday` com base no `WorkSchedule`. A página de férias agrega as fontes e envia datas/configuração normalizadas a `calculateVacationBalance`. Planeador e sugestões recebem o mesmo conjunto por props, sem reler nem duplicar agregação. A sugestão envia início/fim ao formulário da simulação existente, não chama mutações.
 
 ### Domain
 
-`VacationBalance` é autoridade para referência laboral, saldo pessoal, dias úteis e evolução mensal. `VacationPlanner` contém funções puras que reutilizam `calculateVacationBalance` para a projeção temporal, sem escrever turnos/horas. `VacationSuggestions` enumera opções futuras, aplica os critérios escolhidos e reutiliza `simulateVacationPeriod` para validar saldos e contagem de dias, evitando uma segunda fórmula de acumulação. Responsabilidades incluem validar datas civis, deduplicar, filtrar sábado/domingo, separar gozadas/planeadas, calcular direitos configurados, projeções mensais/anuais e simular períodos sem duplicar datas.
+`VacationBalance` é a autoridade para referência laboral, saldo pessoal, dias úteis e evolução mensal. `VacationPlanner` reutiliza `calculateVacationBalance` para projeções temporais sem escrever turnos/horas. `VacationSuggestions` enumera opções futuras, aplica critérios escolhidos e reutiliza `simulateVacationPeriod` para validar contagem e saldos. Responsabilidades incluem validar datas civis, deduplicar, filtrar sábados/domingos, separar gozadas/planeadas, calcular valores anuais/mensais, simular sem duplicar datas.
 
 ## Rotas relevantes
 
-`#/` hoje; `#/foco` foco; `#/atividades` atividades; `#/turnos` mapa de turnos; `#/horas` calculadora de horas; `#/ferias` férias, sugestões e simulador no mesmo ecrã; `#/definicoes` definições. Desktop usa sidebar; mobile/tablet usa top bar, bottom navigation e drawer. PR #211 não acrescenta rota redundante.
+`#/` hoje; `#/foco` foco; `#/atividades` atividades; `#/turnos` mapa de turnos; `#/horas` calculadora de horas; `#/ferias` férias, sugestões e simulador no mesmo ecrã; `#/definicoes` definições. Desktop com sidebar; mobile/tablet com top bar, bottom navigation e drawer. PR #211 não introduz rota redundante.
 
 ## Persistência
 
-Bases: `foco-jornada-security-v1` (perfil de segurança/KDF/chaves/metadados de sync) e `foco-jornada-vault-v1` (`EncryptedVaultRecord` cifrado). Configuração de férias em `secureStorage`, chave `foco-jornada-vacation-settings-v1`, campos:
+`foco-jornada-security-v1` contém perfil de segurança/KDF/chaves/metadados de sync e `foco-jornada-vault-v1` contém o `EncryptedVaultRecord` cifrado. A configuração de férias usa `secureStorage`, chave `foco-jornada-vacation-settings-v1`, campos `employmentStartDate`, `annualEntitlementDays`, `monthlyAccrualTargetDays`, `carriedDays`, `manualTakenDays` e `adjustmentDays`.
 
-- `employmentStartDate`;
-- `annualEntitlementDays`;
-- `monthlyAccrualTargetDays`;
-- `carriedDays`;
-- `manualTakenDays`;
-- `adjustmentDays`.
+PR #210/#211 não acrescentam campos, migrações, registos artificiais nem alterações ao cofre. As preferências da busca são estado React efémero sem nova sincronização.
 
-PR #210/#211 não acrescentam campos, migrações, registos de férias artificiais ou alterações ao cofre. As preferências de busca de sugestões são estado React efémero, sem sync adicional.
-
-## Fontes de dados das férias
+## Fontes de dados e fluxo
 
 ```text
 WorkHours store: reason === "ferias"
@@ -76,98 +67,64 @@ Shift map mensal: kind === "vacation"
 Payroll plan mensal: kind === "vacation"
   ↓ normalizar YYYY-MM-DD
   ↓ deduplicar Set<string>
-  ↓ semana padrão: seg.–sex. contam, sábado/domingo não
+  ↓ semana padrão: seg.–sex. contam; sábado/domingo não
 calculateVacationBalance()
   ├─ referência laboral
-  └─ projeção pessoal: meses fechados, acumulado vivo, saldo, marcos, previsão
+  └─ projeção pessoal: meses fechados, acumulado vivo, saldo, marcos e dezembro
 VacationPlanner(simulação)
   ├─ mesmas datas/configuração da página
   ├─ validar intervalo futuro
-  ├─ dias úteis novos = úteis do intervalo − já registados
+  ├─ úteis novos = úteis do intervalo − já registados
   ├─ calculateVacationBalance(fim do dia anterior)
-  ├─ calculateVacationBalance(fim último dia + novos temporários)
-  └─ previsão dezembro anterior − dias úteis novos
+  ├─ calculateVacationBalance(fim do último dia + úteis novos temporários)
+  └─ previsão dezembro anterior − úteis novos
 VacationSuggestions(sugestão)
-  ├─ datas futuras no ano atual, tamanho pedido e mês excluído
-  ├─ rejeitar sobreposições com dias úteis registados
-  ├─ usar simulateVacationPeriod em cada candidato
-  ├─ aceitar só saldo pessoal não negativo no fim/dezembro
-  ├─ ordenar por critério explícito e escolher um por mês de início
-  └─ enviar escolha à simulação, nunca criar um registo
+  ├─ datas futuras do ano atual, tamanho pedido, mês excluído
+  ├─ rejeitar sobreposições com úteis registados
+  ├─ simulateVacationPeriod valida cada candidato
+  ├─ aceitar saldo pessoal não negativo no fim/dezembro
+  ├─ ordenar por critério e escolher um por mês de início
+  └─ enviar seleção à simulação, nunca criar registo
 ```
 
-A aplicação não infere férias de baixa, folga, ausência ou jornada não iniciada.
+Não se inferem férias de baixa, folga, ausência ou jornada não iniciada.
 
-## Referência laboral
+## Referência laboral e projeção pessoal
 
-Ano normal: `direitoAno = max(22, annualEntitlementDays confirmado)`; `saldoHoje = direitoAno + transitados + ajustes - gozadas`; `saldoProjetado = saldoHoje - planeadas`.
+Ano normal: `direitoAno = max(22, annualEntitlementDays confirmado)`; `saldoHoje = direitoAno + transitados + ajustes - gozadas`; `saldoProjetado = saldoHoje - planeadas`. Ano de admissão: `mesesCompletos = meses completos desde employmentStartDate`, `direitoAdmissao = min(20, mesesCompletos × 2)`; marco de seis meses separado.
 
-Ano de admissão: `mesesCompletos = meses completos desde employmentStartDate`; `direitoAdmissao = min(20, mesesCompletos × 2)`. O marco dos seis meses permanece separado.
+Projeção pessoal: `parcelaMensal = metaAnual / 12`; `marcoMes = metaAnual × numeroMes / 12`. Meta 28: março 7, junho 14, setembro 21, dezembro 28.
 
-## Projeção pessoal mensal
+`progressoMes = (diaMes - 1 + progressoDia) / diasNoMes`; `acumuladoVivo = metaAnual × (mesAtual - 1 + progressoMes) / 12`; `saldoVivo = acumuladoVivo + transitados + ajustes - gozadas`; `saldoVivoProjetado = saldoVivo - planeadas`. O relógio da página atualiza a cada 60 segundos e em `focus`/`visibilitychange`.
 
-`parcelaMensal = metaAnual / 12`; `marcoMes = metaAnual × numeroDoMes / 12`. Para meta 28: março 7, junho 14, setembro 21 e dezembro 28.
+Indicadores derivados de PR #209: `annualAccrualProgressPercent`, `annualAccrualRemainingDays`, `usedAndPlannedDays`, `usedAndPlannedPercentOfTarget`, `yearEndProjectedBalanceDays`, `nextAccrualMilestoneDays`, `nextAccrualMilestoneDate` e `hasReachedAccrualTarget`. `progressoAnual = clamp(acumuladoVivo/metaAnual) × 100`, `falta = max(0, metaAnual - acumuladoVivo)`, `comprometido = gozadas + planeadas`, `previsaoDezembro = metaAnual + transitados + ajustes - comprometido`; próximo marco `min(metaAnual, floor(acumuladoVivo) + 1)` enquanto abaixo da meta.
 
-`progressoMes = (diaDoMes - 1 + progressoDoDia) / diasNoMes`
+## Simulador de períodos — PR #210
 
-`acumuladoVivo = metaAnual × (mesAtual - 1 + progressoMes) / 12`
+`src/domain/vacation/VacationPlanner.ts` exporta `simulateVacationPeriod` e `listUpcomingVacationPeriods`. Aceita apenas início posterior a hoje e fim até 31/12 do ano atual; valida datas em UTC; desconta úteis não registados; consulta `calculateVacationBalance` antes/depois e projeta dezembro; agrupa dias futuros registados, incluindo sexta–segunda. Devolve inválido em vez de gravar. Registo real só por ação separada. Especificação `docs/VACATION-PLANNER.md`.
 
-`saldoVivo = acumuladoVivo + transitados + ajustes - gozadas`
+## Sugestões — PR #211
 
-`saldoVivoProjetado = saldoVivo - planeadas`
+`src/domain/vacation/VacationSuggestions.ts` exporta `suggestVacationPeriods`, inputs efémeros `requestedDays` (1–30), `excludedMonth` (0–12), `preference` (`rest`, `soon`, `balance`). Para cada início útil futuro, soma os dias pedidos e rejeita sobreposição com útil registado, mês excluído e passagem de ano. Valida candidatos com o simulador existente, filtra saldo pessoal não negativo no fim e em dezembro. `rest` mede descanso potencial consecutivo incluindo fins de semana adjacentes, `soon` usa data mais próxima e `balance` compara saldo estimado no fim; apresenta no máximo uma opção por mês de início. Não atribui qualidade objetiva nem aprova férias.
 
-A página atualiza a referência temporal a cada 60 segundos e também em `focus`/`visibilitychange`.
-
-## Indicadores derivados — PR #209
-
-Campos `annualAccrualProgressPercent`, `annualAccrualRemainingDays`, `usedAndPlannedDays`, `usedAndPlannedPercentOfTarget`, `yearEndProjectedBalanceDays`, `nextAccrualMilestoneDays`, `nextAccrualMilestoneDate` e `hasReachedAccrualTarget`.
-
-`progressoAnual% = clamp(acumuladoVivo / metaAnual) × 100`; `faltaAnual = max(0, metaAnual - acumuladoVivo)`; `comprometido = gozadas + planeadas`; `previsaoFimAno = metaAnual + transitados + ajustes - comprometido`.
-
-O próximo marco = `min(metaAnual, floor(acumuladoVivo) + 1)` enquanto a meta não for atingida; a data usa o mesmo modelo mensal.
-
-## Planeador de períodos — PR #210
-
-`src/domain/vacation/VacationPlanner.ts` exporta `simulateVacationPeriod` e `listUpcomingVacationPeriods`: aceita apenas início posterior a hoje e fim até 31 de dezembro do ano atual; valida o calendário civil em UTC; desconta só dias úteis não registados; calcula saldo antes/depois com `calculateVacationBalance`; projeta dezembro; agrupa próximos dias úteis futuros registados, inclusive sexta–segunda; devolve inválido em vez de gravar. Não cria tabela, backend ou migração. A marcação exige uma ação separada. Detalhes: `docs/VACATION-PLANNER.md`.
-
-## Sugestões de períodos — PR #211
-
-`src/domain/vacation/VacationSuggestions.ts` exporta `suggestVacationPeriods`. Os inputs `requestedDays` (inteiro 1–30), `excludedMonth` (0–12) e `preference` (`rest`, `soon`, `balance`) são efémeros. Para cada começo útil futuro, avança até somar os dias pedidos e rejeita intervalos com dias úteis já registados, mês excluído ou passagem de ano. Valida os candidatos com a simulação existente e só apresenta saldos pessoais projetados não negativos no fim e em dezembro. O critério `rest` mede dias consecutivos potenciais incluindo sábados/domingos adjacentes, `soon` usa a data mais próxima e `balance` compara o saldo estimado ao fim. Ordena e retém uma opção por mês inicial, sem prometer que seja a escolha objetivamente melhor.
-
-`VacationSuggestionsPanel.tsx` apresenta filtros, cartão principal, meses, calendário, outras opções, aviso de ausência de cenários, legenda, acessibilidade e botão que preenche a simulação já existente. Não interpreta o ano ilustrativo 2025 como data válida em 2026; não inventa feriados, folgas, preços ou autorização. Detalhes: `docs/VACATION-SUGGESTIONS.md`.
+`VacationSuggestionsPanel.tsx` apresenta filtros, cartão destacado, meses, calendário, alternativas, estado vazio, legenda, acessibilidade e botão que preenche o simulador existente. O ano é dinâmico, não o 2025 ilustrativo. Não infere feriados, folgas, preços ou autorização. Especificação `docs/VACATION-SUGGESTIONS.md`.
 
 ## Arquitetura visual
 
-Grelha mensal: `repeat(auto-fit, minmax(min(100%, 15rem), 1fr))`, contenção de largura, `overflow-wrap`, diferenciação de estados, `forced-colors` e `prefers-reduced-motion`.
-
-Painel de indicadores: `vacation-insights.css` com `repeat(auto-fit, minmax(min(100%, 14rem), 1fr))`, barra anual acessível, estado negativo e uma coluna até 560 px.
-
-Planeador: `vacation-planner.css` com grids `auto-fit/minmax`, campos de data rotulados, texto/números contidos e uma coluna até 560 px. Resultados `aria-live="polite"`, `focus-visible`, `forced-colors` e `prefers-reduced-motion`.
-
-Sugestões: `vacation-suggestions.css` isolado, grelha de filtros adaptativa, cartão principal com ilustração CSS decorativa, cartões por mês selecionáveis com `aria-pressed`, calendário navegável com controlos reais de 44px, descanso/feriados diferenciados semanticamente, mobile de uma coluna até 520px, `focus-visible`, `forced-colors` e `prefers-reduced-motion`.
+Grelha mensal: `repeat(auto-fit, minmax(min(100%, 15rem), 1fr))`, contenção, `overflow-wrap`, estados, `forced-colors` e `prefers-reduced-motion`. Indicadores: `vacation-insights.css`, grelha `repeat(auto-fit, minmax(min(100%, 14rem), 1fr))`, barra anual acessível, estado negativo, uma coluna até 560px. Planeador: `vacation-planner.css`, grids auto-fit, inputs rotulados, resultados `aria-live="polite"`, mobile uma coluna até 560px. Sugestões: `vacation-suggestions.css` isolado, filtros adaptativos, ilustração decorativa CSS, mês selecionado com `aria-pressed`, calendário com controlos de 44px e estados distintos para úteis sugeridos, fins de semana e férias já registadas (não existe estado de feriado), uma coluna até 520px, `focus-visible`, `forced-colors` e `prefers-reduced-motion`.
 
 ## Semana útil padrão
 
-Segunda–sexta contam; sábado/domingo não reduzem saldo. 24/08/2026–06/09/2026 = 10 dias contabilizados + quatro fins de semana ignorados. Feriados e regimes especiais permanecem fora da inferência automática.
+Segunda–sexta contam; sábado/domingo não reduzem saldo. 24/08/2026–06/09/2026 = dez dias úteis e quatro fins de semana ignorados. Feriados e regimes especiais permanecem fora da inferência automática.
 
 ## Sincronização móvel ↔ computador
 
-```text
-EncryptedVaultRecord
-  └─ CloudSyncManager
-       ├─ fingerprint SHA-256
-       ├─ token derivado da dataKey
-       ├─ revisão remota esperada
-       └─ Cloudflare Worker
-            └─ Durable Object por profileId
-```
-
-Apenas local mudou → push; apenas remoto mudou → pull + validação; igual → atualizar metadados; ambos mudaram → conflito explícito, sem `last-write-wins` silencioso.
+`EncryptedVaultRecord` → `CloudSyncManager` (fingerprint SHA-256, token derivado de `dataKey`, revisão remota esperada) → Cloudflare Worker → Durable Object por `profileId`. Só local mudou → push; só remoto → pull/validação; igual → metadados; ambos → conflito explícito, sem `last-write-wins` silencioso.
 
 ## Segurança
 
-PIN, palavra-passe, código de recuperação e `dataKey` original não são enviados ao Worker; backend recebe apenas cofre cifrado e metadados técnicos. Nenhum HTML não confiável é injetado na UI de férias. PR #211 não cria endpoint, token, segredo, permissão, dependência ou dado persistido. Indicadores e simulações não são enviados como telemetria. Links externos usam `rel="noreferrer"`.
+PIN, palavra-passe, código de recuperação e `dataKey` original não são enviados ao Worker; backend recebe só cofre cifrado e metadados técnicos. UI de férias não injeta HTML não confiável. PR #211 não cria endpoint, token, segredo, permissão, dependência, dado persistido ou telemetria. Links externos com `rel="noreferrer"`.
 
-## Qualidade
+## Qualidade e publicação
 
-Workflow `Qualidade`: Node 22, npm 11.6.0, instalação, `npm audit --audit-level=high`, typecheck, lint, Vitest, build, Worker dry-run, smoke test Chromium e artefacto. O head final só pode ser integrado depois de todos os gates verdes. PR #211 acrescenta `VacationSuggestions.test.ts` e `vacation-suggestions.test.ts`.
+Workflow Qualidade: Node22, npm11.6.0, instalação, audit high, typecheck, lint, Vitest, build, Worker dry-run, smoke Chromium, artefacto. PR #211 adicionou testes `VacationSuggestions.test.ts` e `vacation-suggestions.test.ts`. Qualidade #1150/#1156 no head e run `35127380594` em `main`: sucesso. Merge `b687673a467cf5fc5061160b41a254e4b55118cc`; Publicar #250 e Pages #819: sucesso; build `271035a552cb6a1ecdbfe6ee8032bcafed7013ff`. Validação visual no iPhone/Android/tablet/desktop real permanece pendente.
