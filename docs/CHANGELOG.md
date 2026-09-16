@@ -1,12 +1,20 @@
 # Changelog
 
+## 2026-09-16 — resumo em tempo real no planeamento (PR #214)
+
+- `#/ferias/planeamento` ganhou um painel compacto antes das sugestões: acumulado pessoal agora, saldo atual, saldo após férias já planeadas e previsão em 31 de dezembro; hora local do último cálculo apresentada ao minuto.
+- `VacationPlannerPanel.tsx` reutiliza `calculateVacationBalance` com `today`, `asOfDayProgress`, definições e datas que já recebe de `VacationBalancePage`. O relógio preexistente atualiza cada minuto e em foco/visibilidade; seleção de filtros e datas recalcula imediatamente, sem segundo timer, segundo algoritmo ou nova persistência.
+- Os saldos indicam explicitamente que **não incluem** a simulação que ainda não foi registada. `vacation-planner-live.css` isola a grelha fluida, a contenção dos cartões e os estados negativos; suporte de `forced-colors` e `prefers-reduced-motion`.
+- `vacation-planner-live.test.ts` verifica reutilização de cálculo/relógio, ausência de temporizador adicional, valores e estrutura. Especificação em `docs/VACATION-PLANNER-LIVE.md`.
+- Sem alterar 24/08–06/09 = dez úteis, meta pessoal 28, direito oficial, sync, cofre, API, autenticação, segredos ou permissões. O recálculo é local enquanto a página está ativa e ao regressar à PWA; **não garante sync remoto instantâneo**. Quality gates finais, integração, publicação e validação física ainda pendentes nesta revisão.
+
 ## 2026-09-16 — cabeçalho compacto do planeamento (PR #213)
 
 - Corrigido o cabeçalho de `#/ferias/planeamento` após captura real com «Pré-visualização…» cortada e grande espaço branco: rótulo do ano, título, descrição breve e badge informativa ficam dentro de um `header.vacationPlannerHero` com largura limitada.
 - Grelha do cabeçalho com coluna de texto flexível e badge até 12,5rem; abaixo de 820px a badge ocupa linha própria. Texto pode quebrar sem ultrapassar a borda; tipografia e padding fluidos.
 - Painel da vista dedicada usa coluna flex e altura intrínseca em vez de grelha com primeiro filho potencialmente esticado. Sem alterar sugestões, calendário, simulação, dias úteis, meta 28 ou qualquer registo.
 - `vacation-workspace.test.ts` reforçado para proteger estrutura, badge, limites e disposição; detalhes em `VACATION-PLANNER-HEADER.md`. Sem novos schema, dependências, backend, endpoint, permissão, segredo, telemetria ou alterações ao cofre/sync.
-- Validação de qualidade do head final, integração, publicação e verificação visual no iPhone ainda pendentes nesta revisão. Testes automatizados não substituem a captura física.
+- **Entrega confirmada:** Qualidade #1172 (head) e #1173 (`main`), PR #213 integrado `88099b5200b371081822e19197d15f723a8c3f14`, Publicar #252, Pages #832 e build `ddbdced0c2b380e546a8e0da29dbe5819a74d4f8` bem-sucedidos. Teste visual físico permanece pendente.
 
 ## 2026-09-16 — áreas de férias separadas e layout fluido (PR #212)
 
