@@ -8,6 +8,14 @@ O **Foco Jornada** é uma PWA React/TypeScript única e responsiva para telemóv
 
 Em `main` estão integrados turnos noturnos (#189), sincronização/associação cifrada de browsers (#191–#194), shell móvel (#195–#199), bootstrap animado (#200–#201), automação de jornada/pausas (#202), ferramenta/evolução de férias (#203–#209), simulador de períodos (#210), sugestões visuais (#211), separação das áreas de consulta/planeamento (#212) e correção do cabeçalho do planeamento (#213).
 
+## PR #214 — ponto de situação local em tempo real no planeamento
+
+**Estado: implementação no branch `feat/vacation-planner-live-overview`; aguarda gates finais, integração e publicação.** A vista `#/ferias/planeamento` apresenta agora antes das sugestões um resumo compacto com acumulado atual, saldo após gozadas, saldo após férias já planeadas e previsão para 31 de dezembro. Exibe hora local do cálculo. Os valores são obtidos da função pura `calculateVacationBalance` com os mesmos `today`, `asOfDayProgress`, configurações e datas já usados na página; não se introduziu nova fórmula, relógio ou escrita.
+
+O relógio já existente atualiza a cada 60 segundos quando ativo e em `focus`/`visibilitychange`; os filtros e datas simuladas recalculam imediatamente. O resumo diferencia claramente «após planeadas» de «após a simulação», que não está incluída no primeiro valor. CSS isolado e responsivo em `vacation-planner-live.css`, testes em `vacation-planner-live.test.ts`, especificação em `docs/VACATION-PLANNER-LIVE.md`. Sem novos endpoints, autenticação, dependências, segredos, schema ou telemetria. A meta de 28 dias permanece projeção pessoal, não direito oficial.
+
+**Limite:** o iOS pode suspender timers em segundo plano; não alegar sincronização remota instantânea nem validação física. **Próximo passo imediato:** confirmar CI no head final, integrar PR #214, verificar Qualidade `main`, publicação/Pages e recolher captura no iPhone.
+
 ## PR #213 — corrigir corte e espaço vazio no cabeçalho do planeamento
 
 **Estado: integrado, CI e publicação confirmadas.** PR #213 integrado no commit `88099b5200b371081822e19197d15f723a8c3f14`; Qualidade #1172 (head final) e Qualidade #1173 em `main` passaram auditoria, TypeScript, lint, Vitest, build, Worker dry-run, smoke Chromium e artefacto. Publicar Foco & Jornada #252 concluiu com sucesso; build `ddbdced0c2b380e546a8e0da29dbe5819a74d4f8` e GitHub Pages #832 concluíram com sucesso.
@@ -54,11 +62,11 @@ Integrado/publicado: merge `73a6c0f43caf40219a98b1224113bdddaaec420b`, Qualidade
 
 ## Qualidade
 
-React 19, TypeScript 5.9, Vite 7, Vitest 5, Node 22, npm 11.6.0. Gates: `npm audit --audit-level=high`, typecheck, lint, Vitest, build, Worker dry-run, smoke Chromium e artefacto. PR #213 passou no head final e em `main`; Publicar #252/Pages #832 bem-sucedidos.
+React 19, TypeScript 5.9, Vite 7, Vitest 5, Node 22, npm 11.6.0. Gates: `npm audit --audit-level=high`, typecheck, lint, Vitest, build, Worker dry-run, smoke Chromium e artefacto. PR #213 passou no head final e em `main`; Publicar #252/Pages #832 bem-sucedidos. PR #214 aguarda gates finais.
 
 ## Limitações e validações abertas
 
-1. Testar o cabeçalho corrigido no iPhone real, badge contida e altura sem vazio, também Android, tablet e desktop, zoom, orientação horizontal, texto ampliado e VoiceOver/TalkBack.
+1. Validar o ponto de situação vivo, passagem de dia, badge e contenção dos quatro cartões no iPhone real, Android, tablet e desktop, com zoom, texto ampliado e VoiceOver/TalkBack.
 2. Confirmar 24/08–06/09 = dez úteis, sobreposição, atualização ao regressar à PWA e sincronização móvel/computador.
 3. Testar navegação entre as duas rotas com perfil desbloqueado e simulação sem gravação implícita.
 4. Avaliar feriados e descanso semanal alternativo apenas com contrato/CCT ou regras da entidade confirmados.
@@ -66,8 +74,8 @@ React 19, TypeScript 5.9, Vite 7, Vitest 5, Node 22, npm 11.6.0. Gates: `npm aud
 
 ## Última alteração
 
-PR #213 integrado e publicado: cabeçalho compacto e planeador de altura intrínseca. Build `ddbdced0c2b380e546a8e0da29dbe5819a74d4f8`, Pages #832 sucesso; domínio e dados intactos.
+PR #214 em validação: resumo vivo local no planeamento, reuso de `calculateVacationBalance`, CSS isolado e testes; domínio e dados intactos.
 
 ## Próximo passo
 
-Verificar uma nova captura no iPhone atualizado; se persistir espaço vazio, recolher dimensões e inspecionar CSS computado no dispositivo. Não introduzir marcação automática sem confirmação explícita e verificação do direito oficial.
+Confirmar CI, integrar/publicar PR #214 e testar o ponto de situação no iPhone ao regressar à PWA. Não introduzir marcação automática sem confirmação explícita e verificação do direito oficial.
