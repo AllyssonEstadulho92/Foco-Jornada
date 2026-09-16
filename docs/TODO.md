@@ -2,6 +2,27 @@
 
 Atualizado em: 2026-09-16
 
+## P0 — Sugestões personalizadas de férias (PR #211)
+
+- [x] Ler PROJECT_STATE, ARCHITECTURE, DECISIONS, TODO, CHANGELOG e confrontar com `VacationPlannerPanel`, `VacationPlanner` e `VacationBalance`.
+- [x] Reproduzir a hierarquia do protótipo: cabeçalho, destaque, filtros, meses, calendário, alternativas e ações.
+- [x] Usar o ano corrente em vez das datas meramente ilustrativas do protótipo.
+- [x] Filtros: dias úteis 1–30, mês excluído, juntar fins de semana/mais cedo/maior saldo.
+- [x] Enumerar apenas períodos futuros no ano atual, sem sobreposição com dias úteis já registados.
+- [x] Usar `simulateVacationPeriod` para contagem e saldos, sem fórmulas paralelas nem escrita.
+- [x] Exigir saldos pessoais projetados não negativos ao fim do período e em dezembro.
+- [x] Comparar um representante por mês, outras sugestões e calendário mensal navegável.
+- [x] Reencaminhar a escolha para o simulador existente; registo real separado no mapa de turnos.
+- [x] Indicar limites: escala, feriados, aprovação, custos/preços e meta pessoal diferente de direito oficial.
+- [x] CSS isolado, contenção, alvos de 44px, teclado, `forced-colors` e `prefers-reduced-motion`.
+- [x] Testes `VacationSuggestions.test.ts` e `vacation-suggestions.test.ts`; CI inicial Qualidade #1150 verde.
+- [x] Documentação funcional em `VACATION-SUGGESTIONS.md` e atualização dos cinco documentos estruturais.
+- [ ] Confirmar os gates da Qualidade para o head final documentado.
+- [ ] Marcar PR #211 pronto, integrar em `main`, confirmar Qualidade pós-merge.
+- [ ] Confirmar Publicar Foco & Jornada e Pages para o build novo.
+- [ ] Validar visual e funcionalmente no iPhone real: sugestões, filtros, mês excluído, calendário, selecionar/simular e zoom.
+- [ ] Validar Android, tablet/desktop, VoiceOver/TalkBack, PWA após suspensão e dados sincronizados.
+
 ## P0 — Simulador de períodos futuros de férias (PR #210)
 
 - [x] Rever a rota `#/ferias`, `VacationBalance`, CSS, fontes de férias e documentação de `main`.
@@ -20,10 +41,10 @@ Atualizado em: 2026-09-16
 - [x] Documentar regras e limites em `VACATION-PLANNER.md`.
 - [x] Confirmar ausência de novas tabelas, schema, API, segredos, autenticação, dependências e telemetria.
 - [x] Obter primeira execução verde de audit, typecheck, lint, testes, build, Worker dry-run e smoke test (Qualidade #1143).
-- [x] Confirmar gates do head final com toda a documentação (**Qualidade #1148**).
+- [x] Confirmar gates do head final com toda a documentação (Qualidade #1148).
 - [x] Marcar PR #210 pronto e integrar em `main` no commit `73a6c0f43caf40219a98b1224113bdddaaec420b`.
-- [x] Confirmar qualidade pós-merge (**Qualidade #1149**).
-- [x] Confirmar publicação (**Publicar Foco & Jornada #249**), build `8a79445d483ff2017e2cb860c94bccc77d2d33d0` e GitHub Pages #814: sucesso.
+- [x] Confirmar qualidade pós-merge (Qualidade #1149).
+- [x] Confirmar publicação (Publicar Foco & Jornada #249), build `8a79445d483ff2017e2cb860c94bccc77d2d33d0` e GitHub Pages #814: sucesso.
 - [x] Atualizar `PROJECT_STATE`, `ARCHITECTURE`, `DECISIONS`, `TODO` e `CHANGELOG` para a entrega; registar os resultados finais em estado, decisões, tarefas e changelog.
 - [ ] Validar o simulador em iPhone real com períodos sobrepostos, fins de semana e zoom.
 - [ ] Validar Android, tablet e desktop, incluindo VoiceOver/TalkBack e aumento de texto.
@@ -46,7 +67,8 @@ Atualizado em: 2026-09-16
 - [x] PR #207 — contenção de todos os cartões mensais.
 - [x] PR #208 — grelha `auto-fit/minmax` e hierarquia visual adaptativa.
 - [x] PR #209 — painel avançado com progresso anual, marco, férias comprometidas e projeção de fim do ano.
-- [x] PR #210 — simulador de períodos futuros sem escrita nem desconto duplicado; Qualidade #1148/#1149, Publicar #249, Pages #814 verdes.
+- [x] PR #210 — simulador de períodos futuros sem desconto duplicado.
+- [x] Qualidade #1149, Publicar #249 e Pages #814 verdes para PR #210.
 
 ## P0 — Automação de jornada e pausas
 
