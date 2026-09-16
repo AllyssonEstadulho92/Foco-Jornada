@@ -2,106 +2,58 @@
 
 Atualizado em: 2026-09-16
 
-## P0 — Hierarquia visual da evolução mensal de férias (PR #208)
+## P0 — Painel avançado de leitura de férias (PR #209)
 
-- [x] Rever a captura real e o resultado do PR #207 antes de alterar estilos.
-- [x] Preservar toda a lógica de `VacationBalance` e a atualização em tempo real.
-- [x] Trocar a grelha mensal rígida por `auto-fit/minmax`.
-- [x] Aplicar a mesma adaptação automática ao resumo vivo.
-- [x] Melhorar hierarquia entre mês, estado, valor, progresso e texto auxiliar.
-- [x] Distinguir visualmente mês atual, concluídos e futuros.
-- [x] Manter contenção do PR #207 e impedir overflow estrutural.
-- [x] Passar a 1 coluna em ecrãs estreitos e remover altura mínima fixa no mobile.
+- [x] Rever o estado publicado dos PR #203–#208 antes de alterar a área de férias.
+- [x] Preservar separação entre referência laboral e projeção pessoal.
+- [x] Adicionar progresso anual da meta pessoal.
+- [x] Mostrar quanto falta acumular até à meta anual.
+- [x] Calcular próximo marco inteiro da acumulação e data estimada pelo mesmo modelo mensal.
+- [x] Mostrar férias gozadas com separação entre registos automáticos e manuais.
+- [x] Mostrar férias futuras planeadas.
+- [x] Mostrar `gozadas + planeadas` e percentagem da meta pessoal.
+- [x] Calcular previsão pessoal para 31 de dezembro.
+- [x] Mostrar fins de semana ignorados pelo filtro padrão.
+- [x] Mostrar próximo fecho mensal, falta no mês e ritmo diário.
+- [x] Criar painel responsivo `vacation-insights.css` sem alterar estilos globais.
 - [x] Preservar `forced-colors` e `prefers-reduced-motion`.
-- [x] Expandir `vacation-card-containment.test.ts` para proteger auto-fit, contenção e estado atual.
-- [x] Confirmar que não existe alteração de dados, cálculo, persistência, sync, API, autenticação ou dependências.
-- [x] Atualizar `PROJECT_STATE.md`, `ARCHITECTURE.md`, `DECISIONS.md`, `TODO.md` e `CHANGELOG.md`.
-- [x] Obter `npm audit --audit-level=high` verde no head final.
-- [x] Obter typecheck verde.
-- [x] Obter lint verde.
-- [x] Obter testes verdes.
-- [x] Obter build, Worker dry-run e smoke test Chromium verdes.
-- [x] Marcar PR #208 como pronto depois dos gates.
-- [x] Integrar PR #208 em `main` no commit `a41a0c3b9fdef1b0e5d67bc29ce6b453dbcbc4cf`.
-- [x] Confirmar **Qualidade #1139** verde em `main` após merge.
-- [x] Confirmar **Publicar Foco & Jornada #247** verde.
-- [x] Confirmar publicação no commit `a5a17750ffa43f506c9feb5af78a167f3b1f0f5c`.
-- [x] Confirmar **pages build and deployment #801** verde.
-- [ ] Validar iPhone real, sobretudo setembro/percentagens longas e zoom.
-- [ ] Validar Android/Chrome, tablet e desktop.
+- [x] Adicionar testes de domínio para os novos indicadores.
+- [x] Adicionar regressão CSS para o painel.
+- [x] Confirmar que não existe novo campo persistido, endpoint, token, segredo, permissão ou dependência.
+- [x] Atualizar `PROJECT_STATE.md`, `ARCHITECTURE.md`, `DECISIONS.md`, `TODO.md` e `CHANGELOG.md` no head final.
+- [ ] Obter `npm audit --audit-level=high` verde.
+- [ ] Obter typecheck verde.
+- [ ] Obter lint verde.
+- [ ] Obter testes verdes, incluindo `VacationBalance.insights.test.ts` e `vacation-insights.test.ts`.
+- [ ] Obter build, Worker dry-run e smoke test Chromium verdes.
+- [ ] Marcar PR #209 como pronto apenas depois dos gates.
+- [ ] Integrar PR #209 em `main`.
+- [ ] Confirmar Qualidade em `main` após merge.
+- [ ] Confirmar publicação e GitHub Pages.
+- [ ] Validar no iPhone real os novos cartões, barra anual e próximo marco.
+- [ ] Validar Android/Chrome, tablet e desktop, incluindo zoom e aumento de texto.
 
-## P0 — Conter conteúdo dos cartões mensais de férias (PR #207)
+## P0 — Validação física da área de férias já publicada
 
-- [x] Reproduzir o problema visual a partir da captura: badge `Em curso · xx%` ultrapassa o cartão de setembro.
-- [x] Rever `VacationBalancePage.tsx`, `vacation.css` e `vacation-accrual.css` antes de alterar estilos.
-- [x] Aplicar `min-width: 0`/`max-width: 100%` aos elementos relevantes.
-- [x] Permitir quebra segura no cabeçalho dos cartões.
-- [x] Remover `white-space: nowrap` e truncamento por reticências do estado mensal.
-- [x] Limitar valor, descrições, resumo e barra de progresso à largura disponível.
-- [x] Preservar `forced-colors` e `prefers-reduced-motion`.
-- [x] Adicionar teste de regressão `vacation-card-containment.test.ts`.
-- [x] Confirmar ausência de alterações em cálculo/persistência/API/autenticação/sync/dependências.
-- [x] Integrar PR #207 em `main` no commit `3a564251eece4a4c2870982ed3127c1638a68482`.
-- [x] Confirmar **Qualidade #1132** verde em `main`.
-- [x] Confirmar **Publicar Foco & Jornada #246** verde.
-- [x] Confirmar publicação no commit `ce2242b0f90fc4e884764df6d3c31c7dd43a60e9`.
-- [x] Confirmar **pages build and deployment #796** verde.
-- [ ] Validar visualmente em iPhone que nenhum conteúdo ultrapassa o cartão.
-- [ ] Validar Android/Chrome, tablet e desktop, incluindo aumento de texto/zoom.
-
-## P0 — Evolução mensal de férias em tempo real (PR #206)
-
-- [x] Preservar `monthlyAccruedDays` como meses fechados.
-- [x] Adicionar interpolação do mês atual sem alterar a referência laboral.
-- [x] Calcular progresso pela fração de calendário já decorrida, incluindo fração do dia local.
-- [x] Calcular acumulado, saldo vivo e saldo vivo após planeadas.
-- [x] Expor ganho, restante, percentagem, ritmo diário e meta do mês.
-- [x] Atualizar a cada minuto e reconciliar em foco/visibilidade.
-- [x] Preservar `forced-colors` e `prefers-reduced-motion`.
-- [x] Adicionar testes de interpolação e limites do mês.
-- [x] Confirmar férias gozadas/planeadas nos saldos vivos.
-- [x] Integrar PR #206 em `main` no commit `15f4df15308a145f9d303cf56d699837f9516303`.
-- [x] Confirmar **Qualidade #1123**, **Publicar #245** e **Pages #790** verdes.
-- [ ] Validar atualização viva e retoma da PWA em iPhone real.
+- [ ] Confirmar no iPhone que a evolução em tempo real atualiza e reconcilia ao regressar à PWA.
+- [ ] Confirmar que setembro e badges longos não extravasam após PR #207/#208.
+- [ ] Confirmar em dispositivo real que 24/08/2026–06/09/2026 desconta 10 dias úteis e ignora 4 fins de semana.
+- [ ] Confirmar sincronização de `monthlyAccrualTargetDays` e restantes configurações entre telemóvel e computador.
 - [ ] Validar Android/Chrome e tablet.
-- [ ] Confirmar sincronização da configuração entre telemóvel e computador.
 
-## P0 — Contagem de dias úteis nas férias (PR #205)
+## P0 — Funcionalidades de férias já integradas
 
-- [x] Confirmar 24/08/2026–06/09/2026 = 10 dias úteis.
-- [x] Deduplicar datas antes da contagem.
-- [x] Excluir sábado e domingo do desconto automático no regime padrão.
-- [x] Aplicar a regra a gozadas/planeadas, saldo laboral e saldo pessoal.
-- [x] Adicionar testes de regressão.
-- [x] Integrar no commit `2e309975a38e0df975bf1958879fefb3c3b4b514`.
-- [x] Confirmar **Qualidade #1114**, publicação e **Pages #785** verdes.
-- [ ] Validar em dispositivo real o intervalo 24/08/2026–06/09/2026.
+- [x] PR #203 — ferramenta de saldo de férias, referência laboral e rota `#/ferias`.
+- [x] PR #204 — meta pessoal mensal configurável, 28 dias por defeito.
+- [x] PR #205 — exclusão padrão de sábado/domingo; caso 24/08–06/09 = 10 dias.
+- [x] PR #206 — evolução intramensal em tempo real.
+- [x] PR #207 — contenção de todos os cartões mensais.
+- [x] PR #208 — grelha `auto-fit/minmax` e hierarquia visual adaptativa.
+- [x] Qualidade #1139, Publicar #247 e Pages #801 verdes para o PR #208.
 
-## P0 — Acumulação mensal de férias (PR #204)
+## P0 — Automação de jornada e pausas
 
-- [x] Adicionar `monthlyAccrualTargetDays` com 28 por defeito.
-- [x] Manter compatibilidade com configurações antigas.
-- [x] Garantir marcos sem drift: março 7, junho 14, setembro 21, dezembro 28.
-- [x] Criar cronograma de 12 meses responsivo.
-- [x] Manter projeção pessoal separada da referência laboral.
-- [x] Integrar/publicar com quality gates verdes.
-- [ ] Validar em dispositivo real a grelha mensal e o saldo acumulado.
-- [ ] Confirmar sincronização de `monthlyAccrualTargetDays`.
-
-## P0 — Ferramenta de saldo de férias (PR #203)
-
-- [x] Separar referência laboral, ano de admissão, saldo atual e saldo projetado.
-- [x] Reutilizar e deduplicar férias do mapa de turnos/plano mensal/calculadora de horas.
-- [x] Guardar apenas configuração adicional no `secureStorage` cifrado.
-- [x] Criar rota `#/ferias` e UI responsiva/acessível.
-- [x] Integrar/publicar com quality gates verdes.
-- [ ] Validar em dispositivo real rota, persistência, tema e responsividade.
-- [ ] Confirmar sincronização da configuração de férias com o mesmo cofre.
-- [ ] Confirmar com RH/contrato/CCT regras mais favoráveis antes de as tratar como saldo oficial.
-
-## P0 — Automação de jornada e pausas (PR #202)
-
-- [x] Reconciliar entrada, pausas e saída a partir de `WorkSchedule`.
+- [x] Reconciliar entrada, pausas e saída a partir do `WorkSchedule`.
 - [x] Manter Pomodoro/foco personalizado manuais.
 - [x] Preservar timestamps exatos quando a PWA regressa do background.
 - [x] Integrar/publicar com testes e quality gates verdes.
@@ -112,10 +64,10 @@ Atualizado em: 2026-09-16
 
 ## P0 — Segurança de dependências
 
-- [x] Atualizar Vitest para `5.0.0`.
-- [x] Forçar `sharp` `0.35.4` via `overrides`.
-- [x] Fixar npm 11.6.0 nos workflows sem reduzir auditoria/testes/build.
-- [x] Manter `npm audit --audit-level=high` como gate.
+- [x] Vitest `5.0.0`.
+- [x] `sharp` `0.35.4` via `overrides`.
+- [x] npm 11.6.0 fixado nos workflows.
+- [x] `npm audit --audit-level=high` mantido como gate.
 
 ## P0 — Sincronização móvel ↔ computador em dispositivos reais
 
@@ -155,9 +107,11 @@ Implementação concluída nos PR #191–#194; falta validação física.
 
 ## P2 — Melhorias futuras
 
-- [ ] Avaliar calendário laboral para excluir feriados e suportar descanso semanal diferente.
+- [ ] Avaliar calendário laboral para excluir automaticamente feriados e suportar descanso semanal diferente.
 - [ ] Avaliar regras adicionais de férias apenas após confirmar CCT/contrato aplicável.
-- [ ] Avaliar seleção de ano/histórico de férias após validar a versão atual.
+- [ ] Avaliar seleção de ano/histórico de férias depois de validar a versão atual.
+- [ ] Avaliar um calendário/linha temporal de próximos dias de férias planeados.
+- [ ] Avaliar avisos opcionais quando `gozadas + planeadas` ultrapassarem a meta pessoal, sem confundir com direito laboral.
 - [ ] Criar fluxo explícito de resolução de conflitos se necessário.
 - [ ] Avaliar eliminação autenticada da cópia remota.
 - [ ] Avaliar revogação/listagem de browsers associados.
