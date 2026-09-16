@@ -20,10 +20,11 @@ Atualizado em: 2026-09-16
 - [x] Documentar regras e limites em `VACATION-PLANNER.md`.
 - [x] Confirmar ausência de novas tabelas, schema, API, segredos, autenticação, dependências e telemetria.
 - [x] Obter primeira execução verde de audit, typecheck, lint, testes, build, Worker dry-run e smoke test (Qualidade #1143).
-- [ ] Confirmar gates do **head final** com toda a documentação.
-- [ ] Marcar PR #210 pronto, integrar em `main` e confirmar qualidade pós-merge.
-- [ ] Confirmar publicação do build e sucesso de GitHub Pages.
-- [ ] Atualizar nos cinco documentos o estado final da integração/publicação.
+- [x] Confirmar gates do head final com toda a documentação (**Qualidade #1148**).
+- [x] Marcar PR #210 pronto e integrar em `main` no commit `73a6c0f43caf40219a98b1224113bdddaaec420b`.
+- [x] Confirmar qualidade pós-merge (**Qualidade #1149**).
+- [x] Confirmar publicação (**Publicar Foco & Jornada #249**), build `8a79445d483ff2017e2cb860c94bccc77d2d33d0` e GitHub Pages #814: sucesso.
+- [x] Atualizar `PROJECT_STATE`, `ARCHITECTURE`, `DECISIONS`, `TODO` e `CHANGELOG` para a entrega; registar os resultados finais em estado, decisões, tarefas e changelog.
 - [ ] Validar o simulador em iPhone real com períodos sobrepostos, fins de semana e zoom.
 - [ ] Validar Android, tablet e desktop, incluindo VoiceOver/TalkBack e aumento de texto.
 - [ ] Confirmar sincronização de registos/configuração entre telemóvel e computador.
@@ -45,7 +46,7 @@ Atualizado em: 2026-09-16
 - [x] PR #207 — contenção de todos os cartões mensais.
 - [x] PR #208 — grelha `auto-fit/minmax` e hierarquia visual adaptativa.
 - [x] PR #209 — painel avançado com progresso anual, marco, férias comprometidas e projeção de fim do ano.
-- [x] Qualidade #1141, Publicar #248 e Pages #807 verdes para PR #209.
+- [x] PR #210 — simulador de períodos futuros sem escrita nem desconto duplicado; Qualidade #1148/#1149, Publicar #249, Pages #814 verdes.
 
 ## P0 — Automação de jornada e pausas
 
