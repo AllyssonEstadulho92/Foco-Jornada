@@ -1,10 +1,10 @@
 # Estado do Projeto
 
-Atualizado em: 2026-09-15
+Atualizado em: 2026-09-16
 
 ## Estado atual
 
-O **Foco Jornada** é uma única PWA React/TypeScript responsiva para telemóvel, tablet e computador, distribuída por GitHub Pages. A persistência operacional continua local-first num cofre IndexedDB cifrado; a sincronização opcional entre instalações usa Cloudflare Worker/Durable Objects e transporta apenas o cofre cifrado.
+O **Foco Jornada** é uma única PWA React/TypeScript responsiva para telemóvel, tablet e computador, publicada em GitHub Pages. A persistência continua local-first num cofre IndexedDB cifrado; a sincronização opcional usa Cloudflare Worker/Durable Objects e transporta apenas o cofre cifrado.
 
 Em `main` estão integrados, entre outros:
 
@@ -19,125 +19,82 @@ Em `main` estão integrados, entre outros:
 - evolução intramensal da projeção pessoal em tempo real (PR #206);
 - contenção responsiva dos cartões mensais de férias (PR #207).
 
-## PR #207 — contenção visual dos cartões mensais de férias
+## PR #208 — hierarquia visual da evolução mensal
 
-Estado: **integrado, validado por CI e publicado**.
+Estado: **em validação** na branch `feat/vacation-cards-visual-hierarchy`.
 
-- PR #207 integrado em `main` no commit `3a564251eece4a4c2870982ed3127c1638a68482`;
-- **Qualidade #1131** passou integralmente no head final do PR;
-- **Qualidade #1132** passou integralmente após o merge em `main`;
-- **Publicar Foco & Jornada #246** concluiu com sucesso;
-- build publicado na raiz de `main` no commit `ce2242b0f90fc4e884764df6d3c31c7dd43a60e9`;
-- **pages build and deployment #796** concluiu com sucesso para o build publicado.
+### Objetivo
 
-### Problema confirmado
+Depois de eliminar o overflow no PR #207, melhorar a leitura e a estabilidade visual dos 12 cartões sem alterar cálculo, dados ou semântica.
 
-Na grelha **Evolução por mês**, o cabeçalho de um cartão podia exceder a respetiva largura quando o nome do mês e o badge de estado/percentagem competiam pelo mesmo espaço. O caso observado em setembro mostrava `Em curso · xx%` a ultrapassar visualmente a borda do cartão.
+### Alteração implementada
 
-### Correção entregue
-
-- todos os cartões mensais permitem quebra segura no cabeçalho;
-- nome do mês, estado, percentagem, valor, descrições e barra de progresso ficam limitados à largura do cartão;
-- `min-width: 0` e `max-width: 100%` são aplicados nos elementos flex/grid relevantes;
-- o badge deixa de usar `white-space: nowrap` e passa a poder quebrar sem truncar informação;
-- removida a estratégia de `text-overflow: ellipsis` no estado mensal;
-- o resumo superior da própria secção e o cabeçalho do painel também ficam protegidos contra overflow;
-- abaixo de 520 px a grelha mensal e o resumo passam para uma coluna, preservando legibilidade;
+- grelha mensal usa `repeat(auto-fit, minmax(...))`, ajustando automaticamente a quantidade de colunas à largura real disponível;
+- o resumo vivo também usa `auto-fit`, evitando cartões excessivamente comprimidos;
+- mês, estado, valor, barra e texto auxiliar recebem hierarquia tipográfica e espaçamento mais consistentes;
+- cartões têm borda superior de estado e estrutura uniforme;
+- mês atual recebe destaque específico, com superfície e valor reforçados;
+- meses concluídos ficam visualmente distintos do mês atual e dos meses futuros;
+- em ecrãs estreitos a grelha passa para uma coluna e o estado move-se para baixo do nome do mês;
+- a altura mínima usada no desktop é libertada em mobile para evitar espaço vazio;
+- contenção do PR #207 continua ativa com `min-width: 0`, `max-width: 100%`, `overflow-wrap` e `overflow: hidden`;
 - `forced-colors` e `prefers-reduced-motion` permanecem suportados.
 
 ### Regressão
 
-Foi adicionado `src/styles/vacation-card-containment.test.ts` para impedir o regresso de regras que forcem o conteúdo para fora dos cartões ou voltem a truncar o estado mensal.
+`src/styles/vacation-card-containment.test.ts` foi ampliado para validar:
 
-Não houve alteração em cálculos, dados, persistência, sincronização, autenticação, API ou dependências.
+- grelha `auto-fit/minmax`;
+- contenção de valores/textos/progresso;
+- distinção estrutural do mês atual e concluído;
+- uma coluna no breakpoint móvel;
+- ausência de truncamento por reticências.
 
-## PR #206 — evolução mensal de férias em tempo real
+### Segurança e compatibilidade
 
-Estado: **integrado e publicado**.
+Não há alteração em `VacationBalance`, cálculos, férias registadas, cofre, sincronização, autenticação, API, dependências, dados pessoais ou configuração persistida.
 
-- PR #206 integrado em `main` no commit `15f4df15308a145f9d303cf56d699837f9516303`;
-- **Qualidade #1122** passou integralmente no head final do PR;
-- **Qualidade #1123** passou integralmente após o merge em `main`;
-- **Publicar Foco & Jornada #245** concluiu com sucesso;
-- build publicado na raiz de `main` no commit `05e32a99bd0479fdb417876cb9a31f305a32866d`;
-- **pages build and deployment #790** concluiu com sucesso para o build publicado.
+## PR #207 — contenção visual dos cartões mensais
 
-### Regra entregue
+Estado: **integrado, validado por CI e publicado**.
 
-A referência laboral permanece separada e inalterada. A evolução em tempo real aplica-se apenas à projeção pessoal configurável.
+- merge: `3a564251eece4a4c2870982ed3127c1638a68482`;
+- Qualidade #1131 no head final: sucesso;
+- Qualidade #1132 em `main`: sucesso;
+- Publicar Foco & Jornada #246: sucesso;
+- build publicado: `ce2242b0f90fc4e884764df6d3c31c7dd43a60e9`;
+- pages build and deployment #796: sucesso.
 
-- cada mês continua a representar exatamente `meta anual / 12`;
-- meses terminados mantêm marcos fechados;
-- o mês atual usa a fração de calendário já decorrida, incluindo a fração do dia local;
-- `acumulado vivo = meta × (meses anteriores + progresso do mês atual) / 12`;
-- saldo vivo desconta férias já gozadas e inclui transitados/ajustes;
-- saldo vivo projetado desconta também férias futuras planeadas;
-- os cálculos derivam diretamente da meta anual, evitando drift por arredondamentos intermédios.
+O PR #207 corrigiu o caso real em que `Em curso · xx%` ultrapassava a borda do cartão. Nome, estado, percentagem, valor, descrição e barra passaram a ficar contidos no próprio cartão.
 
-### Atualização temporal
+## Férias — regras funcionais atuais
 
-A página `#/ferias`:
+### Referência laboral
 
-- atualiza a referência temporal a cada 60 segundos enquanto está montada;
-- recalcula imediatamente quando a janela recupera foco;
-- recalcula quando a página volta a ficar visível;
-- não depende de execução contínua em background.
+- anos normais: mínimo geral suportado de 22 dias úteis;
+- valor superior apenas quando configurado como condição mais favorável confirmada;
+- ano de admissão: política conservadora de 2 dias por mês completo, até 20;
+- marco de seis meses preservado;
+- transitados, férias externas e ajustes dependem de confirmação explícita.
 
-Se iOS/Android suspender a PWA, ao regressar é usado o instante atual real. Não são fabricados ticks que teriam ocorrido enquanto JavaScript esteve suspenso.
+### Projeção pessoal
 
-### UI entregue
+- meta anual configurável, 28 dias por defeito;
+- marcos exatos: março 7, junho 14, setembro 21, dezembro 28;
+- mês atual progride em tempo real pela fração do calendário já decorrida;
+- atualização enquanto a página está ativa: 60 segundos;
+- `focus` e `visibilitychange` reconciliam imediatamente o relógio atual;
+- não existe dependência de timers em background.
 
-- cartões **Saldo agora**, **Acumulado agora**, **Após planeadas** e **Progresso do mês**;
-- hora da última atualização;
-- meta acumulada no fecho do mês atual;
-- ganho já acumulado no mês;
-- valor restante até ao fecho;
-- ritmo diário aproximado;
-- barra de progresso por mês;
-- mês atual com percentagem, acumulado vivo, ganho e restante;
-- valores vivos com até quatro casas decimais;
-- suporte preservado para mobile/tablet/desktop, `forced-colors` e `prefers-reduced-motion`.
+### Dias gozados/planeados
 
-### Compatibilidade e segurança
+- férias são agregadas do mapa de turnos, plano mensal e calculadora de horas;
+- datas são deduplicadas;
+- segunda–sexta contam no regime padrão;
+- sábado/domingo não reduzem saldo;
+- 24/08/2026–06/09/2026 resulta em 10 dias contabilizados e 4 fins de semana ignorados.
 
-`monthlyAccruedDays` continua a representar apenas meses fechados. Os valores vivos são derivados em runtime; não foi criada nova configuração persistida, migração, tabela, endpoint, token, segredo, permissão, dependência ou alteração de autenticação/sincronização.
-
-## Estado da contagem de dias úteis — PR #205
-
-Estado: **integrado e publicado**.
-
-- 24/08/2026–06/09/2026 = 14 datas civis;
-- 10 dias úteis contabilizados;
-- sábado/domingo ignorados no desconto padrão.
-
-Limite: feriados, descanso semanal diferente e escalas especiais ainda não são inferidos automaticamente.
-
-## Estado da acumulação mensal — PR #204
-
-Estado: **integrado e publicado**.
-
-A meta pessoal continua configurável, com 28 dias por defeito. Os marcos de referência permanecem:
-
-- março: 7 dias;
-- junho: 14 dias;
-- setembro: 21 dias;
-- dezembro: 28 dias.
-
-O PR #206 não substitui estes marcos; interpola apenas o mês atual até ao respetivo marco.
-
-## Estado da ferramenta de saldo — PR #203
-
-Estado: **integrado e publicado**.
-
-A referência laboral mantém:
-
-- anos normais com mínimo geral suportado de 22 dias úteis;
-- valor superior apenas quando explicitamente configurado como condição mais favorável confirmada;
-- ano de admissão com política conservadora de 2 dias por mês completo, até 20;
-- marco de seis meses para o gozo no ano de admissão;
-- dias transitados, férias externas e ajustes apenas por confirmação explícita;
-- férias reutilizadas do Mapa de turnos, plano mensal e Calculadora de horas;
-- deduplicação por data.
+Limite conhecido: feriados, descanso semanal diferente e escalas especiais ainda não são inferidos automaticamente.
 
 ## Qualidade, CI e dependências
 
@@ -148,44 +105,32 @@ Stack atual:
 - Vite 7;
 - Vitest 5;
 - Node 22 no CI;
-- npm 11.6.0 fixado nos workflows;
-- `npm audit --audit-level=high`, typecheck, lint, testes, build, Worker dry-run e smoke test Chromium como gates.
+- npm 11.6.0 fixado nos workflows.
 
-O PR #207 e o merge em `main` passaram integralmente estes gates, incluindo o novo teste estrutural de contenção dos cartões mensais.
+Gates obrigatórios:
 
-## Limitações conhecidas
+1. `npm audit --audit-level=high`;
+2. typecheck;
+3. lint;
+4. testes;
+5. build;
+6. Worker dry-run;
+7. smoke test Chromium;
+8. artefacto do build.
 
-### Projeção pessoal
+## Limitações e validações abertas
 
-- a meta de 28 dias é pessoal/configurável e não representa automaticamente o direito oficial;
-- valores vivos são uma interpolação de planeamento, não aquisição legal diária;
-- o saldo oficial continua dependente de RH, contrato, CCT e situações especiais.
-
-### Tempo real na PWA
-
-- atualização normal enquanto a página está ativa: 1 minuto;
-- o sistema operativo pode suspender JavaScript em background;
-- ao regressar, a aplicação reconcilia imediatamente pelo relógio local atual;
-- não existe garantia de callback por minuto com a app encerrada/suspensa.
-
-### Calendário laboral
-
-- sábado/domingo são excluídos automaticamente na semana padrão;
-- feriados nacionais/municipais e descanso semanal diferente ainda exigem regra/calendário confirmado.
-
-## Riscos e validações ainda abertas
-
-1. Validar visualmente no iPhone real que nenhum mês, badge, percentagem, valor ou texto extravasa a respetiva secção, incluindo zoom/aumento de texto.
-2. Validar Android/Chrome, tablet e desktop para a nova contenção responsiva.
-3. Validar em iPhone real que o valor vivo muda ao longo do tempo e é recalculado ao regressar à PWA.
-4. Confirmar que suspensão e retoma não causam saltos incorretos de data/timezone.
-5. Confirmar sincronização normal da configuração de férias entre telemóvel e computador; a evolução viva não deve exigir estado temporal novo de sync.
-6. Continuar validações físicas pendentes da automação de jornada e sincronização cross-device.
+1. Concluir os quality gates do head final do PR #208.
+2. Validar no iPhone real a nova hierarquia visual, especialmente setembro e percentagens longas.
+3. Validar Android/Chrome, tablet e desktop, incluindo zoom/aumento de texto.
+4. Confirmar atualização viva e reconciliação ao regressar à PWA em dispositivo real.
+5. Confirmar sincronização da configuração de férias entre telemóvel e computador.
+6. Validar fisicamente a automação de jornada e a sincronização cross-device.
 
 ## Última alteração
 
-PR #207 integrado e publicado: todos os cartões da evolução mensal passam a conter o respetivo nome, estado, percentagem, valor, descrição e barra de progresso dentro da própria secção, com reflow responsivo em ecrãs estreitos.
+PR #208 em validação: refinamento visual da secção **Evolução por mês**, com grelha fluida `auto-fit`, hierarquia consistente e destaque do mês atual, preservando a contenção e toda a lógica existente.
 
 ## Próximo passo
 
-Validar visualmente a versão publicada no iPhone e depois confirmar Android/tablet/desktop, incluindo aumento de texto e zoom.
+Concluir CI do PR #208, integrar/publicar apenas com gates verdes e validar a nova grelha em dispositivo real.
