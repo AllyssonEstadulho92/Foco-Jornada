@@ -2,6 +2,16 @@
 
 Atualizado em: 2026-09-16
 
+## P0 — Cabeçalho do planeamento compacto e contido (PR #213)
+
+- [x] Analisar screenshot real e comparar JSX, CSS de planeamento, workspace, router e testes.
+- [x] Corrigir badge cortada, largura do título e vazio excessivo do cabeçalho com altura intrínseca.
+- [x] Usar quebra segura, duas colunas limitadas e passagem para uma coluna até 820px.
+- [x] Manter sugestões, simulador, cálculos, registos e segurança intactos.
+- [x] Adicionar teste estrutural de regressão e `docs/VACATION-PLANNER-HEADER.md`.
+- [ ] Confirmar Quality Gates do head final, integrar PR #213 e confirmar CI em `main`.
+- [ ] Confirmar publicação e Pages; verificar visualmente no iPhone real e com zoom/texto ampliado.
+
 ## P0 — Separação do planeamento e refinamento de layout (PR #212)
 
 - [x] Rever os cinco documentos de continuidade, código da página, router, estilos e testes existentes.
