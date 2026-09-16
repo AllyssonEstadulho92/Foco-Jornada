@@ -13,8 +13,10 @@ Atualizado em: 2026-09-16
 - [x] Proteger teclado, contraste forçado, movimento reduzido e H1 acessível na rota dedicada.
 - [x] Adicionar teste de regressão `vacation-workspace.test.ts` e especificação `VACATION-WORKSPACE.md`.
 - [x] Documentar limite atual: vista escondida via CSS continua montada; sem segunda agregação.
-- [ ] Verificar gates no head final: audit, TypeScript, lint, testes, build, Worker, smoke e artefacto.
-- [ ] Integrar PR #212 e verificar Qualidade em `main`, Publicar Foco & Jornada e GitHub Pages.
+- [x] Verificar gates do head final: **Qualidade #1164**, auditoria, TypeScript, lint, testes, build, Worker, smoke e artefacto com sucesso.
+- [x] Integrar PR #212 no commit `732bfea2e518a5651a71bc347fa9782f574584b0` e confirmar **Qualidade #1165** em `main` com sucesso.
+- [x] Confirmar **Publicar Foco & Jornada #251**, build `2ff90745e506e48009347e10e19e90cea2ad5322` e **GitHub Pages #826**: sucesso.
+- [x] Atualizar PROJECT_STATE, ARCHITECTURE, DECISIONS, TODO e CHANGELOG para a implementação; registar resultados finais de publicação.
 - [ ] Testar iPhone real: alternar vistas, filtros, simulação, textos grandes, zoom, landscape e PWA retomada.
 - [ ] Testar Android/tablet/desktop e VoiceOver/TalkBack; validar sync móvel ↔ computador.
 - [ ] Avaliar extração futura de componentes/hook comuns para não montar painéis ocultos, após testes reais.
@@ -61,6 +63,7 @@ Atualizado em: 2026-09-16
 - [x] PR #209 — painel de progresso anual, próximo marco, férias comprometidas e previsão dezembro.
 - [x] PR #210 — simulação futura sem desconto duplicado.
 - [x] PR #211 — sugestões por critérios, comparação de meses e calendário.
+- [x] PR #212 — vista de planeamento separada e layout equilibrado, Quality #1165 e Pages #826 verdes.
 
 ## P0 — Automação de jornada e pausas
 
