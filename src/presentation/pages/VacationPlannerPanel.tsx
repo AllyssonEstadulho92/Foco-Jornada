@@ -1,8 +1,12 @@
 import { useMemo, useState } from 'react'
 import { NavLink } from 'react-router-dom'
-import type { VacationTrackerSettings } from '../../domain/vacation/VacationBalance'
+import {
+  calculateVacationBalance,
+  type VacationTrackerSettings,
+} from '../../domain/vacation/VacationBalance'
 import { listUpcomingVacationPeriods, simulateVacationPeriod } from '../../domain/vacation/VacationPlanner'
 import { VacationSuggestionsPanel } from './VacationSuggestionsPanel'
+import '../../styles/vacation-planner-live.css'
 
 interface VacationPlannerPanelProps {
   today: string
@@ -19,6 +23,12 @@ function nextCivilDay(dateKey: string) {
   return new Date(Date.UTC(year, month - 1, day + 1)).toISOString().slice(0, 10)
 }
 
+/** The parent clock already refreshes every minute and on focus/visibility; do not add a second timer. */
+function clockLabel(dayProgress: number) {
+  const minuteOfDay = Math.min(1439, Math.max(0, Math.floor(dayProgress * 1440)))
+  return `${String(Math.floor(minuteOfDay / 60)).padStart(2, '0')}:${String(minuteOfDay % 60).padStart(2, '0')}`
+}
+
 export function VacationPlannerPanel({
   today,
   asOfDayProgress,
@@ -32,6 +42,16 @@ export function VacationPlannerPanel({
   const yearEnd = `${today.slice(0, 4)}-12-31`
   const [startDate, setStartDate] = useState(tomorrow <= yearEnd ? tomorrow : '')
   const [endDate, setEndDate] = useState(tomorrow <= yearEnd ? tomorrow : '')
+  const updatedTime = clockLabel(asOfDayProgress)
+  const liveBalance = useMemo(
+    () => calculateVacationBalance({
+      ...settings,
+      asOfDate: today,
+      asOfDayProgress,
+      recordedVacationDates,
+    }),
+    [settings, today, asOfDayProgress, recordedVacationDates],
+  )
   const periods = useMemo(
     () => listUpcomingVacationPeriods(today, recordedVacationDates),
     [today, recordedVacationDates],
@@ -58,6 +78,40 @@ export function VacationPlannerPanel({
         </div>
         <span className="vacationPlannerPreview">Pré-visualização · sem guardar</span>
       </header>
+
+      <section className="vacationPlannerLive" aria-label="Ponto de situação do planeamento em tempo real">
+        <div className="vacationPlannerLiveHeader">
+          <div>
+            <span className="vacationPlannerLiveEyebrow">ACOMPANHAMENTO · TEMPO REAL</span>
+            <h3>O teu saldo neste momento</h3>
+          </div>
+          <p>
+            Cálculo local às <time dateTime={`${today}T${updatedTime}`}>{updatedTime}</time> · atualiza a cada minuto e ao regressares à aplicação.
+          </p>
+        </div>
+        <dl className="vacationPlannerLiveGrid">
+          <div>
+            <dt>Acumulado até agora</dt>
+            <dd>{preciseDaysLabel(liveBalance.monthlyLiveAccruedDays)}</dd>
+            <small>Meta pessoal em evolução.</small>
+          </div>
+          <div className={liveBalance.monthlyLiveAvailableBalanceDays < 0 ? 'vacationPlannerLiveNegative' : undefined}>
+            <dt>Saldo disponível agora</dt>
+            <dd>{preciseDaysLabel(liveBalance.monthlyLiveAvailableBalanceDays)}</dd>
+            <small>Já desconta as férias gozadas.</small>
+          </div>
+          <div className={liveBalance.monthlyLiveProjectedBalanceDays < 0 ? 'vacationPlannerLiveNegative' : undefined}>
+            <dt>Após as já planeadas</dt>
+            <dd>{preciseDaysLabel(liveBalance.monthlyLiveProjectedBalanceDays)}</dd>
+            <small>Sem incluir a simulação abaixo.</small>
+          </div>
+          <div className={liveBalance.yearEndProjectedBalanceDays < 0 ? 'vacationPlannerLiveNegative' : undefined}>
+            <dt>Previsão em dezembro</dt>
+            <dd>{preciseDaysLabel(liveBalance.yearEndProjectedBalanceDays)}</dd>
+            <small>Antes de novas férias simuladas.</small>
+          </div>
+        </dl>
+      </section>
 
       <VacationSuggestionsPanel
         today={today}
