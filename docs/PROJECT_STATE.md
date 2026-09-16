@@ -6,17 +6,31 @@ Atualizado em: 2026-09-16
 
 O **Foco Jornada** é uma PWA única React/TypeScript responsiva para telemóvel, tablet e computador, publicada em GitHub Pages. A persistência é local-first em IndexedDB/cofre cifrado; a sincronização opcional usa Cloudflare Worker/Durable Objects e transporta apenas o cofre cifrado.
 
-Em `main` estão integrados: turnos noturnos (#189); sincronização cifrada e associação de browsers (#191–#194); shell móvel (#195–#199); bootstrap animado (#200–#201); automação de jornada/pausas (#202); ferramenta de férias, meta pessoal 28, dias úteis e evolução viva (#203–#206); contenção e hierarquia visual (#207–#208); indicadores avançados (#209); e **simulador de períodos de férias (#210)**.
+Em `main` estão integrados: turnos noturnos (#189); sincronização cifrada e associação de browsers (#191–#194); shell móvel (#195–#199); bootstrap animado (#200–#201); automação de jornada/pausas (#202); ferramenta de férias, meta pessoal 28, dias úteis e evolução viva (#203–#206); contenção e hierarquia visual (#207–#208); indicadores avançados (#209); e simulador de períodos de férias (#210).
+
+## PR #211 — sugestões de férias alinhadas com o protótipo
+
+**Estado: em validação na branch `feat/vacation-suggestions`; não publicado ainda.** Código inicial passou Qualidade #1150; ainda é necessário validar o head final após atualizar os documentos, integrar, verificar a qualidade em `main` e confirmar a publicação Pages.
+
+A rota `#/ferias` passa a oferecer no planeador existente o painel **Sugestão de férias**, inspirado no protótipo visual aprovado, com destaque de período, filtros de dias úteis pretendidos (1–30, padrão 10), mês a evitar, preferência entre juntar fins de semana/mais cedo/maior saldo pessoal no fim, comparação de meses, calendário navegável, legenda, outras sugestões e botão **Simular este período** que preenche as datas da simulação já existente. A ligação ao mapa de turnos continua explícita.
+
+**Cálculo:** `VacationSuggestions.ts` enumera apenas períodos futuros do ano atual e exclui candidatos com dias úteis já registados ou meses evitados. Reutiliza `VacationPlanner.simulateVacationPeriod` e `VacationBalance` para a contagem e o saldo; por defeito, só mostra períodos com saldo pessoal projetado não negativo no fim e em dezembro. Os dias potenciais de descanso incluem os sábados/domingos imediatamente adjacentes ao intervalo quando estes são descanso na escala. Seleciona um candidato por mês inicial para diversidade. O ano é o atual, não 2025 como na ilustração.
+
+**Exemplo:** 10 dias já gozados em 24/08–06/09/2026, meta pessoal 28 e novos 10 dias sugeridos → previsão pessoal de 8 dias no fim do ano, sem outros ajustes/compromissos. As sugestões não afirmam direito oficial nem analisam feriados, escala real, preços ou aprovação da entidade empregadora.
+
+**Arquitetura/segurança:** novas funções puras em `src/domain/vacation/VacationSuggestions.ts`, UI em `src/presentation/pages/VacationSuggestionsPanel.tsx`, CSS isolado `src/styles/vacation-suggestions.css` e testes específicos de domínio/estrutura. O painel recebe as mesmas datas e definições já carregadas; não cria registos, reserva férias, grava preferências, altera schema, cofre, autenticação, autorização, backend, dependências ou telemetria.
+
+**Pendente:** verificar qualidade do head final, integrar/publicar, testar no iPhone real, Android/tablet/desktop (incluindo zoom, leitura de ecrã e PWA após suspensão), testar cenários reais de sobreposição, confirmar sincronização dos dados entre dispositivos. Conferir disponibilidade oficial e regime de descanso com RH antes de marcar.
 
 ## PR #210 — simulação de períodos de férias
 
 **Estado: integrado, validado por CI e publicado.**
 
 - PR #210 integrado em `main` no commit `73a6c0f43caf40219a98b1224113bdddaaec420b`;
-- **Qualidade #1148** no head final e **Qualidade #1149** após merge em `main`: sucesso integral;
-- **Publicar Foco & Jornada #249**: sucesso;
+- Qualidade #1148 no head final e Qualidade #1149 após merge em `main`: sucesso integral;
+- Publicar Foco & Jornada #249: sucesso;
 - build publicado na raiz de `main`: `8a79445d483ff2017e2cb860c94bccc77d2d33d0`;
-- **pages build and deployment #814**: sucesso para esse build.
+- pages build and deployment #814: sucesso para esse build.
 
 ### Funcionalidade entregue
 
@@ -48,11 +62,11 @@ Só períodos futuros do mesmo ano; feriados, descanso semanal alternativo e CCT
 
 ## Qualidade, CI e dependências
 
-React 19, TypeScript 5.9, Vite 7, Vitest 5, Node 22, npm 11.6.0. Gates: `npm audit --audit-level=high`, typecheck, lint, Vitest, build, Worker dry-run, smoke test Chromium e artefacto. Qualidade #1148 (head final) e #1149 (`main`) passaram integralmente. Publicar #249 e Pages #814 passaram.
+React 19, TypeScript 5.9, Vite 7, Vitest 5, Node 22, npm 11.6.0. Gates: `npm audit --audit-level=high`, typecheck, lint, Vitest, build, Worker dry-run, smoke test Chromium e artefacto. Qualidade #1148 (head final) e #1149 (`main`) passaram integralmente para PR #210; PR #211 teve execução inicial #1150 verde.
 
 ## Limitações e validações abertas
 
-1. Validar visualmente o simulador e lista de períodos em iPhone, Android, tablet e desktop, incluindo zoom/aumento de texto.
+1. Validar PR #211, publicação e o painel no iPhone com os dados reais; testar também Android, tablet e desktop, zoom e aumento do texto.
 2. Confirmar em dispositivo real 24/08–06/09 = dez úteis, sobreposição de datas e atualização viva após regressar à PWA.
 3. Confirmar sincronização de registos e configurações entre telemóvel e computador.
 4. Avaliar calendário laboral de feriados e descanso semanal alternativo somente com regras confirmadas.
@@ -60,8 +74,8 @@ React 19, TypeScript 5.9, Vite 7, Vitest 5, Node 22, npm 11.6.0. Gates: `npm aud
 
 ## Última alteração
 
-PR #210 integrado e publicado: simulação de férias futuras sem desconto duplicado, com saldos pessoais antes/depois e impacto na previsão de dezembro, sem escrita de dados.
+PR #211 em validação: opções futuras com calendário e critérios explícitos, sem escrita de dados nem duplicação de dias.
 
 ## Próximo passo
 
-Verificar o painel em iPhone e restantes dispositivos com dados reais. Considerar integração de marcação apenas depois de validar fluxos, permissões e confirmação explícita do utilizador.
+Validar o head final de #211, publicar apenas com gates verdes e testar os períodos no iPhone. Não introduzir marcação automática sem confirmação explícita e verificação do direito real de férias.
