@@ -1,0 +1,105 @@
+.vacationSuggest {
+  --suggest-deep: #194e44;
+  --suggest-accent: #1b795c;
+  --suggest-mint: #d6f2e9;
+  --suggest-ink: var(--text);
+  --suggest-soft: color-mix(in srgb, var(--surface) 92%, var(--primary-soft));
+  display: grid;
+  gap: clamp(1.05rem, 2.8vw, 1.8rem);
+  min-width: 0;
+  max-width: 100%;
+  margin-bottom: var(--space-5);
+  padding: clamp(1rem, 3vw, 1.8rem);
+  border: 1px solid var(--line);
+  border-radius: 1.5rem;
+  background: var(--suggest-soft);
+  color: var(--suggest-ink);
+}
+
+.vacationSuggest, .vacationSuggest * { box-sizing: border-box; min-width: 0; }
+.vacationSuggest button, .vacationSuggest a { -webkit-tap-highlight-color: transparent; }
+.vacationSuggest button:focus-visible, .vacationSuggest a:focus-visible,
+.vacationSuggest input:focus-visible, .vacationSuggest select:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 3px;
+}
+.vacationSuggestHeader { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.vacationSuggestEyebrow { color: var(--primary); font-size: .74rem; font-weight: 750; letter-spacing: .09em; }
+.vacationSuggestHeader h3 { margin: .5rem 0 .35rem; font-family: var(--font-display); font-size: clamp(1.65rem, 4vw, 2.4rem); line-height: 1.1; }
+.vacationSuggestHeader p { margin: 0; color: var(--muted); line-height: 1.5; overflow-wrap: anywhere; }
+.vacationSuggestSun { position: relative; flex: 0 0 6.5rem; height: 4.7rem; overflow: hidden; border-radius: 2rem; background: linear-gradient(180deg, #eff9fa, #c7e7e4); }
+.vacationSuggestSun::before { content: ''; position: absolute; top: .6rem; right: 1.5rem; width: 2.3rem; height: 2.3rem; border-radius: 50%; background: #ffd998; }
+.vacationSuggestSun::after { content: ''; position: absolute; left: -.7rem; right: -.8rem; bottom: -.6rem; height: 2.8rem; border-radius: 50% 50% 0 0; background: linear-gradient(130deg, #86b6a2, #557d7a); transform: rotate(-6deg); }
+.vacationSuggestSun span { position: absolute; z-index: 1; left: 2.2rem; bottom: -.8rem; width: 5.5rem; height: 2.6rem; border-radius: 50%; background: #a7d6da; transform: rotate(8deg); }
+
+.vacationSuggestFilters { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .8rem; }
+.vacationSuggestFilters label { display: grid; gap: .4rem; padding: .8rem; border: 1px solid var(--line); border-radius: 1rem; background: var(--surface); box-shadow: var(--shadow-sm); }
+.vacationSuggestFilters label > span { color: var(--muted); font-size: .83rem; font-weight: 650; }
+.vacationSuggestFilters input, .vacationSuggestFilters select { width: 100%; max-width: 100%; min-height: 44px; padding: .5rem .6rem; border: 1px solid var(--line-strong); border-radius: .65rem; background: var(--surface); color: var(--text); font: inherit; font-weight: 700; }
+
+.vacationSuggestFeatured { display: grid; grid-template-columns: minmax(0, 1fr) minmax(5rem, .35fr); align-items: center; gap: .5rem; padding: clamp(1rem, 3vw, 1.5rem); border: 1px solid color-mix(in srgb, var(--suggest-accent) 30%, var(--line)); border-radius: 1.25rem; background: linear-gradient(110deg, var(--surface), color-mix(in srgb, var(--suggest-mint) 38%, var(--surface))); }
+.vacationSuggestFeaturedContent { display: grid; gap: .5rem; }
+.vacationSuggestFeaturedTag { justify-self: start; max-width: 100%; padding: .38rem .75rem; border-radius: 2rem; background: color-mix(in srgb, var(--suggest-mint) 80%, var(--surface)); color: var(--suggest-deep); font-size: .8rem; font-weight: 750; overflow-wrap: anywhere; }
+.vacationSuggestFeatured strong { font-size: clamp(1.55rem, 4vw, 2.45rem); font-variant-numeric: tabular-nums; line-height: 1.1; overflow-wrap: anywhere; }
+.vacationSuggestFeatured b { font-size: 1.07rem; }
+.vacationSuggestFeatured small { color: var(--muted); line-height: 1.45; overflow-wrap: anywhere; }
+.vacationSuggestLandscape { position: relative; isolation: isolate; width: min(100%, 12rem); aspect-ratio: 1.3; justify-self: center; overflow: hidden; border-radius: 50%; background: radial-gradient(circle at 60% 30%, #ffe7b3 0 13%, transparent 14%), linear-gradient(#dff3ec 55%, #c2e6e5 56%); }
+.vacationSuggestLandscape::before { content: ''; position: absolute; left: 10%; bottom: -18%; width: 75%; height: 45%; border-radius: 50%; background: #e2ead5; transform: rotate(-8deg); }
+.vacationSuggestLandscape::after { content: ''; position: absolute; right: 25%; bottom: 15%; width: .34rem; height: 48%; border-radius: 1rem; background: #537b66; transform: rotate(17deg); }
+.vacationSuggestLandscape span { position: absolute; z-index: 1; top: 23%; right: 7%; width: 62%; height: 15%; border-radius: 50%; background: #6f9b80; transform: rotate(-13deg); }
+.vacationSuggestLandscape i { position: absolute; z-index: 1; right: 18%; top: 35%; width: 38%; height: 12%; border-radius: 50%; background: #507c65; transform: rotate(22deg); }
+
+.vacationSuggestSectionTitle { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: .5rem; }
+.vacationSuggestSectionTitle h4 { margin: 0; font-size: clamp(1.12rem, 2.5vw, 1.4rem); }
+.vacationSuggestSectionTitle button { padding: .5rem .65rem; border: 0; border-radius: .5rem; background: transparent; color: var(--primary); font: inherit; font-weight: 650; cursor: pointer; }
+.vacationSuggestMonths { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); gap: .7rem; }
+.vacationSuggestMonth { display: flex; align-items: center; gap: .7rem; width: 100%; min-height: 5.25rem; padding: .9rem; border: 1px solid var(--line); border-radius: 1rem; background: var(--surface); color: var(--text); text-align: left; font: inherit; cursor: pointer; }
+.vacationSuggestMonth.isSelected { border-color: var(--suggest-accent); box-shadow: 0 0 0 1px var(--suggest-accent); }
+.vacationSuggestMonthNumber { display: grid; flex: 0 0 2.5rem; place-items: center; height: 2.5rem; border-radius: 50%; background: color-mix(in srgb, var(--suggest-mint) 70%, var(--surface)); color: var(--suggest-deep); font-weight: 800; }
+.vacationSuggestMonth.isSelected .vacationSuggestMonthNumber { background: var(--suggest-accent); color: white; }
+.vacationSuggestMonth strong, .vacationSuggestMonth small { display: block; max-width: 100%; overflow-wrap: anywhere; }
+.vacationSuggestMonth strong { text-transform: capitalize; }
+.vacationSuggestMonth small { margin-top: .2rem; color: var(--muted); line-height: 1.35; }
+
+.vacationSuggestCalendarLayout { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(12rem, .7fr); gap: .75rem; align-items: stretch; }
+.vacationSuggestCalendar, .vacationSuggestLegend, .vacationSuggestCalendarSummary { border: 1px solid var(--line); border-radius: 1.1rem; padding: clamp(.8rem, 2vw, 1.2rem); background: var(--surface); box-shadow: var(--shadow-sm); }
+.vacationSuggestCalendarHeader { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem; margin-bottom: .8rem; }
+.vacationSuggestCalendarHeader > strong { text-transform: capitalize; }
+.vacationSuggestCalendarNavigation { display: flex; gap: .25rem; }
+.vacationSuggestCalendarNavigation button { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid var(--line); border-radius: .65rem; background: var(--surface); color: var(--text); font: inherit; font-size: 1.5rem; cursor: pointer; }
+.vacationSuggestCalendarNavigation button:disabled { opacity: .35; cursor: not-allowed; }
+.vacationSuggestCalendarGrid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: .2rem; }
+.vacationSuggestWeekday, .vacationSuggestDay { display: grid; place-items: center; min-width: 0; min-height: 2.15rem; border-radius: .5rem; font-size: .82rem; font-variant-numeric: tabular-nums; text-align: center; }
+.vacationSuggestWeekday { color: var(--muted); font-size: .72rem; font-weight: 700; }
+.vacationSuggestDay.isSuggested { background: var(--suggest-mint); color: var(--suggest-deep); font-weight: 800; }
+.vacationSuggestDay.isRest { background: #ffebc8; color: #6c4b16; }
+.vacationSuggestDay.isBooked { background: color-mix(in srgb, var(--muted) 18%, var(--surface)); border: 1px dashed var(--line-strong); color: var(--text); }
+.vacationSuggestCalendarNote { margin: .85rem 0 0; color: var(--muted); font-size: .82rem; line-height: 1.5; overflow-wrap: anywhere; }
+.vacationSuggestCalendarAside { display: grid; align-content: start; gap: .75rem; }
+.vacationSuggestLegend { display: grid; gap: .8rem; }
+.vacationSuggestLegend > span { display: flex; align-items: center; gap: .55rem; color: var(--muted); font-size: .86rem; line-height: 1.4; }
+.vacationSuggestLegend i { display: inline-block; flex: 0 0 .95rem; height: .95rem; border-radius: 50%; }
+.vacationSuggestLegend i.isSuggested { background: var(--suggest-accent); }
+.vacationSuggestLegend i.isRest { background: #e8bd73; }
+.vacationSuggestLegend i.isBooked { background: var(--muted); }
+.vacationSuggestCalendarSummary { display: grid; gap: .5rem; }
+.vacationSuggestCalendarSummary strong { overflow-wrap: anywhere; }
+.vacationSuggestCalendarSummary span { line-height: 1.45; }
+.vacationSuggestCalendarSummary small { color: var(--muted); line-height: 1.5; }
+
+.vacationSuggestAlternatives { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr)); gap: .7rem; }
+.vacationSuggestAlternatives button { display: flex; align-items: center; gap: .65rem; min-height: 5.5rem; padding: .8rem; border: 1px solid var(--line); border-radius: 1rem; background: var(--surface); color: var(--text); font: inherit; text-align: left; cursor: pointer; }
+.vacationSuggestAlternatives button > span:nth-child(2) { flex: 1; }
+.vacationSuggestAlternatives strong, .vacationSuggestAlternatives small { display: block; overflow-wrap: anywhere; }
+.vacationSuggestAlternatives small { margin-top: .25rem; color: var(--muted); line-height: 1.35; }
+.vacationSuggestAlternativeIcon { display: grid; flex: 0 0 2rem; place-items: center; height: 2rem; border-radius: .6rem; background: var(--primary-soft); color: var(--primary); }
+.vacationSuggestActions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .7rem; }
+.vacationSuggestActions button, .vacationSuggestActions a { display: grid; place-items: center; min-height: 48px; padding: .9rem; border: 1px solid var(--suggest-deep); border-radius: .8rem; background: var(--surface); color: var(--text); font: inherit; font-weight: 750; text-align: center; text-decoration: none; cursor: pointer; overflow-wrap: anywhere; }
+.vacationSuggestActions .vacationSuggestPrimaryAction { background: var(--suggest-deep); color: white; }
+.vacationSuggestDisclaimer, .vacationSuggestEmpty { margin: 0; padding: .9rem 1rem; border: 1px solid var(--line); border-radius: .9rem; background: var(--surface); color: var(--muted); font-size: .85rem; line-height: 1.6; overflow-wrap: anywhere; }
+.vacationSuggestEmpty { color: var(--text); }
+
+@media (max-width: 760px) { .vacationSuggestFilters { grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); } .vacationSuggestCalendarLayout { grid-template-columns: minmax(0, 1fr); } .vacationSuggestCalendarAside { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 520px) { .vacationSuggestHeader { align-items: flex-start; } .vacationSuggestSun { flex-basis: 3.7rem; height: 3.6rem; } .vacationSuggestFilters, .vacationSuggestCalendarAside, .vacationSuggestAlternatives, .vacationSuggestActions { grid-template-columns: minmax(0, 1fr); } .vacationSuggestFeatured { grid-template-columns: minmax(0, 1fr); } .vacationSuggestLandscape { display: none; } .vacationSuggestWeekday, .vacationSuggestDay { min-height: 2rem; font-size: .74rem; } }
+@media (forced-colors: active) { .vacationSuggestFeatured, .vacationSuggestMonth.isSelected, .vacationSuggestDay.isSuggested, .vacationSuggestDay.isRest, .vacationSuggestDay.isBooked, .vacationSuggestActions .vacationSuggestPrimaryAction { border: 2px solid Highlight; background: Canvas; color: CanvasText; } .vacationSuggestMonth.isSelected .vacationSuggestMonthNumber { background: Highlight; color: HighlightText; } .vacationSuggestCalendarGrid .vacationSuggestDay.isRest { border-style: dashed; } }
+@media (prefers-reduced-motion: reduce) { .vacationSuggest *, .vacationSuggest *::before, .vacationSuggest *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
