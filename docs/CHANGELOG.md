@@ -1,5 +1,57 @@
 # Changelog
 
+## 2026-09-16 — painel avançado de leitura de férias (PR #209)
+
+### Adicionado
+
+- Painel **O que tens, o que falta e o que vem a seguir** na rota `#/ferias`.
+- Progresso anual da meta pessoal em percentagem.
+- Dias ainda por acumular até à meta anual.
+- Próximo marco inteiro da acumulação e respetiva data estimada pelo mesmo modelo mensal.
+- Separação visual entre férias gozadas detetadas na app e dias introduzidos manualmente.
+- Férias futuras planeadas e total `gozadas + planeadas`.
+- Percentagem da meta pessoal já comprometida.
+- Previsão pessoal para 31 de dezembro.
+- Número de fins de semana registados como férias e ignorados pelo filtro padrão.
+- Próximo fecho mensal, falta no mês e ritmo diário aproximado.
+
+### Domínio
+
+Novos campos derivados em `VacationBalance`:
+
+- `annualAccrualProgressPercent`;
+- `annualAccrualRemainingDays`;
+- `usedAndPlannedDays`;
+- `usedAndPlannedPercentOfTarget`;
+- `yearEndProjectedBalanceDays`;
+- `nextAccrualMilestoneDays`;
+- `nextAccrualMilestoneDate`;
+- `hasReachedAccrualTarget`.
+
+A data do próximo marco é calculada usando a mesma distribuição `meta / 12`, sem introduzir uma segunda taxa de acumulação.
+
+### UI/UX e acessibilidade
+
+- Novo `vacation-insights.css` isolado dos estilos globais.
+- Grelha fluida `auto-fit/minmax` para desktop/tablet/mobile.
+- Barra anual com semântica `progressbar`.
+- Destaque do próximo marco sem depender apenas da cor.
+- Estado visual para projeção final negativa.
+- Contenção de texto/valores, uma coluna em ecrãs estreitos, `forced-colors` e `prefers-reduced-motion`.
+
+### Testes
+
+- `VacationBalance.insights.test.ts` cobre progresso anual, restante, próximo marco/data, projeção final e meta concluída.
+- Caso real 24/08/2026–06/09/2026 mantém 10 dias úteis e, sem outros ajustes, projeta 18 dias pessoais no fim do ano para meta 28.
+- `vacation-insights.test.ts` protege grelha, contenção, mobile e acessibilidade estrutural.
+
+### Compatibilidade e segurança
+
+- Sem novo campo persistido ou migração IndexedDB.
+- Sem novo endpoint, token, segredo, permissão, dependência ou telemetria.
+- Referência laboral continua separada da projeção pessoal.
+- Configuração e registos continuam protegidos pelo cofre cifrado existente.
+
 ## 2026-09-16 — hierarquia visual da evolução mensal de férias (PR #208)
 
 ### Aprimorado
