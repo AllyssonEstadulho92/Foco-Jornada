@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import type { VacationTrackerSettings } from '../../domain/vacation/VacationBalance'
 import { listUpcomingVacationPeriods, simulateVacationPeriod } from '../../domain/vacation/VacationPlanner'
+import { VacationSuggestionsPanel } from './VacationSuggestionsPanel'
 
 interface VacationPlannerPanelProps {
   today: string
@@ -52,13 +53,28 @@ export function VacationPlannerPanel({
       <div className="vacationPanelHeader">
         <div>
           <span>PLANEAMENTO · {today.slice(0, 4)}</span>
-          <h2 id="vacation-planner-title">Simula as próximas férias</h2>
+          <h2 id="vacation-planner-title">Planeia as próximas férias</h2>
         </div>
         <strong>Pré-visualização sem guardar</strong>
       </div>
+
+      <VacationSuggestionsPanel
+        today={today}
+        asOfDayProgress={asOfDayProgress}
+        settings={settings}
+        recordedVacationDates={recordedVacationDates}
+        formatDate={formatDate}
+        daysLabel={daysLabel}
+        onSimulate={(start, end) => {
+          setStartDate(start)
+          setEndDate(end)
+        }}
+      />
+
       <p className="vacationPlannerIntro">
-        Escolhe um período e vê quantos dias úteis acrescentaria às férias já marcadas, o saldo pessoal
-        estimado no início e no fim e o efeito na previsão de dezembro. A simulação não reserva nem regista férias.
+        Escolhe um período ou utiliza uma sugestão acima para veres quantos dias úteis acrescentaria às férias
+        já marcadas, o saldo pessoal estimado no início e no fim e o efeito na previsão de dezembro.
+        A simulação não reserva nem regista férias.
       </p>
 
       {tomorrow > yearEnd ? (
@@ -67,7 +83,7 @@ export function VacationPlannerPanel({
         </p>
       ) : (
         <>
-          <div className="vacationPlannerForm">
+          <div className="vacationPlannerForm" id="vacation-planner-dates">
             <label>
               <span>Início do período</span>
               <input
