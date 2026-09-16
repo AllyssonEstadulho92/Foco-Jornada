@@ -2,6 +2,18 @@
 
 Atualizado em: 2026-09-16
 
+## P0 — Ponto de situação em tempo real no planeamento (PR #214)
+
+- [x] Analisar o relógio existente, `VacationBalancePage`, o domínio, sugestões, simulador, CSS e testes.
+- [x] Reutilizar `calculateVacationBalance`, data/progresso, configurações e registos, sem nova fórmula/timer ou gravação.
+- [x] Apresentar acumulado, saldo agora, após férias já planeadas e previsão de dezembro, com hora local ao minuto.
+- [x] Separar os valores existentes do período apenas simulado; manter sugestões e datas a recalcular quando alteradas.
+- [x] Criar CSS responsivo/contido, `forced-colors`, movimento reduzido e teste estrutural.
+- [x] Registar a especificação em `docs/VACATION-PLANNER-LIVE.md`.
+- [ ] Confirmar todos os quality gates no head final, integrar PR #214 e confirmar a CI de `main`.
+- [ ] Confirmar publicação e GitHub Pages; verificar visualmente iPhone real, zoom, texto grande e retorno após suspensão.
+- [ ] Confirmar atualização após alterar registos de férias e atravessar a meia-noite, sem atribuir sincronia instantânea ao backend.
+
 ## P0 — Cabeçalho do planeamento compacto e contido (PR #213)
 
 - [x] Analisar screenshot real e comparar JSX, CSS de planeamento, workspace, router e testes.

@@ -13,7 +13,7 @@ GitHub Pages
        ├─ Presentation: Hoje, Foco, Turnos, Horas, Férias, Definições
        │    └─ VacationWorkspacePage (PR #212)
        │         ├─ #/ferias: evolução mensal + indicadores + configuração
-       │         └─ #/ferias/planeamento: sugestões + calendário + simulador
+       │         └─ #/ferias/planeamento: resumo vivo + sugestões + calendário + simulador
        │              └─ VacationBalancePage (mesma agregação e dados)
        ├─ Application: casos de uso e reconciliações de WorkSchedule
        ├─ Domain
@@ -34,7 +34,7 @@ React 19, TypeScript 5.9, Vite 7, React Router, IndexedDB/Dexie, cofre AES-GCM, 
 
 Componentes relevantes: `src/presentation/layouts/AppShell.tsx`, páginas `TodayReferencePage.tsx`, `FocusPage.tsx`, `ActivitiesPage.tsx`, `ShiftMapPage.tsx`, `WorkHoursCalculatorPage.tsx`, `VacationBalancePage.tsx`, `VacationPlannerPanel.tsx`, `VacationSuggestionsPanel.tsx`, `VacationWorkspacePage.tsx`, `SettingsReferencePage.tsx` e `src/presentation/providers/AppServicesProvider.tsx`.
 
-Férias usam `src/styles/vacation.css` (base), `vacation-accrual.css` (grelha mensal), `vacation-insights.css` (indicadores), `vacation-planner.css` (simulador), `vacation-suggestions.css` (sugestões) e `vacation-workspace.css` (separação visual e navegação). Testes estruturais: `vacation-card-containment.test.ts`, `vacation-insights.test.ts`, `vacation-planner.test.ts`, `vacation-suggestions.test.ts` e `vacation-workspace.test.ts`. Indicadores/simulações não persistem snapshots nem períodos novos.
+Férias usam `src/styles/vacation.css` (base), `vacation-accrual.css` (grelha mensal), `vacation-insights.css` (indicadores), `vacation-planner.css` (simulador), `vacation-planner-live.css` (resumo vivo do planeador), `vacation-suggestions.css` (sugestões) e `vacation-workspace.css` (separação visual e navegação). Testes estruturais: `vacation-card-containment.test.ts`, `vacation-insights.test.ts`, `vacation-planner.test.ts`, `vacation-planner-live.test.ts`, `vacation-suggestions.test.ts` e `vacation-workspace.test.ts`. Indicadores/simulações não persistem snapshots nem períodos novos.
 
 ### Application
 
@@ -51,7 +51,7 @@ Coordena casos de uso e repositories, não regras visuais: entrada, saída, paus
 `VacationWorkspacePage` recebe `view="overview" | "planning"`. `NavLink` com `end` em `/ferias` evita ativar a vista geral quando se navega para `/ferias/planeamento`; `aria-current=page` é tratado pelo Router. Ambas as vistas utilizam o mesmo `VacationBalancePage` e cálculos, sem estado ou dados duplicados:
 
 - overview: hero «Férias acumuladas mês a mês» → métricas → painel mensal → «O que tens, o que falta e o que vem a seguir» → configurações/referência/fontes/nota legal;
-- planning: apenas `VacationPlannerPanel`, contendo sugestões, filtros, calendário, períodos, simulação e link separado para registo no mapa de turnos.
+- planning: apenas `VacationPlannerPanel`, contendo resumo vivo, sugestões, filtros, calendário, períodos, simulação e link separado para registo no mapa de turnos.
 
 A separação atual é **de apresentação por CSS**: `display:none` oculta a zona não aplicável em cada rota. React ainda monta o componente completo e calcula os seus valores, mesmo quando a zona não é visível; não alegar desmontagem ou isolamento funcional. Esta opção evita refatorar cálculos num pedido primariamente visual; extração de componentes/hook comum pode ser feita numa alteração posterior, com testes de regressão. A nova rota tem H1 acessível próprio.
 
@@ -63,11 +63,17 @@ A captura física revelou a badge cortada à direita e um cabeçalho demasiado a
 
 Para evitar o esticamento do primeiro filho observado na vista dedicada, `.vacationWorkspace--planning .vacationPage > .vacationPlannerPanel` substitui o layout de grelha do PR #212 por coluna flex de altura intrínseca e o cabeçalho tem `flex: 0 0 auto`. O cálculo e os outros cartões não mudam. Teste de regressão estrutural em `vacation-workspace.test.ts`; especificação `docs/VACATION-PLANNER-HEADER.md`. Validar visualmente após publicação num iPhone real: CI não comprova geometria de um dispositivo específico.
 
+## Resumo local em tempo real do planeamento — PR #214
+
+O relógio existente em `VacationBalancePage` fornece `today` e `asOfDayProgress`, atualiza a cada minuto e em `focus`/`visibilitychange`. `VacationPlannerPanel` recebe estas props e as datas/configuração já agregadas e aplica `calculateVacationBalance` por `useMemo`: `monthlyLiveAccruedDays`, `monthlyLiveAvailableBalanceDays`, `monthlyLiveProjectedBalanceDays` e `yearEndProjectedBalanceDays`. O resumo não introduz nova fórmula nem segundo temporizador. O rótulo temporal ao minuto é derivado do mesmo progresso temporal; não comprova sincronização remota. A simulação mantém a sua própria pré-visualização e não está incluída no saldo «após as já planeadas».
+
+`vacation-planner-live.css` é importado no componente, com grelha fluida, contenção e estados negativos; `vacation-planner-live.test.ts` cobre fonte/relógio, ausência de intervalo adicional e CSS. A chamada adicional à função pura não agrega fontes novas; por agora a rota oculta continua montada no React, pelo que não se deve alegar ausência de cálculos ocultos. Documento `docs/VACATION-PLANNER-LIVE.md`. A atualização depende de a PWA estar ativa; ao retomar, o evento de foco/visibilidade recalcula. Não se adicionou protocolo WebSocket, push ou polling remoto.
+
 ## Persistência e fronteira de segurança
 
 `foco-jornada-security-v1`: perfil/KDF/chaves/metadados sync. `foco-jornada-vault-v1`: `EncryptedVaultRecord` cifrado. Configuração de férias em `secureStorage`, chave `foco-jornada-vacation-settings-v1`, campos `employmentStartDate`, `annualEntitlementDays`, `monthlyAccrualTargetDays`, `carriedDays`, `manualTakenDays`, `adjustmentDays`.
 
-PR #210/#211/#212/#213 não acrescentam campos, migrações, férias artificiais nem alterações ao cofre. Filtros de sugestões são estado React efémero. PIN, palavra-passe, código recuperação e dataKey original não são enviados ao Worker; backend recebe cofre cifrado/metadados. Nenhum HTML não confiável é injetado no planeador; PR #213 não acrescenta endpoint, token, segredo, permissão, dependência, telemetria ou mutação.
+PR #210/#211/#212/#213/#214 não acrescentam campos, migrações, férias artificiais nem alterações ao cofre. Filtros de sugestões são estado React efémero. PIN, palavra-passe, código recuperação e dataKey original não são enviados ao Worker; backend recebe cofre cifrado/metadados. Nenhum HTML não confiável é injetado no planeador; PR #214 não acrescenta endpoint, token, segredo, permissão, dependência, telemetria ou mutação.
 
 ## Fontes e cálculo de férias
 
@@ -115,4 +121,4 @@ Indicadores PR #209: `annualAccrualProgressPercent`, `annualAccrualRemainingDays
 
 ## Qualidade
 
-Workflow `Qualidade`: Node 22/npm 11.6.0, `npm audit --audit-level=high`, typecheck, lint, Vitest, build, Worker dry-run, smoke Chromium e artefacto. Head final tem de estar verde antes de integrar. PR #213 alarga `vacation-workspace.test.ts`; validação física real ainda pendente.
+Workflow `Qualidade`: Node 22/npm 11.6.0, `npm audit --audit-level=high`, typecheck, lint, Vitest, build, Worker dry-run, smoke Chromium e artefacto. Head final tem de estar verde antes de integrar. PR #214 acrescenta `vacation-planner-live.test.ts`; validação física real ainda pendente.
