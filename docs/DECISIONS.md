@@ -299,7 +299,7 @@ O próximo marco é `min(metaAnual, floor(acumuladoVivo) + 1)` enquanto a meta n
 
 ## D-029 — Simular férias futuras sem criar registos implícitos
 
-**Estado:** proposta no PR #210; integrar apenas depois dos quality gates do head final.
+**Estado:** aceite, integrada no PR #210 e publicada.
 
 **Decisão:** o planeador recebe a mesma configuração e datas normalizadas da página de férias, mas limita-se a calcular pré-visualizações de períodos futuros do ano atual. Nenhuma simulação grava ou reserva dias; só o utilizador pode efetuar um registo explícito no mapa de turnos.
 
@@ -310,3 +310,5 @@ O próximo marco é `min(metaAnual, floor(acumuladoVivo) + 1)` enquanto a meta n
 **Limites:** bloquear períodos passados e cruzamento de anos nesta versão; feriados, escalas especiais e regimes semanais não padrão exigem regras previamente confirmadas. A lista de próximos períodos mostra o primeiro e último dia útil marcado de cada grupo, não o período integral aprovado de descanso.
 
 **Segurança e acessibilidade:** sem novo schema, endpoint, dependência ou segredo; CSS isolado, validação de datas civis, `aria-live`, `focus-visible`, `forced-colors` e `prefers-reduced-motion`.
+
+**Entrega:** Qualidade #1148 no head final e #1149 em `main`, Publicar Foco & Jornada #249 e Pages #814 concluídos com sucesso. Merge `73a6c0f43caf40219a98b1224113bdddaaec420b`; build publicado `8a79445d483ff2017e2cb860c94bccc77d2d33d0`. Testes físicos de dispositivo permanecem pendentes.
