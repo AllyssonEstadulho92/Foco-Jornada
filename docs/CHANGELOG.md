@@ -14,7 +14,8 @@
 - O isolamento é visual por `display:none`: zonas ocultas continuam montadas no React. A extração futura para componentes/hook partilhado pode eliminar renderizações ocultas; não é atribuída a este PR.
 - `vacation-workspace.test.ts` cobre rotas, nav, ordem, isolamento, largura, mobile, foco e acessibilidade estrutural. Especificação em `docs/VACATION-WORKSPACE.md`.
 - Sem nova persistência, schema, auth, API, Worker, token, segredo, dependência ou telemetria. A projeção pessoal continua distinta do direito laboral.
-- **Estado nesta revisão:** CI final, merge, Pages e validação física em dispositivo real pendentes; não declarar publicado antes de confirmação.
+- **Entrega confirmada:** Qualidade #1158 (código inicial), #1164 (head final) e #1165 (`main`) passaram auditoria, TypeScript, lint, Vitest, build, Worker dry-run, smoke Chromium e artefacto. PR #212 integrado no commit `732bfea2e518a5651a71bc347fa9782f574584b0`. **Publicar Foco & Jornada #251** e **GitHub Pages #826** concluídos com sucesso; build `2ff90745e506e48009347e10e19e90cea2ad5322`.
+- **Pendente:** validação visual/funcional em iPhone, Android, tablet e desktop reais, com zoom/texto ampliado e tecnologias de apoio. CI não substitui testes físicos.
 
 ## 2026-09-16 — sugestões de férias baseadas em critérios (PR #211)
 
