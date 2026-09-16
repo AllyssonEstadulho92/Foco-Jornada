@@ -8,7 +8,12 @@ export type VacationSuggestionPreference = 'rest' | 'soon' | 'balance'
 
 export interface VacationSuggestionInput extends VacationBalanceInput {
   requestedDays: number
+  /** Campo legado: continua a excluir um mês, se configurado. */
   excludedMonth: number
+  excludedMonths?: number[]
+  preferredMonth?: number
+  /** Até três alternativas do mês preferido; restantes meses mantêm uma opção. */
+  preferredMonthOptions?: number
   preference: VacationSuggestionPreference
 }
 
@@ -46,11 +51,11 @@ function isWeekday(timestamp: number) {
   return weekday !== 0 && weekday !== 6
 }
 
-function isInExcludedMonth(timestamp: number, excludedMonth: number) {
-  return excludedMonth > 0 && new Date(timestamp).getUTCMonth() + 1 === excludedMonth
+function isInExcludedMonth(timestamp: number, blockedMonths: Set<number>) {
+  return blockedMonths.has(new Date(timestamp).getUTCMonth() + 1)
 }
 
-/** Potential consecutive rest days: chosen interval plus immediately adjacent Sat/Sun. */
+/** Descanso potencial consecutivo, contando fins de semana imediatamente adjacentes. */
 function restDaysForRange(start: number, end: number) {
   let beginning = start
   let finish = end
@@ -73,16 +78,24 @@ function orderCandidates(preference: VacationSuggestionPreference, left: Vacatio
 }
 
 /**
- * Suggestions use ONLY the existing personal monthly model and standard Mon–Fri week.
- * No holidays, approval, prices, workplace roster or additional persistence are inferred.
- * Each proposed weekday is new; candidates overlapping already recorded weekdays are discarded.
+ * Propostas apenas com a projeção pessoal e a semana padrão de segunda a sexta.
+ * O ano considerado é o de asOfDate; a vista pode enviar 01/01 do ano seguinte como
+ * cenário autónomo, sem transferir automaticamente saldos do ano corrente.
+ * Não se inferem feriados, aprovação, disponibilidade da parceira, preços ou escalas.
  */
 export function suggestVacationPeriods(input: VacationSuggestionInput): VacationSuggestion[] {
   const today = parseDate(input.asOfDate)
+  const extraMonths = input.excludedMonths ?? []
+  const preferredMonth = input.preferredMonth ?? 0
+  const preferredMonthOptions = input.preferredMonthOptions ?? 1
   if (today === null || !Number.isInteger(input.requestedDays) || input.requestedDays < 1 ||
       input.requestedDays > 30 || !Number.isInteger(input.excludedMonth) ||
-      input.excludedMonth < 0 || input.excludedMonth > 12) return []
+      input.excludedMonth < 0 || input.excludedMonth > 12 ||
+      !Array.isArray(extraMonths) || extraMonths.some((month) => !Number.isInteger(month) || month < 1 || month > 12) ||
+      !Number.isInteger(preferredMonth) || preferredMonth < 0 || preferredMonth > 12 ||
+      !Number.isInteger(preferredMonthOptions) || preferredMonthOptions < 1 || preferredMonthOptions > 3) return []
 
+  const blockedMonths = new Set([input.excludedMonth, ...extraMonths].filter((month) => month > 0))
   const year = new Date(today).getUTCFullYear()
   const yearEnd = Date.UTC(year, 11, 31)
   const alreadyRecorded = new Set(input.recordedVacationDates)
@@ -91,21 +104,18 @@ export function suggestVacationPeriods(input: VacationSuggestionInput): Vacation
   const yearEndAfter = Math.round((annual.yearEndProjectedBalanceDays - input.requestedDays + Number.EPSILON) * 10_000) / 10_000
 
   for (let start = today + DAY_MS; start <= yearEnd; start += DAY_MS) {
-    if (!isWeekday(start) || isInExcludedMonth(start, input.excludedMonth)) continue
+    if (!isWeekday(start) || isInExcludedMonth(start, blockedMonths)) continue
 
     let end = start
     let workingDays = 0
-    let overlaps = false
-    const proposed: string[] = []
+    let blockedOrBooked = false
     for (; end <= yearEnd && workingDays < input.requestedDays; end += DAY_MS) {
-      if (isInExcludedMonth(end, input.excludedMonth)) { overlaps = true; break }
+      if (isInExcludedMonth(end, blockedMonths)) { blockedOrBooked = true; break }
       if (!isWeekday(end)) continue
-      const key = dateKey(end)
-      if (alreadyRecorded.has(key)) { overlaps = true; break }
-      proposed.push(key)
+      if (alreadyRecorded.has(dateKey(end))) { blockedOrBooked = true; break }
       workingDays += 1
     }
-    if (overlaps || workingDays !== input.requestedDays) continue
+    if (blockedOrBooked || workingDays !== input.requestedDays) continue
     const lastDay = end - DAY_MS
     const simulation = simulateVacationPeriod({
       ...input,
@@ -126,16 +136,22 @@ export function suggestVacationPeriods(input: VacationSuggestionInput): Vacation
     })
   }
 
-  // Prefer periods that do not put the personal *projected* balance below zero at their end.
-  const nonnegative = options.filter((option) => option.afterPeriodBalanceDays >= 0 && option.afterYearEndBalanceDays >= 0)
-  if (nonnegative.length === 0) return []
-  nonnegative.sort((left, right) => orderCandidates(input.preference, left, right))
+  const eligible = options.filter((option) => option.afterPeriodBalanceDays >= 0 && option.afterYearEndBalanceDays >= 0)
+  eligible.sort((left, right) => {
+    if (preferredMonth > 0) {
+      const leftPreferred = left.month === preferredMonth
+      const rightPreferred = right.month === preferredMonth
+      if (leftPreferred !== rightPreferred) return leftPreferred ? -1 : 1
+    }
+    return orderCandidates(input.preference, left, right)
+  })
 
-  // One representative per starting month gives the user genuinely different months to compare.
-  const months = new Set<number>()
-  return nonnegative.filter((option) => {
-    if (months.has(option.month)) return false
-    months.add(option.month)
+  const months = new Map<number, number>()
+  return eligible.filter((option) => {
+    const count = months.get(option.month) ?? 0
+    const limit = option.month === preferredMonth ? preferredMonthOptions : 1
+    if (count >= limit) return false
+    months.set(option.month, count + 1)
     return true
   })
 }
