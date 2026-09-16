@@ -296,3 +296,17 @@ O próximo marco é `min(metaAnual, floor(acumuladoVivo) + 1)` enquanto a meta n
 **UI/UX:** o painel usa `vacation-insights.css`, grelha `auto-fit/minmax`, barra anual acessível, contenção responsiva, `forced-colors` e `prefers-reduced-motion`.
 
 **Entrega:** Qualidade #1140 no head, Qualidade #1141 em `main`, Publicar Foco & Jornada #248 e pages build and deployment #807 concluíram com sucesso; build publicado no commit `ac121c3f687f86149d90e1bd78c4788b8c86d0a6`.
+
+## D-029 — Simular férias futuras sem criar registos implícitos
+
+**Estado:** proposta no PR #210; integrar apenas depois dos quality gates do head final.
+
+**Decisão:** o planeador recebe a mesma configuração e datas normalizadas da página de férias, mas limita-se a calcular pré-visualizações de períodos futuros do ano atual. Nenhuma simulação grava ou reserva dias; só o utilizador pode efetuar um registo explícito no mapa de turnos.
+
+**Cálculo:** usar a mesma política de semana útil de `VacationBalance` (segunda–sexta); descontar apenas datas úteis do intervalo que ainda não constem dos registos existentes. Obter saldo no início/fim chamando `calculateVacationBalance` nos instantes correspondentes, sem implementar uma segunda fórmula de acumulação. Projeção pessoal de dezembro após simulação = projeção anterior − dias adicionais.
+
+**Motivo:** permitir avaliação de cenários sem duplicação de dias, mutação silenciosa de dados ou apresentação da meta pessoal de 28 dias como direito oficial.
+
+**Limites:** bloquear períodos passados e cruzamento de anos nesta versão; feriados, escalas especiais e regimes semanais não padrão exigem regras previamente confirmadas. A lista de próximos períodos mostra o primeiro e último dia útil marcado de cada grupo, não o período integral aprovado de descanso.
+
+**Segurança e acessibilidade:** sem novo schema, endpoint, dependência ou segredo; CSS isolado, validação de datas civis, `aria-live`, `focus-visible`, `forced-colors` e `prefers-reduced-motion`.
