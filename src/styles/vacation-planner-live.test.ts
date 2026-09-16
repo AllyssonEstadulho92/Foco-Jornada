@@ -20,7 +20,7 @@ describe('planeamento de férias — resumo vivo', () => {
   })
 
   it('separa projeção pessoal de novas simulações e mantém estados legíveis', () => {
-    expect(plannerPage).toContain('sem incluir a simulação abaixo')
+    expect(plannerPage).toContain('Sem incluir a simulação abaixo.')
     expect(plannerPage).toContain('vacationPlannerLiveNegative')
     expect(plannerPage).toContain('<time dateTime={`${today}T${updatedTime}`}>')
     expect(plannerPage).toContain('A simulação não reserva nem regista férias.')
