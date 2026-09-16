@@ -1,5 +1,29 @@
 # Changelog
 
+## 2026-09-16 — simulação de períodos futuros de férias (PR #210)
+
+### Adicionado
+
+- Novo painel **Simula as próximas férias** dentro de `#/ferias`, com início/fim e pré-visualização sem gravação.
+- Contagem de dias civis, dias úteis padrão, fins de semana e dias úteis já registados; apenas os dias ainda não registados contam como adicionais.
+- Saldo pessoal estimado no início e no fim do período, reutilizando `calculateVacationBalance`.
+- Previsão pessoal de 31 de dezembro antes/depois da simulação e aviso quando se torna negativa.
+- Lista dos próximos conjuntos de dias úteis futuros marcados, incluindo agrupamento de sexta a segunda.
+- Ligação explícita ao mapa de turnos para registar férias, sem criar ou alterar registos na simulação.
+
+### Precisão, segurança e testes
+
+- Datas civis validadas com UTC; datas passadas, invertidas ou fora do ano atual são rejeitadas.
+- Caso 24/08/2026–06/09/2026 mantém dez dias úteis e quatro fins de semana; meta 28 e dez dias novos produzem previsão final de 18 dias.
+- Testes `VacationPlanner.test.ts` cobrem datas, sobreposição, saldos e agrupamento; `vacation-planner.test.ts` verifica integração, contenção e acessibilidade estrutural.
+- Novo `vacation-planner.css` isolado, grelha fluida, uma coluna em mobile, `focus-visible`, `forced-colors` e `prefers-reduced-motion`.
+- Sem nova persistência, schema, endpoint, segredo, autenticação, permissão, dependência ou telemetria. A referência laboral permanece separada da meta pessoal.
+
+### Qualidade e publicação
+
+- Primeira Qualidade #1143: sucesso integral no código com especificação do simulador; validar o head final antes de integrar.
+- Integração/publicação e validação física: pendentes nesta revisão do changelog.
+
 ## 2026-09-16 — painel avançado de leitura de férias (PR #209)
 
 ### Adicionado
@@ -54,12 +78,11 @@ A data do próximo marco é calculada usando a mesma distribuição `meta / 12`,
 
 ### Qualidade, integração e publicação
 
-- **Qualidade #1140** no head final do PR concluiu integralmente com sucesso.
+- **Qualidade #1140** no head final do PR e **Qualidade #1141** em `main`: sucesso.
 - PR #209 integrado em `main` no commit `8b7b6fc68c3330714b081865992de9adb5243d4c`.
-- **Qualidade #1141** após o merge concluiu com sucesso: auditoria, typecheck, lint, testes, build, Worker dry-run, smoke test Chromium e artefacto.
-- **Publicar Foco & Jornada #248** concluiu com sucesso.
-- Build publicado na raiz de `main` no commit `ac121c3f687f86149d90e1bd78c4788b8c86d0a6`.
-- **pages build and deployment #807** concluiu com sucesso para o build publicado.
+- **Publicar Foco & Jornada #248**: sucesso.
+- Build publicado: `ac121c3f687f86149d90e1bd78c4788b8c86d0a6`.
+- **pages build and deployment #807**: sucesso.
 
 ## 2026-09-16 — hierarquia visual da evolução mensal de férias (PR #208)
 
@@ -90,8 +113,8 @@ A data do próximo marco é calculada usando a mesma distribuição `meta / 12`,
 - PR #208 integrado em `main` no commit `a41a0c3b9fdef1b0e5d67bc29ce6b453dbcbc4cf`.
 - **Qualidade #1139** após o merge concluiu com sucesso: auditoria, typecheck, lint, testes, build, Worker dry-run, smoke test Chromium e artefacto.
 - **Publicar Foco & Jornada #247** concluiu com sucesso.
-- Build publicado na raiz de `main` no commit `a5a17750ffa43f506c9feb5af78a167f3b1f0f5c`.
-- **pages build and deployment #801** concluiu com sucesso para o build publicado.
+- Build publicado: `a5a17750ffa43f506c9feb5af78a167f3b1f0f5c`.
+- **pages build and deployment #801**: sucesso.
 
 ## 2026-09-15 — contenção visual dos cartões mensais de férias (PR #207)
 
