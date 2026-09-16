@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import workspaceCss from './vacation-workspace.css?raw'
+import plannerCss from './vacation-planner.css?raw'
+import plannerPage from '../presentation/pages/VacationPlannerPanel.tsx?raw'
 import workspacePage from '../presentation/pages/VacationWorkspacePage.tsx?raw'
 import vacationPage from '../presentation/pages/VacationBalancePage.tsx?raw'
 import router from '../presentation/router.tsx?raw'
@@ -41,5 +43,21 @@ describe('férias — áreas separadas e responsivas', () => {
     expect(workspaceCss).toContain('grid-template-columns: minmax(0, 1fr)')
     expect(workspaceCss).toContain('@media (forced-colors: active)')
     expect(workspaceCss).toContain('@media (prefers-reduced-motion: reduce)')
+  })
+
+  it('mantém cabeçalho de planeamento compacto e estado visível sem transbordar', () => {
+    expect(plannerPage).toContain('<header className="vacationPlannerHero">')
+    expect(plannerPage).toContain('vacationPlannerHeroCopy')
+    expect(plannerPage).toContain('vacationPlannerPreview')
+    expect(plannerPage).toContain('Pré-visualização · sem guardar')
+    expect(plannerCss).toContain('grid-template-columns: minmax(0, 1fr) minmax(0, 12.5rem)')
+    expect(plannerCss).toContain('grid-auto-rows: min-content')
+    expect(plannerCss).toContain('.vacationWorkspace--planning .vacationPage > .vacationPlannerPanel {')
+    expect(plannerCss).toContain('flex-direction: column')
+    expect(plannerCss).toContain('justify-content: flex-start')
+    expect(plannerCss).toContain('flex: 0 0 auto')
+    expect(plannerCss).toContain('overflow-wrap: anywhere')
+    expect(plannerCss).toContain('@media (max-width: 820px)')
+    expect(plannerCss).toContain('grid-template-columns: minmax(0, 1fr)')
   })
 })
