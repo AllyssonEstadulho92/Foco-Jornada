@@ -52,6 +52,15 @@ A data do próximo marco é calculada usando a mesma distribuição `meta / 12`,
 - Referência laboral continua separada da projeção pessoal.
 - Configuração e registos continuam protegidos pelo cofre cifrado existente.
 
+### Qualidade, integração e publicação
+
+- **Qualidade #1140** no head final do PR concluiu integralmente com sucesso.
+- PR #209 integrado em `main` no commit `8b7b6fc68c3330714b081865992de9adb5243d4c`.
+- **Qualidade #1141** após o merge concluiu com sucesso: auditoria, typecheck, lint, testes, build, Worker dry-run, smoke test Chromium e artefacto.
+- **Publicar Foco & Jornada #248** concluiu com sucesso.
+- Build publicado na raiz de `main` no commit `ac121c3f687f86149d90e1bd78c4788b8c86d0a6`.
+- **pages build and deployment #807** concluiu com sucesso para o build publicado.
+
 ## 2026-09-16 — hierarquia visual da evolução mensal de férias (PR #208)
 
 ### Aprimorado
