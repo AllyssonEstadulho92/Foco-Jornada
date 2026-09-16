@@ -22,7 +22,15 @@
 ### Compatibilidade e segurança
 
 - Nenhuma alteração em `VacationBalance`, cálculo, persistência, cofre, sincronização, API, autenticação, dependências ou dados pessoais.
-- PR permanece em validação até os quality gates do head final concluírem.
+
+### Qualidade, integração e publicação
+
+- **Qualidade #1138** no head final do PR concluiu integralmente com sucesso.
+- PR #208 integrado em `main` no commit `a41a0c3b9fdef1b0e5d67bc29ce6b453dbcbc4cf`.
+- **Qualidade #1139** após o merge concluiu com sucesso: auditoria, typecheck, lint, testes, build, Worker dry-run, smoke test Chromium e artefacto.
+- **Publicar Foco & Jornada #247** concluiu com sucesso.
+- Build publicado na raiz de `main` no commit `a5a17750ffa43f506c9feb5af78a167f3b1f0f5c`.
+- **pages build and deployment #801** concluiu com sucesso para o build publicado.
 
 ## 2026-09-15 — contenção visual dos cartões mensais de férias (PR #207)
 
