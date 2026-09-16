@@ -232,9 +232,9 @@ O relógio é efémero. A página atualiza a cada minuto e também em `focus`/`v
 
 ## D-027 — A grelha mensal deve adaptar a quantidade de colunas ao espaço real
 
-**Estado:** proposta no PR #208; integração depende dos quality gates.
+**Estado:** aceite, integrada no PR #208 e publicada.
 
-**Decisão:** depois de corrigido o overflow, a grelha mensal passa a usar `auto-fit/minmax` em vez de depender apenas de breakpoints rígidos. O cartão mensal mantém uma largura mínima confortável no desktop/tablet e cai naturalmente para menos colunas à medida que o espaço diminui.
+**Decisão:** depois de corrigido o overflow, a grelha mensal usa `auto-fit/minmax` em vez de depender apenas de breakpoints rígidos. O cartão mensal mantém uma largura mínima confortável no desktop/tablet e cai naturalmente para menos colunas à medida que o espaço diminui.
 
 A regra principal é:
 
