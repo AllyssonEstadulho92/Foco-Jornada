@@ -8,6 +8,14 @@ O **Foco Jornada** é uma PWA React/TypeScript única e responsiva para telemóv
 
 Em `main` estão integrados turnos noturnos (#189), sincronização/associação cifrada de browsers (#191–#194), shell móvel (#195–#199), bootstrap animado (#200–#201), automação de jornada/pausas (#202), ferramenta/evolução de férias (#203–#209), simulador de períodos (#210), sugestões visuais (#211) e **separação das áreas de consulta e planeamento (#212)**.
 
+## PR #213 — corrigir corte e espaço vazio no cabeçalho do planeamento
+
+**Estado: alteração no branch `fix/vacation-planner-hero-spacing`, em validação; ainda não integrada/publicada nesta revisão.** A captura real mostra «Pré-visualização…» cortada à direita e uma caixa de cabeçalho demasiado alta. Causa provável no código: o painel de planeamento usa `display:grid`, que pode esticar a linha do cabeçalho, e partilha o estilo flexível de outros cabeçalhos sem orçamento próprio de largura.
+
+Correção: `VacationPlannerPanel.tsx` passa a usar um `header.vacationPlannerHero` com título, explicação curta e badge contida; `vacation-planner.css` limita as colunas, permite quebra de texto e muda a vista dedicada para coluna flex de altura intrínseca. Em ecrãs até 820px a badge desce para a linha seguinte. Teste estrutural em `vacation-workspace.test.ts`. Não se alteraram fórmulas, 10 dias úteis de 24/08–06/09, meta pessoal de 28, fontes de dados, cofre, sync, API ou permissões. Especificação em `docs/VACATION-PLANNER-HEADER.md`.
+
+**Próximo passo imediato:** validar head final no GitHub Actions, integrar apenas se passar, verificar Qualidade de `main`, publicação e Pages, e confirmar no iPhone com nova captura que a badge e a altura ficaram corretas. CI estrutural não equivale a teste visual físico.
+
 ## PR #212 — separar evolução e planeamento, melhorar largura e espaçamento
 
 **Estado: integrado, CI concluída e publicado.** O PR #212 foi integrado em `main` no commit `732bfea2e518a5651a71bc347fa9782f574584b0`. Qualidade #1158 (código inicial), #1164 (head final) e **#1165 em `main`** concluíram com sucesso: auditoria, TypeScript, lint, Vitest, build, Worker dry-run, smoke Chromium e artefacto. **Publicar Foco & Jornada #251** e **GitHub Pages #826** concluíram com sucesso. Build publicado `2ff90745e506e48009347e10e19e90cea2ad5322`.
@@ -44,11 +52,11 @@ Integrado/publicado: merge `73a6c0f43caf40219a98b1224113bdddaaec420b`, Qualidade
 
 ## Qualidade
 
-React 19, TypeScript 5.9, Vite 7, Vitest 5, Node 22, npm 11.6.0. Gates: `npm audit --audit-level=high`, typecheck, lint, Vitest, build, Worker dry-run, smoke Chromium e artefacto. PR #212 passou no head final e em `main`; Publicar #251/Pages #826 bem-sucedidos.
+React 19, TypeScript 5.9, Vite 7, Vitest 5, Node 22, npm 11.6.0. Gates: `npm audit --audit-level=high`, typecheck, lint, Vitest, build, Worker dry-run, smoke Chromium e artefacto. PR #212 passou no head final e em `main`; Publicar #251/Pages #826 bem-sucedidos. PR #213 aguarda gates finais.
 
 ## Limitações e validações abertas
 
-1. Testar separação, sugestões e simulador no iPhone real, Android, tablet e desktop, incluindo zoom, orientação horizontal, texto ampliado e VoiceOver/TalkBack.
+1. Testar o cabeçalho corrigido no iPhone real, badge contida e altura sem vazio, também Android, tablet e desktop, zoom, orientação horizontal, texto ampliado e VoiceOver/TalkBack.
 2. Confirmar 24/08–06/09 = dez úteis, sobreposição, atualização ao regressar à PWA e sincronização móvel/computador.
 3. Testar navegação entre as duas rotas com perfil desbloqueado e simulação sem gravação implícita.
 4. Avaliar feriados e descanso semanal alternativo apenas com contrato/CCT ou regras da entidade confirmados.
@@ -56,8 +64,8 @@ React 19, TypeScript 5.9, Vite 7, Vitest 5, Node 22, npm 11.6.0. Gates: `npm aud
 
 ## Última alteração
 
-PR #212 integrado/publicado: planeamento em rota própria, meses antes de indicadores, espaçamento/largura fluidos e domínio/dados intactos. Build `2ff90745e506e48009347e10e19e90cea2ad5322`; Pages #826 bem-sucedido.
+PR #213 em validação: novo cabeçalho compacto e planeador em coluna de altura intrínseca; código do domínio e dados intactos.
 
 ## Próximo passo
 
-Validar as duas rotas em iPhone real com dados verdadeiros e comparar desktop/tablet. Avaliar posterior extração de componentes/hook partilhado para eliminar montagem de painéis ocultos apenas com testes próprios. Não introduzir marcação automática sem confirmação explícita e verificação do direito oficial.
+Confirmar CI, integrar/publicar PR #213 e pedir captura do iPhone atualizado; se persistir espaço vazio, recolher dimensões e inspecionar CSS computado no dispositivo. Não introduzir marcação automática sem confirmação explícita e verificação do direito oficial.
