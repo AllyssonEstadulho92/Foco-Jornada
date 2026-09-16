@@ -260,7 +260,7 @@ O resumo vivo usa a mesma estratégia com base mínima de `13rem`.
 
 ## D-028 — Indicadores avançados de férias são derivados e não criam novo estado persistido
 
-**Estado:** proposta no PR #209; integração depende dos quality gates.
+**Estado:** aceite, integrada no PR #209 e publicada.
 
 **Decisão:** acrescentar um painel de leitura rápida com informação derivada da projeção pessoal já existente, sem gravar percentagens, previsões ou marcos futuros no cofre.
 
@@ -294,3 +294,5 @@ O próximo marco é `min(metaAnual, floor(acumuladoVivo) + 1)` enquanto a meta n
 **Persistência e segurança:** nenhum novo campo persistido, tabela, endpoint, token, segredo, permissão, dependência ou telemetria. O painel usa apenas valores já disponíveis em `VacationBalance` e dados existentes no cofre cifrado.
 
 **UI/UX:** o painel usa `vacation-insights.css`, grelha `auto-fit/minmax`, barra anual acessível, contenção responsiva, `forced-colors` e `prefers-reduced-motion`.
+
+**Entrega:** Qualidade #1140 no head, Qualidade #1141 em `main`, Publicar Foco & Jornada #248 e pages build and deployment #807 concluíram com sucesso; build publicado no commit `ac121c3f687f86149d90e1bd78c4788b8c86d0a6`.
