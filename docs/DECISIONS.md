@@ -105,3 +105,13 @@ Atualizado em: 2026-09-16
 **Compatibilidade/segurança:** link antigo preservado, novas rotas só de apresentação; configurações e registos continuam no cofre cifrado. Sem novos endpoints, permissões, tokens, segredos, migrações, dependências ou telemetria. Mantidos `forced-colors`, `prefers-reduced-motion`, labels e testes estruturais; testes físicos no iPhone/Android/desktop ainda pendentes. Detalhes em `docs/VACATION-WORKSPACE.md`.
 
 **Entrega:** Qualidade #1158 (código inicial), #1164 (head final) e #1165 em `main` concluídas com sucesso; PR #212 integrado `732bfea2e518a5651a71bc347fa9782f574584b0`, Publicar Foco & Jornada #251, GitHub Pages #826 e build `2ff90745e506e48009347e10e19e90cea2ad5322` confirmados com sucesso.
+
+## D-032 — Cabeçalho do planeamento usa altura intrínseca e orçamento de largura próprio
+
+**Estado:** proposto no PR #213, integração condicionada aos quality gates finais.
+
+**Decisão:** substituir `vacationPanelHeader` na vista de planeamento por `header.vacationPlannerHero` com texto curto e badge informativa contida; grelha 1fr + 12,5rem, quebra de linha e apenas uma coluna até 820px. Trocar o painel autónomo de grelha para coluna flex de altura intrínseca, impedindo a primeira linha de crescer verticalmente. Reutilizar as sugestões e simulação sem modificar nenhum cálculo.
+
+**Motivo:** screenshot real mostrou o estado «Pré-visualização…» fora da borda e uma área branca excessiva no cabeçalho. O espaço deve corresponder à altura do conteúdo, e nenhum texto pode ultrapassar o cartão.
+
+**Risco/limite:** o CSS do PR #212 continua a ocultar a vista inativa sem desmontar React. O teste estrutural não substitui inspeção visual num iPhone real com zoom e texto aumentado. Nenhuma mudança em dados, persistência, sync, autenticação, autorização, dependências, API ou regras de férias. Especificação `docs/VACATION-PLANNER-HEADER.md`.
