@@ -21,15 +21,17 @@ Atualizado em: 2026-09-16
 - [x] Adicionar regressão CSS para o painel.
 - [x] Confirmar que não existe novo campo persistido, endpoint, token, segredo, permissão ou dependência.
 - [x] Atualizar `PROJECT_STATE.md`, `ARCHITECTURE.md`, `DECISIONS.md`, `TODO.md` e `CHANGELOG.md` no head final.
-- [ ] Obter `npm audit --audit-level=high` verde.
-- [ ] Obter typecheck verde.
-- [ ] Obter lint verde.
-- [ ] Obter testes verdes, incluindo `VacationBalance.insights.test.ts` e `vacation-insights.test.ts`.
-- [ ] Obter build, Worker dry-run e smoke test Chromium verdes.
-- [ ] Marcar PR #209 como pronto apenas depois dos gates.
-- [ ] Integrar PR #209 em `main`.
-- [ ] Confirmar Qualidade em `main` após merge.
-- [ ] Confirmar publicação e GitHub Pages.
+- [x] Obter `npm audit --audit-level=high` verde.
+- [x] Obter typecheck verde.
+- [x] Obter lint verde.
+- [x] Obter testes verdes, incluindo `VacationBalance.insights.test.ts` e `vacation-insights.test.ts`.
+- [x] Obter build, Worker dry-run e smoke test Chromium verdes.
+- [x] Marcar PR #209 como pronto depois dos gates.
+- [x] Integrar PR #209 em `main` no commit `8b7b6fc68c3330714b081865992de9adb5243d4c`.
+- [x] Confirmar **Qualidade #1141** verde em `main` após merge.
+- [x] Confirmar **Publicar Foco & Jornada #248** verde.
+- [x] Confirmar publicação no commit `ac121c3f687f86149d90e1bd78c4788b8c86d0a6`.
+- [x] Confirmar **pages build and deployment #807** verde.
 - [ ] Validar no iPhone real os novos cartões, barra anual e próximo marco.
 - [ ] Validar Android/Chrome, tablet e desktop, incluindo zoom e aumento de texto.
 
@@ -49,7 +51,8 @@ Atualizado em: 2026-09-16
 - [x] PR #206 — evolução intramensal em tempo real.
 - [x] PR #207 — contenção de todos os cartões mensais.
 - [x] PR #208 — grelha `auto-fit/minmax` e hierarquia visual adaptativa.
-- [x] Qualidade #1139, Publicar #247 e Pages #801 verdes para o PR #208.
+- [x] PR #209 — painel avançado com progresso anual, próximo marco, férias comprometidas e projeção de fim do ano.
+- [x] Qualidade #1141, Publicar #248 e Pages #807 verdes para o PR #209.
 
 ## P0 — Automação de jornada e pausas
 
