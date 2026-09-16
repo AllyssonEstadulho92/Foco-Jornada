@@ -15,17 +15,18 @@ Atualizado em: 2026-09-16
 - [x] Preservar `forced-colors` e `prefers-reduced-motion`.
 - [x] Expandir `vacation-card-containment.test.ts` para proteger auto-fit, contenção e estado atual.
 - [x] Confirmar que não existe alteração de dados, cálculo, persistência, sync, API, autenticação ou dependências.
-- [x] Atualizar `PROJECT_STATE.md`, `ARCHITECTURE.md` e `DECISIONS.md`.
-- [ ] Atualizar `CHANGELOG.md` com o estado final do PR #208.
-- [ ] Obter `npm audit --audit-level=high` verde no head final.
-- [ ] Obter typecheck verde.
-- [ ] Obter lint verde.
-- [ ] Obter testes verdes.
-- [ ] Obter build, Worker dry-run e smoke test Chromium verdes.
-- [ ] Marcar PR #208 como pronto apenas depois dos gates.
-- [ ] Integrar PR #208 em `main`.
-- [ ] Confirmar qualidade em `main` após merge.
-- [ ] Confirmar publicação e GitHub Pages.
+- [x] Atualizar `PROJECT_STATE.md`, `ARCHITECTURE.md`, `DECISIONS.md`, `TODO.md` e `CHANGELOG.md`.
+- [x] Obter `npm audit --audit-level=high` verde no head final.
+- [x] Obter typecheck verde.
+- [x] Obter lint verde.
+- [x] Obter testes verdes.
+- [x] Obter build, Worker dry-run e smoke test Chromium verdes.
+- [x] Marcar PR #208 como pronto depois dos gates.
+- [x] Integrar PR #208 em `main` no commit `a41a0c3b9fdef1b0e5d67bc29ce6b453dbcbc4cf`.
+- [x] Confirmar **Qualidade #1139** verde em `main` após merge.
+- [x] Confirmar **Publicar Foco & Jornada #247** verde.
+- [x] Confirmar publicação no commit `a5a17750ffa43f506c9feb5af78a167f3b1f0f5c`.
+- [x] Confirmar **pages build and deployment #801** verde.
 - [ ] Validar iPhone real, sobretudo setembro/percentagens longas e zoom.
 - [ ] Validar Android/Chrome, tablet e desktop.
 
