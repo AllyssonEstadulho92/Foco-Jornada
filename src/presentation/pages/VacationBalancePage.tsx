@@ -199,6 +199,7 @@ export function VacationBalancePage() {
     balance.monthlyLiveAvailableBalanceDays < 0 ? ' vacationMetricDanger' : ''
   const monthlyProjectedTone =
     balance.monthlyLiveProjectedBalanceDays < 0 ? ' vacationMetricDanger' : ''
+  const yearEndTone = balance.yearEndProjectedBalanceDays < 0 ? ' vacationInsightDanger' : ''
   const currentMonthName = monthLabel(Number(today.slice(5, 7)))
 
   return (
@@ -258,6 +259,101 @@ export function VacationBalancePage() {
             +{preciseDaysLabel(balance.currentAccrualMonthEarnedDays)} de cerca de {daysLabel(balance.monthlyAccrualPerMonth)} neste mês.
           </small>
         </article>
+      </section>
+
+      <section className="vacationPanel vacationInsightsPanel" aria-labelledby="vacation-insights-title">
+        <div className="vacationPanelHeader">
+          <div>
+            <span>LEITURA RÁPIDA · {balance.year}</span>
+            <h2 id="vacation-insights-title">O que tens, o que falta e o que vem a seguir</h2>
+          </div>
+          <strong>{percentLabel(balance.annualAccrualProgressPercent)}% da meta anual</strong>
+        </div>
+
+        <div className="vacationAnnualProgress" aria-label="Progresso anual da meta pessoal">
+          <div className="vacationAnnualProgressHeader">
+            <span>{preciseDaysLabel(balance.monthlyLiveAccruedDays)} acumulados</span>
+            <strong>{daysLabel(balance.monthlyAccrualTargetDays)} de meta</strong>
+          </div>
+          <div
+            className="vacationAnnualProgressTrack"
+            role="progressbar"
+            aria-label="Progresso anual da acumulação pessoal"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={Math.round(balance.annualAccrualProgressPercent)}
+          >
+            <span style={{ width: `${Math.min(100, balance.annualAccrualProgressPercent)}%` }} />
+          </div>
+          <small>
+            Faltam {preciseDaysLabel(balance.annualAccrualRemainingDays)} para completares a meta pessoal de {balance.year}.
+          </small>
+        </div>
+
+        <div className="vacationInsightsGrid">
+          <article className="vacationInsightCard vacationInsightPrimary">
+            <span>Próximo marco</span>
+            <strong>
+              {balance.hasReachedAccrualTarget || balance.nextAccrualMilestoneDays === null
+                ? 'Meta atingida'
+                : daysLabel(balance.nextAccrualMilestoneDays)}
+            </strong>
+            <small>
+              {balance.nextAccrualMilestoneDate
+                ? `Previsão pelo ritmo atual: ${formatDate(balance.nextAccrualMilestoneDate)}.`
+                : 'A meta anual pessoal já está completamente acumulada.'}
+            </small>
+          </article>
+
+          <article className="vacationInsightCard">
+            <span>Já gozadas</span>
+            <strong>{daysLabel(balance.takenDays)}</strong>
+            <small>
+              {daysLabel(balance.recordedTakenDays)} detetados na app + {daysLabel(balance.manualTakenDays)} lançados manualmente.
+            </small>
+          </article>
+
+          <article className="vacationInsightCard">
+            <span>Planeadas</span>
+            <strong>{daysLabel(balance.recordedPlannedDays)}</strong>
+            <small>Dias úteis futuros já marcados nas fontes da aplicação.</small>
+          </article>
+
+          <article className="vacationInsightCard">
+            <span>Gozadas + planeadas</span>
+            <strong>{daysLabel(balance.usedAndPlannedDays)}</strong>
+            <small>{percentLabel(balance.usedAndPlannedPercentOfTarget)}% da meta pessoal anual.</small>
+          </article>
+
+          <article className={`vacationInsightCard${yearEndTone}`}>
+            <span>Previsão em 31 de dezembro</span>
+            <strong>{preciseDaysLabel(balance.yearEndProjectedBalanceDays)}</strong>
+            <small>Meta anual + transitados + ajustes − gozadas − planeadas.</small>
+          </article>
+
+          <article className="vacationInsightCard">
+            <span>Fins de semana ignorados</span>
+            <strong>{daysLabel(balance.recordedIgnoredWeekendDays)}</strong>
+            <small>Sábados e domingos marcados como férias que não descontam no regime padrão.</small>
+          </article>
+
+          <article className="vacationInsightCard">
+            <span>Fecho de {currentMonthName}</span>
+            <strong>{daysLabel(balance.currentAccrualMonthTargetCumulativeDays)}</strong>
+            <small>Marco previsto para {formatDate(balance.currentAccrualMonthEndDate)}.</small>
+          </article>
+
+          <article className="vacationInsightCard">
+            <span>Falta neste mês</span>
+            <strong>{preciseDaysLabel(balance.currentAccrualMonthRemainingDays)}</strong>
+            <small>Ritmo aproximado de {preciseDaysLabel(balance.currentAccrualMonthDailyRate)} por dia de calendário.</small>
+          </article>
+        </div>
+
+        <p className="vacationInsightsProjection">
+          Mantendo a meta atual e sem novos ajustes ou férias adicionais, a projeção pessoal termina {balance.year}
+          {' '}com <strong>{preciseDaysLabel(balance.yearEndProjectedBalanceDays)}</strong> depois dos dias já gozados e planeados.
+        </p>
       </section>
 
       <section className="vacationPanel vacationAccrualPanel" aria-labelledby="vacation-accrual-title">
@@ -518,6 +614,11 @@ export function VacationBalancePage() {
           A meta anual continua distribuída em 12 partes exatas. No mês atual, essa parcela é multiplicada pela
           fração do mês já decorrida, incluindo a fração do dia local. O resultado vivo usa até quatro casas
           decimais na apresentação e é recalculado diretamente a partir da meta, evitando drift de arredondamento.
+        </p>
+        <p>
+          Os indicadores de progresso anual, próximo marco e previsão para 31 de dezembro são derivados da mesma
+          projeção pessoal. O próximo marco indica quando o modelo de acumulação alcança o próximo dia inteiro;
+          não representa uma nova regra laboral nem uma garantia emitida pela entidade empregadora.
         </p>
         <p>
           A atualização automática ocorre a cada minuto enquanto a página está ativa e também quando regressas
