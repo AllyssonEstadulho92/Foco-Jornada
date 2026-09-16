@@ -71,7 +71,7 @@ A página de férias usa:
 - `src/styles/vacation-accrual.css` — grelha mensal, resumo vivo, estados e contenção;
 - `src/styles/vacation-insights.css` — painel de leitura avançada;
 - `src/styles/vacation-card-containment.test.ts` — regressão estrutural da grelha mensal;
-- `src/styles/vacation-insights.test.ts` — regressão do novo painel.
+- `src/styles/vacation-insights.test.ts` — regressão do painel avançado.
 
 O painel de indicadores é puramente derivado. Não guarda snapshots de progresso, datas estimadas nem percentagens.
 
@@ -330,4 +330,4 @@ Workflow `Qualidade`:
 10. smoke test Chromium;
 11. artefacto.
 
-O PR #209 adiciona `VacationBalance.insights.test.ts` e `vacation-insights.test.ts`. Integração só ocorre depois de todos os gates do head final estarem verdes.
+O PR #209 adicionou `VacationBalance.insights.test.ts` e `vacation-insights.test.ts`. O head final passou a **Qualidade #1140**, o merge em `main` passou a **Qualidade #1141**, a publicação **#248** foi concluída e o build `ac121c3f687f86149d90e1bd78c4788b8c86d0a6` passou o **pages build and deployment #807**.
