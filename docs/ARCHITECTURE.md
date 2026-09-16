@@ -15,6 +15,9 @@ GitHub Pages
        │    ├─ Foco / atividades
        │    ├─ Turnos / horas
        │    ├─ Férias
+       │    │    ├─ resumo vivo
+       │    │    ├─ painel de indicadores
+       │    │    └─ evolução mensal
        │    └─ Definições
        ├─ Application
        │    └─ casos de uso / reconciliações
@@ -23,7 +26,8 @@ GitHub Pages
        │         ├─ referência laboral
        │         ├─ filtro de dias úteis padrão
        │         ├─ marcos mensais pessoais
-       │         └─ evolução intramensal em tempo real
+       │         ├─ evolução intramensal em tempo real
+       │         └─ indicadores derivados anuais
        └─ Persistência cifrada
             ├─ IndexedDB/Dexie
             ├─ secureStorage no snapshot cifrado
@@ -41,15 +45,13 @@ GitHub Pages
 - cofre cifrado AES-GCM;
 - Zustand onde necessário;
 - Vitest 5;
-- GitHub Pages para distribuição;
-- Cloudflare Worker + Durable Objects para sincronização cifrada;
+- GitHub Pages;
+- Cloudflare Worker + Durable Objects;
 - Node 22 e npm 11.6.0 nos workflows.
 
 ## Camadas
 
 ### Presentation
-
-Responsável por páginas, componentes, navegação, estado efémero e interação.
 
 Componentes relevantes:
 
@@ -65,48 +67,13 @@ Componentes relevantes:
 
 A página de férias usa:
 
-- `src/styles/vacation.css` — estrutura/base da página;
+- `src/styles/vacation.css` — estrutura/base;
 - `src/styles/vacation-accrual.css` — grelha mensal, resumo vivo, estados e contenção;
-- `src/styles/vacation-card-containment.test.ts` — regressão estrutural da grelha mensal.
+- `src/styles/vacation-insights.css` — painel de leitura avançada;
+- `src/styles/vacation-card-containment.test.ts` — regressão estrutural da grelha mensal;
+- `src/styles/vacation-insights.test.ts` — regressão do novo painel.
 
-### Arquitetura visual da grelha mensal
-
-A grelha do PR #208 deixa de depender apenas de uma sequência rígida de breakpoints e passa a adaptar a quantidade de colunas à largura real disponível:
-
-```css
-grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
-```
-
-O resumo vivo usa a mesma estratégia com base mínima de `13rem`.
-
-Objetivos:
-
-- evitar cartões excessivamente comprimidos;
-- preservar toda a informação dentro da secção;
-- manter proporções consistentes entre desktop, tablet e smartphone;
-- permitir que a grelha escolha naturalmente 4, 3, 2 ou 1 coluna conforme o espaço efetivo.
-
-Cada cartão mensal usa:
-
-- `position: relative` + `overflow: hidden` para contenção final;
-- cabeçalho em grid `minmax(0, 1fr) auto`;
-- `min-width: 0` e `max-width: 100%` nos elementos internos;
-- `overflow-wrap: anywhere` em conteúdo textual variável;
-- valor principal com `font-variant-numeric: tabular-nums`;
-- barra de progresso limitada a `100%`;
-- linha superior de estado via `::before`;
-- diferenciação visual para mês concluído, mês atual e mês futuro;
-- `forced-colors` e `prefers-reduced-motion` preservados.
-
-Em ecrãs até 560 px:
-
-- grelha mensal = 1 coluna;
-- resumo vivo = 1 coluna;
-- cabeçalho do cartão = 1 coluna;
-- badge passa para baixo do nome do mês;
-- `min-height` fixa do desktop é removida.
-
-Estas regras são exclusivamente de apresentação. Não alteram `VacationBalance`, dados, persistência, fontes de férias ou sincronização.
+O painel de indicadores é puramente derivado. Não guarda snapshots de progresso, datas estimadas nem percentagens.
 
 ### Application
 
@@ -123,7 +90,7 @@ A área de férias agrega fontes existentes na página e envia input normalizado
 
 ### Domain
 
-`VacationBalance` é a autoridade para cálculos de férias e não escreve nos registos de turnos/horas.
+`VacationBalance` é a autoridade para cálculos da área de férias e não escreve nos registos de turnos/horas.
 
 Responsabilidades:
 
@@ -133,7 +100,8 @@ Responsabilidades:
 4. separar férias gozadas e planeadas;
 5. calcular referência laboral/contratual;
 6. calcular marcos mensais da projeção pessoal;
-7. calcular evolução do mês atual em tempo real.
+7. calcular evolução do mês atual em tempo real;
+8. calcular indicadores anuais derivados e o próximo marco da projeção.
 
 ## Rotas relevantes
 
@@ -149,8 +117,6 @@ Desktop usa sidebar. Mobile/tablet usa top bar + bottom navigation + drawer.
 
 ## Persistência
 
-A aplicação mantém o estado funcional num snapshot cifrado.
-
 Bases principais:
 
 - `foco-jornada-security-v1` — perfil de segurança/KDF/chaves/metadados de sync;
@@ -160,7 +126,7 @@ Configuração de férias no `secureStorage`:
 
 `foco-jornada-vacation-settings-v1`
 
-Campos:
+Campos persistidos:
 
 - `employmentStartDate`;
 - `annualEntitlementDays`;
@@ -169,7 +135,7 @@ Campos:
 - `manualTakenDays`;
 - `adjustmentDays`.
 
-Os PR #206–#208 não acrescentam novos campos persistidos.
+Os valores introduzidos no PR #209 são derivados em runtime. Não existe novo campo persistido nem migração.
 
 ## Fontes de dados das férias
 
@@ -193,10 +159,13 @@ calculateVacationBalance()
         ├─ referência laboral
         └─ projeção pessoal
              ├─ meses fechados
-             ├─ marco mensal
              ├─ progresso atual
              ├─ acumulado vivo
-             └─ saldo vivo/projetado
+             ├─ saldo vivo/projetado
+             ├─ progresso anual
+             ├─ dias ainda por acumular
+             ├─ próximo marco/data
+             └─ projeção 31 dezembro
 ```
 
 A aplicação não infere férias a partir de baixa, folga, ausência ou jornada não iniciada.
@@ -238,7 +207,75 @@ saldoVivo = acumuladoVivo + transitados + ajustes - gozadas
 saldoVivoProjetado = saldoVivo - planeadas
 ```
 
-O relógio é efémero. `VacationBalancePage` atualiza a cada 60 s e também em `focus`/`visibilitychange`.
+A página atualiza a referência temporal a cada 60 s e também em `focus`/`visibilitychange`.
+
+## Indicadores derivados — PR #209
+
+Campos adicionados ao output de `VacationBalance`:
+
+- `annualAccrualProgressPercent`;
+- `annualAccrualRemainingDays`;
+- `usedAndPlannedDays`;
+- `usedAndPlannedPercentOfTarget`;
+- `yearEndProjectedBalanceDays`;
+- `nextAccrualMilestoneDays`;
+- `nextAccrualMilestoneDate`;
+- `hasReachedAccrualTarget`.
+
+Fórmulas principais:
+
+```text
+progressoAnual% = clamp(acumuladoVivo / metaAnual) × 100
+faltaAnual = max(0, metaAnual - acumuladoVivo)
+comprometido = gozadas + planeadas
+percentagemComprometida = comprometido / metaAnual × 100
+previsaoFimAno = metaAnual + transitados + ajustes - comprometido
+```
+
+### Próximo marco de acumulação
+
+Se a meta ainda não foi atingida:
+
+```text
+proximoMarco = min(metaAnual, floor(acumuladoVivo) + 1)
+```
+
+A data estimada é calculada pelo mesmo modelo mensal, nunca por uma taxa média anual diferente:
+
+1. localizar o mês em que o marco fica entre o acumulado anterior e o fecho desse mês;
+2. converter a fração necessária da parcela mensal para uma fração dos dias civis desse mês;
+3. devolver a data civil `YYYY-MM-DD` em que esse patamar é alcançado.
+
+Esta data é uma estimativa da projeção pessoal, não uma data jurídica de aquisição de férias.
+
+## Arquitetura visual
+
+### Evolução mensal
+
+A grelha usa:
+
+```css
+grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+```
+
+Mantém `min-width: 0`, `max-width: 100%`, `overflow-wrap`, contenção, diferenciação de estados, `forced-colors` e `prefers-reduced-motion`.
+
+### Painel de indicadores
+
+`vacation-insights.css` usa uma grelha independente:
+
+```css
+grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+```
+
+O painel contém:
+
+- barra anual com `role="progressbar"`;
+- cartões com largura contida e números tabulares;
+- destaque estrutural do próximo marco;
+- estado de risco para projeção final negativa;
+- uma coluna abaixo de 560 px;
+- suporte `forced-colors` e `prefers-reduced-motion`.
 
 ## Semana útil padrão
 
@@ -273,8 +310,8 @@ Regras:
 - PIN, palavra-passe, código de recuperação e `dataKey` original não são enviados ao Worker;
 - backend recebe apenas cofre cifrado e metadados técnicos;
 - nenhum HTML não confiável é injetado na UI de férias;
-- PR #208 não cria endpoint, token, segredo, permissão, dependência ou dado persistido;
-- valores temporais vivos não são persistidos nem enviados como telemetria;
+- PR #209 não cria endpoint, token, segredo, permissão, dependência ou dado persistido;
+- indicadores derivados não são enviados como nova telemetria;
 - links externos mantêm `rel="noreferrer"`.
 
 ## Qualidade
@@ -293,4 +330,4 @@ Workflow `Qualidade`:
 10. smoke test Chromium;
 11. artefacto.
 
-O head final de qualquer alteração só deve ser integrado depois de todos os gates estarem verdes.
+O PR #209 adiciona `VacationBalance.insights.test.ts` e `vacation-insights.test.ts`. Integração só ocorre depois de todos os gates do head final estarem verdes.
