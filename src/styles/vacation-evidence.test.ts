@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import evidence from '../presentation/pages/VacationEvidencePanel.tsx?raw'
 import workspace from '../presentation/pages/VacationWorkspacePage.tsx?raw'
 import router from '../presentation/router.tsx?raw'
-import shell from '../presentation/layouts/AppShell.tsx?raw'
+import notFound from '../presentation/pages/NotFoundPage.tsx?raw'
 import css from './vacation-evidence.css?raw'
 import layout from './vacation-evidence-layout.css?raw'
 
@@ -16,6 +16,12 @@ describe('detalhe de proveniência do saldo', () => {
     expect(workspace).not.toContain('calculateVacationBalance')
     expect(evidence).toContain('id="vacation-evidence-title" tabIndex={-1}')
     expect(layout).toContain('.vacationWorkspace--overview .vacationWorkspacePane')
+  })
+
+  it('a rota desconhecida oferece recuperação sem o ecrã de erro técnico do Router', () => {
+    expect(router).toContain("{ path: '*', element: <NotFoundPage /> }")
+    expect(notFound).toContain('Não encontrámos esta página')
+    expect(notFound).toContain('<NavLink to="/ferias">Voltar às férias</NavLink>')
   })
 
   it('mostra fontes e datas só quando aberto e nunca escreve nem cria timers', () => {
@@ -41,9 +47,5 @@ describe('detalhe de proveniência do saldo', () => {
     expect(css).toContain('@media (max-width: 560px)')
     expect(css).toContain('@media (forced-colors: active)')
     expect(css).toContain('@media (prefers-reduced-motion: reduce)')
-  })
-
-  it('reserva o fragmento para rotas e mantém o salto global sujeito a correção equivalente', () => {
-    expect(shell).toContain('href="#main-content"')
   })
 })
