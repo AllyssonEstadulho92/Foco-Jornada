@@ -2,13 +2,13 @@
 
 Atualizado em: 2026-09-17. Alterações anteriores até ao PR #214 (texto completo e provas históricas) permanecem em `docs/history/CHANGELOG-pre-217.md`.
 
-## 2026-09-17 — PR #218: corrigir 404 do atalho de férias (em validação)
+## 2026-09-17 — PR #218: corrigir 404 do atalho de férias (integrado e publicado)
 
 - Captura real no iPhone revelou `Unexpected Application Error! / 404 Not Found` após tocar em «Ver de onde vêm os dias registados». Causa confirmada: `href="#vacation-evidence-title"` substituía a rota `#/ferias` do `createHashRouter`.
 - O atalho usa agora botão nativo, scroll e foco programático via `focusSection`, preservando o hash da rota. Título focável sem entrar na ordem normal de Tab; CSS mantém aparência e área de toque.
 - Adicionada rota de recuperação `*` com mensagem em PT-PT e opções para regressar às férias ou ao início, evitando o fallback técnico do Router quando o URL é desconhecido.
 - Testes jsdom verificam que o hash não muda e o título recebe foco; teste estrutural impede regressão do `href` incompatível e protege a rota de recuperação. Sem alterar cálculos, dias de férias, dados cifrados, sincronização, autenticação, backend ou dependências.
-- O skip link global `AppShell` (`href="#main-content"`) tem problema análogo, documentado em TODO para correção dirigida. CI final, merge, publicação e teste físico pendentes nesta revisão. Ver `HASH-ROUTER-NAVIGATION.md`.
+- O skip link global `AppShell` (`href="#main-content"`) tem problema análogo, documentado em TODO para correção dirigida. **Entrega verificada:** Qualidade #1201 (head final) e #1202 (`main`) com sucesso; merge `89564f3ebbfe5d54e5d09dcf28db9e574b35cc50`; Publicar Foco & Jornada #257 e GitHub Pages #848 concluídos com sucesso; build `42397a6c97d60044f5dbc1cf90723ee799b1d0ac`. Teste físico do atalho corrigido ainda pendente. Ver `HASH-ROUTER-NAVIGATION.md`.
 
 ## 2026-09-17 — PR #217: origem dos dias de férias (integrado e publicado)
 
