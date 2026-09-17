@@ -4,6 +4,7 @@ import { collectVacationDatesForYear } from '../../domain/vacation/VacationYearR
 import type { VacationTrackerSettings } from '../../domain/vacation/VacationBalance'
 import { secureStorage } from '../../security/secureStorage'
 import { useWorkHoursStore } from '../store/useWorkHoursStore'
+import { VacationConfirmationChecklist } from './VacationConfirmationChecklist'
 import '../../styles/vacation-joint-planner.css'
 
 interface VacationJointPlannerProps {
@@ -20,6 +21,9 @@ const monthFormatter = new Intl.DateTimeFormat('pt-PT', { month: 'long', timeZon
 const dateFormatter = new Intl.DateTimeFormat('pt-PT', {
   day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC',
 })
+const shortDateFormatter = new Intl.DateTimeFormat('pt-PT', {
+  day: 'numeric', month: 'short', timeZone: 'UTC',
+})
 const numberFormatter = new Intl.NumberFormat('pt-PT', { maximumFractionDigits: 2 })
 
 function monthLabel(month: number, year: number) {
@@ -32,9 +36,7 @@ function dateLabel(key: string) {
 
 function shortDate(key: string) {
   const [year, month, day] = key.split('-').map(Number)
-  return new Intl.DateTimeFormat('pt-PT', {
-    day: 'numeric', month: 'short', timeZone: 'UTC',
-  }).format(new Date(Date.UTC(year, month - 1, day)))
+  return shortDateFormatter.format(new Date(Date.UTC(year, month - 1, day)))
 }
 
 function dateKey(stamp: number) {
@@ -52,8 +54,6 @@ export function VacationJointPlanner({ today, asOfDayProgress, year, settings }:
   const [requestedDays, setRequestedDays] = useState(10)
   const [month, setMonth] = useState(7)
   const [selectedStart, setSelectedStart] = useState('')
-  const [partnerConfirmed, setPartnerConfirmed] = useState(false)
-  const [employerConfirmed, setEmployerConfirmed] = useState(false)
   const [showCalendar, setShowCalendar] = useState(false)
 
   // The parent clock drives a fresh read from the encrypted vault each minute
@@ -73,6 +73,11 @@ export function VacationJointPlanner({ today, asOfDayProgress, year, settings }:
     settings,
   }), [today, year, month, requestedDays, recorded, settings])
   const selected = suggestions.find((item) => item.startDate === selectedStart) ?? suggestions[0]
+  // A different scenario remounts the checklist; stale ticks never carry to another period.
+  const confirmationScope = selected ? JSON.stringify({
+    year, month, requestedDays, start: selected.startDate, end: selected.endDate,
+    settings, recorded,
+  }) : ''
   const date = new Date(Date.UTC(year, month - 1, 1))
   const startOffset = (date.getUTCDay() + 6) % 7
   const daysInMonth = new Date(Date.UTC(year, month, 0)).getUTCDate()
@@ -83,20 +88,15 @@ export function VacationJointPlanner({ today, asOfDayProgress, year, settings }:
   ]
   const updatedAt = clockLabel(asOfDayProgress)
 
-  function resetConfirmations() {
-    setPartnerConfirmed(false)
-    setEmployerConfirmed(false)
-  }
-
   return (
     <section className="vacationJoint" aria-labelledby="vacation-joint-title">
       <header className="vacationJointHeader">
         <div>
           <span className="vacationJointEyebrow">PROPOSTAS · {year}</span>
           <h3 id="vacation-joint-title">Organiza as férias a dois</h3>
-          <p>Compara períodos no mesmo calendário e confirma as datas com a tua parceira e com a entidade empregadora.</p>
+          <p>Compara datas e saldos estimados. As sugestões não criam pedidos nem reservas.</p>
         </div>
-        <span className="vacationJointLive">Atualizado às <time dateTime={`${today}T${updatedAt}`}>{updatedAt}</time></span>
+        <span className="vacationJointLive">Cálculo local às <time dateTime={`${today}T${updatedAt}`}>{updatedAt}</time></span>
       </header>
 
       <div className="vacationJointFilters" aria-label="Preferências do período de férias">
@@ -106,7 +106,6 @@ export function VacationJointPlanner({ today, asOfDayProgress, year, settings }:
             setMonth(Number(event.target.value))
             setSelectedStart('')
             setShowCalendar(false)
-            resetConfirmations()
           }}>
             {Array.from({ length: 12 }, (_, index) => index + 1).map((value) => (
               <option key={value} value={value} disabled={BLOCKED_MONTHS.includes(value as 11 | 12)}>
@@ -122,13 +121,12 @@ export function VacationJointPlanner({ today, asOfDayProgress, year, settings }:
               setRequestedDays(Number(event.target.value))
               setSelectedStart('')
               setShowCalendar(false)
-              resetConfirmations()
             }} />
         </label>
         <div className="vacationJointRestriction" role="note">
           <strong>Meses excluídos</strong>
           <span>Novembro · Dezembro</span>
-          <small>Restrição que indicaste para a ILUNION; confirma se se mantém em {year}.</small>
+          <small>Restrição indicada por ti; confirma se se mantém na tua escala em {year}.</small>
         </div>
       </div>
 
@@ -152,7 +150,6 @@ export function VacationJointPlanner({ today, asOfDayProgress, year, settings }:
                   onClick={() => {
                     setSelectedStart(item.startDate)
                     setShowCalendar(true)
-                    resetConfirmations()
                   }}>
                   <span className="vacationJointOptionTag">{index === 0 ? 'Primeira opção' : `Alternativa ${index + 1}`}</span>
                   <strong>{shortDate(item.startDate)} – {shortDate(item.endDate)}</strong>
@@ -203,6 +200,10 @@ export function VacationJointPlanner({ today, asOfDayProgress, year, settings }:
               </div>
             ) : null}
           </div>
+          <VacationConfirmationChecklist
+            key={confirmationScope}
+            periodLabel={`${shortDate(selected.startDate)} a ${shortDate(selected.endDate)} de ${year}`}
+          />
         </>
       ) : (
         <p className="vacationJointEmpty" role="status">
@@ -211,17 +212,6 @@ export function VacationJointPlanner({ today, asOfDayProgress, year, settings }:
             : 'Não há períodos disponíveis com estas condições e com saldo pessoal projetado não negativo. Confirma os registos, escolhe outro mês ou reduz os dias.'}
         </p>
       )}
-
-      <div className="vacationJointConfirmations">
-        <h4>Antes de marcares as férias</h4>
-        <label><input type="checkbox" checked={partnerConfirmed}
-          onChange={(event) => setPartnerConfirmed(event.target.checked)} /> Já confirmei as datas com a minha parceira.</label>
-        <label><input type="checkbox" checked={employerConfirmed}
-          onChange={(event) => setEmployerConfirmed(event.target.checked)} /> Já recebi confirmação da entidade empregadora.</label>
-        <p>{partnerConfirmed && employerConfirmed
-          ? 'Assinalaste ambas as confirmações neste ecrã. Não é enviado qualquer pedido à empresa.'
-          : 'As confirmações são apenas uma lista temporária para te organizares; nada é enviado ou guardado.'}</p>
-      </div>
 
       <p className="vacationJointDisclaimer">
         <strong>Estimativa, não direito adquirido.</strong> Para {year}, a meta pessoal de {numberFormatter.format(settings.monthlyAccrualTargetDays)} dias é usada sem transportar automaticamente saldo, ajustes ou dias manuais de {year - 1}. Feriados, escala efetiva, disponibilidade da parceira e aprovação da ILUNION não são verificados. O tempo real refere-se ao recálculo local, não à confirmação da empresa nem à sincronização instantânea entre dispositivos.
