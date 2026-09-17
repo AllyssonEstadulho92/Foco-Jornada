@@ -19,7 +19,7 @@ describe('planeamento a dois e hierarquia responsiva', () => {
     expect(joint).toContain('disabled={BLOCKED_MONTHS.includes(value as 11 | 12)}')
     expect(joint).toContain('Já confirmei as datas com a minha parceira.')
     expect(joint).toContain('Já recebi confirmação da entidade empregadora.')
-    expect(joint).toContain('não é enviado qualquer pedido à empresa')
+    expect(joint).toContain('Não é enviado qualquer pedido à empresa.')
     expect(joint).not.toContain('setItem(')
     expect(joint).not.toContain('setInterval(')
     expect(joint).toContain('aria-pressed={active}')
