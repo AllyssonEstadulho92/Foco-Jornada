@@ -1,4 +1,5 @@
 import { NavLink } from 'react-router-dom'
+import { focusSection } from '../navigation/focusSection'
 import { VacationBalancePage } from './VacationBalancePage'
 import { VacationEvidencePanel } from './VacationEvidencePanel'
 import '../../styles/vacation-workspace.css'
@@ -33,7 +34,11 @@ export function VacationWorkspacePage({ view }: { view: VacationWorkspaceView })
       </nav>
 
       {planning ? <h1 className="vacationWorkspaceScreenReaderTitle">Planeamento de férias</h1> : null}
-      {!planning ? <a className="vacationEvidenceJump" href="#vacation-evidence-title">Ver de onde vêm os dias registados ↓</a> : null}
+      {!planning ? (
+        <button className="vacationEvidenceJump" type="button" onClick={() => { focusSection('vacation-evidence-title') }}>
+          Ver de onde vêm os dias registados ↓
+        </button>
+      ) : null}
       <div className="vacationWorkspacePane">
         <VacationBalancePage />
         {!planning ? <VacationEvidencePanel /> : null}
