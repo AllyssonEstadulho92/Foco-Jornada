@@ -57,8 +57,9 @@ export function collectVacationEvidenceForYear(
         const data: unknown = JSON.parse(raw)
         if (!Array.isArray(data)) continue
         for (const item of data as VacationRecord[]) {
-          if (item?.kind === 'vacation' && typeof item.date === 'string' &&
-            item.date.startsWith(`${monthKey}-`)) record(item.date, source)
+          // Preserve the previous collector's behaviour: a record can contain a valid
+          // date from another month of the same year. The actual date is authoritative.
+          if (item?.kind === 'vacation') record(item.date, source)
         }
       } catch {
         // Indisponibilidade/corrupção de um mês não inventa dias nem bloqueia os restantes.
