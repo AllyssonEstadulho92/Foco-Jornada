@@ -7,7 +7,7 @@ import balance from '../presentation/pages/VacationBalancePage.tsx?raw'
 describe('auditoria visual das férias', () => {
   it('aplica a camada às duas rotas sem alterar cálculo, cofre ou saltos hash', () => {
     expect(workspace).toContain("import '../../styles/vacation-visual-audit.css'")
-    expect(workspace).toContain('focusSection(\'vacation-evidence-title\')')
+    expect(workspace).toContain("focusSection('vacation-evidence-title')")
     expect(workspace).not.toContain('href="#vacation-evidence-title"')
     expect(polish).toContain('.vacationWorkspace--overview')
     expect(polish).toContain('.vacationWorkspace--planning')
@@ -29,7 +29,6 @@ describe('auditoria visual das férias', () => {
     expect(polish).toContain('grid-template-columns: repeat(2, minmax(0, 1fr))')
     expect(polish).toContain('min-height: 44px')
     expect(polish).toContain('.vacationWorkspace .vacationWorkspaceTabCopy small { display: none; }')
-    expect(polish).toContain('overflow-wrap: anywhere') === false // inherited from base styles
     expect(workspaceCss).toContain('overflow-wrap: anywhere')
     expect(polish).toContain('@media (forced-colors: active)')
     expect(polish).toContain('@media (prefers-reduced-motion: reduce)')
