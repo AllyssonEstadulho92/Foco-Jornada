@@ -2,12 +2,12 @@
 
 Atualizado em: 2026-09-17. Alterações anteriores até ao PR #214 (texto completo e provas históricas) permanecem em `docs/history/CHANGELOG-pre-217.md`.
 
-## 2026-09-17 — PR #217: origem dos dias de férias (em validação)
+## 2026-09-17 — PR #217: origem dos dias de férias (integrado e publicado)
 
 - `#/ferias` ganhou painel opcional, recolhido por defeito, «De onde vêm os teus dias?», com atalho, datas ordenadas, indicação das áreas de origem (horas, turnos e plano), úteis até hoje/futuros e fins de semana ignorados.
 - `VacationYearRecords` expõe proveniência única por data e `collectVacationDatesForYear` deriva a mesma coleta para o ano futuro. Mantém datas civis válidas encontradas em folhas de outro mês do mesmo ano; rejeita datas impossíveis, fontes inválidas e indisponíveis sem inventar dias.
 - Explicação legível do saldo pessoal, atualização manual e nota explícita sobre dias gozados manualmente sem data, que não aparecem como datas mas continuam a ser descontados no saldo. CSS fluido, foco, contraste forçado e movimento reduzido. Testes unitários/domínio/UI e `docs/VACATION-EVIDENCE.md`.
-- Sem mudança de fórmula, direito oficial, meta pessoal 28, registos persistidos, cofre, autenticação, sync, API, segredos, dependências ou telemetria. CI #1192 passou na versão pré-documentação; integração/publicação/validação física ainda pendentes nesta revisão.
+- Sem mudança de fórmula, direito oficial, meta pessoal 28, registos persistidos, cofre, autenticação, sync, API, segredos, dependências ou telemetria. **Entrega verificada:** Qualidade #1192 (implementação) e #1193 (head final) com sucesso; merge `61816f7ec3f1c43043d57b094f834bb116d19a27`; Publicar #256 e GitHub Pages #842 concluídos com sucesso; build `322b8b37f745e17233360af07e473f50e9fc79d5`. Testes físicos de iPhone/Android/tablet/desktop ainda pendentes.
 
 ## 2026-09-17 — PR #216: confirmação por cenário
 
