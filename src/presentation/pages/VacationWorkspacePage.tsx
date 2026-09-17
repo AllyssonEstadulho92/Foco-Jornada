@@ -1,7 +1,9 @@
 import { NavLink } from 'react-router-dom'
 import { VacationBalancePage } from './VacationBalancePage'
+import { VacationEvidencePanel } from './VacationEvidencePanel'
 import '../../styles/vacation-workspace.css'
 import '../../styles/vacation-planning-year.css'
+import '../../styles/vacation-evidence-layout.css'
 
 type VacationWorkspaceView = 'overview' | 'planning'
 
@@ -31,8 +33,10 @@ export function VacationWorkspacePage({ view }: { view: VacationWorkspaceView })
       </nav>
 
       {planning ? <h1 className="vacationWorkspaceScreenReaderTitle">Planeamento de férias</h1> : null}
+      {!planning ? <a className="vacationEvidenceJump" href="#vacation-evidence-title">Ver de onde vêm os dias registados ↓</a> : null}
       <div className="vacationWorkspacePane">
         <VacationBalancePage />
+        {!planning ? <VacationEvidencePanel /> : null}
       </div>
     </div>
   )
