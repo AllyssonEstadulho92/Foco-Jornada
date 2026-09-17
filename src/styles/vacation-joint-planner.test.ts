@@ -14,12 +14,16 @@ describe('planeamento a dois e hierarquia responsiva', () => {
     expect(planner).toContain('Pré-visualização · sem guardar')
   })
 
-  it('impede novembro/dezembro, mantém confirmações separadas e não cria gravações implícitas', () => {
+  it('impede novembro/dezembro, mantém confirmações por período e não cria gravações implícitas', () => {
     expect(joint).toContain('BLOCKED_MONTHS = [11, 12] as const')
     expect(joint).toContain('disabled={BLOCKED_MONTHS.includes(value as 11 | 12)}')
     expect(joint).toContain('Já confirmei as datas com a minha parceira.')
     expect(joint).toContain('Já recebi confirmação da entidade empregadora.')
     expect(joint).toContain('Não é enviado qualquer pedido à empresa.')
+    expect(joint).toContain('function resetConfirmations()')
+    expect(joint).toContain('setPartnerConfirmed(false)')
+    expect(joint).toContain('setEmployerConfirmed(false)')
+    expect(joint).toContain('resetConfirmations()')
     expect(joint).not.toContain('setItem(')
     expect(joint).not.toContain('setInterval(')
     expect(joint).toContain('aria-pressed={active}')
