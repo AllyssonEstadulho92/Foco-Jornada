@@ -9,7 +9,9 @@ Atualizado em: 2026-09-17. Tarefas históricas completas em `docs/history/TODO-p
 - [x] Substituir por botão acessível de scroll/foco sem alterar o fragmento; preservar layout e dados.
 - [x] Adicionar fallback localizado para rotas inexistentes, com retorno às férias e ao início.
 - [x] Criar testes jsdom de foco/hash e regressão estrutural; documentar em `HASH-ROUTER-NAVIGATION.md`.
-- [ ] Confirmar Qualidade no head final, integrar PR #218 e verificar publicação/Pages.
+- [x] Confirmar Qualidade #1201 no head final e #1202 em `main`, incluindo auditoria, tipos, lint, testes, build, Worker e smoke Chromium.
+- [x] Integrar PR #218: merge `89564f3ebbfe5d54e5d09dcf28db9e574b35cc50`.
+- [x] Confirmar Publicar Foco & Jornada #257, build `42397a6c97d60044f5dbc1cf90723ee799b1d0ac` e GitHub Pages #848 com sucesso.
 - [ ] Testar no iPhone real abertura do atalho, expansão da secção, refresh da PWA e recuperação de URL inválido; não confundir CI com validação física.
 - [ ] Corrigir também `AppShell.tsx` `href="#main-content"`, sujeito ao mesmo problema no HashRouter; testar navegação por teclado, sem reescrever o shell sem necessidade.
 
@@ -46,3 +48,4 @@ Atualizado em: 2026-09-17. Tarefas históricas completas em `docs/history/TODO-p
 - [x] PR #215: cenários de julho para o ano seguinte e exclusão declarada de novembro/dezembro, integrado.
 - [x] PR #216: confirmação efémera por cenário, Quality #1190, Publicar #255, Pages #840, integrado/publicado.
 - [x] PR #217: proveniência por dia, Qualidade #1193, Publicar #256 e Pages #842, integrado/publicado.
+- [x] PR #218: salto de férias sem alterar hash e recuperação para rota desconhecida, Qualidade #1202 e Pages #848, integrado/publicado.
