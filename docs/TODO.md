@@ -6,11 +6,11 @@ Atualizado em: 2026-09-17. Tarefas históricas completas em `docs/history/TODO-p
 
 - [x] Ler os cinco documentos de continuidade e comparar rotas, componentes e CSS do `main` com a arquitetura descrita.
 - [x] Registar factos, impacto e alcance em `docs/VACATION-UI-AUDIT-2026.md`.
-- [x] Harmonizar cartão/typografia/espaçamento; navegação móvel em duas opções compactas; atalho secundário; sem mudar dados ou fórmulas.
+- [x] Harmonizar cartão/tipografia/espaçamento; navegação móvel em duas opções compactas; atalho secundário; sem mudar dados ou fórmulas.
 - [x] Adicionar teste de regressão da importação, separação de vistas, hash e regras móveis/acessíveis.
-- [ ] Confirmar CI no head final com documentação e integrar PR #219 só com Qualidade verde.
-- [ ] Confirmar CI da `main`, Publicar Foco & Jornada, build e Pages; atualizar estado/decisão/changelog com as provas.
-- [ ] Validar realmente no iPhone e Android a 320–430 px CSS, textos ampliados, rotação, cabeçalhos, cartões, filtros e calendário; depois tablet/desktop e zoom.
+- [x] Confirmar Qualidade #1209 no head final com documentação; integrar PR #219 em `main` no merge `f96ced5532178bb0746db0e50ef52874e72710dc`.
+- [x] Confirmar Qualidade #1210 da `main`, Publicar Foco & Jornada #258, build `96c779f88ab2d0f941b7a54f690dd759fa909ec1` e GitHub Pages #854 concluídos com sucesso; atualizar estado/decisão/changelog.
+- [ ] Validar no iPhone e Android a 320–430 px CSS, textos ampliados, rotação, cabeçalhos, cartões, filtros e calendário; depois tablet/desktop e zoom.
 
 ## P0 — Navegação e estabilidade
 
@@ -48,3 +48,4 @@ Atualizado em: 2026-09-17. Tarefas históricas completas em `docs/history/TODO-p
 - [x] PR #216: checklist temporária por cenário; Qualidade #1190, Publicar #255, Pages #840.
 - [x] PR #217: proveniência por dia; Qualidade #1193, Publicar #256, Pages #842.
 - [x] PR #218: salto sem mudar hash, recuperação de rota; Qualidade #1202, Pages #848.
+- [x] PR #219: auditoria e refinamento visual; Qualidade #1209/#1210, Publicar #258, Pages #854; validação física permanece aberta.
