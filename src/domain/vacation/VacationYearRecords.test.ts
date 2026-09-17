@@ -36,7 +36,7 @@ describe('collectVacationDatesForYear e proveniência', () => {
     expect(balance.recordedIgnoredWeekendDays).toBe(1)
   })
 
-  it('não inventa férias quando fontes estão indisponíveis, inválidas ou de outro mês', () => {
+  it('não inventa férias quando fontes estão indisponíveis ou datas são inválidas', () => {
     expect(collectVacationDatesForYear(2027, [], () => '{')).toEqual([])
     expect(collectVacationDatesForYear(2027, [], () => { throw new Error('cofre bloqueado') })).toEqual([])
     expect(collectVacationDatesForYear(0, [], () => null)).toEqual([])
@@ -48,6 +48,6 @@ describe('collectVacationDatesForYear e proveniência', () => {
       ]),
     }
     expect(collectVacationDatesForYear(2027, [], (key) => records[key] ?? null))
-      .toEqual(['2027-02-28'])
+      .toEqual(['2027-02-28', '2027-03-01'])
   })
 })
