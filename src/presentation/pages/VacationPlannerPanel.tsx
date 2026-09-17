@@ -5,6 +5,7 @@ import {
   type VacationTrackerSettings,
 } from '../../domain/vacation/VacationBalance'
 import { listUpcomingVacationPeriods, simulateVacationPeriod } from '../../domain/vacation/VacationPlanner'
+import { VacationJointPlanner } from './VacationJointPlanner'
 import { VacationSuggestionsPanel } from './VacationSuggestionsPanel'
 import '../../styles/vacation-planner-live.css'
 
@@ -38,6 +39,10 @@ export function VacationPlannerPanel({
   daysLabel,
   preciseDaysLabel,
 }: VacationPlannerPanelProps) {
+  const currentYear = Number(today.slice(0, 4))
+  const [planningYear, setPlanningYear] = useState(() =>
+    Number(today.slice(5, 7)) > 7 ? currentYear + 1 : currentYear)
+  const shownYear = Math.max(currentYear, Math.min(currentYear + 1, planningYear))
   const tomorrow = nextCivilDay(today)
   const yearEnd = `${today.slice(0, 4)}-12-31`
   const [startDate, setStartDate] = useState(tomorrow <= yearEnd ? tomorrow : '')
@@ -72,18 +77,27 @@ export function VacationPlannerPanel({
     <section className="vacationPanel vacationPlannerPanel" aria-labelledby="vacation-planner-title">
       <header className="vacationPlannerHero">
         <div className="vacationPlannerHeroCopy">
-          <span className="vacationPlannerEyebrow">PLANEAMENTO · {today.slice(0, 4)}</span>
+          <span className="vacationPlannerEyebrow">PLANEAMENTO · {shownYear}</span>
           <h2 id="vacation-planner-title">Planeia as próximas férias</h2>
-          <p>Compara períodos, consulta o saldo previsto e simula as datas antes de as marcares.</p>
+          <p>Compara períodos, consulta o saldo previsto e organiza as datas com a tua parceira antes de as marcares.</p>
         </div>
         <span className="vacationPlannerPreview">Pré-visualização · sem guardar</span>
       </header>
+
+      <div className="vacationPlanningYearSwitch" role="group" aria-label="Ano de planeamento">
+        <button type="button" aria-pressed={shownYear === currentYear}
+          className={shownYear === currentYear ? 'isSelected' : ''}
+          onClick={() => setPlanningYear(currentYear)}>Este ano · {currentYear}</button>
+        <button type="button" aria-pressed={shownYear === currentYear + 1}
+          className={shownYear === currentYear + 1 ? 'isSelected' : ''}
+          onClick={() => setPlanningYear(currentYear + 1)}>Próximo ano · {currentYear + 1}</button>
+      </div>
 
       <section className="vacationPlannerLive" aria-label="Ponto de situação do planeamento em tempo real">
         <div className="vacationPlannerLiveHeader">
           <div>
             <span className="vacationPlannerLiveEyebrow">ACOMPANHAMENTO · TEMPO REAL</span>
-            <h3>O teu saldo neste momento</h3>
+            <h3>O teu saldo neste momento · {currentYear}</h3>
           </div>
           <p>
             Cálculo local às <time dateTime={`${today}T${updatedTime}`}>{updatedTime}</time> · atualiza a cada minuto e ao regressares à aplicação.
@@ -106,135 +120,146 @@ export function VacationPlannerPanel({
             <small>Sem incluir a simulação abaixo.</small>
           </div>
           <div className={liveBalance.yearEndProjectedBalanceDays < 0 ? 'vacationPlannerLiveNegative' : undefined}>
-            <dt>Previsão em dezembro</dt>
+            <dt>Previsão em dezembro de {currentYear}</dt>
             <dd>{preciseDaysLabel(liveBalance.yearEndProjectedBalanceDays)}</dd>
             <small>Antes de novas férias simuladas.</small>
           </div>
         </dl>
       </section>
 
-      <VacationSuggestionsPanel
-        today={today}
-        asOfDayProgress={asOfDayProgress}
-        settings={settings}
-        recordedVacationDates={recordedVacationDates}
-        formatDate={formatDate}
-        daysLabel={daysLabel}
-        onSimulate={(start, end) => {
-          setStartDate(start)
-          setEndDate(end)
-        }}
-      />
-
-      <p className="vacationPlannerIntro">
-        Escolhe um período ou utiliza uma sugestão acima para veres quantos dias úteis acrescentaria às férias
-        já marcadas, o saldo pessoal estimado no início e no fim e o efeito na previsão de dezembro.
-        A simulação não reserva nem regista férias.
-      </p>
-
-      {tomorrow > yearEnd ? (
-        <p className="vacationPlannerNotice" role="status">
-          Não há datas futuras neste ano. A simulação fica disponível no início do próximo ano.
-        </p>
+      {shownYear === currentYear + 1 ? (
+        <VacationJointPlanner
+          today={today}
+          asOfDayProgress={asOfDayProgress}
+          year={shownYear}
+          settings={settings}
+        />
       ) : (
         <>
-          <div className="vacationPlannerForm" id="vacation-planner-dates">
-            <label>
-              <span>Início do período</span>
-              <input
-                type="date"
-                value={startDate}
-                min={tomorrow}
-                max={yearEnd}
-                onChange={(event) => {
-                  const value = event.target.value
-                  setStartDate(value)
-                  if (endDate < value) setEndDate(value)
-                }}
-              />
-            </label>
-            <label>
-              <span>Fim do período</span>
-              <input
-                type="date"
-                value={endDate}
-                min={startDate || tomorrow}
-                max={yearEnd}
-                onChange={(event) => setEndDate(event.target.value)}
-              />
-            </label>
+          <VacationSuggestionsPanel
+            today={today}
+            asOfDayProgress={asOfDayProgress}
+            settings={settings}
+            recordedVacationDates={recordedVacationDates}
+            formatDate={formatDate}
+            daysLabel={daysLabel}
+            onSimulate={(start, end) => {
+              setStartDate(start)
+              setEndDate(end)
+            }}
+          />
+
+          <p className="vacationPlannerIntro">
+            Escolhe um período ou utiliza uma sugestão acima para veres quantos dias úteis acrescentaria às férias
+            já marcadas, o saldo pessoal estimado no início e no fim e o efeito na previsão de dezembro.
+            A simulação não reserva nem regista férias.
+          </p>
+
+          {tomorrow > yearEnd ? (
+            <p className="vacationPlannerNotice" role="status">
+              Não há datas futuras neste ano. Escolhe o próximo ano para comparar novos períodos.
+            </p>
+          ) : (
+            <>
+              <div className="vacationPlannerForm" id="vacation-planner-dates">
+                <label>
+                  <span>Início do período</span>
+                  <input
+                    type="date"
+                    value={startDate}
+                    min={tomorrow}
+                    max={yearEnd}
+                    onChange={(event) => {
+                      const value = event.target.value
+                      setStartDate(value)
+                      if (endDate < value) setEndDate(value)
+                    }}
+                  />
+                </label>
+                <label>
+                  <span>Fim do período</span>
+                  <input
+                    type="date"
+                    value={endDate}
+                    min={startDate || tomorrow}
+                    max={yearEnd}
+                    onChange={(event) => setEndDate(event.target.value)}
+                  />
+                </label>
+              </div>
+
+              {simulation.valid ? (
+                <div className="vacationPlannerResults" aria-live="polite">
+                  <div className="vacationPlannerGrid">
+                    <div className="vacationPlannerResult">
+                      <span>Dias úteis do período</span>
+                      <strong>{daysLabel(simulation.workingDays)}</strong>
+                      <small>{daysLabel(simulation.calendarDays)} de calendário · {daysLabel(simulation.weekendDays)} de fim de semana.</small>
+                    </div>
+                    <div className="vacationPlannerResult vacationPlannerResultAccent">
+                      <span>Dias adicionais a descontar</span>
+                      <strong>{daysLabel(simulation.additionalDays)}</strong>
+                      <small>{daysLabel(simulation.alreadyRecordedDays)} já marcados e não descontados outra vez.</small>
+                    </div>
+                    <div className="vacationPlannerResult">
+                      <span>Saldo no início</span>
+                      <strong>{preciseDaysLabel(simulation.beforePeriodBalanceDays)}</strong>
+                      <small>Projeção pessoal ao início de {formatDate(simulation.startDate)}.</small>
+                    </div>
+                    <div className={`vacationPlannerResult${simulation.afterPeriodBalanceDays < 0 ? ' vacationPlannerNegative' : ''}`}>
+                      <span>Saldo no fim</span>
+                      <strong>{preciseDaysLabel(simulation.afterPeriodBalanceDays)}</strong>
+                      <small>Projeção pessoal ao fim de {formatDate(simulation.endDate)}.</small>
+                    </div>
+                    <div className={`vacationPlannerResult vacationPlannerYearEnd${simulation.afterYearEndBalanceDays < 0 ? ' vacationPlannerNegative' : ''}`}>
+                      <span>Previsão para 31 de dezembro</span>
+                      <strong>{preciseDaysLabel(simulation.afterYearEndBalanceDays)}</strong>
+                      <small>Antes: {preciseDaysLabel(simulation.beforeYearEndBalanceDays)} · impacto: −{daysLabel(simulation.additionalDays)}.</small>
+                    </div>
+                  </div>
+                  {simulation.workingDays === 0 ? (
+                    <p className="vacationPlannerNotice" role="status">Este período contém apenas fins de semana; não desconta dias úteis.</p>
+                  ) : simulation.additionalDays === 0 ? (
+                    <p className="vacationPlannerNotice" role="status">Todos os dias úteis escolhidos já estão marcados. A simulação não os duplica.</p>
+                  ) : null}
+                  {simulation.afterYearEndBalanceDays < 0 ? (
+                    <p className="vacationPlannerNotice vacationPlannerWarning" role="status">
+                      A previsão pessoal do final do ano fica negativa. Confirma a disponibilidade real com a entidade empregadora antes de marcares férias.
+                    </p>
+                  ) : null}
+                </div>
+              ) : (
+                <p className="vacationPlannerNotice" role="status">{simulation.message}</p>
+              )}
+            </>
+          )}
+
+          <div className="vacationPlannerUpcoming">
+            <h3>Próximos períodos já registados</h3>
+            {periods.length === 0 ? (
+              <p>Ainda não há dias úteis futuros marcados como férias nas áreas da aplicação.</p>
+            ) : (
+              <ol className="vacationPlannerPeriodList">
+                {periods.map((period) => (
+                  <li key={`${period.startDate}-${period.endDate}`}>
+                    <span>{formatDate(period.startDate)} — {formatDate(period.endDate)}</span>
+                    <strong>{daysLabel(period.workingDays)}</strong>
+                  </li>
+                ))}
+              </ol>
+            )}
+            <p>
+              Os períodos agrupam dias úteis consecutivos, incluindo a passagem de sexta para segunda-feira;
+              as datas apresentadas são o primeiro e o último dia útil marcado, não necessariamente o intervalo completo de descanso.
+            </p>
           </div>
 
-          {simulation.valid ? (
-            <div className="vacationPlannerResults" aria-live="polite">
-              <div className="vacationPlannerGrid">
-                <div className="vacationPlannerResult">
-                  <span>Dias úteis do período</span>
-                  <strong>{daysLabel(simulation.workingDays)}</strong>
-                  <small>{daysLabel(simulation.calendarDays)} de calendário · {daysLabel(simulation.weekendDays)} de fim de semana.</small>
-                </div>
-                <div className="vacationPlannerResult vacationPlannerResultAccent">
-                  <span>Dias adicionais a descontar</span>
-                  <strong>{daysLabel(simulation.additionalDays)}</strong>
-                  <small>{daysLabel(simulation.alreadyRecordedDays)} já marcados e não descontados outra vez.</small>
-                </div>
-                <div className="vacationPlannerResult">
-                  <span>Saldo no início</span>
-                  <strong>{preciseDaysLabel(simulation.beforePeriodBalanceDays)}</strong>
-                  <small>Projeção pessoal ao início de {formatDate(simulation.startDate)}.</small>
-                </div>
-                <div className={`vacationPlannerResult${simulation.afterPeriodBalanceDays < 0 ? ' vacationPlannerNegative' : ''}`}>
-                  <span>Saldo no fim</span>
-                  <strong>{preciseDaysLabel(simulation.afterPeriodBalanceDays)}</strong>
-                  <small>Projeção pessoal ao fim de {formatDate(simulation.endDate)}.</small>
-                </div>
-                <div className={`vacationPlannerResult vacationPlannerYearEnd${simulation.afterYearEndBalanceDays < 0 ? ' vacationPlannerNegative' : ''}`}>
-                  <span>Previsão para 31 de dezembro</span>
-                  <strong>{preciseDaysLabel(simulation.afterYearEndBalanceDays)}</strong>
-                  <small>Antes: {preciseDaysLabel(simulation.beforeYearEndBalanceDays)} · impacto: −{daysLabel(simulation.additionalDays)}.</small>
-                </div>
-              </div>
-              {simulation.workingDays === 0 ? (
-                <p className="vacationPlannerNotice" role="status">Este período contém apenas fins de semana; não desconta dias úteis.</p>
-              ) : simulation.additionalDays === 0 ? (
-                <p className="vacationPlannerNotice" role="status">Todos os dias úteis escolhidos já estão marcados. A simulação não os duplica.</p>
-              ) : null}
-              {simulation.afterYearEndBalanceDays < 0 ? (
-                <p className="vacationPlannerNotice vacationPlannerWarning" role="status">
-                  A previsão pessoal do final do ano fica negativa. Confirma a disponibilidade real com a entidade empregadora antes de marcares férias.
-                </p>
-              ) : null}
-            </div>
-          ) : (
-            <p className="vacationPlannerNotice" role="status">{simulation.message}</p>
-          )}
+          <div className="vacationPlannerFooter">
+            <span>Regime padrão: segunda–sexta. Feriados e escalas especiais não são inferidos; o contador de 28 dias é uma projeção pessoal.</span>
+            <NavLink to="/turnos">Marcar no mapa de turnos</NavLink>
+          </div>
         </>
       )}
-
-      <div className="vacationPlannerUpcoming">
-        <h3>Próximos períodos já registados</h3>
-        {periods.length === 0 ? (
-          <p>Ainda não há dias úteis futuros marcados como férias nas áreas da aplicação.</p>
-        ) : (
-          <ol className="vacationPlannerPeriodList">
-            {periods.map((period) => (
-              <li key={`${period.startDate}-${period.endDate}`}>
-                <span>{formatDate(period.startDate)} — {formatDate(period.endDate)}</span>
-                <strong>{daysLabel(period.workingDays)}</strong>
-              </li>
-            ))}
-          </ol>
-        )}
-        <p>
-          Os períodos agrupam dias úteis consecutivos, incluindo a passagem de sexta para segunda-feira;
-          as datas apresentadas são o primeiro e o último dia útil marcado, não necessariamente o intervalo completo de descanso.
-        </p>
-      </div>
-
-      <div className="vacationPlannerFooter">
-        <span>Regime padrão: segunda–sexta. Feriados e escalas especiais não são inferidos; o contador de 28 dias é uma projeção pessoal.</span>
-        <NavLink to="/turnos">Marcar no mapa de turnos</NavLink>
-      </div>
     </section>
   )
 }
