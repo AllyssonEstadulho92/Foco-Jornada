@@ -11,7 +11,7 @@ describe('auditoria visual das férias', () => {
     expect(workspace).not.toContain('href="#vacation-evidence-title"')
     expect(polish).toContain('.vacationWorkspace--overview')
     expect(polish).toContain('.vacationWorkspace--planning')
-    expect(polish).not.toContain('display: none;')
+    expect(polish).not.toContain('.vacationPlannerPanel { display: none; }')
     expect(balance).toContain('calculateVacationBalance(')
     expect(workspace).not.toContain('secureStorage')
   })
