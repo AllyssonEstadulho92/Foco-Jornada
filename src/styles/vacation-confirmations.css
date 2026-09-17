@@ -1,0 +1,36 @@
+.vacationJointConfirmations {
+  display: grid;
+  gap: clamp(.8rem, 1.9vw, 1rem);
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  padding: clamp(1rem, 2.5vw, 1.4rem);
+  border: 1px solid var(--line-strong);
+  border-radius: 1.15rem;
+  background: color-mix(in srgb, var(--surface) 90%, var(--primary-soft));
+}
+.vacationJointConfirmations, .vacationJointConfirmations * { box-sizing: border-box; min-width: 0; }
+.vacationJointConfirmationsHeading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .65rem 1rem; }
+.vacationJointConfirmationsHeading h4 { margin: .3rem 0 0; font-size: clamp(1.12rem, 2.2vw, 1.4rem); line-height: 1.28; overflow-wrap: anywhere; }
+.vacationJointConfirmationBadge { display: inline-flex; align-items: center; min-height: 2rem; padding: .35rem .7rem; border: 1px solid var(--line-strong); border-radius: 99px; background: var(--surface); color: var(--muted); font-size: .82rem; font-weight: 750; white-space: normal; }
+.vacationJointConfirmationBadge.isComplete { border-color: var(--primary); color: var(--primary); }
+.vacationJointConfirmationPeriod { margin: 0; color: var(--muted); font-size: .9rem; line-height: 1.5; overflow-wrap: anywhere; }
+.vacationJointConfirmationPeriod strong { color: var(--text); }
+.vacationJointConfirmationChoices { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr)); gap: .65rem; }
+.vacationJointConfirmationChoices label { display: grid; grid-template-columns: 1.2rem minmax(0, 1fr); align-items: center; gap: .75rem; min-height: 54px; padding: .8rem .9rem; border: 1px solid var(--line); border-radius: .85rem; background: var(--surface); color: var(--text); line-height: 1.45; cursor: pointer; }
+.vacationJointConfirmationChoices input { width: 1.2rem; height: 1.2rem; margin: 0; accent-color: var(--primary); }
+.vacationJointConfirmationChoices label:focus-within { outline: 3px solid var(--primary); outline-offset: 2px; }
+.vacationJointConfirmationStatus { margin: 0; padding: .7rem .85rem; border-radius: .75rem; background: var(--surface-2); color: var(--text); line-height: 1.5; overflow-wrap: anywhere; }
+.vacationJointConfirmations > small { color: var(--muted); line-height: 1.5; overflow-wrap: anywhere; }
+@media (max-width: 520px) {
+  .vacationJointConfirmationsHeading { align-items: flex-start; }
+  .vacationJointConfirmationBadge { max-width: 100%; }
+  .vacationJointConfirmationChoices { grid-template-columns: minmax(0, 1fr); }
+}
+@media (forced-colors: active) {
+  .vacationJointConfirmations, .vacationJointConfirmationBadge, .vacationJointConfirmationChoices label { background: Canvas; color: CanvasText; border: 1px solid CanvasText; }
+  .vacationJointConfirmationBadge.isComplete { border: 2px solid Highlight; color: CanvasText; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vacationJointConfirmations *, .vacationJointConfirmations *::before, .vacationJointConfirmations *::after { transition: none !important; animation: none !important; }
+}
