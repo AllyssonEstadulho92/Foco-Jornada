@@ -3,6 +3,7 @@ import { VacationBalancePage } from './VacationBalancePage'
 import { VacationEvidencePanel } from './VacationEvidencePanel'
 import '../../styles/vacation-workspace.css'
 import '../../styles/vacation-planning-year.css'
+import '../../styles/vacation-evidence-layout.css'
 
 type VacationWorkspaceView = 'overview' | 'planning'
 
