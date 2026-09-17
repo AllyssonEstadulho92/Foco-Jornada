@@ -59,7 +59,7 @@ export function VacationEvidencePanel() {
       <div className="vacationEvidenceHeading">
         <div>
           <span className="vacationEvidenceEyebrow">TRANSPARÊNCIA DOS REGISTOS · {year}</span>
-          <h2 id="vacation-evidence-title">De onde vêm os teus dias?</h2>
+          <h2 id="vacation-evidence-title" tabIndex={-1}>De onde vêm os teus dias?</h2>
           <p>Abre o detalhe para consultar cada data uma única vez, mesmo quando aparece em várias áreas.</p>
         </div>
         <button type="button" className="vacationEvidenceToggle"

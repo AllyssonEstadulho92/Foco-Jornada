@@ -6,12 +6,20 @@
 .vacationEvidenceJump {
   justify-self: start;
   max-width: 100%;
+  min-height: 2.75rem;
+  padding: .4rem 0;
+  border: 0;
+  background: transparent;
   color: var(--primary);
+  font: inherit;
   font-size: var(--text-sm);
   font-weight: 700;
   line-height: 1.5;
-  overflow-wrap: anywhere;
+  text-align: left;
+  text-decoration: underline;
   text-underline-offset: .2em;
+  cursor: pointer;
+  overflow-wrap: anywhere;
 }
 .vacationEvidenceJump:focus-visible { outline: 3px solid var(--primary); outline-offset: 3px; }
 @media (forced-colors: active) { .vacationEvidenceJump { color: LinkText; } }

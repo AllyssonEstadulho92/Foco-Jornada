@@ -2,6 +2,17 @@
 
 Atualizado em: 2026-09-17. Tarefas históricas completas em `docs/history/TODO-pre-217.md`; não considerar pendências físicas antigas concluídas por omissão.
 
+## P0 — 404 no atalho de férias (PR #218)
+
+- [x] Confrontar screenshot do iPhone com código `VacationWorkspacePage`, `VacationEvidencePanel` e `createHashRouter`.
+- [x] Confirmar a causa: `href="#vacation-evidence-title"` substitui a rota em vez de saltar na página.
+- [x] Substituir por botão acessível de scroll/foco sem alterar o fragmento; preservar layout e dados.
+- [x] Adicionar fallback localizado para rotas inexistentes, com retorno às férias e ao início.
+- [x] Criar testes jsdom de foco/hash e regressão estrutural; documentar em `HASH-ROUTER-NAVIGATION.md`.
+- [ ] Confirmar Qualidade no head final, integrar PR #218 e verificar publicação/Pages.
+- [ ] Testar no iPhone real abertura do atalho, expansão da secção, refresh da PWA e recuperação de URL inválido; não confundir CI com validação física.
+- [ ] Corrigir também `AppShell.tsx` `href="#main-content"`, sujeito ao mesmo problema no HashRouter; testar navegação por teclado, sem reescrever o shell sem necessidade.
+
 ## P0 — Rastreabilidade do saldo, PR #217
 
 - [x] Comparar `VacationBalance`, `VacationBalancePage`, `VacationYearRecords`, cofre, rotas, estilos e testes com os documentos existentes.

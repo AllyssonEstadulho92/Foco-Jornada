@@ -2,6 +2,14 @@
 
 Atualizado em: 2026-09-17. Alterações anteriores até ao PR #214 (texto completo e provas históricas) permanecem em `docs/history/CHANGELOG-pre-217.md`.
 
+## 2026-09-17 — PR #218: corrigir 404 do atalho de férias (em validação)
+
+- Captura real no iPhone revelou `Unexpected Application Error! / 404 Not Found` após tocar em «Ver de onde vêm os dias registados». Causa confirmada: `href="#vacation-evidence-title"` substituía a rota `#/ferias` do `createHashRouter`.
+- O atalho usa agora botão nativo, scroll e foco programático via `focusSection`, preservando o hash da rota. Título focável sem entrar na ordem normal de Tab; CSS mantém aparência e área de toque.
+- Adicionada rota de recuperação `*` com mensagem em PT-PT e opções para regressar às férias ou ao início, evitando o fallback técnico do Router quando o URL é desconhecido.
+- Testes jsdom verificam que o hash não muda e o título recebe foco; teste estrutural impede regressão do `href` incompatível e protege a rota de recuperação. Sem alterar cálculos, dias de férias, dados cifrados, sincronização, autenticação, backend ou dependências.
+- O skip link global `AppShell` (`href="#main-content"`) tem problema análogo, documentado em TODO para correção dirigida. CI final, merge, publicação e teste físico pendentes nesta revisão. Ver `HASH-ROUTER-NAVIGATION.md`.
+
 ## 2026-09-17 — PR #217: origem dos dias de férias (integrado e publicado)
 
 - `#/ferias` ganhou painel opcional, recolhido por defeito, «De onde vêm os teus dias?», com atalho, datas ordenadas, indicação das áreas de origem (horas, turnos e plano), úteis até hoje/futuros e fins de semana ignorados.

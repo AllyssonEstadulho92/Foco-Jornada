@@ -1,16 +1,27 @@
 import { describe, expect, it } from 'vitest'
 import evidence from '../presentation/pages/VacationEvidencePanel.tsx?raw'
 import workspace from '../presentation/pages/VacationWorkspacePage.tsx?raw'
+import router from '../presentation/router.tsx?raw'
+import notFound from '../presentation/pages/NotFoundPage.tsx?raw'
 import css from './vacation-evidence.css?raw'
 import layout from './vacation-evidence-layout.css?raw'
 
 describe('detalhe de proveniência do saldo', () => {
-  it('existe apenas na vista geral e não polui o planeamento', () => {
+  it('existe apenas na vista geral e o atalho não substitui a rota do HashRouter', () => {
+    expect(router).toContain('createHashRouter')
     expect(workspace).toContain('!planning ? <VacationEvidencePanel /> : null')
-    expect(workspace).toContain('href="#vacation-evidence-title"')
+    expect(workspace).toContain("focusSection('vacation-evidence-title')")
+    expect(workspace).not.toContain('href="#vacation-evidence-title"')
     expect(workspace).toContain('<VacationBalancePage />')
     expect(workspace).not.toContain('calculateVacationBalance')
+    expect(evidence).toContain('id="vacation-evidence-title" tabIndex={-1}')
     expect(layout).toContain('.vacationWorkspace--overview .vacationWorkspacePane')
+  })
+
+  it('a rota desconhecida oferece recuperação sem o ecrã de erro técnico do Router', () => {
+    expect(router).toContain("{ path: '*', element: <NotFoundPage /> }")
+    expect(notFound).toContain('Não encontrámos esta página')
+    expect(notFound).toContain('<NavLink to="/ferias">Voltar às férias</NavLink>')
   })
 
   it('mostra fontes e datas só quando aberto e nunca escreve nem cria timers', () => {
@@ -32,6 +43,7 @@ describe('detalhe de proveniência do saldo', () => {
     expect(css).toContain('grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr))')
     expect(css).toContain('overflow-wrap: anywhere')
     expect(css).toContain(':focus-visible')
+    expect(layout).toContain('cursor: pointer')
     expect(css).toContain('@media (max-width: 560px)')
     expect(css).toContain('@media (forced-colors: active)')
     expect(css).toContain('@media (prefers-reduced-motion: reduce)')

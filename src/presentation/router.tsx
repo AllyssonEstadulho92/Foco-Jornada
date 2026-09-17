@@ -10,6 +10,7 @@ import { MedicationActionsGuidePage } from './pages/MedicationActionsGuidePage'
 import { MedicationsStockPage } from './pages/MedicationsStockPage'
 import { MoreWithBackupPage } from './pages/MoreWithBackupPage'
 import { NotificationCenterPage } from './pages/NotificationCenterPage'
+import { NotFoundPage } from './pages/NotFoundPage'
 import { OperationalCalendarPage } from './pages/OperationalCalendarPage'
 import { PayrollPage } from './pages/PayrollPage'
 import { PayrollReferencePage } from './pages/PayrollReferencePage'
@@ -50,6 +51,7 @@ export const router = createHashRouter([
       { path: 'relatorio', element: <ExportDataPage /> },
       { path: 'exportar', element: <ExportDataPage /> },
       { path: 'definicoes', element: <SettingsReferencePage /> },
+      { path: '*', element: <NotFoundPage /> },
     ],
   },
 ])
