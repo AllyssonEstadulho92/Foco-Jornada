@@ -9,9 +9,10 @@ Atualizado em: 2026-09-17. Tarefas históricas completas em `docs/history/TODO-p
 - [x] Reutilizar coletor de proveniência para planeamento anual; preservar datas válidas de outro mês e evitar dias inválidos.
 - [x] Tornar painel responsivo, acesso por teclado, `aria-expanded`, contraste forçado e movimento reduzido; nenhuma gravação.
 - [x] Acrescentar testes de domínio/UI e especificação `docs/VACATION-EVIDENCE.md`.
-- [x] Qualidade #1192 verde no head de implementação pré-documentação.
-- [ ] Confirmar qualidade no head final com docs e integrar PR #217.
-- [ ] Verificar gates da `main`, publicação GitHub Pages e commit de build; atualizar PROJECT_STATE/TODO/DECISIONS/CHANGELOG com provas.
+- [x] Qualidade #1192 verde no head de implementação e #1193 no head final com documentação, incluindo auditoria, tipos, lint, testes, build, Worker e smoke Chromium.
+- [x] Integrar PR #217 em `main`: merge `61816f7ec3f1c43043d57b094f834bb116d19a27`.
+- [x] Verificar Publicar Foco & Jornada #256 e GitHub Pages #842 com sucesso; build `322b8b37f745e17233360af07e473f50e9fc79d5`.
+- [x] Atualizar documentos de continuidade, preservando histórico anterior em `docs/history`.
 - [ ] Validar painel no iPhone real e comparar origens/contagens com dados efetivos e sincronização.
 
 ## P0 — Validação física e integridade
@@ -33,3 +34,4 @@ Atualizado em: 2026-09-17. Tarefas históricas completas em `docs/history/TODO-p
 - [x] PR #214: ponto de situação local em tempo real, integrado.
 - [x] PR #215: cenários de julho para o ano seguinte e exclusão declarada de novembro/dezembro, integrado.
 - [x] PR #216: confirmação efémera por cenário, Quality #1190, Publicar #255, Pages #840, integrado/publicado.
+- [x] PR #217: proveniência por dia, Qualidade #1193, Publicar #256 e Pages #842, integrado/publicado.
