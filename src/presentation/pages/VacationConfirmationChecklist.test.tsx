@@ -1,6 +1,8 @@
-import { fireEvent, render, screen } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { afterEach, describe, expect, it } from 'vitest'
 import { VacationConfirmationChecklist } from './VacationConfirmationChecklist'
+
+afterEach(cleanup)
 
 describe('VacationConfirmationChecklist', () => {
   it('começa por confirmar e não interpreta os vistos como aprovação externa', () => {
