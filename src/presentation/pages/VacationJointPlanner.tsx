@@ -42,7 +42,8 @@ function dateKey(stamp: number) {
 }
 
 function clockLabel(progress: number) {
-  const minute = Math.min(1439, Math.max(0, Math.floor(progress * 1440)))
+  const safeProgress = Number.isFinite(progress) ? progress : 0
+  const minute = Math.min(1439, Math.max(0, Math.floor(safeProgress * 1440)))
   return `${String(Math.floor(minute / 60)).padStart(2, '0')}:${String(minute % 60).padStart(2, '0')}`
 }
 
@@ -55,13 +56,12 @@ export function VacationJointPlanner({ today, asOfDayProgress, year, settings }:
   const [employerConfirmed, setEmployerConfirmed] = useState(false)
   const [showCalendar, setShowCalendar] = useState(false)
 
-  // Same encrypted shift/payroll sources as the current-year tracker, but scoped
-  // to the selected future year. The existing parent clock re-reads on activity.
-  const recorded = useMemo(() => collectVacationDatesForYear(
-    year,
-    entries,
-    (key) => secureStorage.getItem(key),
-  ), [year, entries, asOfDayProgress])
+  // The parent clock drives a fresh read from the encrypted vault each minute
+  // and on focus/visibility. Never read unencrypted browser storage here.
+  const recorded = useMemo(() => {
+    if (!Number.isFinite(asOfDayProgress)) return []
+    return collectVacationDatesForYear(year, entries, (key) => secureStorage.getItem(key))
+  }, [year, entries, asOfDayProgress])
 
   const suggestions = useMemo(() => suggestJointVacationPeriods({
     today,
@@ -83,6 +83,11 @@ export function VacationJointPlanner({ today, asOfDayProgress, year, settings }:
   ]
   const updatedAt = clockLabel(asOfDayProgress)
 
+  function resetConfirmations() {
+    setPartnerConfirmed(false)
+    setEmployerConfirmed(false)
+  }
+
   return (
     <section className="vacationJoint" aria-labelledby="vacation-joint-title">
       <header className="vacationJointHeader">
@@ -101,6 +106,7 @@ export function VacationJointPlanner({ today, asOfDayProgress, year, settings }:
             setMonth(Number(event.target.value))
             setSelectedStart('')
             setShowCalendar(false)
+            resetConfirmations()
           }}>
             {Array.from({ length: 12 }, (_, index) => index + 1).map((value) => (
               <option key={value} value={value} disabled={BLOCKED_MONTHS.includes(value as 11 | 12)}>
@@ -116,6 +122,7 @@ export function VacationJointPlanner({ today, asOfDayProgress, year, settings }:
               setRequestedDays(Number(event.target.value))
               setSelectedStart('')
               setShowCalendar(false)
+              resetConfirmations()
             }} />
         </label>
         <div className="vacationJointRestriction" role="note">
@@ -142,7 +149,11 @@ export function VacationJointPlanner({ today, asOfDayProgress, year, settings }:
                 <button type="button" key={item.startDate}
                   className={`vacationJointOption${active ? ' isSelected' : ''}`}
                   aria-pressed={active}
-                  onClick={() => { setSelectedStart(item.startDate); setShowCalendar(true) }}>
+                  onClick={() => {
+                    setSelectedStart(item.startDate)
+                    setShowCalendar(true)
+                    resetConfirmations()
+                  }}>
                   <span className="vacationJointOptionTag">{index === 0 ? 'Primeira opção' : `Alternativa ${index + 1}`}</span>
                   <strong>{shortDate(item.startDate)} – {shortDate(item.endDate)}</strong>
                   <span>{item.workingDays} dias úteis · {item.restDays} dias de descanso potencial</span>
