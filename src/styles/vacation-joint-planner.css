@@ -1,0 +1,83 @@
+.vacationJoint {
+  --joint-accent: #237c55;
+  --joint-deep: #155739;
+  display: grid;
+  gap: clamp(1rem, 2.2vw, 1.6rem);
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  padding: clamp(1rem, 2.6vw, 1.8rem);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+.vacationJoint, .vacationJoint * { box-sizing: border-box; min-width: 0; }
+.vacationJointHeader { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: .85rem 1.2rem; }
+.vacationJointHeader > div { flex: 1 1 18rem; max-width: 70ch; }
+.vacationJointEyebrow { color: var(--primary); font-size: .77rem; font-weight: 800; letter-spacing: .075em; overflow-wrap: anywhere; }
+.vacationJointHeader h3 { margin: .4rem 0 .45rem; font: 750 clamp(1.5rem, 2.6vw, 2.2rem)/1.15 var(--font-display); letter-spacing: -.025em; overflow-wrap: anywhere; }
+.vacationJointHeader p, .vacationJointSectionHeading p { margin: 0; color: var(--muted); line-height: 1.55; overflow-wrap: anywhere; }
+.vacationJointLive { align-self: flex-start; flex: 0 1 auto; max-width: 100%; padding: .5rem .75rem; border: 1px solid var(--line); border-radius: 99px; background: var(--surface-2); color: var(--muted); font-size: .8rem; line-height: 1.4; overflow-wrap: anywhere; }
+.vacationJointLive::before { content: ''; display: inline-block; width: .45rem; height: .45rem; margin-inline-end: .4rem; border-radius: 50%; background: var(--joint-accent); vertical-align: middle; }
+.vacationJointFilters { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr)); gap: .8rem; align-items: stretch; }
+.vacationJointFilters label, .vacationJointRestriction { display: grid; align-content: start; gap: .45rem; padding: .9rem; border: 1px solid var(--line); border-radius: 1rem; background: var(--surface-2); }
+.vacationJointFilters label > span, .vacationJointRestriction > strong { color: var(--muted); font-size: .83rem; font-weight: 700; }
+.vacationJointFilters input, .vacationJointFilters select { width: 100%; max-width: 100%; min-height: 44px; padding: .55rem .65rem; border: 1px solid var(--line-strong); border-radius: .65rem; color: var(--text); background: var(--surface); font: inherit; }
+.vacationJointRestriction > span { color: var(--joint-accent); font-weight: 750; overflow-wrap: anywhere; }
+.vacationJointRestriction small { color: var(--muted); line-height: 1.45; overflow-wrap: anywhere; }
+.vacationJointSectionHeading { display: flex; align-items: end; justify-content: space-between; flex-wrap: wrap; gap: .7rem; }
+.vacationJointSectionHeading h4 { margin: 0 0 .25rem; font-size: clamp(1.05rem, 1.6vw, 1.25rem); }
+.vacationJointSectionHeading > span { color: var(--muted); font-size: .82rem; font-weight: 650; }
+.vacationJointOptions { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); align-items: stretch; gap: .8rem; }
+.vacationJointOption { display: grid; align-content: start; gap: .7rem; width: 100%; padding: 1rem; border: 1px solid var(--line); border-radius: 1.1rem; background: var(--surface); color: var(--text); text-align: left; font: inherit; cursor: pointer; transition: border-color .16s ease, box-shadow .16s ease; }
+.vacationJointOption.isSelected { border-color: var(--joint-accent); box-shadow: inset 0 0 0 1px var(--joint-accent); background: color-mix(in srgb, var(--surface) 93%, #bcf0cd); }
+.vacationJointOptionTag { justify-self: start; padding: .32rem .65rem; border-radius: 2rem; background: color-mix(in srgb, var(--surface) 72%, #c6eed8); color: var(--joint-deep); font-size: .76rem; font-weight: 750; }
+.vacationJointOption > strong { font-size: clamp(1.15rem, 1.9vw, 1.4rem); line-height: 1.24; overflow-wrap: anywhere; }
+.vacationJointOption > span:not(.vacationJointOptionTag):not(.vacationJointOptionAction) { line-height: 1.45; }
+.vacationJointOption small { color: var(--muted); line-height: 1.4; overflow-wrap: anywhere; }
+.vacationJointOptionAction { display: flex; justify-content: space-between; gap: .6rem; align-items: center; margin-top: auto; padding-top: .7rem; border-top: 1px solid var(--line); color: var(--joint-accent); font-size: .87rem; font-weight: 750; }
+.vacationJointDetail { display: grid; gap: 1rem; padding: clamp(1rem, 2vw, 1.35rem); border: 1px solid var(--line); border-radius: 1.1rem; background: var(--surface-2); }
+.vacationJointDetailHeader { display: flex; align-items: start; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.vacationJointDetailHeader > div { flex: 1 1 17rem; }
+.vacationJointDetailHeader h4 { margin: .4rem 0; font-size: clamp(1.15rem, 2vw, 1.55rem); overflow-wrap: anywhere; }
+.vacationJointDetailHeader p { margin: 0; line-height: 1.5; color: var(--muted); overflow-wrap: anywhere; }
+.vacationJointDetailHeader button { flex: 0 1 auto; min-height: 44px; max-width: 100%; padding: .6rem .85rem; border: 1px solid var(--line-strong); border-radius: .75rem; background: var(--surface); color: var(--text); font: inherit; font-weight: 650; cursor: pointer; }
+.vacationJointFigures { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr)); gap: .65rem; margin: 0; }
+.vacationJointFigures > div { display: grid; gap: .35rem; padding: .85rem; border: 1px solid var(--line); border-radius: .8rem; background: var(--surface); }
+.vacationJointFigures dt { color: var(--muted); font-size: .8rem; line-height: 1.4; overflow-wrap: anywhere; }
+.vacationJointFigures dd { margin: 0; font-size: clamp(1.05rem, 1.6vw, 1.3rem); font-weight: 800; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.vacationJointCalendar { display: grid; gap: .8rem; width: min(100%, 35rem); padding: 1rem; border: 1px solid var(--line); border-radius: .9rem; background: var(--surface); }
+.vacationJointCalendar > strong { text-transform: capitalize; }
+.vacationJointCalendarGrid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: .2rem; }
+.vacationJointWeekday, .vacationJointDay { display: grid; place-items: center; min-height: 2.2rem; border-radius: .45rem; font-size: .82rem; font-variant-numeric: tabular-nums; }
+.vacationJointWeekday { color: var(--muted); font-weight: 750; }
+.vacationJointDay.isSuggested { background: #d7efdf; color: #164b33; font-weight: 800; }
+.vacationJointDay.isRest { background: #fff0d6; color: #66440e; }
+.vacationJointDay.isBooked { border: 2px dashed var(--line-strong); }
+.vacationJointCalendar p { margin: 0; color: var(--muted); font-size: .82rem; line-height: 1.5; }
+.vacationJointEmpty, .vacationJointDisclaimer { margin: 0; padding: 1rem; border-radius: .85rem; background: var(--surface-2); color: var(--muted); line-height: 1.6; overflow-wrap: anywhere; }
+.vacationJointConfirmations { display: grid; gap: .7rem; padding: 1rem; border: 1px solid var(--line); border-radius: .9rem; }
+.vacationJointConfirmations h4 { margin: 0; }
+.vacationJointConfirmations label { display: flex; align-items: flex-start; gap: .65rem; line-height: 1.45; cursor: pointer; }
+.vacationJointConfirmations input { flex: 0 0 1.1rem; width: 1.1rem; height: 1.1rem; margin-top: .18rem; accent-color: var(--joint-accent); }
+.vacationJointConfirmations p { margin: 0; font-size: .82rem; color: var(--muted); line-height: 1.5; }
+.vacationJointDisclaimer { font-size: .82rem; }
+.vacationJointDisclaimer strong { color: var(--text); }
+.vacationJoint button:focus-visible, .vacationJoint select:focus-visible,
+.vacationJoint input:focus-visible { outline: 3px solid var(--primary); outline-offset: 3px; }
+@media (max-width: 640px) {
+  .vacationJoint { padding: 1rem; gap: 1rem; }
+  .vacationJointOptions { grid-template-columns: minmax(0, 1fr); }
+  .vacationJointDetailHeader button { width: 100%; }
+  .vacationJointCalendar { padding: .65rem; }
+  .vacationJointWeekday, .vacationJointDay { min-height: 1.95rem; font-size: .72rem; }
+}
+@media (forced-colors: active) {
+  .vacationJointOption.isSelected, .vacationJointDay.isSuggested,
+  .vacationJointDay.isRest, .vacationJointDay.isBooked { border: 2px solid Highlight; background: Canvas; color: CanvasText; }
+  .vacationJointOptionTag, .vacationJointLive { border: 1px solid CanvasText; background: Canvas; color: CanvasText; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vacationJoint *, .vacationJoint *::before, .vacationJoint *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+}
