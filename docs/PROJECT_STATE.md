@@ -1,18 +1,18 @@
 # Estado do Projeto
 
-Atualizado em: 2026-09-17. Estado de integração/publicação verificado até ao PR #216.
+Atualizado em: 2026-09-17. PR #217 integrado e publicado, validação física ainda pendente.
 
 ## Estado atual
 
 **Foco Jornada**: uma PWA React 19/TypeScript responsiva (iPhone, Android, tablet e computador), frontend GitHub Pages, IndexedDB/Dexie e cofre AES-GCM, sincronização opcional cifrada por Cloudflare Worker/Durable Object. As mesmas regras de domínio e o mesmo perfil aplicam-se a todos os tamanhos de ecrã; a replicação não é instantânea garantida.
 
-Em `main` estão integrados os trabalhos anteriores de jornada, autenticação/sync e férias #203–#216. `#/ferias` mostra evolução mensal, saldo e indicadores; `#/ferias/planeamento` concentra sugestões, calendário e simulação. O planeamento a dois permite julho do ano seguinte, exclui novembro e dezembro como restrição indicada pelo utilizador sujeita a confirmação anual e **não** valida a disponibilidade da parceira ou a aprovação da ILUNION. PR #214 (resumo local vivo), #215 (planeamento a dois em dois anos) e #216 (confirmações por cenário) integrados; PR #216 merge `faa8c064c13246654152c5eb66e7e7be65bdeaee`, Publicar #255 e Pages #840 concluídos com sucesso, build `a41a76152277952d5f1ea30500e358d098a40c51`.
+Em `main` estão integrados os trabalhos anteriores de jornada, autenticação/sync e férias #203–#217. `#/ferias` mostra evolução mensal, saldo, indicadores e, agora, detalhe opcional de proveniência dos dias; `#/ferias/planeamento` concentra sugestões, calendário e simulação. O planeamento a dois permite julho do ano seguinte, exclui novembro e dezembro como restrição indicada pelo utilizador sujeita a confirmação anual e **não** valida a disponibilidade da parceira ou a aprovação da ILUNION. PR #214 (resumo local vivo), #215 (planeamento a dois em dois anos) e #216 (confirmações por cenário) integrados; PR #216 merge `faa8c064c13246654152c5eb66e7e7be65bdeaee`, Publicar #255 e Pages #840 concluídos com sucesso.
 
-## Alteração atual — PR #217
+## Última alteração — PR #217
 
-**Estado:** branch `feat/vacation-saldo-traceability`, PR em validação; **não integrado nem publicado** nesta fase documental. Acrescenta na vista geral uma secção recolhida «De onde vêm os teus dias?», atalho de navegação, lista por data com fontes (horas/turnos/plano), contagens de úteis até hoje/futuros e fins de semana ignorados, explicação da fórmula e atualização manual. Os dias lançados manualmente sem data são descontados no saldo, mas não apresentados como datas inventadas. O planeamento não recebe este painel. `VacationYearRecords` passa a fornecer proveniência e as mesmas datas ao planeador anual; sem alteração de `calculateVacationBalance`, da meta pessoal de 28 dias nem do cofre. Especificação e testes: `docs/VACATION-EVIDENCE.md`.
+**Estado: integrado e publicado.** PR #217 `feat/vacation-saldo-traceability`, merge `61816f7ec3f1c43043d57b094f834bb116d19a27`, Qualidade #1192 (implementação) e #1193 (head final) com sucesso (auditoria, TypeScript, lint, Vitest, build, Worker dry-run, smoke Chromium). Publicar Foco & Jornada #256 e GitHub Pages #842 terminaram com sucesso; build publicado `322b8b37f745e17233360af07e473f50e9fc79d5`. A confirmação de uma execução de Qualidade especificamente em `main` não foi obtida nesta verificação; o head final e a publicação passaram os respetivos gates.
 
-**Validação:** Qualidade #1192 passou no head pré-documentação (auditoria, TypeScript, lint, Vitest, build, Worker dry-run, smoke Chromium). Confirmar novamente no head final com documentos e só então integrar e verificar `main`/Publicar/Pages. A validação física continua pendente.
+Na vista geral, foi acrescentada uma secção recolhida «De onde vêm os teus dias?», atalho de navegação, lista por data com fontes (horas/turnos/plano), contagens de úteis até hoje/futuros e fins de semana ignorados, explicação da fórmula e atualização manual. Os dias lançados manualmente sem data são descontados no saldo, mas não apresentados como datas inventadas. O planeamento não recebe este painel. `VacationYearRecords` passa a fornecer proveniência e as mesmas datas ao planeador anual; não foi alterada `calculateVacationBalance`, a meta pessoal de 28 dias nem o cofre. Especificação e testes em `docs/VACATION-EVIDENCE.md`.
 
 ## Precisão e limites
 
@@ -25,6 +25,6 @@ A meta pessoal anual de 28 dias é configurável e **não equivale automaticamen
 - Indisponibilidade temporária de uma fonte cifrada pode gerar lista parcial, sem criar dados fictícios; painel permite atualizar manualmente.
 - Teste físico ainda pendente: iPhone, Android, tablet/desktop, zoom/texto ampliado, teclado/VoiceOver/TalkBack, mudança de ano, retorno após suspensão e sincronização.
 
-## Última alteração e próximo passo
+## Próximo passo
 
-PR #217: proveniência por data e painel de consulta opcional implementados, sem novas escritas nem cálculos de saldo. Revalidar CI do head final; integrar/publicar apenas com gates verdes. Validar a correspondência entre contagens do painel e saldo em dispositivo real. Para detalhes históricos não apagados, consultar `docs/history/PROJECT_STATE-pre-217.md` e os restantes ficheiros em `docs/history/`.
+Validar no iPhone real as datas exibidas e a coincidência entre painel de origens e saldo em dados concretos, incluindo dias manuais, fins de semana e retorno após sincronização. Reconciliar depois a recolha anual comum sem alterar valores existentes. O histórico integral anterior mantém-se em `docs/history/PROJECT_STATE-pre-217.md` e nos restantes ficheiros de `docs/history/`. Não introduzir marcação automática ou direito de 28 dias presumido.
