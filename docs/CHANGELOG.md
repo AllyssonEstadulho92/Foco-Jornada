@@ -2,12 +2,12 @@
 
 Atualizado em: 2026-09-17. Alterações anteriores até ao PR #214 (texto completo e provas históricas) permanecem em `docs/history/CHANGELOG-pre-217.md`.
 
-## 2026-09-17 — PR #219: auditoria e refinamento visual das férias (em validação)
+## 2026-09-17 — PR #219: auditoria e refinamento visual das férias (integrado e publicado)
 
 - Auditados os componentes e CSS das rotas `#/ferias` e `#/ferias/planeamento`. Relatório factual, critérios e limitações em `docs/VACATION-UI-AUDIT-2026.md`.
-- Nova camada `vacation-visual-audit.css` importada só em `VacationWorkspacePage`: navegação móvel mais compacta em duas opções, estado ativo destacado, atalho de proveniência apresentado como ação secundária, hierarquia e largura de títulos, espaços/raios/sombras uniformes, cartões de altura intrínseca e formulários/resultados do planeamento mais coerentes.
-- Conservados os dados, cálculos, ano do planeamento, estados de interação, saltos sem alterar hash, foco visível e modos de alto contraste/movimento reduzido. Teste estrutural `vacation-visual-audit.test.ts` protege as rotas, a importação e os principais limites móveis; não comprova visualmente todas as resoluções.
-- **Estado:** PR #219 aberto em draft; validar CI no head final, integrar/publicar só com gates verdes. Confirmação visual em iPhone/Android/tablet/desktop continua pendente. O skip link global de `AppShell` e os coletores de férias distintos continuam fora do âmbito desta intervenção CSS.
+- Nova camada `vacation-visual-audit.css` importada só em `VacationWorkspacePage`: navegação móvel compacta em duas opções, estado ativo destacado, atalho de proveniência apresentado como ação secundária, hierarquia e largura dos títulos, espaços/raios/sombras uniformes, cartões de altura intrínseca e formulários/resultados do planeamento mais coerentes.
+- Conservados os dados, cálculos, ano do planeamento, estados de interação, saltos sem alterar hash, foco visível e modos de alto contraste/movimento reduzido. Teste estrutural `vacation-visual-audit.test.ts` protege rotas, importação e principais limites móveis; não comprova visualmente todas as resoluções.
+- **Entrega verificada:** PR #219 merge `f96ced5532178bb0746db0e50ef52874e72710dc`; Qualidade #1209 (head final) e #1210 (`main`) passaram auditoria, TypeScript, lint, testes, build, Worker dry-run e smoke Chromium. Publicar Foco & Jornada #258 e GitHub Pages #854 concluíram com sucesso; build publicado `96c779f88ab2d0f941b7a54f690dd759fa909ec1`. Confirmação visual em iPhone/Android/tablet/desktop continua pendente. O skip link global de `AppShell` e os coletores de férias distintos continuam fora do âmbito desta intervenção CSS.
 
 ## 2026-09-17 — PR #218: corrigir 404 do atalho de férias (integrado e publicado)
 
