@@ -1,0 +1,188 @@
+/* Camada visual exclusivamente para as duas rotas de férias.
+   Não altera dados, cálculo, estados, navegação ou lógica do planeador. */
+.vacationWorkspace {
+  --vacation-ui-radius: 1.2rem;
+  --vacation-ui-gap: clamp(.75rem, 1.5vw, 1.1rem);
+  gap: clamp(1rem, 2.2vw, 1.6rem);
+}
+
+/* Navegação compacta e claramente ativa, com alvos confortáveis no telemóvel. */
+.vacationWorkspace .vacationWorkspaceNavigation {
+  gap: var(--vacation-ui-gap);
+  align-items: stretch;
+}
+.vacationWorkspace .vacationWorkspaceTab {
+  min-height: 4.75rem;
+  padding: clamp(.8rem, 1.5vw, 1.05rem);
+  border-radius: var(--vacation-ui-radius);
+  box-shadow: none;
+}
+.vacationWorkspace .vacationWorkspaceTab.isActive {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+  box-shadow: inset 0 0 0 1px var(--primary);
+}
+.vacationWorkspace .vacationWorkspaceTabCopy strong {
+  font-size: clamp(.93rem, 1.25vw, 1.07rem);
+  line-height: 1.35;
+}
+.vacationWorkspace .vacationWorkspaceTabCopy small { line-height: 1.35; }
+.vacationWorkspace .vacationWorkspaceTabNumber {
+  width: 2.4rem;
+  height: 2.4rem;
+  flex-basis: 2.4rem;
+  border-radius: .75rem;
+}
+
+/* Atalho de auditoria: ação secundária, sem competir com o título da página. */
+.vacationWorkspace .vacationEvidenceJump {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: .6rem .95rem;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--control-radius);
+  background: var(--surface);
+  color: var(--text);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  line-height: 1.4;
+  text-align: center;
+  text-decoration: none;
+  box-shadow: none;
+  cursor: pointer;
+}
+.vacationWorkspace .vacationEvidenceJump:hover { border-color: var(--primary); }
+
+/* Uma linguagem de cartões e espaçamentos, sem adicionar secções repetidas. */
+.vacationWorkspace .vacationPage { gap: clamp(1rem, 2.2vw, 1.6rem); }
+.vacationWorkspace .vacationHero,
+.vacationWorkspace .vacationPanel,
+.vacationWorkspace .vacationLegalNote,
+.vacationWorkspace .vacationEvidencePanel {
+  border-radius: var(--vacation-ui-radius);
+}
+.vacationWorkspace--overview .vacationHero {
+  align-items: flex-start;
+  background: linear-gradient(115deg, var(--surface), color-mix(in srgb, var(--primary-soft) 30%, var(--surface)));
+}
+.vacationWorkspace .vacationHero h1 {
+  max-width: 21ch;
+  font-size: clamp(1.65rem, 2.65vw, 2.4rem);
+  line-height: 1.16;
+  letter-spacing: -.025em;
+}
+.vacationWorkspace .vacationHero p { max-width: 60ch; line-height: 1.55; }
+.vacationWorkspace .vacationHeroDate {
+  border-radius: .9rem;
+  padding: clamp(.8rem, 1.5vw, 1.1rem);
+}
+.vacationWorkspace .vacationMetricGrid,
+.vacationWorkspace .vacationMonthGrid,
+.vacationWorkspace .vacationInsightsGrid,
+.vacationWorkspace .vacationColumns { gap: var(--vacation-ui-gap); }
+.vacationWorkspace .vacationMetricCard {
+  border-radius: 1rem;
+  padding: clamp(.95rem, 1.7vw, 1.25rem);
+  box-shadow: none;
+}
+.vacationWorkspace .vacationMetricPrimary {
+  border-color: color-mix(in srgb, var(--primary) 38%, var(--line));
+}
+.vacationWorkspace .vacationMetricCard strong {
+  font-size: clamp(1.35rem, 2vw, 1.85rem);
+  line-height: 1.22;
+}
+.vacationWorkspace .vacationPanelHeader {
+  margin-bottom: clamp(.7rem, 1.5vw, 1rem);
+  gap: .4rem 1rem;
+}
+.vacationWorkspace .vacationPanelHeader h2 {
+  font-size: clamp(1.2rem, 1.9vw, 1.55rem);
+  line-height: 1.27;
+}
+.vacationWorkspace .vacationPanelHeader > strong {
+  font-variant-numeric: tabular-nums;
+  line-height: 1.45;
+}
+.vacationWorkspace .vacationAccrualPanel,
+.vacationWorkspace .vacationInsightsPanel { gap: clamp(.85rem, 1.7vw, 1.25rem); }
+.vacationWorkspace .vacationLiveSummary { gap: var(--vacation-ui-gap); margin-bottom: 0; }
+.vacationWorkspace .vacationLiveSummary > div {
+  min-height: 0;
+  padding: .85rem 1rem;
+  border-radius: .85rem;
+  box-shadow: none;
+}
+.vacationWorkspace .vacationMonthCard {
+  min-height: 0;
+  gap: .75rem;
+  border-radius: 1rem;
+  box-shadow: none;
+}
+.vacationWorkspace .vacationMonthCard > strong { margin-top: 0; }
+.vacationWorkspace .vacationAnnualProgress { margin-bottom: 0; border-radius: 1rem; }
+.vacationWorkspace .vacationInsightCard {
+  min-height: 0;
+  gap: .5rem;
+  border-radius: 1rem;
+  box-shadow: none;
+}
+.vacationWorkspace .vacationInsightsProjection { margin-top: 0; }
+.vacationWorkspace .vacationBreakdown dd { font-variant-numeric: tabular-nums; }
+
+/* Planeamento: foco nas escolhas, não nos elementos decorativos. */
+.vacationWorkspace--planning .vacationPlannerPanel { gap: clamp(.9rem, 1.8vw, 1.4rem); }
+.vacationWorkspace--planning .vacationPlannerHero { border-radius: var(--vacation-ui-radius); }
+.vacationWorkspace--planning .vacationPlannerHero h2 { font-size: clamp(1.55rem, 2.6vw, 2.2rem); }
+.vacationWorkspace--planning .vacationPlanningYearSwitch { width: min(100%, 30rem); }
+.vacationWorkspace--planning .vacationPlannerLive,
+.vacationWorkspace--planning .vacationJoint,
+.vacationWorkspace--planning .vacationSuggest,
+.vacationWorkspace--planning .vacationPlannerResults,
+.vacationWorkspace--planning .vacationPlannerUpcoming,
+.vacationWorkspace--planning .vacationPlannerFooter {
+  border-radius: var(--vacation-ui-radius);
+  box-shadow: none;
+}
+.vacationWorkspace--planning .vacationSuggestFilters label,
+.vacationWorkspace--planning .vacationJointFilters label,
+.vacationWorkspace--planning .vacationJointRestriction { border-radius: .9rem; box-shadow: none; }
+.vacationWorkspace--planning .vacationSuggestFeatured,
+.vacationWorkspace--planning .vacationJointDetail { border-radius: 1rem; }
+.vacationWorkspace--planning .vacationPlannerLiveGrid { gap: var(--vacation-ui-gap); }
+.vacationWorkspace--planning .vacationPlannerLiveGrid > div { border-radius: .85rem; }
+.vacationWorkspace--planning .vacationPlannerResult { border-radius: .85rem; }
+
+@media (min-width: 1050px) {
+  .vacationWorkspace--overview .vacationMetricPrimary { grid-column: span 2; }
+}
+@media (max-width: 560px) {
+  .vacationWorkspace { gap: .8rem; }
+  .vacationWorkspace .vacationWorkspaceNavigation { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem; }
+  .vacationWorkspace .vacationWorkspaceTab { min-height: 3.75rem; padding: .7rem .75rem; justify-content: center; text-align: center; }
+  .vacationWorkspace .vacationWorkspaceTabNumber,
+  .vacationWorkspace .vacationWorkspaceTabArrow,
+  .vacationWorkspace .vacationWorkspaceTabCopy small { display: none; }
+  .vacationWorkspace .vacationWorkspaceTabCopy strong { font-size: .9rem; }
+  .vacationWorkspace .vacationEvidenceJump { width: 100%; }
+  .vacationWorkspace .vacationHero h1 { max-width: 100%; }
+  .vacationWorkspace .vacationHeroDate { width: 100%; }
+  .vacationWorkspace .vacationPanel,
+  .vacationWorkspace .vacationHero,
+  .vacationWorkspace .vacationEvidencePanel { padding: clamp(.9rem, 4vw, 1.1rem); }
+  .vacationWorkspace--planning .vacationSuggest,
+  .vacationWorkspace--planning .vacationJoint { padding: clamp(.9rem, 4vw, 1.1rem); }
+}
+@media (max-width: 360px) {
+  .vacationWorkspace .vacationWorkspaceTabCopy strong { font-size: .85rem; }
+}
+@media (forced-colors: active) {
+  .vacationWorkspace .vacationWorkspaceTab.isActive { border: 2px solid Highlight; background: Canvas; box-shadow: none; }
+  .vacationWorkspace .vacationEvidenceJump { border-color: CanvasText; background: Canvas; color: CanvasText; }
+  .vacationWorkspace--overview .vacationHero { background: Canvas; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vacationWorkspace .vacationWorkspaceTab { transition: none; }
+}
