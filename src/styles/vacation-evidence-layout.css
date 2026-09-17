@@ -1,0 +1,17 @@
+.vacationWorkspace--overview .vacationWorkspacePane {
+  display: grid;
+  min-width: 0;
+  gap: clamp(1.2rem, 2.5vw, 1.9rem);
+}
+.vacationEvidenceJump {
+  justify-self: start;
+  max-width: 100%;
+  color: var(--primary);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  text-underline-offset: .2em;
+}
+.vacationEvidenceJump:focus-visible { outline: 3px solid var(--primary); outline-offset: 3px; }
+@media (forced-colors: active) { .vacationEvidenceJump { color: LinkText; } }
