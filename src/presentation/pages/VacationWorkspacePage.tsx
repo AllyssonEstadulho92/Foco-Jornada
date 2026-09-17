@@ -5,6 +5,7 @@ import { VacationEvidencePanel } from './VacationEvidencePanel'
 import '../../styles/vacation-workspace.css'
 import '../../styles/vacation-planning-year.css'
 import '../../styles/vacation-evidence-layout.css'
+import '../../styles/vacation-visual-audit.css'
 
 type VacationWorkspaceView = 'overview' | 'planning'
 
