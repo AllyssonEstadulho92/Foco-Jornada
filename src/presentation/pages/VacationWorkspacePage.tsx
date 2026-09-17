@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom'
 import { VacationBalancePage } from './VacationBalancePage'
 import '../../styles/vacation-workspace.css'
+import '../../styles/vacation-planning-year.css'
 
 type VacationWorkspaceView = 'overview' | 'planning'
 
