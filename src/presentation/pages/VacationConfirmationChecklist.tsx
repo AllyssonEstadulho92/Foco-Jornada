@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import '../../styles/vacation-confirmations.css'
 
 interface VacationConfirmationChecklistProps {
   periodLabel: string
