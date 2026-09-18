@@ -3,6 +3,7 @@ import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { SecuritySettingsPanel } from '../../security/SecuritySettingsPanel'
 import { AppTopBar } from '../components/AppTopBar'
 import { AppIcon } from '../components/ui/AppIcon'
+import { focusSection } from '../navigation/focusSection'
 import { NavigationIcon } from '../navigation/NavigationIcon'
 import {
   mobileBottomNavigation,
@@ -152,7 +153,9 @@ export function AppShell() {
 
   return (
     <div className={`appShell${sidebarCollapsed ? ' appShellCollapsed' : ''}${mobileMenuOpen ? ' appShellMobileMenuOpen' : ''}`}>
-      <a className="skipLink" href="#main-content">Saltar para o conteúdo</a>
+      <button className="skipLink" type="button" onClick={() => { focusSection('main-content') }}>
+        Saltar para o conteúdo
+      </button>
 
       <aside className="sidebar" aria-label="Navegação principal">
         <div className="brandRow">
