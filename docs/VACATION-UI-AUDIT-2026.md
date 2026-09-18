@@ -1,27 +1,27 @@
-# Auditoria visual da área de Férias — 2026-09-17
+# Auditoria visual da área de Férias — 18/09/2026
 
-## Âmbito e base verificada
+## Âmbito e evidência
 
-Auditoria estática do código em `main` após PR #218: `VacationWorkspacePage`, `VacationBalancePage`, `VacationPlannerPanel`, `VacationEvidencePanel` e os estilos `vacation-workspace.css`, `vacation.css`, `vacation-accrual.css`, `vacation-insights.css`, `vacation-planner.css`, `vacation-planner-live.css`, `vacation-suggestions.css`, `vacation-joint-planner.css` e `vacation-evidence.css`. Estas observações provêm dos componentes e CSS, **não** de uma medição de layout no iPhone/Android reais.
+Base: componentes e estilos reais do `main` após PR #219, `VacationWorkspacePage`, `VacationBalancePage`, `VacationPlannerPanel`, `VacationSuggestionsPanel`, `VacationJointPlanner`, `VacationEvidencePanel`, `AppShell`, `focusSection`, `router` e `vacation-visual-audit.css`. Esta é **uma auditoria estática do código** e uma validação de regressão automatizada; não foi observada nem medida a interface no iPhone do utilizador. A auditoria de 17/09 está no histórico do GitHub do presente ficheiro e no PR #219.
 
-## Diagnóstico — factos, impacto e correção
+## Diagnóstico e alterações no PR #220
 
-| Prioridade | Facto no código | Impacto na interface | Alteração delimitada |
-| --- | --- | --- | --- |
-| P1 | A navegação de duas áreas mudava para uma coluna a 560 px, mantendo descrições e ícones grandes. | Ocupa muita altura antes do conteúdo no smartphone. | Duas opções compactas lado a lado até 560 px, apenas com os títulos visíveis e alvos de toque adequados. |
-| P1 | Os cartões existentes usavam tamanhos de título, sombras e raios distintos entre resumo, meses, indicadores e planeamento. | Hierarquia pouco consistente e sensação de vários produtos numa página. | Camada CSS escopada às férias com ritmo de espaços, raios, texto e sombras harmonizados; destaque reservado ao saldo principal e ao estado selecionado. |
-| P1 | O atalho para a proveniência era visualmente mais forte do que a sua função secundária. | Compete com o cabeçalho e os indicadores. | Apresentação compacta como botão secundário de consulta, sem alterar `focusSection` nem a rota hash. |
-| P2 | Cartões de meses e indicadores tinham alturas mínimas fixas apesar de largura e texto variáveis. | Espaço vazio desnecessário, sobretudo com uma coluna. | Altura intrínseca e espaçamento menor, sem ocultar os valores ou os estados. |
-| P2 | O planeamento combina cabeçalho, seletor de ano, resumo atual, sugestões e simulação com superfícies de estilos diferentes. | Percurso visual menos previsível. | Superfícies, formulários e resultados com bordas e espaços coerentes; ano continua selecionável e planeamento permanece numa rota autónoma. |
+| Facto confirmado | Impacto ou risco | Correção limitada |
+| --- | --- | --- |
+| O `AppShell` utiliza `href="#main-content"` com `createHashRouter`, enquanto `#/ferias` e `#/ferias/planeamento` são rotas. | Ativar o salto global substitui a rota por um fragmento não registado e pode exibir o fallback 404. | Substituir por botão nativo que chama `focusSection('main-content')`; o `<main>` já tem `id` e `tabIndex={-1}`. Testar hash/foco em ambas as páginas e em `/turnos`. |
+| O espaço de leitura tem largura máxima de 80rem e os cartões usam sombras, bordas e níveis de destaque diferentes. | Em ecrãs largos a hierarquia pode ficar difusa e em pequenos o texto concorre com os números. | Ajustar largura de leitura para 74rem, suavizar sombras e uniformizar espaçamento; saldo principal e seleção do planeamento continuam proeminentes. |
+| O cabeçalho do planeamento tem badge lateral, e ambos os calendários usam grelha de sete colunas. | Em 320–360 px CSS, títulos, badges e células necessitam de largura contida; não há prova física de overflow. | Manter título com quebra, badge com largura limitada, sete colunas `minmax(0,1fr)` e células sem padding lateral em ecrãs estreitos. |
+| Os cartões e painéis já têm CSS escopado com alto contraste e movimento reduzido. | Uma nova camada ou sombras excessivas podem quebrar consistência/a11y. | Refinar a camada existente `vacation-visual-audit.css`, sem criar novo tema nem esconder funções, preservar `:focus-visible`, `forced-colors` e `prefers-reduced-motion`. |
 
-## Preservação e segurança
+A atualização não modifica qualquer fórmula de férias, data, registo, aprovação, segurança do cofre, API, sincronização, dependências ou persiste preferências novas. A meta de 28 dias permanece **pessoal**, não substitui direitos contratuais. O planeamento de julho com a parceira e a restrição declarada de novembro/dezembro continuam a requerer confirmação da empresa e de ambas as pessoas.
 
-A mudança de UI em `src/styles/vacation-visual-audit.css` é importada pela vista partilhada apenas nas rotas de férias. Não modifica domínio, fórmulas, dias úteis, persistência, cofre, login, sincronização, backend nem pedidos de férias. Férias acumuladas, indicadores e planeamento permanecem separados. Conservam-se `:focus-visible` e `aria` existentes; a variante de alto contraste e a opção de movimento reduzido têm regras explícitas.
+## Testes e níveis de confiança
 
-## Validação e limitações
+- `focusSection.test.ts` comprova via jsdom que o destino recebe foco e a rota não muda em `#/ferias`, `#/ferias/planeamento` e `#/turnos`; teste estrutural impede regressão ao `href="#main-content"`.
+- `vacation-visual-audit.test.ts` protege a importação, separação das vistas, estado selecionado, valores numéricos legíveis e calendário sete-colunas em larguras compactas. **Testes estáticos não medem caixas CSS nem fotografam ecrãs.**
+- A pipeline de Qualidade executa auditoria de dependências, tipos, lint, Vitest, build, Worker dry-run e smoke Chromium de arranque. Registar número/resultado do head final, `main`, build e Pages **após confirmação**.
+- **Validação física pendente:** no iPhone do utilizador abrir ambas as páginas, testar 320–430 px CSS, texto ampliado, retrato/paisagem, cabeçalho, status mensal, 12 meses, cartões de saldo, badge de pré-visualização, escolha do ano, calendário e resumo a dois; teclado/VoiceOver, salto global/atalho de proveniência e retorno após suspender a PWA. Repetir no Android e desktop com zoom 200%. Não declarar que isto foi feito sem capturas e testes reais.
 
-`src/styles/vacation-visual-audit.test.ts` protege a importação da camada visual, a separação das rotas, o salto sem `href="#..."`, os limites móveis e a inexistência de novos `display: none` na camada. A suite completa CI deve confirmar lint, TypeScript, testes, build, Worker e smoke do browser. A validação visual efetiva **continua pendente**: iPhone real (320–430 px CSS, texto ampliado e orientação), Android, tablet e desktop; avaliar quebras de título, alturas e comportamento do calendário. Testes estáticos e smoke de arranque não demonstram ausência de overflow em todos os aparelhos.
+## Riscos fora do âmbito
 
-## Riscos que esta auditoria não altera
-
-O `AppShell` ainda possui `href="#main-content"`, incompatível com `createHashRouter` ao ativar o salto global: correção funcional separada e prioritária. A vista não ativa continua montada e o coletor das férias do ano corrente ainda é distinto do coletor de proveniência; não misturar essas refatorizações numa intervenção visual. O valor 28 permanece uma meta pessoal, não um direito laboral confirmado; feriados, escala e aprovação são externos à apresentação.
+A vista oculta por CSS continua montada e o saldo do ano corrente pode diferir de uma consulta parcial do coletor de proveniência se o cofre estiver indisponível. Validar os dados reais e só depois consolidar a arquitetura. O salto global foi corrigido no código, mas a confirmação em dispositivos reais permanece necessária. Histórico e decisões nos cinco documentos de continuidade.
