@@ -56,8 +56,7 @@ export function VacationJointPlanner({ today, asOfDayProgress, year, settings }:
   const [selectedStart, setSelectedStart] = useState('')
   const [showCalendar, setShowCalendar] = useState(false)
 
-  // The parent clock drives a fresh read from the encrypted vault each minute
-  // and on focus/visibility. Never read unencrypted browser storage here.
+  // O relógio do pai atualiza a leitura do cofre cifrado; não ler storage não cifrado.
   const recorded = useMemo(() => {
     if (!Number.isFinite(asOfDayProgress)) return []
     return collectVacationDatesForYear(year, entries, (key) => secureStorage.getItem(key))
@@ -73,7 +72,7 @@ export function VacationJointPlanner({ today, asOfDayProgress, year, settings }:
     settings,
   }), [today, year, month, requestedDays, recorded, settings])
   const selected = suggestions.find((item) => item.startDate === selectedStart) ?? suggestions[0]
-  // A different scenario remounts the checklist; stale ticks never carry to another period.
+  // Uma alteração de cenário remonta a checklist e não reutiliza vistos antigos.
   const confirmationScope = selected ? JSON.stringify({
     year, month, requestedDays, start: selected.startDate, end: selected.endDate,
     settings, recorded,
@@ -94,112 +93,122 @@ export function VacationJointPlanner({ today, asOfDayProgress, year, settings }:
         <div>
           <span className="vacationJointEyebrow">PROPOSTAS · {year}</span>
           <h3 id="vacation-joint-title">Organiza as férias a dois</h3>
-          <p>Compara datas e saldos estimados. As sugestões não criam pedidos nem reservas.</p>
+          <p>Escolhe o mês e os dias, compara as opções e confirma a disponibilidade antes de marcares.</p>
         </div>
         <span className="vacationJointLive">Cálculo local às <time dateTime={`${today}T${updatedAt}`}>{updatedAt}</time></span>
       </header>
 
-      <div className="vacationJointFilters" aria-label="Preferências do período de férias">
-        <label>
-          <span>Mês pretendido</span>
-          <select value={month} onChange={(event) => {
-            setMonth(Number(event.target.value))
-            setSelectedStart('')
-            setShowCalendar(false)
-          }}>
-            {Array.from({ length: 12 }, (_, index) => index + 1).map((value) => (
-              <option key={value} value={value} disabled={BLOCKED_MONTHS.includes(value as 11 | 12)}>
-                {monthLabel(value, year)}{BLOCKED_MONTHS.includes(value as 11 | 12) ? ' · indisponível' : ''}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label>
-          <span>Dias úteis que pretendes tirar</span>
-          <input type="number" min="1" max="30" step="1" inputMode="numeric"
-            value={requestedDays || ''} onChange={(event) => {
-              setRequestedDays(Number(event.target.value))
+      <section className="vacationJointChoice" aria-label="Passo 1: escolher preferências">
+        <div className="vacationJointStep">
+          <span>01 · ESCOLHER</span>
+          <h4>Quando queres tirar férias?</h4>
+        </div>
+        <div className="vacationJointFilters" aria-label="Preferências do período de férias">
+          <label>
+            <span>Mês pretendido</span>
+            <select value={month} onChange={(event) => {
+              setMonth(Number(event.target.value))
               setSelectedStart('')
               setShowCalendar(false)
-            }} />
-        </label>
-        <div className="vacationJointRestriction" role="note">
-          <strong>Meses excluídos</strong>
-          <span>Novembro · Dezembro</span>
-          <small>Restrição indicada por ti; confirma se se mantém na tua escala em {year}.</small>
+            }}>
+              {Array.from({ length: 12 }, (_, index) => index + 1).map((value) => (
+                <option key={value} value={value} disabled={BLOCKED_MONTHS.includes(value as 11 | 12)}>
+                  {monthLabel(value, year)}{BLOCKED_MONTHS.includes(value as 11 | 12) ? ' · indisponível' : ''}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            <span>Dias úteis que pretendes tirar</span>
+            <input type="number" min="1" max="30" step="1" inputMode="numeric"
+              value={requestedDays || ''} onChange={(event) => {
+                setRequestedDays(Number(event.target.value))
+                setSelectedStart('')
+                setShowCalendar(false)
+              }} />
+          </label>
+          <div className="vacationJointRestriction" role="note">
+            <strong>Meses excluídos</strong>
+            <span>Novembro · Dezembro</span>
+            <small>Restrição indicada por ti; confirma se se mantém na tua escala em {year}.</small>
+          </div>
         </div>
-      </div>
+      </section>
 
       {selected ? (
         <>
-          <div className="vacationJointSectionHeading">
-            <div>
-              <h4>Períodos para comparar</h4>
-              <p>{monthLabel(month, year)} de {year} · {requestedDays} dias úteis por opção</p>
-            </div>
-            <span>{suggestions.length} {suggestions.length === 1 ? 'alternativa' : 'alternativas'}</span>
-          </div>
-
-          <div className="vacationJointOptions" role="group" aria-label="Escolher uma proposta de férias">
-            {suggestions.map((item, index) => {
-              const active = selected.startDate === item.startDate
-              return (
-                <button type="button" key={item.startDate}
-                  className={`vacationJointOption${active ? ' isSelected' : ''}`}
-                  aria-pressed={active}
-                  onClick={() => {
-                    setSelectedStart(item.startDate)
-                    setShowCalendar(true)
-                  }}>
-                  <span className="vacationJointOptionTag">{index === 0 ? 'Primeira opção' : `Alternativa ${index + 1}`}</span>
-                  <strong>{shortDate(item.startDate)} – {shortDate(item.endDate)}</strong>
-                  <span>{item.workingDays} dias úteis · {item.restDays} dias de descanso potencial</span>
-                  <small>Saldo pessoal estimado no fim: {numberFormatter.format(item.afterPeriodBalanceDays)} dias</small>
-                  <span className="vacationJointOptionAction">{active ? 'Período selecionado' : 'Selecionar período'} <span aria-hidden="true">→</span></span>
-                </button>
-              )
-            })}
-          </div>
-
-          <div className="vacationJointDetail" aria-live="polite">
-            <div className="vacationJointDetailHeader">
+          <section className="vacationJointCompare" aria-label="Passo 2: comparar propostas">
+            <div className="vacationJointSectionHeading">
               <div>
-                <span className="vacationJointEyebrow">SIMULAÇÃO PESSOAL · {year}</span>
-                <h4>{shortDate(selected.startDate)} a {shortDate(selected.endDate)}</h4>
-                <p>{selected.workingDays} dias úteis de férias · {selected.restDays} dias de descanso apenas se os fins de semana forem livres.</p>
+                <span className="vacationJointEyebrow">02 · COMPARAR</span>
+                <h4>Períodos para comparar</h4>
+                <p>{monthLabel(month, year)} de {year} · {requestedDays} dias úteis por opção</p>
               </div>
-              <button type="button" onClick={() => setShowCalendar((current) => !current)}
-                aria-expanded={showCalendar} aria-controls="vacation-joint-calendar">
-                {showCalendar ? 'Ocultar calendário' : 'Ver calendário'}
-              </button>
+              <span>{suggestions.length} {suggestions.length === 1 ? 'alternativa' : 'alternativas'}</span>
             </div>
-            <dl className="vacationJointFigures">
-              <div><dt>Saldo pessoal estimado no fim</dt><dd>{numberFormatter.format(selected.afterPeriodBalanceDays)} dias</dd></div>
-              <div><dt>Projeção pessoal em dezembro</dt><dd>{numberFormatter.format(selected.afterYearEndBalanceDays)} dias</dd></div>
-              <div><dt>Datas já registadas neste período</dt><dd>{selected.alreadyRecordedDays} dias úteis</dd></div>
-            </dl>
-            {showCalendar ? (
-              <div className="vacationJointCalendar" id="vacation-joint-calendar">
-                <strong>{monthLabel(month, year)} {year}</strong>
-                <div className="vacationJointCalendarGrid" role="group" aria-label={`Calendário de ${monthLabel(month, year)} de ${year}`}>
-                  {WEEKDAYS.map((day) => <span className="vacationJointWeekday" key={day}>{day}</span>)}
-                  {cells.map((key, index) => {
-                    if (!key) return <span key={`empty-${index}`} aria-hidden="true" />
-                    const day = new Date(`${key}T00:00:00Z`).getUTCDay()
-                    const weekend = day === 0 || day === 6
-                    const active = key >= selected.startDate && key <= selected.endDate
-                    const booked = recorded.includes(key) && !weekend
-                    return <span key={key}
-                      className={`vacationJointDay${booked ? ' isBooked' : active ? weekend ? ' isRest' : ' isSuggested' : ''}`}
-                      aria-label={`${dateLabel(key)}${booked ? ', férias já registadas' : active ? weekend ? ', fim de semana no intervalo' : ', dia de férias simulado' : ''}`}>
-                      {Number(key.slice(-2))}
-                    </span>
-                  })}
+            <div className="vacationJointOptions" role="group" aria-label="Escolher uma proposta de férias">
+              {suggestions.map((item, index) => {
+                const active = selected.startDate === item.startDate
+                return (
+                  <button type="button" key={item.startDate}
+                    className={`vacationJointOption${active ? ' isSelected' : ''}`}
+                    aria-pressed={active}
+                    onClick={() => {
+                      setSelectedStart(item.startDate)
+                      setShowCalendar(true)
+                    }}>
+                    <span className="vacationJointOptionTag">Opção {index + 1}</span>
+                    <strong>{shortDate(item.startDate)} – {shortDate(item.endDate)}</strong>
+                    <span>{item.workingDays} dias úteis · {item.restDays} dias de descanso potencial</span>
+                    <small>Saldo pessoal estimado no fim: {numberFormatter.format(item.afterPeriodBalanceDays)} dias</small>
+                    <span className="vacationJointOptionAction">{active ? 'Selecionada' : 'Selecionar'} <span aria-hidden="true">→</span></span>
+                  </button>
+                )
+              })}
+            </div>
+          </section>
+
+          <section className="vacationJointSimulation" aria-label="Passo 3: consultar a simulação">
+            <div className="vacationJointDetail" aria-live="polite">
+              <div className="vacationJointDetailHeader">
+                <div>
+                  <span className="vacationJointEyebrow">03 · SIMULAR · {year}</span>
+                  <h4>{shortDate(selected.startDate)} a {shortDate(selected.endDate)}</h4>
+                  <p>{selected.workingDays} dias úteis de férias · {selected.restDays} dias de descanso apenas se os fins de semana forem livres.</p>
                 </div>
-                <p>Verde: úteis simulados · bege: fim de semana · contorno: já registados. O calendário não grava nem reserva datas.</p>
+                <button type="button" onClick={() => setShowCalendar((current) => !current)}
+                  aria-expanded={showCalendar} aria-controls="vacation-joint-calendar">
+                  {showCalendar ? 'Ocultar calendário' : 'Ver calendário'}
+                </button>
               </div>
-            ) : null}
-          </div>
+              <dl className="vacationJointFigures">
+                <div><dt>Saldo pessoal estimado no fim</dt><dd>{numberFormatter.format(selected.afterPeriodBalanceDays)} dias</dd></div>
+                <div><dt>Projeção pessoal em dezembro</dt><dd>{numberFormatter.format(selected.afterYearEndBalanceDays)} dias</dd></div>
+                <div><dt>Datas já registadas neste período</dt><dd>{selected.alreadyRecordedDays} dias úteis</dd></div>
+              </dl>
+              {showCalendar ? (
+                <div className="vacationJointCalendar" id="vacation-joint-calendar">
+                  <strong>{monthLabel(month, year)} {year}</strong>
+                  <div className="vacationJointCalendarGrid" role="group" aria-label={`Calendário de ${monthLabel(month, year)} de ${year}`}>
+                    {WEEKDAYS.map((day) => <span className="vacationJointWeekday" key={day}>{day}</span>)}
+                    {cells.map((key, index) => {
+                      if (!key) return <span key={`empty-${index}`} aria-hidden="true" />
+                      const day = new Date(`${key}T00:00:00Z`).getUTCDay()
+                      const weekend = day === 0 || day === 6
+                      const active = key >= selected.startDate && key <= selected.endDate
+                      const booked = recorded.includes(key) && !weekend
+                      return <span key={key}
+                        className={`vacationJointDay${booked ? ' isBooked' : active ? weekend ? ' isRest' : ' isSuggested' : ''}`}
+                        aria-label={`${dateLabel(key)}${booked ? ', férias já registadas' : active ? weekend ? ', fim de semana no intervalo' : ', dia de férias simulado' : ''}`}>
+                        {Number(key.slice(-2))}
+                      </span>
+                    })}
+                  </div>
+                  <p>Verde: úteis simulados · bege: fim de semana · contorno: já registados. O calendário não grava nem reserva datas.</p>
+                </div>
+              ) : null}
+            </div>
+          </section>
           <VacationConfirmationChecklist
             key={confirmationScope}
             periodLabel={`${shortDate(selected.startDate)} a ${shortDate(selected.endDate)} de ${year}`}
@@ -213,9 +222,12 @@ export function VacationJointPlanner({ today, asOfDayProgress, year, settings }:
         </p>
       )}
 
-      <p className="vacationJointDisclaimer">
-        <strong>Estimativa, não direito adquirido.</strong> Para {year}, a meta pessoal de {numberFormatter.format(settings.monthlyAccrualTargetDays)} dias é usada sem transportar automaticamente saldo, ajustes ou dias manuais de {year - 1}. Feriados, escala efetiva, disponibilidade da parceira e aprovação da ILUNION não são verificados. O tempo real refere-se ao recálculo local, não à confirmação da empresa nem à sincronização instantânea entre dispositivos.
-      </p>
+      <details className="vacationJointMethod">
+        <summary>Como são calculadas estas propostas?</summary>
+        <p className="vacationJointDisclaimer">
+          <strong>Estimativa, não direito adquirido.</strong> Para {year}, a meta pessoal de {numberFormatter.format(settings.monthlyAccrualTargetDays)} dias é usada sem transportar automaticamente saldo, ajustes ou dias manuais de {year - 1}. Feriados, escala efetiva, disponibilidade da parceira e aprovação da ILUNION não são verificados. O tempo real refere-se ao recálculo local, não à confirmação da empresa nem à sincronização instantânea entre dispositivos.
+        </p>
+      </details>
     </section>
   )
 }

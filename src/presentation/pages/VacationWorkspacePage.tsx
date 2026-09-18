@@ -6,6 +6,7 @@ import '../../styles/vacation-workspace.css'
 import '../../styles/vacation-planning-year.css'
 import '../../styles/vacation-evidence-layout.css'
 import '../../styles/vacation-visual-audit.css'
+import '../../styles/vacation-planning-structure.css'
 
 type VacationWorkspaceView = 'overview' | 'planning'
 

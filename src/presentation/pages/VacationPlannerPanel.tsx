@@ -24,7 +24,7 @@ function nextCivilDay(dateKey: string) {
   return new Date(Date.UTC(year, month - 1, day + 1)).toISOString().slice(0, 10)
 }
 
-/** The parent clock already refreshes every minute and on focus/visibility; do not add a second timer. */
+/** O relógio da página já atualiza a cada minuto e ao regressar; não criar outro timer. */
 function clockLabel(dayProgress: number) {
   const minuteOfDay = Math.min(1439, Math.max(0, Math.floor(dayProgress * 1440)))
   return `${String(Math.floor(minuteOfDay / 60)).padStart(2, '0')}:${String(minuteOfDay % 60).padStart(2, '0')}`
@@ -73,13 +73,51 @@ export function VacationPlannerPanel({
     [settings, today, asOfDayProgress, recordedVacationDates, startDate, endDate],
   )
 
+  // A referência a 2026 continua disponível em 2027, mas não compete com as propostas.
+  // Mantém exatamente a mesma origem e as mesmas fórmulas da apresentação anterior.
+  const liveSummary = (
+    <section className="vacationPlannerLive" aria-label="Ponto de situação do planeamento em tempo real">
+      <div className="vacationPlannerLiveHeader">
+        <div>
+          <span className="vacationPlannerLiveEyebrow">ACOMPANHAMENTO · TEMPO REAL</span>
+          <h3>O teu saldo neste momento · {currentYear}</h3>
+        </div>
+        <p>
+          Cálculo local às <time dateTime={`${today}T${updatedTime}`}>{updatedTime}</time> · atualiza a cada minuto e ao regressares à aplicação.
+        </p>
+      </div>
+      <dl className="vacationPlannerLiveGrid">
+        <div>
+          <dt>Acumulado até agora</dt>
+          <dd>{preciseDaysLabel(liveBalance.monthlyLiveAccruedDays)}</dd>
+          <small>Meta pessoal em evolução.</small>
+        </div>
+        <div className={liveBalance.monthlyLiveAvailableBalanceDays < 0 ? 'vacationPlannerLiveNegative' : undefined}>
+          <dt>Saldo disponível agora</dt>
+          <dd>{preciseDaysLabel(liveBalance.monthlyLiveAvailableBalanceDays)}</dd>
+          <small>Já desconta as férias gozadas.</small>
+        </div>
+        <div className={liveBalance.monthlyLiveProjectedBalanceDays < 0 ? 'vacationPlannerLiveNegative' : undefined}>
+          <dt>Após as já planeadas</dt>
+          <dd>{preciseDaysLabel(liveBalance.monthlyLiveProjectedBalanceDays)}</dd>
+          <small>Sem incluir a simulação abaixo.</small>
+        </div>
+        <div className={liveBalance.yearEndProjectedBalanceDays < 0 ? 'vacationPlannerLiveNegative' : undefined}>
+          <dt>Previsão em dezembro de {currentYear}</dt>
+          <dd>{preciseDaysLabel(liveBalance.yearEndProjectedBalanceDays)}</dd>
+          <small>Antes de novas férias simuladas.</small>
+        </div>
+      </dl>
+    </section>
+  )
+
   return (
     <section className="vacationPanel vacationPlannerPanel" aria-labelledby="vacation-planner-title">
       <header className="vacationPlannerHero">
         <div className="vacationPlannerHeroCopy">
           <span className="vacationPlannerEyebrow">PLANEAMENTO · {shownYear}</span>
           <h2 id="vacation-planner-title">Planeia as próximas férias</h2>
-          <p>Compara períodos, consulta o saldo previsto e organiza as datas com a tua parceira antes de as marcares.</p>
+          <p>Escolhe as datas, compara o saldo estimado e organiza as férias com a tua parceira.</p>
         </div>
         <span className="vacationPlannerPreview">Pré-visualização · sem guardar</span>
       </header>
@@ -93,49 +131,28 @@ export function VacationPlannerPanel({
           onClick={() => setPlanningYear(currentYear + 1)}>Próximo ano · {currentYear + 1}</button>
       </div>
 
-      <section className="vacationPlannerLive" aria-label="Ponto de situação do planeamento em tempo real">
-        <div className="vacationPlannerLiveHeader">
-          <div>
-            <span className="vacationPlannerLiveEyebrow">ACOMPANHAMENTO · TEMPO REAL</span>
-            <h3>O teu saldo neste momento · {currentYear}</h3>
-          </div>
-          <p>
-            Cálculo local às <time dateTime={`${today}T${updatedTime}`}>{updatedTime}</time> · atualiza a cada minuto e ao regressares à aplicação.
-          </p>
-        </div>
-        <dl className="vacationPlannerLiveGrid">
-          <div>
-            <dt>Acumulado até agora</dt>
-            <dd>{preciseDaysLabel(liveBalance.monthlyLiveAccruedDays)}</dd>
-            <small>Meta pessoal em evolução.</small>
-          </div>
-          <div className={liveBalance.monthlyLiveAvailableBalanceDays < 0 ? 'vacationPlannerLiveNegative' : undefined}>
-            <dt>Saldo disponível agora</dt>
-            <dd>{preciseDaysLabel(liveBalance.monthlyLiveAvailableBalanceDays)}</dd>
-            <small>Já desconta as férias gozadas.</small>
-          </div>
-          <div className={liveBalance.monthlyLiveProjectedBalanceDays < 0 ? 'vacationPlannerLiveNegative' : undefined}>
-            <dt>Após as já planeadas</dt>
-            <dd>{preciseDaysLabel(liveBalance.monthlyLiveProjectedBalanceDays)}</dd>
-            <small>Sem incluir a simulação abaixo.</small>
-          </div>
-          <div className={liveBalance.yearEndProjectedBalanceDays < 0 ? 'vacationPlannerLiveNegative' : undefined}>
-            <dt>Previsão em dezembro de {currentYear}</dt>
-            <dd>{preciseDaysLabel(liveBalance.yearEndProjectedBalanceDays)}</dd>
-            <small>Antes de novas férias simuladas.</small>
-          </div>
-        </dl>
-      </section>
-
       {shownYear === currentYear + 1 ? (
-        <VacationJointPlanner
-          today={today}
-          asOfDayProgress={asOfDayProgress}
-          year={shownYear}
-          settings={settings}
-        />
+        <>
+          <VacationJointPlanner
+            today={today}
+            asOfDayProgress={asOfDayProgress}
+            year={shownYear}
+            settings={settings}
+          />
+          <details className="vacationPlannerContext" key={shownYear}>
+            <summary>
+              <span>
+                <strong>Consultar saldo do ano atual · {currentYear}</strong>
+                <small>Referência de {currentYear}, não saldo transferido para {shownYear}.</small>
+              </span>
+              <span className="vacationPlannerContextValue">{preciseDaysLabel(liveBalance.monthlyLiveAvailableBalanceDays)}</span>
+            </summary>
+            {liveSummary}
+          </details>
+        </>
       ) : (
         <>
+          {liveSummary}
           <VacationSuggestionsPanel
             today={today}
             asOfDayProgress={asOfDayProgress}
