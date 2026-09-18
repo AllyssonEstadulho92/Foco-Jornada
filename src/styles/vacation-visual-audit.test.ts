@@ -41,7 +41,7 @@ describe('auditoria visual das férias', () => {
     expect(polish).toContain('.vacationWorkspace .vacationMetricPrimary:not(.vacationMetricDanger)')
     expect(polish).toContain('.vacationWorkspace .vacationMetricCard strong')
     expect(polish).toContain('font-variant-numeric: tabular-nums')
-    expect(polish).toContain('.vacationWorkspace .vacationPlannerPreview')
+    expect(polish).toContain('.vacationWorkspace--planning .vacationPlannerPreview')
     expect(polish).not.toContain('visibility: hidden')
   })
 
