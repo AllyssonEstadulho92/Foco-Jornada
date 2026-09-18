@@ -1,13 +1,20 @@
 # Changelog
 
-Atualizado em: 2026-09-17. Alterações anteriores até ao PR #214 (texto completo e provas históricas) permanecem em `docs/history/CHANGELOG-pre-217.md`.
+Atualizado em: 2026-09-18. Alterações anteriores até ao PR #214 (texto completo e provas históricas) permanecem em `docs/history/CHANGELOG-pre-217.md`.
+
+## 2026-09-18 — PR #220: refinar Férias e Planeamento; eliminar risco de 404 no salto global (em validação)
+
+- Nas duas rotas de férias, a camada `vacation-visual-audit.css` existente recebeu largura de leitura de 74rem, superfícies/sombras mais subtis, contraste e hierarquia entre saldo e indicadores, cabeçalhos de planeamento mais contidos e calendários de sete colunas com células `min-width:0` e padding lateral reduzido no smartphone. Sem criar tema adicional, esconder funcionalidades ou alterar formulários/valores.
+- O atalho global «Saltar para o conteúdo» em `AppShell` deixou de usar `href="#main-content"`; botão nativo chama `focusSection('main-content')` e foca o `<main tabIndex={-1}>` sem substituir a rota `#/ferias` ou `#/ferias/planeamento`.
+- Testes jsdom verificam foco e hash intacto nas duas rotas e em turnos; testes estruturais protegem CSS de calendários, tamanhos compactos, alto contraste e movimento reduzido. Não altera fórmulas, dados cifrados, aprovações, segredos, sync ou backend.
+- **Estado:** PR #220 em draft e a aguardar CI final, merge e publicação; teste de aparência e funcionamento no iPhone real permanece por fazer. Provas e roteiro em `docs/VACATION-UI-AUDIT-2026.md`.
 
 ## 2026-09-17 — PR #219: auditoria e refinamento visual das férias (integrado e publicado)
 
 - Auditados os componentes e CSS das rotas `#/ferias` e `#/ferias/planeamento`. Relatório factual, critérios e limitações em `docs/VACATION-UI-AUDIT-2026.md`.
 - Nova camada `vacation-visual-audit.css` importada só em `VacationWorkspacePage`: navegação móvel compacta em duas opções, estado ativo destacado, atalho de proveniência apresentado como ação secundária, hierarquia e largura dos títulos, espaços/raios/sombras uniformes, cartões de altura intrínseca e formulários/resultados do planeamento mais coerentes.
 - Conservados os dados, cálculos, ano do planeamento, estados de interação, saltos sem alterar hash, foco visível e modos de alto contraste/movimento reduzido. Teste estrutural `vacation-visual-audit.test.ts` protege rotas, importação e principais limites móveis; não comprova visualmente todas as resoluções.
-- **Entrega verificada:** PR #219 merge `f96ced5532178bb0746db0e50ef52874e72710dc`; Qualidade #1209 (head final) e #1210 (`main`) passaram auditoria, TypeScript, lint, testes, build, Worker dry-run e smoke Chromium. Publicar Foco & Jornada #258 e GitHub Pages #854 concluíram com sucesso; build publicado `96c779f88ab2d0f941b7a54f690dd759fa909ec1`. Confirmação visual em iPhone/Android/tablet/desktop continua pendente. O skip link global de `AppShell` e os coletores de férias distintos continuam fora do âmbito desta intervenção CSS.
+- **Entrega verificada:** PR #219 merge `f96ced5532178bb0746db0e50ef52874e72710dc`; Qualidade #1209 (head final) e #1210 (`main`) passaram auditoria, TypeScript, lint, testes, build, Worker dry-run e smoke Chromium. Publicar Foco & Jornada #258 e GitHub Pages #854 concluíram com sucesso; build publicado `96c779f88ab2d0f941b7a54f690dd759fa909ec1`. Confirmação visual em iPhone/Android/tablet/desktop continua pendente. O skip link global foi remetido à intervenção #220.
 
 ## 2026-09-17 — PR #218: corrigir 404 do atalho de férias (integrado e publicado)
 
@@ -15,7 +22,7 @@ Atualizado em: 2026-09-17. Alterações anteriores até ao PR #214 (texto comple
 - O atalho usa agora botão nativo, scroll e foco programático via `focusSection`, preservando o hash da rota. Título focável sem entrar na ordem normal de Tab; CSS mantém aparência e área de toque.
 - Adicionada rota de recuperação `*` com mensagem em PT-PT e opções para regressar às férias ou ao início, evitando o fallback técnico do Router quando o URL é desconhecido.
 - Testes jsdom verificam que o hash não muda e o título recebe foco; teste estrutural impede regressão do `href` incompatível e protege a rota de recuperação. Sem alterar cálculos, dias de férias, dados cifrados, sincronização, autenticação, backend ou dependências.
-- O skip link global `AppShell` (`href="#main-content"`) tem problema análogo, documentado em TODO para correção dirigida. **Entrega verificada:** Qualidade #1201 (head final) e #1202 (`main`) com sucesso; merge `89564f3ebbfe5d54e5d09dcf28db9e574b35cc50`; Publicar #257 e GitHub Pages #848 concluídos com sucesso; build `42397a6c97d60044f5dbc1cf90723ee799b1d0ac`. Teste físico do atalho corrigido ainda pendente. Ver `HASH-ROUTER-NAVIGATION.md`.
+- **Entrega verificada:** Qualidade #1201 (head final) e #1202 (`main`) com sucesso; merge `89564f3ebbfe5d54e5d09dcf28db9e574b35cc50`; Publicar Foco & Jornada #257 e GitHub Pages #848 concluídos com sucesso; build `42397a6c97d60044f5dbc1cf90723ee799b1d0ac`. Teste físico do atalho corrigido ainda pendente. Ver `HASH-ROUTER-NAVIGATION.md`.
 
 ## 2026-09-17 — PR #217: origem dos dias de férias (integrado e publicado)
 
@@ -26,7 +33,7 @@ Atualizado em: 2026-09-17. Alterações anteriores até ao PR #214 (texto comple
 
 ## 2026-09-17 — PR #216: confirmação por cenário
 
-- Checklist temporária e responsiva de férias a dois. Vistos da parceira e entidade empregadora são declarações locais, não aprovações externas; mudar cenário repõe os vistos. Corrigido teste após primeira falha de isolamento e obtida CI #1190 verde. PR integrado `faa8c064c13246654152c5eb66e7e7be65bdeaee`, Publicar #255 e Pages #840 concluídos com sucesso.
+- Checklist temporária e responsiva de férias a dois. Vistos da parceira e entidade empregadora são declarações locais, não aprovações externas; mudar cenário repõe os vistos. Corrigido teste após primeira falha de isolamento e obtida CI #1190 verde. PR integrado `faa8c064c13246654152c5eb66e7e7be65bdeaee`, Publicar #255, Pages #840 concluídos com sucesso.
 
 ## 2026-09-17 — PR #215: julho do ano seguinte
 
