@@ -1,22 +1,30 @@
 # TODO
 
-Atualizado em: 2026-09-17. Tarefas históricas completas em `docs/history/TODO-pre-217.md`; não considerar pendências físicas antigas concluídas por omissão.
+Atualizado em: 2026-09-18. Tarefas históricas completas em `docs/history/TODO-pre-217.md`; não considerar pendências físicas antigas concluídas por omissão.
 
-## P0 — Auditoria visual das férias, PR #219
+## P0 — Refinamento das férias e salto global, PR #220
 
-- [x] Ler os cinco documentos de continuidade e comparar rotas, componentes e CSS do `main` com a arquitetura descrita.
-- [x] Registar factos, impacto e alcance em `docs/VACATION-UI-AUDIT-2026.md`.
-- [x] Harmonizar cartão/tipografia/espaçamento; navegação móvel em duas opções compactas; atalho secundário; sem mudar dados ou fórmulas.
-- [x] Adicionar teste de regressão da importação, separação de vistas, hash e regras móveis/acessíveis.
-- [x] Confirmar Qualidade #1209 no head final com documentação; integrar PR #219 em `main` no merge `f96ced5532178bb0746db0e50ef52874e72710dc`.
-- [x] Confirmar Qualidade #1210 da `main`, Publicar Foco & Jornada #258, build `96c779f88ab2d0f941b7a54f690dd759fa909ec1` e GitHub Pages #854 concluídos com sucesso; atualizar estado/decisão/changelog.
-- [ ] Validar no iPhone e Android a 320–430 px CSS, textos ampliados, rotação, cabeçalhos, cartões, filtros e calendário; depois tablet/desktop e zoom.
+- [x] Ler os cinco documentos, comparar componentes, rotas, CSS, AppShell e `focusSection` com o código de `main`.
+- [x] Refinar apenas `vacation-visual-audit.css` existente: leitura a 74rem, superfícies, títulos, destaques e contenção do calendário em 320–360 px CSS.
+- [x] Substituir `AppShell` `href="#main-content"` por botão nativo que foca `<main>` sem alterar o hash; preservar o atalho de proveniência e menu.
+- [x] Acrescentar regressões jsdom de foco/hash para duas rotas de férias e turnos, e testes estruturais de responsividade, alto contraste e movimento reduzido.
+- [x] Atualizar relatório `VACATION-UI-AUDIT-2026.md` e os cinco documentos obrigatórios.
+- [ ] Confirmar Qualidade do **head final**; só depois integrar o PR #220.
+- [ ] Confirmar Qualidade em `main`, Publicar, commit do build e GitHub Pages; atualizar provas nos documentos.
+- [ ] **Teste físico:** abrir no iPhone do utilizador `#/ferias` e `#/ferias/planeamento` e confirmar a ausência de overflow, o salto global com VoiceOver/teclado e navegação sem 404. Depois testar Android, tablet/desktop, zoom/textos ampliados e orientação horizontal.
+
+## P0 — Auditoria visual anterior, PR #219
+
+- [x] Ler documentos, analisar componentes, relatório e estilos; harmonizar navegação móvel, tipografia, espaçamento e cartões sem alterar fórmulas.
+- [x] Proteger importação, separação de vistas, hash e regras CSS por testes estruturais.
+- [x] Qualidade #1209 (head) e #1210 (`main`), merge `f96ced5532178bb0746db0e50ef52874e72710dc`, Publicar #258, build `96c779f88ab2d0f941b7a54f690dd759fa909ec1`, Pages #854.
+- [ ] Confirmar a aparência no iPhone/Android 320–430 px CSS, textos ampliados, rotação, cartões, filtros e calendário; também tablet/desktop e zoom.
 
 ## P0 — Navegação e estabilidade
 
 - [x] PR #218 corrigiu `href="#vacation-evidence-title"` com foco/scroll sem alterar hash; fallback PT-PT; Qualidade #1201/#1202, Publicar #257, Pages #848.
 - [ ] Testar no iPhone real abertura do atalho, expansão, refresh da PWA e recuperação de URL inválido.
-- [ ] Corrigir `AppShell.tsx` `href="#main-content"`, ainda sujeito ao mesmo 404 em `createHashRouter`; testar teclado/VoiceOver sem reescrever o shell.
+- [x] Implementada no PR #220 a correção do `AppShell.tsx` `href="#main-content"` sujeito a 404 em HashRouter; publicação e validação física dependem dos itens acima.
 
 ## P0 — Rastreabilidade do saldo, PR #217
 
@@ -48,4 +56,4 @@ Atualizado em: 2026-09-17. Tarefas históricas completas em `docs/history/TODO-p
 - [x] PR #216: checklist temporária por cenário; Qualidade #1190, Publicar #255, Pages #840.
 - [x] PR #217: proveniência por dia; Qualidade #1193, Publicar #256, Pages #842.
 - [x] PR #218: salto sem mudar hash, recuperação de rota; Qualidade #1202, Pages #848.
-- [x] PR #219: auditoria e refinamento visual; Qualidade #1209/#1210, Publicar #258, Pages #854; validação física permanece aberta.
+- [x] PR #219: auditoria visual; Qualidade #1209/#1210, Publicar #258, Pages #854; validação física aberta.
