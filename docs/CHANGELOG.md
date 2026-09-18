@@ -2,19 +2,19 @@
 
 Atualizado em: 2026-09-18. Alterações anteriores até ao PR #214 (texto completo e provas históricas) permanecem em `docs/history/CHANGELOG-pre-217.md`.
 
-## 2026-09-18 — PR #220: refinar Férias e Planeamento; eliminar risco de 404 no salto global (em validação)
+## 2026-09-18 — PR #220: refinar Férias e Planeamento; eliminar risco de 404 no salto global (integrado e publicado)
 
 - Nas duas rotas de férias, a camada `vacation-visual-audit.css` existente recebeu largura de leitura de 74rem, superfícies/sombras mais subtis, contraste e hierarquia entre saldo e indicadores, cabeçalhos de planeamento mais contidos e calendários de sete colunas com células `min-width:0` e padding lateral reduzido no smartphone. Sem criar tema adicional, esconder funcionalidades ou alterar formulários/valores.
 - O atalho global «Saltar para o conteúdo» em `AppShell` deixou de usar `href="#main-content"`; botão nativo chama `focusSection('main-content')` e foca o `<main tabIndex={-1}>` sem substituir a rota `#/ferias` ou `#/ferias/planeamento`.
 - Testes jsdom verificam foco e hash intacto nas duas rotas e em turnos; testes estruturais protegem CSS de calendários, tamanhos compactos, alto contraste e movimento reduzido. Não altera fórmulas, dados cifrados, aprovações, segredos, sync ou backend.
-- **Estado:** PR #220 em draft e a aguardar CI final, merge e publicação; teste de aparência e funcionamento no iPhone real permanece por fazer. Provas e roteiro em `docs/VACATION-UI-AUDIT-2026.md`.
+- **Entrega verificada:** PR #220 integrado, merge `8a45758f68462e8631edbaf65f0b802a2c60ee19`; Qualidade #1219 (head final) e #1220 (`main`) passaram auditoria de dependências, TypeScript, lint, Vitest, build, Worker dry-run e smoke Chromium. Publicar Foco & Jornada #259 e GitHub Pages #859 concluíram com sucesso; build `eec8da024db5b3f65624433c66726e7c56e04cb0`. **Validação visual e funcional no iPhone real continua pendente.** Ver `docs/VACATION-UI-AUDIT-2026.md`.
 
 ## 2026-09-17 — PR #219: auditoria e refinamento visual das férias (integrado e publicado)
 
 - Auditados os componentes e CSS das rotas `#/ferias` e `#/ferias/planeamento`. Relatório factual, critérios e limitações em `docs/VACATION-UI-AUDIT-2026.md`.
 - Nova camada `vacation-visual-audit.css` importada só em `VacationWorkspacePage`: navegação móvel compacta em duas opções, estado ativo destacado, atalho de proveniência apresentado como ação secundária, hierarquia e largura dos títulos, espaços/raios/sombras uniformes, cartões de altura intrínseca e formulários/resultados do planeamento mais coerentes.
 - Conservados os dados, cálculos, ano do planeamento, estados de interação, saltos sem alterar hash, foco visível e modos de alto contraste/movimento reduzido. Teste estrutural `vacation-visual-audit.test.ts` protege rotas, importação e principais limites móveis; não comprova visualmente todas as resoluções.
-- **Entrega verificada:** PR #219 merge `f96ced5532178bb0746db0e50ef52874e72710dc`; Qualidade #1209 (head final) e #1210 (`main`) passaram auditoria, TypeScript, lint, testes, build, Worker dry-run e smoke Chromium. Publicar Foco & Jornada #258 e GitHub Pages #854 concluíram com sucesso; build publicado `96c779f88ab2d0f941b7a54f690dd759fa909ec1`. Confirmação visual em iPhone/Android/tablet/desktop continua pendente. O skip link global foi remetido à intervenção #220.
+- **Entrega verificada:** PR #219 merge `f96ced5532178bb0746db0e50ef52874e72710dc`; Qualidade #1209 (head final) e #1210 (`main`) passaram auditoria, TypeScript, lint, testes, build, Worker dry-run e smoke Chromium. Publicar Foco & Jornada #258 e GitHub Pages #854 concluíram com sucesso; build publicado `96c779f88ab2d0f941b7a54f690dd759fa909ec1`. Confirmação visual em iPhone/Android/tablet/desktop continua pendente. O skip link global foi resolvido pelo PR #220.
 
 ## 2026-09-17 — PR #218: corrigir 404 do atalho de férias (integrado e publicado)
 
@@ -27,8 +27,8 @@ Atualizado em: 2026-09-18. Alterações anteriores até ao PR #214 (texto comple
 ## 2026-09-17 — PR #217: origem dos dias de férias (integrado e publicado)
 
 - `#/ferias` ganhou painel opcional, recolhido por defeito, «De onde vêm os teus dias?», com atalho, datas ordenadas, indicação das áreas de origem (horas, turnos e plano), úteis até hoje/futuros e fins de semana ignorados.
-- `VacationYearRecords` expõe proveniência única por data e `collectVacationDatesForYear` deriva a mesma coleta para o ano futuro. Mantém datas civis válidas encontradas em folhas de outro mês do mesmo ano; rejeita datas impossíveis, fontes inválidas e indisponíveis sem inventar dias.
-- Explicação legível do saldo pessoal, atualização manual e nota explícita sobre dias gozados manualmente sem data, que não aparecem como datas mas continuam a ser descontados no saldo. CSS fluido, foco, contraste forçado e movimento reduzido. Testes unitários/domínio/UI e `docs/VACATION-EVIDENCE.md`.
+- `VacationYearRecords` expõe proveniência única por data e `collectVacationDatesForYear` deriva a mesma coleta para o ano futuro. Mantém datas civis válidas encontradas numa folha de outro mês do mesmo ano; rejeita datas impossíveis, fontes inválidas e indisponíveis sem inventar dias.
+- Explicação legível do saldo pessoal, atualização manual e nota explícita sobre dias gozados manualmente sem data, que não aparecem como datas mas continuam a ser descontados no saldo. CSS fluido, foco, contraste forçado, movimento reduzido. Testes unitários/domínio/UI e `docs/VACATION-EVIDENCE.md`.
 - Sem mudança de fórmula, direito oficial, meta pessoal 28, registos persistidos, cofre, autenticação, sync, API, segredos, dependências ou telemetria. **Entrega verificada:** Qualidade #1192 (implementação) e #1193 (head final) com sucesso; merge `61816f7ec3f1c43043d57b094f834bb116d19a27`; Publicar #256 e GitHub Pages #842 concluídos com sucesso; build `322b8b37f745e17233360af07e473f50e9fc79d5`. Testes físicos de iPhone/Android/tablet/desktop ainda pendentes.
 
 ## 2026-09-17 — PR #216: confirmação por cenário
