@@ -9,8 +9,8 @@ Atualizado em: 2026-09-18. Tarefas históricas completas em `docs/history/TODO-p
 - [x] Substituir `AppShell` `href="#main-content"` por botão nativo que foca `<main>` sem alterar o hash; preservar o atalho de proveniência e menu.
 - [x] Acrescentar regressões jsdom de foco/hash para duas rotas de férias e turnos, e testes estruturais de responsividade, alto contraste e movimento reduzido.
 - [x] Atualizar relatório `VACATION-UI-AUDIT-2026.md` e os cinco documentos obrigatórios.
-- [ ] Confirmar Qualidade do **head final**; só depois integrar o PR #220.
-- [ ] Confirmar Qualidade em `main`, Publicar, commit do build e GitHub Pages; atualizar provas nos documentos.
+- [x] Confirmar Qualidade #1219 no head final `3b423ead89f98ed525e100e2cbfd7d6055a3e193`; integrar PR #220, merge `8a45758f68462e8631edbaf65f0b802a2c60ee19`.
+- [x] Confirmar Qualidade #1220 em `main`, Publicar #259, build `eec8da024db5b3f65624433c66726e7c56e04cb0` e GitHub Pages #859 com sucesso; atualizar provas nos documentos.
 - [ ] **Teste físico:** abrir no iPhone do utilizador `#/ferias` e `#/ferias/planeamento` e confirmar a ausência de overflow, o salto global com VoiceOver/teclado e navegação sem 404. Depois testar Android, tablet/desktop, zoom/textos ampliados e orientação horizontal.
 
 ## P0 — Auditoria visual anterior, PR #219
@@ -24,7 +24,7 @@ Atualizado em: 2026-09-18. Tarefas históricas completas em `docs/history/TODO-p
 
 - [x] PR #218 corrigiu `href="#vacation-evidence-title"` com foco/scroll sem alterar hash; fallback PT-PT; Qualidade #1201/#1202, Publicar #257, Pages #848.
 - [ ] Testar no iPhone real abertura do atalho, expansão, refresh da PWA e recuperação de URL inválido.
-- [x] Implementada no PR #220 a correção do `AppShell.tsx` `href="#main-content"` sujeito a 404 em HashRouter; publicação e validação física dependem dos itens acima.
+- [x] PR #220 corrigiu e publicou o `AppShell.tsx` `href="#main-content"` sujeito a 404 em HashRouter; validação física ainda depende do item anterior.
 
 ## P0 — Rastreabilidade do saldo, PR #217
 
@@ -57,3 +57,4 @@ Atualizado em: 2026-09-18. Tarefas históricas completas em `docs/history/TODO-p
 - [x] PR #217: proveniência por dia; Qualidade #1193, Publicar #256, Pages #842.
 - [x] PR #218: salto sem mudar hash, recuperação de rota; Qualidade #1202, Pages #848.
 - [x] PR #219: auditoria visual; Qualidade #1209/#1210, Publicar #258, Pages #854; validação física aberta.
+- [x] PR #220: refinamento de férias e salto global sem hash; Qualidade #1219/#1220, Publicar #259, Pages #859; validação física aberta.
