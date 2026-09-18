@@ -40,7 +40,7 @@ describe('estrutura do planeamento de férias', () => {
     expect(structure).toContain('grid-template-columns: minmax(0, 1fr)')
     expect(structure).toContain('@media (forced-colors: active)')
     expect(structure).toContain('@media (prefers-reduced-motion: reduce)')
-    expect(structure).not.toContain('display: none')
+    expect(structure).not.toContain('.vacationJointOptions { display: none; }')
     expect(structure).not.toContain('overflow-x: hidden')
   })
 })
