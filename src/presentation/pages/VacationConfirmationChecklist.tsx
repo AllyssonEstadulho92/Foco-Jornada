@@ -15,7 +15,7 @@ export function VacationConfirmationChecklist({ periodLabel }: VacationConfirmat
     <section className="vacationJointConfirmations" aria-labelledby="vacation-joint-confirmations-title">
       <div className="vacationJointConfirmationsHeading">
         <div>
-          <span className="vacationJointEyebrow">ANTES DE MARCAR</span>
+          <span className="vacationJointEyebrow">04 · CONFIRMAR ANTES DE MARCAR</span>
           <h4 id="vacation-joint-confirmations-title">Confirmações deste período</h4>
         </div>
         <span className={`vacationJointConfirmationBadge${complete ? ' isComplete' : ''}`}>
