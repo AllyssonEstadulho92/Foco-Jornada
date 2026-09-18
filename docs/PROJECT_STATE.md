@@ -1,14 +1,18 @@
 # Estado do Projeto
 
-Atualizado em: 2026-09-17. PR #219 integrado e publicado; validação física ainda pendente.
+Atualizado em: 2026-09-18. PR #220 em validação; última publicação confirmada: PR #219. A validação física no iPhone ainda não ocorreu.
 
-## Última alteração — PR #219
+## Alteração em curso — PR #220
 
-**Objetivo e alteração:** harmonizar a apresentação das duas rotas de férias sem alterar o domínio. A auditoria estática dos componentes e estilos (`docs/VACATION-UI-AUDIT-2026.md`) identificou navegação excessivamente alta em smartphone, sombras/raios/tipografia pouco uniformes, atalho de proveniência demasiado destacado e alturas mínimas desnecessárias. A camada `src/styles/vacation-visual-audit.css`, importada exclusivamente por `VacationWorkspacePage`, introduz dois separadores compactos no móvel, destaque do estado ativo e saldo principal, hierarquia tipográfica, espaços/bordas coerentes, cartões de altura intrínseca, atalho secundário e salvaguardas de alto contraste e movimento reduzido. Nenhuma funcionalidade foi retirada e não se alteraram fórmulas, dados ou URLs.
+**Objetivo:** atualizar visualmente `#/ferias` e `#/ferias/planeamento` com uma leitura mais elegante e contida, e resolver o risco conhecido do atalho global «Saltar para o conteúdo». A branch `fix/vacation-polish-skiplink-20260918` altera apenas o CSS específico de férias (`vacation-visual-audit.css`), a importação/markup do salto em `AppShell.tsx` e testes: largura de leitura 74rem, sombras discretas, diferenciação clara do saldo e da seleção, títulos legíveis, ano e calendários contidos em 320–360 px CSS. O salto global é um botão que chama `focusSection('main-content')` e não substitui o hash da rota. Testes jsdom em três rotas e estruturais de apresentação. Nenhum cálculo, registo, cofre, sync ou backend foi modificado.
 
-**Estado verificado:** [PR #219](https://github.com/AllyssonEstadulho92/Foco-Jornada/pull/219) integrado em `main`, merge `f96ced5532178bb0746db0e50ef52874e72710dc`. Qualidade #1209 (head final) e #1210 (`main`) terminaram com sucesso, incluindo auditoria, TypeScript, lint, Vitest, build, Worker dry-run e smoke Chromium. Publicar Foco & Jornada #258 concluiu com sucesso e gerou build `96c779f88ab2d0f941b7a54f690dd759fa909ec1`; GitHub Pages #854 concluiu com sucesso para esse build. **A validação visual e funcional no iPhone/Android reais ainda não foi feita**; CI e smoke de arranque não garantem ausência de overflow em todas as dimensões.
+**Estado desta revisão:** PR #220 aberto em draft, CI final, integração e publicação ainda por confirmar. A auditoria estática e os critérios de validação constam em `docs/VACATION-UI-AUDIT-2026.md`. **Não alegar teste físico do iPhone**; confirmar com capturas do utilizador, texto ampliado, orientação e navegação real. O problema do skip link passa de pendência a correção implementada, mas ainda não publicada neste momento.
 
-**Riscos pendentes:** `AppShell` ainda contém `href="#main-content"`, com risco independente de 404 no HashRouter; corrigir numa tarefa própria. A vista inativa continua montada e o saldo do ano corrente utiliza coletor distinto do detalhe por data; não misturar estas refatorizações com CSS.
+## Última alteração publicada — PR #219
+
+**Objetivo e alteração:** harmonizar a apresentação das duas rotas de férias sem alterar o domínio. A auditoria estática dos componentes e estilos identificou navegação excessivamente alta em smartphone, sombras/raios/tipografia pouco uniformes, atalho de proveniência demasiado destacado e alturas mínimas desnecessárias. A camada `src/styles/vacation-visual-audit.css`, importada exclusivamente por `VacationWorkspacePage`, introduziu dois separadores compactos no móvel, destaque do estado ativo e saldo principal, hierarquia tipográfica, espaços/bordas coerentes, cartões de altura intrínseca, atalho secundário e salvaguardas de alto contraste e movimento reduzido. Nenhuma funcionalidade foi retirada; fórmulas, dados e URLs permaneceram iguais.
+
+**Estado verificado:** [PR #219](https://github.com/AllyssonEstadulho92/Foco-Jornada/pull/219) integrado em `main`, merge `f96ced5532178bb0746db0e50ef52874e72710dc`. Qualidade #1209 (head final) e #1210 (`main`) terminaram com sucesso, incluindo auditoria, TypeScript, lint, Vitest, build, Worker dry-run e smoke Chromium. Publicar Foco & Jornada #258 gerou build `96c779f88ab2d0f941b7a54f690dd759fa909ec1`; GitHub Pages #854 concluiu com sucesso. **A validação visual e funcional no iPhone/Android reais ainda não foi feita**; CI e smoke de arranque não garantem ausência de overflow em todas as dimensões.
 
 ## Entrega anterior — PR #218
 
@@ -22,7 +26,7 @@ A meta anual de 28 dias é **pessoal e configurável**, não um direito contratu
 
 ## Problemas e próximo passo
 
-- Validar visualmente no iPhone, Android, tablet/desktop e com zoom, texto ampliado, orientação e teclado/VoiceOver/TalkBack. Testar salto/expansão da proveniência, filtros, mudança de ano, calendário e retorno após suspensão/sync.
-- Corrigir o skip link global `AppShell` incompatível com HashRouter em tarefa autónoma, para evitar novo 404.
+- Concluir CI do PR #220, integrar/publicar e confirmar GitHub Pages; atualizar provas documentais.
+- Validar visualmente no iPhone, Android, tablet/desktop e com zoom, texto ampliado, orientação e teclado/VoiceOver/TalkBack. Testar salto global, salto/expansão da proveniência, filtros, mudança de ano, calendário e retorno após suspensão/sync.
 - Confirmar consistência entre `VacationBalancePage` e `VacationYearRecords` com dados reais; cofre temporariamente inacessível pode dar lista parcial. Não alterar cálculo ou transferir saldos entre anos sem testes.
 - Preservar documentos históricos em `docs/history/PROJECT_STATE-pre-217.md` e restantes ficheiros do mesmo diretório.
