@@ -26,6 +26,7 @@ describe('auditoria visual das férias', () => {
 
   it('tem navegação móvel compacta, conteúdo contido e alvos de toque acessíveis', () => {
     expect(polish).toContain('@media (max-width: 560px)')
+    expect(polish).toContain('@media (max-width: 360px)')
     expect(polish).toContain('grid-template-columns: repeat(2, minmax(0, 1fr))')
     expect(polish).toContain('min-height: 44px')
     expect(polish).toContain('.vacationWorkspace .vacationWorkspaceTabCopy small { display: none; }')
@@ -33,5 +34,23 @@ describe('auditoria visual das férias', () => {
     expect(polish).toContain('@media (forced-colors: active)')
     expect(polish).toContain('@media (prefers-reduced-motion: reduce)')
     expect(workspaceCss).toContain('.vacationWorkspaceTab:focus-visible')
+  })
+
+  it('mantém superfícies legíveis, salientando o saldo sem esconder valores', () => {
+    expect(polish).toContain('width: min(100%, 74rem)')
+    expect(polish).toContain('.vacationWorkspace .vacationMetricPrimary:not(.vacationMetricDanger)')
+    expect(polish).toContain('.vacationWorkspace .vacationMetricCard strong')
+    expect(polish).toContain('font-variant-numeric: tabular-nums')
+    expect(polish).toContain('.vacationWorkspace .vacationPlannerPreview')
+    expect(polish).not.toContain('visibility: hidden')
+  })
+
+  it('preserva sete colunas e evita larguras mínimas que empurrem calendários para fora do ecrã', () => {
+    expect(polish).toContain('.vacationWorkspace--planning .vacationSuggestCalendarGrid')
+    expect(polish).toContain('.vacationWorkspace--planning .vacationJointCalendarGrid')
+    expect(polish).toContain('grid-template-columns: repeat(7, minmax(0, 1fr))')
+    expect(polish).toContain('.vacationWorkspace--planning .vacationSuggestDay')
+    expect(polish).toContain('padding-inline: 0')
+    expect(polish).toContain('gap: .12rem')
   })
 })
