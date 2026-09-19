@@ -45,6 +45,18 @@ describe('férias — áreas separadas e responsivas', () => {
     expect(workspaceCss).toContain('@media (prefers-reduced-motion: reduce)')
   })
 
+  it('elimina altura artificial dos títulos quando o cabeçalho vira coluna no telemóvel', () => {
+    const mobileHeaders = workspaceCss.slice(workspaceCss.indexOf('@media (max-width: 640px)'))
+    expect(mobileHeaders).toContain('.vacationWorkspace.vacationWorkspace--overview .vacationAccrualPanel .vacationPanelHeader > div,')
+    expect(mobileHeaders).toContain('.vacationWorkspace.vacationWorkspace--overview .vacationInsightsPanel .vacationPanelHeader > div {')
+    expect(mobileHeaders).toContain('flex: 0 0 auto;')
+    expect(mobileHeaders).toContain('width: 100%;')
+    expect(mobileHeaders).not.toContain('flex-basis: 100%')
+    expect(mobileHeaders).toContain('.vacationMonthCard > div:first-child {')
+    expect(mobileHeaders).toContain('flex-wrap: wrap;')
+    expect(mobileHeaders).toContain('.vacationMonthCard small + small { margin-top: 0; }')
+  })
+
   it('mantém cabeçalho de planeamento compacto e estado visível sem transbordar', () => {
     expect(plannerPage).toContain('<header className="vacationPlannerHero">')
     expect(plannerPage).toContain('vacationPlannerHeroCopy')
