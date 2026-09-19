@@ -2,13 +2,13 @@
 
 Atualizado em: 2026-09-19. Alterações anteriores até ao PR #214 (texto completo e provas históricas) em `docs/history/CHANGELOG-pre-217.md`.
 
-## 2026-09-19 — PR #222: auditoria de espaços e refinamento das secções (em validação)
+## 2026-09-19 — PR #222: auditoria de espaços e refinamento das secções (integrado e publicado)
 
 - Inspecionado PDF exportado do iPhone em 19/09: títulos de «Evolução por mês» e «O que tens, o que falta e o que vem a seguir» separados dos valores por grandes espaços vazios. O CSS confirmou que as bases `flex:1 1 240px`/`flex:1 1 260px` dos títulos se convertiam em alturas quando o cabeçalho passava para coluna <=640px; `flex-basis:100%` genérico agravava o risco. Ver `VACATION-MOBILE-SPACING-AUDIT-2026.md`.
 - `vacation-workspace.css`: títulos móveis com `flex:0 0 auto`, largura inteira, gap contido e altura intrínseca; cartões mensais <=560px mais compactos, mês e estado lado a lado quando possível, com quebra de linha quando necessário. Mantidos todos os meses e descrições.
 - `vacation-insights.css`: progresso anual e próximo marco recebem maior destaque relativo; outros indicadores têm menos decoração e margens/altura menores, incluindo no telemóvel. `vacation-planning-structure.css`: escolher/comparar lado a lado apenas em desktop >=1100px, percurso vertical no móvel e resumo opcional do ano anterior com quebra segura <=440px. Não existe uma nova camada CSS.
-- Testes `vacation-workspace.test.ts`, `vacation-insights.test.ts` e `vacation-planning-structure.test.ts` protegem regras de responsividade e de contenção. Alterações apenas de CSS/testes/documentação: sem modificar componentes TSX, cálculos, registos, feriados, confirmação da empresa, autenticação, cofre, Worker ou sincronização. **Estado:** CI final, merge, build Pages e validação física ainda por confirmar; não confundir a captura anterior à mudança com prova de resultado.
-- O PDF exibe data de admissão de 30/09/2026 em 19/09/2026 e referência laboral 0 apesar de campo anual 22. A discrepância é registada para confirmação dos dados, não corrigida por suposição nesta alteração visual.
+- Testes `vacation-workspace.test.ts`, `vacation-insights.test.ts` e `vacation-planning-structure.test.ts` protegem responsividade e contenção. Alterações apenas de CSS/testes/documentação: sem modificar componentes TSX, cálculos, registos, feriados, confirmação da empresa, autenticação, cofre, Worker ou sincronização. **Entrega verificada:** merge `b5f34b9b8adf8e2ecacd210ecfbeb7f9d6c0614a`, Qualidade #1240 (head final) e #1241 (`main`) com auditoria, TypeScript, lint, Vitest, build, Worker dry-run e smoke Chromium aprovados; Publicar #261 e GitHub Pages #869 com sucesso, build `112d2dbb7a56925d8a42dec2aaf0d9bae967a0fe`. **Validação física no iPhone continua pendente**; não confundir a captura anterior à mudança com prova de resultado.
+- O PDF exibe data de admissão de 30/09/2026 em 19/09/2026 e referência laboral 0 apesar de campo anual 22. Discrepância registada para confirmação dos dados, não corrigida por suposição nesta alteração visual.
 
 ## 2026-09-18 — PR #221: estrutura progressiva do Planeamento de Férias (integrado e publicado)
 
