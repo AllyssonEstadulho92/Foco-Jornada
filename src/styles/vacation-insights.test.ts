@@ -22,4 +22,14 @@ describe('painel de indicadores avançados de férias', () => {
     expect(vacationInsightsCss).toContain('grid-template-columns: 1fr')
     expect(vacationInsightsCss).toContain('@media (forced-colors: active)')
   })
+
+  it('dá destaque ao progresso e ao marco, sem sublinhados decorativos em todos os cartões', () => {
+    expect(vacationInsightsCss).toContain('.vacationWorkspace--overview .vacationInsightsGrid')
+    expect(vacationInsightsCss).toContain('repeat(auto-fit, minmax(min(100%, 16.5rem), 1fr))')
+    expect(vacationInsightsCss).toContain('.vacationWorkspace--overview .vacationInsightCard::before { content: none; }')
+    expect(vacationInsightsCss).toContain('.vacationWorkspace--overview .vacationInsightPrimary')
+    expect(vacationInsightsCss).toContain('.vacationWorkspace--overview .vacationInsightDanger')
+    expect(vacationInsightsCss).toContain('.vacationWorkspace--overview .vacationInsightCard { padding: .85rem 1rem; }')
+    expect(vacationInsightsCss).toContain('border-color: Highlight;')
+  })
 })
