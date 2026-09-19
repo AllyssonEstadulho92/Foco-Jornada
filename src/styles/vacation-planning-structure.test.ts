@@ -30,7 +30,7 @@ describe('estrutura do planeamento de férias', () => {
     expect(checklist).not.toContain('setItem(')
   })
 
-  it('reduz cartões repetidos e contém o fluxo em móvel sem ocultar informação', () => {
+  it('contém cartões, filtros e calendário e preserva a versão de uma coluna', () => {
     expect(workspace).toContain("import '../../styles/vacation-planning-structure.css'")
     expect(structure).toContain('.vacationWorkspace--planning .vacationPlannerContext')
     expect(structure).toContain('.vacationWorkspace--planning .vacationJointOptions')
@@ -42,5 +42,17 @@ describe('estrutura do planeamento de férias', () => {
     expect(structure).toContain('@media (prefers-reduced-motion: reduce)')
     expect(structure).not.toContain('.vacationJointOptions { display: none; }')
     expect(structure).not.toContain('overflow-x: hidden')
+  })
+
+  it('coloca escolher e comparar lado a lado apenas no desktop e contém o resumo no móvel', () => {
+    expect(structure).toContain('@media (min-width: 1100px)')
+    expect(structure).toContain('grid-template-columns: repeat(12, minmax(0, 1fr))')
+    expect(structure).toContain('.vacationJointChoice { grid-column: span 4; }')
+    expect(structure).toContain('.vacationJointCompare { grid-column: span 8; }')
+    expect(structure).toContain('.vacationJointSimulation,')
+    expect(structure).toContain('.vacationJointConfirmations,')
+    expect(structure).toContain('grid-template-columns: minmax(0, 1fr) auto;')
+    expect(structure).toContain('.vacationPlannerContext > summary > span:first-child { grid-column: 1 / -1; }')
+    expect(structure).toContain('outline: 3px solid var(--primary)')
   })
 })
