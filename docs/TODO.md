@@ -8,7 +8,7 @@ Atualizado em: 2026-09-19. Histórico completo anterior em `docs/history/TODO-pr
 - [x] Identificar a causa de cabeçalhos com base flex de 240/260px em orientação vertical, eliminar `flex-basis:100%` na regra móvel da área, manter texto e valores de altura intrínseca.
 - [x] Harmonizar indicadores, cartões mensais e disposição do planeamento em desktop, preservando a ordem móvel e os dados.
 - [x] Reforçar `vacation-workspace.test.ts`, `vacation-insights.test.ts`, `vacation-planning-structure.test.ts`; registar evidências em `VACATION-MOBILE-SPACING-AUDIT-2026.md`.
-- [ ] Verificar CI do head final do PR #222, integrar e confirmar CI `main`, build e GitHub Pages; documentar provas.
+- [x] Qualidade #1240 no head final, PR #222 integrado (`b5f34b9b8adf8e2ecacd210ecfbeb7f9d6c0614a`), Qualidade #1241 em `main`, Publicar #261, build `112d2dbb7a56925d8a42dec2aaf0d9bae967a0fe` e GitHub Pages #869: todos com sucesso.
 - [ ] Comparar nova captura do iPhone com o PDF de 19/09: títulos/valores sem vazio de 200+ pt, cartão de setembro, indicadores, períodos de 2027, zoom, texto ampliado, orientação, VoiceOver e teclado. Prosseguir com Android, tablet e computador.
 - [ ] Confirmar com o utilizador a «Data de admissão» 30/09/2026 exibida no PDF de 19/09 e a referência laboral de 0 dias; investigar dados/validação separadamente, sem modificar saldos por inferência.
 
