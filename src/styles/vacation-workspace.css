@@ -158,16 +158,50 @@
   .vacationWorkspace--planning .vacationSuggestCalendarLayout { grid-template-columns: minmax(0, 1fr); }
   .vacationWorkspace--planning .vacationSuggestFeatured { grid-template-columns: minmax(0, 1fr); }
 }
+/* In column-oriented mobile headers, 240–260px flex-basis becomes unwanted height.
+   Use intrinsic title height, including when the browser enlarges text. */
+@media (max-width: 640px) {
+  .vacationWorkspace.vacationWorkspace--overview .vacationPanelHeader > div,
+  .vacationWorkspace.vacationWorkspace--overview .vacationAccrualPanel .vacationPanelHeader > div,
+  .vacationWorkspace.vacationWorkspace--overview .vacationInsightsPanel .vacationPanelHeader > div {
+    flex: 0 0 auto;
+    width: 100%;
+    max-width: 100%;
+  }
+  .vacationWorkspace--overview .vacationAccrualPanel > .vacationPanelHeader,
+  .vacationWorkspace--overview .vacationInsightsPanel > .vacationPanelHeader {
+    align-items: flex-start;
+    gap: .35rem;
+  }
+  .vacationWorkspace--overview .vacationAccrualPanel > .vacationPanelHeader > strong,
+  .vacationWorkspace--overview .vacationInsightsPanel > .vacationPanelHeader > strong {
+    margin: 0;
+    text-align: left;
+  }
+}
 @media (max-width: 560px) {
   .vacationWorkspace { padding-inline: 0; gap: 1rem; }
   .vacationWorkspaceNavigation { grid-template-columns: minmax(0, 1fr); }
   .vacationWorkspaceTab { min-height: 4.5rem; padding: .85rem 1rem; }
   .vacationWorkspace .vacationHero { align-items: stretch; }
   .vacationWorkspace .vacationHeroDate { flex-basis: auto; }
-  .vacationWorkspace .vacationPanelHeader > div { flex-basis: 100%; }
+  .vacationWorkspace .vacationPanelHeader > div { flex: 0 0 auto; width: 100%; }
   .vacationWorkspace .vacationFormGrid { grid-template-columns: minmax(0, 1fr); }
   .vacationWorkspace--planning .vacationSuggestFeatured { grid-template-columns: minmax(0, 1fr); }
   .vacationWorkspace--planning .vacationSuggestCalendarAside { grid-template-columns: minmax(0, 1fr); }
+  /* Finished months can be read at a glance; no dates or progress are hidden. */
+  .vacationWorkspace--overview .vacationMonthCard {
+    gap: .5rem;
+    padding: .85rem;
+  }
+  .vacationWorkspace--overview .vacationMonthCard > div:first-child {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .35rem .65rem;
+  }
+  .vacationWorkspace--overview .vacationMonthState { width: auto; justify-self: auto; }
+  .vacationWorkspace--overview .vacationMonthCard small + small { margin-top: 0; }
 }
 @media (forced-colors: active) {
   .vacationWorkspaceTab,
