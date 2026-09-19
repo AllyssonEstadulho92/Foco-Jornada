@@ -1,16 +1,22 @@
 # Estado do Projeto
 
-Atualizado em: 2026-09-18. PR #221 integrado e publicado; validação física no iPhone pendente.
+Atualizado em: 2026-09-19. PR #222 em validação na branch `refactor/vacation-section-rhythm-20260919`; última publicação confirmada: PR #221. Validação física do iPhone continua pendente.
 
-## Última alteração — PR #221
+## Alteração em curso — PR #222
+
+**Objetivo:** refinar visualmente os dois destinos de férias sem adicionar funcionalidades, alterar números ou criar mais uma camada CSS. Auditoria estática de `VacationBalancePage`, `VacationPlannerPanel`, `VacationJointPlanner`, estilos e testes confirmou indicadores com destaque uniforme e escolha/comparação demasiado vertical no desktop. O PDF de 18/09 documenta a densidade anterior; ainda não há captura real da versão #221.
+
+**Implementação:** o CSS existente `vacation-insights.css` dá primazia ao progresso anual e ao próximo marco, torna os restantes cartões mais compactos e remove apenas linhas decorativas repetidas. No CSS existente `vacation-planning-structure.css`, escolher/comparar ocupam uma linha no desktop a partir de 1100px e mantêm a ordem vertical em tablet/telemóvel; o resumo recolhido do ano atual usa grelha contida e passa a duas linhas em 440px. Preservados foco, alto contraste, movimento reduzido e todas as informações. Testes estruturais reforçados nos dois módulos. **Estado:** CI do head final, merge, publicação e dispositivos reais ainda por confirmar.
+
+**Próximo passo:** verificar Qualidade no head final, integrar e verificar Qualidade em `main`, publicação e Pages; depois obter capturas do iPhone para comprovar 320–430px CSS, zoom, texto ampliado, calendário e teclado/VoiceOver. Não declarar fidelidade visual sem essa observação.
+
+## Última alteração publicada — PR #221
 
 **Objetivo e evidência:** o PDF de uma página enviado pelo utilizador mostra o planeamento de julho/2027 precedido por quatro cartões do saldo de 2026, seguido de quatro alternativas volumosas, simulação, checklist e notas extensas. A captura demonstra excesso de informação antes das decisões principais, não um erro comprovado de cálculo. O código confirmou a ordem anterior em `VacationPlannerPanel` e a altura dos cartões em `vacation-joint-planner.css`.
 
 **Implementação:** para o ano seguinte, `VacationJointPlanner` surge primeiro; a referência viva do ano corrente, com as mesmas quatro métricas e relógio, está num `<details>` opcional a seguir, com aviso explícito de que o saldo não é transferido automaticamente. Para o ano corrente o resumo mantém-se aberto antes das sugestões. O planeamento a dois segue quatro etapas (escolher, comparar, simular, confirmar), opções mais compactas e notas detalhadas expansíveis. CSS específico `vacation-planning-structure.css`, testes estruturais e relatório `docs/VACATION-PLANNING-STRUCTURE-2026.md`. Não mudaram fórmulas, datas, exclusões de novembro/dezembro, confirmações temporárias por cenário, cofre ou sincronização.
 
 **Entrega confirmada:** [PR #221](https://github.com/AllyssonEstadulho92/Foco-Jornada/pull/221) integrado, merge `9e9d267fd7a9ed7de3a9afdc68cbc8a8d2b708b9`. Qualidade #1227 (head final) e #1228 (`main`) passaram auditoria de dependências, TypeScript, lint, Vitest, build, Worker dry-run e smoke Chromium. Publicar Foco & Jornada #260 concluiu com sucesso e gerou o build `4074f203c6788d30a4f542c951a6b94b62f86fad`; GitHub Pages #866 concluiu a publicação desse build com sucesso. **Não foi testado visualmente no iPhone real**: estes gates não demonstram ausência de overflow e não verificam todas as interações.
-
-**Próximo passo:** validar captura e interações reais em `#/ferias/planeamento` no iPhone, incluindo seleção das quatro alternativas, calendário, detalhes, mudança de ano/filtros e reposição de vistos; depois Android, tablet e desktop com zoom e texto ampliado.
 
 ## Entrega anterior — PR #220
 
@@ -30,4 +36,4 @@ A meta anual de 28 dias é **pessoal e configurável**, não direito contratual 
 
 - Validar visualmente no iPhone real as duas rotas, depois Android/tablet/desktop: zoom, texto ampliado, rotação, teclado e VoiceOver/TalkBack. Testar salto global sem 404, atalho e expansão de proveniência, filtros, mudança de ano, calendário e retorno após suspensão/sync.
 - A vista inativa continua montada sob CSS; `VacationBalancePage` mantém coletor próprio distinto de `VacationYearRecords`. Comparar dados reais antes de qualquer unificação e não inventar saldo com cofre temporariamente inacessível.
-- Preservar documentos históricos em `docs/history/PROJECT_STATE-pre-217.md` e restantes ficheiros do mesmo diretório; histórico recente nos PRs #217–#221.
+- Preservar documentos históricos em `docs/history/PROJECT_STATE-pre-217.md` e restantes ficheiros do mesmo diretório; histórico recente nos PRs #217–#222.
