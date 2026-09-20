@@ -2,6 +2,16 @@
 
 Atualizado em: 2026-09-20. Histórico completo anterior em `docs/history/TODO-pre-217.md`; não considerar pendências físicas resolvidas por omissão.
 
+## P0 — Refinamento visual de Férias, branch de design em análise
+
+- [x] Comparar o novo painel ilustrado de quatro ecrãs com as duas rotas e os registos realmente existentes; não fabricar saldos, feriados ou um histórico de aprovações.
+- [x] Juntar «Visão geral», «Planeamento» e «Registos» numa barra compacta; «Registos» usa `focusSection` sem mudar hash nem criar rota.
+- [x] Refinar contraste do saldo pessoal, espaços, grelha, linha temporal visual de fontes, estados de perigo e breakpoints 960/540/355px, sem alterar domínio, cofre ou sincronização.
+- [x] Criar regressões estruturais `vacation-elegance.test.ts` e documentar em `VACATION-ELEGANCE-2026-09-20.md`.
+- [ ] Confirmar CI no commit final: auditoria, tipos, lint, testes, build, Worker dry-run e smoke Chromium; verificar se regressões de navegação permanecem aprovadas.
+- [ ] Testar em iPhone real e depois Android, tablet e computador: 320–430px, 200% zoom, texto ampliado, modo escuro, alto contraste, VoiceOver/teclado, foco na proveniência, ano e dias reais, calendário e retorno da PWA.
+- [ ] Validar diferenças de CSS com a PR #224 de integridade antes de integrar ambas; consolidar folha adicional depois de medições físicas.
+
 ## P0 — Adaptação do protótipo de Férias e Planeamento, PR #223
 
 - [x] Comparar duas imagens e PDF do iPhone com os cinco documentos e código real; distinguir conteúdo ilustrativo de dados reais.
