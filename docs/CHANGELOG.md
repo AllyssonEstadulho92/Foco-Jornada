@@ -54,3 +54,13 @@ Atualizado em: 2026-09-20. Alterações anteriores até ao PR #214 (texto comple
 - Sem alterar fórmula, meta pessoal 28, direito contratual, persistência, autenticação ou sync. **Entrega:** merge `61816f7ec3f1c43043d57b094f834bb116d19a27`, Qualidade #1192/#1193, Publicar #256, Pages #842, build `322b8b37f745e17233360af07e473f50e9fc79d5`. Teste físico pendente.
 
 ## 2026-09-17 — PR #216: confirmação por cenário
+
+- Checklist temporária local da parceira e empregador; mudança de cenário repõe vistos. Qualidade #1190, merge `faa8c064c13246654152c5eb66e7e7be65bdeaee`, Publicar #255, Pages #840.
+
+## 2026-09-17 — PR #215: julho do ano seguinte
+
+- Planeamento autónomo ano atual/seguinte, julho predefinido, novembro/dezembro excluídos segundo restrição comunicada; sem transportar saldos, registar datas ou assumir aprovação. PR integrado.
+
+## 2026-09-16 — PR #214: resumo vivo local no planeador
+
+- Acumulado, disponível, após planeadas e previsão dezembro pelo mesmo `VacationBalance` e relógio, sem prometer sync instantânea. PR integrado.
