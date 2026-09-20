@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { calculateVacationBalance, defaultVacationTrackerSettings } from './VacationBalance'
-import { collectVacationDatesForYear, collectVacationEvidenceForYear } from './VacationYearRecords'
+import { collectVacationDatesForYear, collectVacationEvidenceForYear, type VacationEvidenceReadIssue } from './VacationYearRecords'
 
 describe('collectVacationDatesForYear e proveniência', () => {
   it('reutiliza horas, turnos e plano existentes sem duplicar datas nem fontes', () => {
@@ -49,5 +49,32 @@ describe('collectVacationDatesForYear e proveniência', () => {
     }
     expect(collectVacationDatesForYear(2027, [], (key) => records[key] ?? null))
       .toEqual(['2027-02-28', '2027-03-01'])
+  })
+
+  it('assinala separadamente dados inválidos e falhas de leitura, sem apagar dias de outras fontes', () => {
+    const issues: VacationEvidenceReadIssue[] = []
+    const read = (key: string) => {
+      if (key === 'foco-jornada-shift-map-v1-2027-02') return '{'
+      if (key === 'foco-jornada-payroll-plan-v1-2027-03') return JSON.stringify({ date: '2027-03-01' })
+      if (key === 'foco-jornada-shift-map-v1-2027-04') throw new Error('cofre temporariamente inacessível')
+      if (key === 'foco-jornada-payroll-plan-v1-2027-05') return JSON.stringify([
+        { date: '2027-05-03', kind: 'vacation' },
+      ])
+      return null
+    }
+    const evidence = collectVacationEvidenceForYear(2027, [
+      { date: '2027-05-03', reason: 'ferias' },
+      { date: '2027-05-04', reason: 'ferias' },
+    ], read, issues)
+    expect(evidence).toEqual([
+      { date: '2027-05-03', sources: ['horas', 'plano'] },
+      { date: '2027-05-04', sources: ['horas'] },
+    ])
+    expect(issues).toEqual([
+      { source: 'turnos', month: '2027-02', reason: 'invalid-format' },
+      { source: 'plano', month: '2027-03', reason: 'invalid-format' },
+      { source: 'turnos', month: '2027-04', reason: 'unavailable' },
+    ])
+    expect(collectVacationDatesForYear(2027, [], () => null)).toEqual([])
   })
 })
