@@ -1,0 +1,190 @@
+/* Polimento escopado às férias. Nunca altera contagens, estados ou permissões. */
+.vacationWorkspace {
+  --vacation-elegant-radius: 1.15rem;
+  --vacation-elegant-edge: color-mix(in srgb, var(--line) 80%, var(--primary) 20%);
+}
+
+/* Três ações reais: duas rotas e consulta local de registos (não uma terceira rota). */
+.vacationWorkspace .vacationWorkspaceToolbar {
+  display: flex;
+  align-items: center;
+  gap: .65rem;
+  min-width: 0;
+}
+.vacationWorkspace .vacationWorkspaceToolbar .vacationWorkspaceNavigation {
+  display: flex;
+  flex: 0 1 auto;
+  min-width: 0;
+  align-items: stretch;
+  gap: .25rem;
+  padding: .3rem;
+  border: 1px solid var(--vacation-elegant-edge);
+  border-radius: 999px;
+  background: var(--surface-2);
+}
+.vacationWorkspace .vacationWorkspaceToolbar .vacationWorkspaceTab {
+  display: inline-flex;
+  justify-content: center;
+  min-height: 44px;
+  padding: .6rem 1rem;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text);
+  text-align: center;
+  white-space: normal;
+}
+.vacationWorkspace .vacationWorkspaceToolbar .vacationWorkspaceTab.isActive {
+  border-color: #095842;
+  background: #095842;
+  color: #fff;
+  box-shadow: none;
+}
+.vacationWorkspace .vacationWorkspaceToolbar .vacationWorkspaceTab.isActive .vacationWorkspaceTabCopy strong { color: #fff; }
+.vacationWorkspace .vacationWorkspaceToolbar .vacationWorkspaceTab:focus-visible,
+.vacationWorkspace .vacationWorkspaceToolbar .vacationEvidenceJump:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 3px;
+}
+.vacationWorkspace .vacationWorkspaceToolbar .vacationEvidenceJump {
+  flex: 0 0 auto;
+  min-height: 44px;
+  margin: 0;
+  padding: .6rem .9rem;
+  border-radius: 999px;
+  border-color: var(--vacation-elegant-edge);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: .88rem;
+  font-weight: 650;
+  white-space: nowrap;
+}
+.vacationWorkspace .vacationWorkspaceToolbar .vacationEvidenceJump span { color: var(--primary); }
+
+/* As métricas são sempre as calculadas pelo domínio; o cartão principal não é um saldo legal. */
+.vacationWorkspace--overview .vacationMetricGrid {
+  grid-template-columns: minmax(0, 1.45fr) repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+}
+.vacationWorkspace--overview .vacationMetricCard {
+  border-color: var(--vacation-elegant-edge);
+  border-radius: var(--vacation-elegant-radius);
+  background: var(--surface);
+  min-width: 0;
+}
+.vacationWorkspace--overview .vacationMetricCard.vacationMetricPrimary {
+  border-color: #095842;
+  background: linear-gradient(137deg, #095842 0%, #064332 100%);
+  color: #fff;
+  box-shadow: none;
+}
+.vacationWorkspace--overview .vacationMetricCard.vacationMetricPrimary > span,
+.vacationWorkspace--overview .vacationMetricCard.vacationMetricPrimary > strong,
+.vacationWorkspace--overview .vacationMetricCard.vacationMetricPrimary > small { color: #fff; }
+.vacationWorkspace--overview .vacationMetricCard.vacationMetricPrimary > strong {
+  font-size: clamp(1.45rem, 2.5vw, 2.35rem);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.13;
+}
+.vacationWorkspace--overview .vacationMetricCard.vacationMetricPrimary > small { opacity: .94; }
+.vacationWorkspace--overview .vacationMetricCard.vacationMetricPrimary.vacationMetricDanger {
+  border-color: #7f1d1d;
+  background: linear-gradient(135deg, #7f1d1d, #541414);
+}
+.vacationWorkspace--overview .vacationMetricCard.vacationMetricPrimary.vacationMetricDanger > strong { color: #fff; }
+.vacationWorkspace--overview .vacationMetricCard:not(.vacationMetricPrimary) > strong { font-variant-numeric: tabular-nums; }
+
+/* Conteúdo de leitura: superfícies e destaques mais contidos, sem esconder secções. */
+.vacationWorkspace .vacationPanel,
+.vacationWorkspace .vacationEvidencePanel,
+.vacationWorkspace--planning .vacationJointChoice,
+.vacationWorkspace--planning .vacationJointCompare,
+.vacationWorkspace--planning .vacationJointSimulation,
+.vacationWorkspace--planning .vacationJointConfirmations {
+  border-radius: var(--vacation-elegant-radius);
+  border-color: var(--vacation-elegant-edge);
+}
+.vacationWorkspace--overview .vacationAnnualProgressTrack { border-radius: 999px; }
+.vacationWorkspace--overview .vacationEvidenceJump:hover,
+.vacationWorkspace .vacationWorkspaceToolbar .vacationWorkspaceTab:not(.isActive):hover {
+  background: var(--primary-soft);
+}
+
+/* A lista já existente passa a linha temporal; não inventa dias manuais sem data. */
+.vacationWorkspace--overview .vacationEvidenceList {
+  position: relative;
+  padding: .25rem .25rem .25rem 1.75rem;
+  gap: .75rem;
+  background: linear-gradient(var(--vacation-elegant-edge), var(--vacation-elegant-edge)) 1rem .25rem / 2px calc(100% - .5rem) no-repeat;
+}
+.vacationWorkspace--overview .vacationEvidenceDay {
+  position: relative;
+  margin: 0;
+  padding: .85rem 1rem;
+  border-radius: .95rem;
+  border-color: var(--vacation-elegant-edge);
+  background: var(--surface);
+}
+.vacationWorkspace--overview .vacationEvidenceDay::before {
+  content: '';
+  position: absolute;
+  top: 1.05rem;
+  left: -1.17rem;
+  width: .65rem;
+  height: .65rem;
+  border: 2px solid var(--surface);
+  border-radius: 50%;
+  background: var(--primary);
+  box-shadow: 0 0 0 1px var(--primary);
+}
+
+@media (max-width: 960px) {
+  .vacationWorkspace--overview .vacationMetricGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .vacationWorkspace--overview .vacationMetricCard.vacationMetricPrimary { grid-column: 1 / -1; }
+  .vacationWorkspace--overview .vacationMetricProgress { grid-column: 1 / -1; }
+}
+@media (max-width: 540px) {
+  .vacationWorkspace .vacationWorkspaceToolbar { gap: .35rem; }
+  .vacationWorkspace .vacationWorkspaceToolbar .vacationWorkspaceNavigation {
+    flex: 1 1 auto;
+    gap: .1rem;
+    padding: .2rem;
+  }
+  .vacationWorkspace .vacationWorkspaceToolbar .vacationWorkspaceTab {
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 44px;
+    padding: .5rem .4rem;
+  }
+  .vacationWorkspace .vacationWorkspaceToolbar .vacationWorkspaceTabCopy strong { font-size: clamp(.72rem, 3vw, .88rem); }
+  .vacationWorkspace .vacationWorkspaceToolbar .vacationEvidenceJump { min-width: 0; padding: .5rem .6rem; font-size: .8rem; }
+  .vacationWorkspace--overview .vacationMetricCard.vacationMetricPrimary > strong { font-size: clamp(1.5rem, 7vw, 2rem); }
+}
+@media (max-width: 355px) {
+  .vacationWorkspace .vacationWorkspaceToolbar { display: grid; grid-template-columns: minmax(0, 1fr); }
+  .vacationWorkspace .vacationWorkspaceToolbar .vacationWorkspaceNavigation { width: 100%; }
+  .vacationWorkspace .vacationWorkspaceToolbar .vacationEvidenceJump { justify-self: start; }
+  .vacationWorkspace--overview .vacationMetricGrid { grid-template-columns: minmax(0, 1fr); }
+  .vacationWorkspace--overview .vacationMetricCard.vacationMetricPrimary,
+  .vacationWorkspace--overview .vacationMetricProgress { grid-column: auto; }
+}
+@media (forced-colors: active) {
+  .vacationWorkspace .vacationWorkspaceToolbar .vacationWorkspaceTab.isActive,
+  .vacationWorkspace--overview .vacationMetricCard.vacationMetricPrimary,
+  .vacationWorkspace--overview .vacationMetricCard.vacationMetricPrimary.vacationMetricDanger {
+    border-color: Highlight;
+    background: Canvas;
+    color: CanvasText;
+  }
+  .vacationWorkspace .vacationWorkspaceToolbar .vacationWorkspaceTab.isActive .vacationWorkspaceTabCopy strong,
+  .vacationWorkspace--overview .vacationMetricCard.vacationMetricPrimary > span,
+  .vacationWorkspace--overview .vacationMetricCard.vacationMetricPrimary > strong,
+  .vacationWorkspace--overview .vacationMetricCard.vacationMetricPrimary > small { color: CanvasText; }
+  .vacationWorkspace--overview .vacationEvidenceList { background: none; border-left: 2px solid CanvasText; }
+  .vacationWorkspace--overview .vacationEvidenceDay::before { background: Highlight; box-shadow: 0 0 0 1px CanvasText; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vacationWorkspace .vacationWorkspaceToolbar *,
+  .vacationWorkspace--overview .vacationEvidenceDay { animation: none; transition: none; }
+}
