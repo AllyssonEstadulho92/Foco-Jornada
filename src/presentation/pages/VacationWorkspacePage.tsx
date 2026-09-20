@@ -8,6 +8,7 @@ import '../../styles/vacation-evidence-layout.css'
 import '../../styles/vacation-visual-audit.css'
 import '../../styles/vacation-planning-structure.css'
 import '../../styles/vacation-prototype.css'
+import '../../styles/vacation-month-visual.css'
 
 type VacationWorkspaceView = 'overview' | 'planning'
 
