@@ -15,6 +15,12 @@ export interface VacationDayEvidence {
   sources: VacationEvidenceSource[]
 }
 
+export interface VacationEvidenceReadIssue {
+  source: Exclude<VacationEvidenceSource, 'horas'>
+  month: string
+  reason: 'invalid-format' | 'unavailable'
+}
+
 const SHIFT_MAP_PREFIX = 'foco-jornada-shift-map-v1-'
 const PAYROLL_PLAN_PREFIX = 'foco-jornada-payroll-plan-v1-'
 const SOURCE_ORDER: VacationEvidenceSource[] = ['horas', 'turnos', 'plano']
@@ -27,11 +33,14 @@ function validDateInYear(dateKey: unknown, year: number): dateKey is string {
   return date.getUTCFullYear() === y && date.getUTCMonth() === month - 1 && date.getUTCDate() === day
 }
 
-/** One entry per valid civil date. Sources are labels, not separate vacation days. */
+/** One entry per valid civil date. Sources are labels, not separate vacation days.
+ * The optional issues array is diagnostic only and never changes the calculated dates.
+ */
 export function collectVacationEvidenceForYear(
   year: number,
   entries: WorkHoursVacationRecord[],
   readEncryptedItem: (key: string) => string | null,
+  issues: VacationEvidenceReadIssue[] = [],
 ): VacationDayEvidence[] {
   if (!Number.isInteger(year) || year < 2000 || year > 9999) return []
   const sourcesByDate = new Map<string, Set<VacationEvidenceSource>>()
@@ -51,18 +60,30 @@ export function collectVacationEvidenceForYear(
     for (const [prefix, source] of [
       [SHIFT_MAP_PREFIX, 'turnos'], [PAYROLL_PLAN_PREFIX, 'plano'],
     ] as const) {
+      const key = `${prefix}${monthKey}`
+      let raw: string | null
       try {
-        const raw = readEncryptedItem(`${prefix}${monthKey}`)
-        if (!raw) continue
-        const data: unknown = JSON.parse(raw)
-        if (!Array.isArray(data)) continue
-        for (const item of data as VacationRecord[]) {
-          // Preserve the previous collector's behaviour: a record can contain a valid
-          // date from another month of the same year. The actual date is authoritative.
-          if (item?.kind === 'vacation') record(item.date, source)
-        }
+        raw = readEncryptedItem(key)
       } catch {
-        // Indisponibilidade/corrupção de um mês não inventa dias nem bloqueia os restantes.
+        issues.push({ source, month: monthKey, reason: 'unavailable' })
+        continue
+      }
+      if (!raw) continue
+      let data: unknown
+      try {
+        data = JSON.parse(raw) as unknown
+      } catch {
+        issues.push({ source, month: monthKey, reason: 'invalid-format' })
+        continue
+      }
+      if (!Array.isArray(data)) {
+        issues.push({ source, month: monthKey, reason: 'invalid-format' })
+        continue
+      }
+      for (const item of data as VacationRecord[]) {
+        // Preserve the previous collector's behaviour: a record can contain a valid
+        // date from another month of the same year. The actual date is authoritative.
+        if (item?.kind === 'vacation') record(item.date, source)
       }
     }
   }
