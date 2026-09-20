@@ -2,6 +2,17 @@
 
 Atualizado em: 2026-09-20. Histórico completo anterior em `docs/history/TODO-pre-217.md`; não considerar pendências físicas resolvidas por omissão.
 
+## P0 — Integridade da proveniência das férias, PR #224 (rascunho)
+
+- [x] Auditar coletores, cofre, evento de gravação e atualização do painel; identificar consulta memorizada obsoleta e erros de leitura silenciosos.
+- [x] Implementar diagnóstico opcional de fonte/mês/formato e aviso acessível de consulta incompleta, sem alterar saldos, datas nem persistência.
+- [x] Invalidar a leitura da proveniência no foco, retorno à visibilidade e evento local de gravação do cofre; acrescentar casos de corrupção e deduplicação.
+- [ ] Confirmar CI completo do head final: auditoria, TypeScript, lint, Vitest, build, Worker e smoke; corrigir qualquer regressão antes do merge.
+- [ ] Validar em iPhone real, Android, tablet e computador: registos, regresso após suspensão, perfis e sincronização; não assumir que evento local confirma recebimento remoto.
+- [ ] Comparar o coletor próprio de `VacationBalancePage` com `VacationYearRecords` usando registos reais; tratar cofre inacessível sem apresentar um falso saldo zero, antes de unificar.
+- [ ] Confirmar se erros com `secureStorage.getItem()` a devolver `null` resultam de ausência legítima ou cofre não vinculado; avaliar sinalização explícita no contrato de armazenamento.
+- [ ] Integrar PR #224 somente após validação, sem publicação direta na branch `main`.
+
 ## P0 — Adaptação do protótipo de Férias e Planeamento, PR #223
 
 - [x] Comparar duas imagens e PDF do iPhone com os cinco documentos e código real; distinguir conteúdo ilustrativo de dados reais.

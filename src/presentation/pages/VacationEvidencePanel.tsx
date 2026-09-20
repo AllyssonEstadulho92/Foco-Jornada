@@ -2,8 +2,10 @@ import { useEffect, useMemo, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import {
   collectVacationEvidenceForYear,
+  type VacationEvidenceReadIssue,
   type VacationEvidenceSource,
 } from '../../domain/vacation/VacationYearRecords'
+import { CLOUD_SYNC_VAULT_SAVED_EVENT } from '../../security/cloudSync'
 import { secureStorage } from '../../security/secureStorage'
 import { toLocalDateKey } from '../../shared/utils/dateTime'
 import { useWorkHoursStore } from '../store/useWorkHoursStore'
@@ -34,22 +36,29 @@ export function VacationEvidencePanel() {
   const year = now.getFullYear()
 
   useEffect(() => {
-    const refresh = () => setNow(new Date())
+    const refresh = () => {
+      setNow(new Date())
+      setRevision((value) => value + 1)
+    }
     const onVisibility = () => { if (!document.hidden) refresh() }
     window.addEventListener('focus', refresh)
+    window.addEventListener(CLOUD_SYNC_VAULT_SAVED_EVENT, refresh)
     document.addEventListener('visibilitychange', onVisibility)
     return () => {
       window.removeEventListener('focus', refresh)
+      window.removeEventListener(CLOUD_SYNC_VAULT_SAVED_EVENT, refresh)
       document.removeEventListener('visibilitychange', onVisibility)
     }
   }, [])
 
-  const evidence = useMemo(
-    () => expanded
-      ? collectVacationEvidenceForYear(year, entries, (key) => secureStorage.getItem(key))
-      : [],
-    [expanded, year, entries, revision],
-  )
+  const audit = useMemo(() => {
+    const issues: VacationEvidenceReadIssue[] = []
+    const evidence = expanded
+      ? collectVacationEvidenceForYear(year, entries, (key) => secureStorage.getItem(key), issues)
+      : []
+    return { evidence, issues }
+  }, [expanded, year, entries, revision])
+  const evidence = audit.evidence
   const taken = evidence.filter((item) => !isWeekend(item.date) && item.date <= today).length
   const planned = evidence.filter((item) => !isWeekend(item.date) && item.date > today).length
   const ignored = evidence.filter((item) => isWeekend(item.date)).length
@@ -75,6 +84,12 @@ export function VacationEvidencePanel() {
           já gozadas (registadas e manuais). O saldo após planeadas desconta ainda as datas futuras registadas.
           A meta pessoal não substitui o direito contratual.
         </p>
+        {audit.issues.length > 0 ? (
+          <p className="vacationEvidenceEmpty" role="alert">
+            Consulta incompleta: {audit.issues.length} fonte(s) mensais indisponíveis ou com formato inválido.
+            Os totais apresentados podem estar abaixo dos registos reais. Verifica o cofre e atualiza a consulta.
+          </p>
+        ) : null}
         <div className="vacationEvidenceTotals" aria-label="Contagem das datas registadas">
           <div><span>Úteis até hoje</span><strong>{taken}</strong></div>
           <div><span>Úteis futuros</span><strong>{planned}</strong></div>

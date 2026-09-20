@@ -38,6 +38,16 @@ describe('detalhe de proveniência do saldo', () => {
     expect(evidence).not.toContain('setInterval(')
   })
 
+  it('refaz a consulta no regresso e após guardar o cofre, sem presumir sync instantânea', () => {
+    expect(evidence).toContain("window.addEventListener('focus', refresh)")
+    expect(evidence).toContain('window.addEventListener(CLOUD_SYNC_VAULT_SAVED_EVENT, refresh)')
+    expect(evidence).toContain('window.removeEventListener(CLOUD_SYNC_VAULT_SAVED_EVENT, refresh)')
+    expect(evidence).toContain('setRevision((value) => value + 1)')
+    expect(evidence).toContain('Consulta incompleta:')
+    expect(evidence).toContain('role="alert"')
+    expect(evidence).toContain('audit.issues.length > 0')
+  })
+
   it('mantém contenção, leitura por teclado, contraste forçado e movimento reduzido', () => {
     expect(css).toContain('.vacationEvidenceBody[hidden] { display: none; }')
     expect(css).toContain('grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr))')
