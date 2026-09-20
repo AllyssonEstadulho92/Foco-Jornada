@@ -8,8 +8,8 @@ Atualizado em: 2026-09-20. Histórico completo anterior em `docs/history/TODO-pr
 - [x] Implementar paisagem SVG local/offline, separadores, cabeçalhos, cartões e percurso de planeamento responsivos sem alterar o AppShell.
 - [x] Criar alternância Gráfico/Tabela alimentada pelo cronograma original do domínio e preservar 12 cartões completos e progresso intramensal em detalhe expansível.
 - [x] Manter cálculo, cofre, deduplicação, ano, julho predefinido, restrições declaradas, calendário, confirmação temporária, ligações e simulação sem criar submissão falsa à ILUNION.
-- [x] Acrescentar testes de alternância, valores e CSS, mais `VACATION-PROTOTYPE-2026.md`; validar CI preliminar (#1244) com auditoria, tipos, lint, testes, build, Worker e smoke aprovados.
-- [ ] Verificar CI do head final do PR #223, integrar se verde e confirmar CI em main, Publicar e Pages; atualizar documentação com os números finais.
+- [x] Acrescentar testes de alternância, valores e CSS, mais `VACATION-PROTOTYPE-2026.md`. CI #1250 (PR) e #1251 (`main`) aprovaram auditoria, tipos, lint, testes, build, Worker e smoke.
+- [x] Integrar o [PR #223](https://github.com/AllyssonEstadulho92/Foco-Jornada/pull/223), merge `49cf48d1abc6bed68eabd7e8b5e1da4931a50c02`; Publicar #262 com sucesso, build `ae506c4a0e73a6a2a6aa5fecf5cb221ab70c8a41`, Pages #875 com sucesso. O PR permanecia em rascunho até esta verificação, motivo por que a versão pública não mudara.
 - [ ] Testar visualmente em iPhone real e Android, tablet e computador: 320–430px CSS, zoom, texto ampliado, paisagem, modo escuro, VoiceOver/teclado, gráfico/tabela, 12 meses, seleção de período, calendário e regresso da PWA. Comparar com as referências sem exigir valores ou pessoas demonstrativos.
 - [ ] Confirmar a data de admissão 30/09/2026 e referência laboral 0 mostradas no PDF de 20/09; corrigir apenas depois de validar dados reais e regras contratuais.
 
