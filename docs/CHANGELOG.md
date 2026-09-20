@@ -2,6 +2,12 @@
 
 Atualizado em: 2026-09-20. Alterações anteriores até ao PR #214 (texto completo e provas históricas) em `docs/history/CHANGELOG-pre-217.md`.
 
+## 2026-09-20 — PR #224: integridade da consulta de proveniência (rascunho, sem publicação)
+
+- Auditoria do código encontrou duas falhas na consulta «De onde vêm os teus dias?»: o foco atualizava a data mas não invalidava a recolha memorizada; erros de leitura/JSON/formato em registos mensais eram omitidos sem aviso de consulta parcial.
+- `VacationYearRecords.ts` recebe um argumento opcional de diagnóstico apenas com fonte, mês e tipo de erro, sem mudar deduplicação, datas ou fórmula. `VacationEvidencePanel.tsx` atualiza ao regressar à janela e ao evento de gravação local do cofre; se detetar erros, apresenta aviso acessível de totais potencialmente incompletos. Sem escrita, alteração do saldo, schema, dependências, API ou sincronização.
+- `VacationYearRecords.test.ts` cobre exceções de leitura, JSON inválido, formato inesperado e continuidade de dias válidos; `vacation-evidence.test.ts` cobre aviso, releitura e remoção do listener. CI e testes físicos ainda por confirmar. A vista de saldo mantém coletor próprio e a ausência de chave `null` não comprova completude. [PR #224](https://github.com/AllyssonEstadulho92/Foco-Jornada/pull/224).
+
 ## 2026-09-20 — PR #223: adaptar visualmente Férias e Planeamento aos dois protótipos (em validação)
 
 - Duas imagens do utilizador orientaram o desenho para desktop e móvel: separadores, paisagem, quatro métricas, evolução mês a mês em gráfico/tabela, indicadores e planeamento em etapas. Os números, nomes de colaboradores e botão de submissão presentes no mockup são ilustrativos; não foram importados para o produto nem foi criada uma aprovação fictícia.
