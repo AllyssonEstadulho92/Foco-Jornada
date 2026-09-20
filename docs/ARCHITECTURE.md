@@ -2,6 +2,12 @@
 
 Atualizado em: 2026-09-20. Histórico integral anterior preservado em `docs/history/ARCHITECTURE-pre-217.md`.
 
+## PR #224 — auditoria não destrutiva da proveniência (rascunho)
+
+`VacationYearRecords.collectVacationEvidenceForYear(year, entries, readEncryptedItem, issues?)` mantém a mesma lista ordenada de datas e fontes; o quarto argumento opcional recolhe apenas fonte (`turnos`/`plano`), mês e causa (`unavailable` ou `invalid-format`). Exceções de leitura, JSON ilegível e formato diferente de array não fabricam dias. A função `collectVacationDatesForYear` continua compatível e sem diagnóstico público. Nenhuma chave, valor cifrado ou dado pessoal entra no diagnóstico.
+
+`VacationEvidencePanel` lê o mesmo cofre apenas quando expandido; se houver fontes detetavelmente ilegíveis, apresenta aviso acessível de totais incompletos sem bloquear as fontes válidas. O `useMemo` passa a invalidar a recolha no foco, no retorno à visibilidade e no evento **local** `CLOUD_SYNC_VAULT_SAVED_EVENT` já existente; o listener é removido no cleanup e não há novo timer. O evento indica gravação local, **não** confirma réplica remota. A sincronização cifrada opcional permanece a cargo de `SecureAppBootstrap`/`cloudSyncManager`, com reconciliação e reabertura do runtime após pull. A chave ausente (`getItem` devolve `null`) não pode distinguir ausência legítima de cofre não vinculado e não gera alerta. `VacationBalancePage` continua com coletor próprio e precisa de reconciliação testada com dados reais antes de a UI do saldo poder prometer completude. Alterações escopadas, sem nova API, esquema, autenticação, persistência, permissões ou alteração de cálculos. CI/QA físico pendentes no PR #224.
+
 ## PR #223 — protótipo aplicado às duas rotas com valores reais
 
 `VacationWorkspacePage` continua a ser o ponto de entrada das rotas `#/ferias` e `#/ferias/planeamento`, com `NavLink` e salto `focusSection` sem mudança do hash. Importa em último lugar `vacation-prototype.css` (apresentação de ambas as vistas) e `vacation-month-visual.css` (gráfico/tabela). A paisagem em `src/assets/vacation-coast.svg` é SVG local processado pelo Vite, sem pedido externo, pessoas ou saldos fictícios. As classes permanecem escopadas a `.vacationWorkspace` / `.vacationWorkspace--overview` / `.vacationWorkspace--planning`; o `AppShell` e restantes páginas não são redesenhados.
