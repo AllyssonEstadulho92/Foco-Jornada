@@ -1,6 +1,17 @@
 # TODO
 
-Atualizado em: 2026-09-19. Histórico completo anterior em `docs/history/TODO-pre-217.md`; não considerar pendências físicas resolvidas por omissão.
+Atualizado em: 2026-09-20. Histórico completo anterior em `docs/history/TODO-pre-217.md`; não considerar pendências físicas resolvidas por omissão.
+
+## P0 — Adaptação do protótipo de Férias e Planeamento, PR #223
+
+- [x] Comparar duas imagens e PDF do iPhone com os cinco documentos e código real; distinguir conteúdo ilustrativo de dados reais.
+- [x] Implementar paisagem SVG local/offline, separadores, cabeçalhos, cartões e percurso de planeamento responsivos sem alterar o AppShell.
+- [x] Criar alternância Gráfico/Tabela alimentada pelo cronograma original do domínio e preservar 12 cartões completos e progresso intramensal em detalhe expansível.
+- [x] Manter cálculo, cofre, deduplicação, ano, julho predefinido, restrições declaradas, calendário, confirmação temporária, ligações e simulação sem criar submissão falsa à ILUNION.
+- [x] Acrescentar testes de alternância, valores e CSS, mais `VACATION-PROTOTYPE-2026.md`; validar CI preliminar (#1244) com auditoria, tipos, lint, testes, build, Worker e smoke aprovados.
+- [ ] Verificar CI do head final do PR #223, integrar se verde e confirmar CI em main, Publicar e Pages; atualizar documentação com os números finais.
+- [ ] Testar visualmente em iPhone real e Android, tablet e computador: 320–430px CSS, zoom, texto ampliado, paisagem, modo escuro, VoiceOver/teclado, gráfico/tabela, 12 meses, seleção de período, calendário e regresso da PWA. Comparar com as referências sem exigir valores ou pessoas demonstrativos.
+- [ ] Confirmar a data de admissão 30/09/2026 e referência laboral 0 mostradas no PDF de 20/09; corrigir apenas depois de validar dados reais e regras contratuais.
 
 ## P0 — Auditoria de espaços e ritmo de Férias, PR #222
 
