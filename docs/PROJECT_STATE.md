@@ -1,6 +1,14 @@
 # Estado do Projeto
 
-Atualizado em: 2026-09-19. PR #222 integrado e publicado; verificação visual da nova versão no iPhone ainda pendente.
+Atualizado em: 2026-09-20. PR #223 em validação na branch `feat/vacation-prototype-layout-20260920`. Última publicação confirmada: PR #222. Verificação física no iPhone pendente.
+
+## Alteração em curso — PR #223: protótipo de Férias e Planeamento
+
+**Objetivo:** aproximar as duas rotas das imagens entregues em 20/09, mantendo as funções e os valores reais. Comparados os cinco documentos, `VacationWorkspacePage`, `VacationBalancePage`, `VacationPlannerPanel`, `VacationJointPlanner`, `VacationEvidencePanel`, domínio, estilos, testes e PDF do iPhone. Os protótipos mostram fotografia, números demonstrativos, pessoas fictícias, gráfico/tabela e submissão à entidade empregadora; esses exemplos não são dados da aplicação.
+
+**Implementado:** cabeçalho panorâmico com ilustração SVG original local/offline, separadores compactos, cartões de saldo e indicadores harmonizados, percurso do planeamento responsivo; gráfico/tabela mensais interativos usam diretamente `balance.monthlyAccrualSchedule` e meta real, mantendo todos os cartões originais num `<details>` expansível. Configuração, referência laboral, proveniência, calendário, sugestões, simulação, confirmação efémera, anos e restrição comunicada de novembro/dezembro continuam disponíveis. Sem registos, chaves, dependências, APIs, autenticação ou sync novos. Documentação técnica em `docs/VACATION-PROTOTYPE-2026.md`.
+
+**Limites expressos:** a paisagem vetorial substitui a fotografia; não importamos os nomes/valores exemplificativos nem simulamos um envio/aprovação inexistente pela ILUNION. Meta pessoal 28 não se converte em direito contratual. A vista escondida continua montada pelo React; não se afirma economia de computação nem sync instantânea. Testes de gráfico/tabela e CSS adicionados; CI final do head, integração e deploy ainda por confirmar. **Próximo passo:** CI final, merge após verde, CI main, publicação e Pages; testar o resultado real no iPhone/Android/tablet/desktop, zoom, VoiceOver, calendário, alternância gráfico/tabela e retoma da PWA. Confirmar separadamente data de admissão futura e referência laboral zero do PDF, sem alterar saldos por suposição.
 
 ## Última alteração publicada — PR #222
 
@@ -34,4 +42,4 @@ Meta anual de 28 dias é pessoal e configurável, não direito contratual autom�
 
 - Validar as duas rotas em iPhone real e depois Android/tablet/desktop: zoom, texto ampliado, orientação, teclado, VoiceOver/TalkBack, salto sem 404, expansão de proveniência, filtros, mudança de ano, calendário e retorno após suspensão/sync.
 - Vista inativa permanece montada sob CSS; `VacationBalancePage` mantém coletor próprio distinto de `VacationYearRecords`. Comparar com dados reais antes de unificar e não inferir saldo quando o cofre estiver temporariamente indisponível.
-- Preservar os documentos históricos em `docs/history/PROJECT_STATE-pre-217.md` e ficheiros associados; PRs #217–#222 e documentos dedicados guardam alterações recentes.
+- Preservar os documentos históricos em `docs/history/PROJECT_STATE-pre-217.md` e ficheiros associados; PRs #217–#223 e documentos dedicados guardam alterações recentes.
