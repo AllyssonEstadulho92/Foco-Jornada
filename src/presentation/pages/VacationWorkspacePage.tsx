@@ -9,6 +9,7 @@ import '../../styles/vacation-visual-audit.css'
 import '../../styles/vacation-planning-structure.css'
 import '../../styles/vacation-prototype.css'
 import '../../styles/vacation-month-visual.css'
+import '../../styles/vacation-elegance.css'
 
 type VacationWorkspaceView = 'overview' | 'planning'
 
@@ -18,31 +19,33 @@ export function VacationWorkspacePage({ view }: { view: VacationWorkspaceView })
 
   return (
     <div className={`vacationWorkspace vacationWorkspace--${view}`}>
-      <nav className="vacationWorkspaceNavigation" aria-label="Áreas das férias">
-        <NavLink to="/ferias" end className={({ isActive }) => `vacationWorkspaceTab${isActive ? ' isActive' : ''}`}>
-          <span className="vacationWorkspaceTabNumber" aria-hidden="true">01</span>
-          <span className="vacationWorkspaceTabCopy">
-            <strong>Acumulação e saldo</strong>
-            <small>Meses, evolução e indicadores</small>
-          </span>
-          <span className="vacationWorkspaceTabArrow" aria-hidden="true">↗</span>
-        </NavLink>
-        <NavLink to="/ferias/planeamento" className={({ isActive }) => `vacationWorkspaceTab${isActive ? ' isActive' : ''}`}>
-          <span className="vacationWorkspaceTabNumber" aria-hidden="true">02</span>
-          <span className="vacationWorkspaceTabCopy">
-            <strong>Planeamento de férias</strong>
-            <small>Sugestões, calendário e simulação</small>
-          </span>
-          <span className="vacationWorkspaceTabArrow" aria-hidden="true">↗</span>
-        </NavLink>
-      </nav>
+      <div className="vacationWorkspaceToolbar">
+        <nav className="vacationWorkspaceNavigation" aria-label="Áreas das férias">
+          <NavLink to="/ferias" end className={({ isActive }) => `vacationWorkspaceTab${isActive ? ' isActive' : ''}`}>
+            <span className="vacationWorkspaceTabNumber" aria-hidden="true">01</span>
+            <span className="vacationWorkspaceTabCopy">
+              <strong>Visão geral</strong>
+              <small>Meses, evolução e indicadores</small>
+            </span>
+            <span className="vacationWorkspaceTabArrow" aria-hidden="true">↗</span>
+          </NavLink>
+          <NavLink to="/ferias/planeamento" className={({ isActive }) => `vacationWorkspaceTab${isActive ? ' isActive' : ''}`}>
+            <span className="vacationWorkspaceTabNumber" aria-hidden="true">02</span>
+            <span className="vacationWorkspaceTabCopy">
+              <strong>Planeamento</strong>
+              <small>Sugestões, calendário e simulação</small>
+            </span>
+            <span className="vacationWorkspaceTabArrow" aria-hidden="true">↗</span>
+          </NavLink>
+        </nav>
+        {!planning ? (
+          <button className="vacationEvidenceJump" type="button" aria-label="Consultar dias de férias registados e respetivas fontes" onClick={() => { focusSection('vacation-evidence-title') }}>
+            Registos <span aria-hidden="true">↓</span>
+          </button>
+        ) : null}
+      </div>
 
       {planning ? <h1 className="vacationWorkspaceScreenReaderTitle">Planeamento de férias</h1> : null}
-      {!planning ? (
-        <button className="vacationEvidenceJump" type="button" onClick={() => { focusSection('vacation-evidence-title') }}>
-          Ver de onde vêm os dias registados ↓
-        </button>
-      ) : null}
       <div className="vacationWorkspacePane">
         <VacationBalancePage />
         {!planning ? <VacationEvidencePanel /> : null}
