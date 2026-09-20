@@ -1,6 +1,14 @@
 # Estado do Projeto
 
-Atualizado em: 2026-09-20. **PR #223 integrado e publicado**; visualização física no iPhone ainda por confirmar. A atualização não aparecia ao utilizador porque o PR permanecia em rascunho e fora de `main`; esta pendência foi resolvida nesta sessão.
+Atualizado em: 2026-09-20. **Nova intervenção visual em análise** na branch `design/vacation-elegant-mobile-2026-09-20`, ainda não integrada nem publicada. A PR #224 de integridade da proveniência permanece separada, em rascunho.
+
+## Intervenção em curso — navegação e acabamento visual das Férias
+
+**Objetivo:** aproximar as duas rotas do novo painel visual de quatro ecrãs sem simular um histórico completo, direito laboral, número de dias ou sincronização inexistentes. Ver `docs/VACATION-ELEGANCE-2026-09-20.md`.
+
+**Alteração na branch:** `VacationWorkspacePage` reúne os dois links reais (`#/ferias` e `#/ferias/planeamento`) e o botão «Registos» numa barra compacta; o botão usa o salto interno `focusSection` até à proveniência existente, não cria nova rota nem altera o hash. `vacation-elegance.css` refina estado ativo, cartão de saldo pessoal, distribuição responsiva e apresentação dos registos por linha temporal; `vacation-elegance.test.ts` protege estruturas, foco e breakpoints. Não altera `VacationBalancePage`, domínio, valores, chaves, dados, armazenamento, autenticação, APIs ou sincronização.
+
+**Validação pendente:** obter resultado CI para o commit final, verificar 320–430px, 200% zoom, modo escuro, alto contraste, VoiceOver/teclado, datas efetivas e consulta do painel ao regressar à PWA. Não integrar ou publicar sem confirmar as verificações. O design de quatro ecrãs continua apenas referência: não foram criados calendário independente ou histórico com registos não disponíveis. Consolidar o CSS após a validação em dispositivos.
 
 ## Última alteração publicada — PR #223: protótipo de Férias e Planeamento
 
@@ -16,7 +24,7 @@ Atualizado em: 2026-09-20. **PR #223 integrado e publicado**; visualização fí
 
 O PDF do iPhone de 19/09 mostrou grandes hiatos entre os títulos e os valores de «Evolução por mês» e «O que tens, o que falta e o que vem a seguir». A auditoria do código confirmou que, em <=640px, `.vacationPanelHeader` mudava de linha para coluna, enquanto bases `flex:1 1 240px` e `flex:1 1 260px` passavam a alturas verticais. `vacation-workspace.css` também usava `flex-basis:100%` <=560px. A correção usa `flex:0 0 auto`, largura 100% e altura intrínseca, compacta os cartões e conserva valores e quebras de texto. `vacation-insights.css` distingue progresso/marco de indicadores secundários e `vacation-planning-structure.css` distribui escolha/comparação em colunas a partir de 1100px sem mudar a ordem móvel. Ver `docs/VACATION-MOBILE-SPACING-AUDIT-2026.md`.
 
-**Entrega verificada:** PR #222 integrado, merge `b5f34b9b8adf8e2ecacd210ecfbeb7f9d6c0614a`. Qualidade #1240/#1241, Publicar #261, build `112d2dbb7a56925d8a42dec2aaf0d9bae967a0fe` e Pages #869 passaram. Alterações só de CSS, testes e documentação; não se confirmou visualmente em dispositivo físico.
+**Entrega verificada:** PR #222 integrado, merge `b5f34b9b8adf8e2ecacd210ecfbeb7f9d6c0614a`. Qualidade #1240/#1241, Publicar #261, build `112d2dbb7a56925d8a42dec2aaf0d9bae967a0fe` e GitHub Pages #869 passaram. Alterações só de CSS, testes e documentação; não se confirmou visualmente em dispositivo físico.
 
 ## Entrega anterior — PR #221
 
