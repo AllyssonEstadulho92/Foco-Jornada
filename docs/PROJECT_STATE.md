@@ -1,6 +1,14 @@
 # Estado do Projeto
 
-Atualizado em: 2026-09-20. **PR #223 integrado e publicado**; visualização física no iPhone ainda por confirmar. A atualização não aparecia ao utilizador porque o PR permanecia em rascunho e fora de `main`; esta pendência foi resolvida nesta sessão.
+Atualizado em: 2026-09-20. **PR #224 em rascunho, ainda não integrado nem publicado.** O PR #223 permanece a última alteração publicada. Os testes e a inspeção física do PR #224 requerem confirmação.
+
+## Etapa atual — PR #224: integridade da proveniência das férias
+
+**Auditoria:** `VacationEvidencePanel` atualizava o relógio ao regressar à janela, mas a recolha guardada em `useMemo` não voltava a ler as chaves cifradas se a revisão/ano/horas se mantivessem. `VacationYearRecords` omitia silenciosamente falhas de leitura, JSON inválido e estruturas mensais inesperadas; o resultado parcial podia parecer completo. Identificada também duplicação de coletores entre o saldo e a auditoria. Não foi possível confirmar dados reais do utilizador nem executar testes em telemóvel físico.
+
+**Alteração proposta na branch `fix/vacation-evidence-integrity-2026-09-20`:** diagnóstico opcional das fontes mensais inacessíveis/inválidas sem alterar dias ou fórmulas; aviso acessível de consulta incompleta na vista geral; releitura ao regressar à aplicação e quando o cofre emite evento de gravação; testes de proveniência, deduplicação, corrupção e regressões estruturais. Sem alterações de esquema, cálculos, permissões, dependências, endpoints ou operações de escrita. [PR #224](https://github.com/AllyssonEstadulho92/Foco-Jornada/pull/224). **Aguardar CI e revisão antes de integrar.**
+
+**Riscos pendentes:** uma leitura que devolva `null` continua indistinguível de uma chave mensal inexistente. O coletor próprio de `VacationBalancePage` não recebeu ainda diagnóstico, podendo mostrar um saldo incompleto se o cofre estiver inacessível. Sincronização remota não é instantânea e depende do perfil/reconciliação; evento de gravação não prova que outro dispositivo já recebeu os dados. Comparar coletores com dados reais, validar a integridade do cofre e testar iPhone/Android/tablet/desktop antes da unificação. Feriados, descanso alternativo, CCT, admissão e direito contratual carecem de confirmação.
 
 ## Última alteração publicada — PR #223: protótipo de Férias e Planeamento
 
@@ -16,7 +24,7 @@ Atualizado em: 2026-09-20. **PR #223 integrado e publicado**; visualização fí
 
 O PDF do iPhone de 19/09 mostrou grandes hiatos entre os títulos e os valores de «Evolução por mês» e «O que tens, o que falta e o que vem a seguir». A auditoria do código confirmou que, em <=640px, `.vacationPanelHeader` mudava de linha para coluna, enquanto bases `flex:1 1 240px` e `flex:1 1 260px` passavam a alturas verticais. `vacation-workspace.css` também usava `flex-basis:100%` <=560px. A correção usa `flex:0 0 auto`, largura 100% e altura intrínseca, compacta os cartões e conserva valores e quebras de texto. `vacation-insights.css` distingue progresso/marco de indicadores secundários e `vacation-planning-structure.css` distribui escolha/comparação em colunas a partir de 1100px sem mudar a ordem móvel. Ver `docs/VACATION-MOBILE-SPACING-AUDIT-2026.md`.
 
-**Entrega verificada:** PR #222 integrado, merge `b5f34b9b8adf8e2ecacd210ecfbeb7f9d6c0614a`. Qualidade #1240/#1241, Publicar #261, build `112d2dbb7a56925d8a42dec2aaf0d9bae967a0fe` e Pages #869 passaram. Alterações só de CSS, testes e documentação; não se confirmou visualmente em dispositivo físico.
+**Entrega verificada:** PR #222 integrado, merge `b5f34b9b8adf8e2ecacd210ecfbeb7f9d6c0614a`. Qualidade #1240/#1241, Publicar #261, build `112d2dbb7a56925d8a42dec2aaf0d9bae967a0fe` e GitHub Pages #869 passaram. Alterações só de CSS, testes e documentação; não se confirmou visualmente em dispositivo físico.
 
 ## Entrega anterior — PR #221
 
