@@ -1,6 +1,14 @@
 # Changelog
 
-Atualizado em: 2026-09-19. Alterações anteriores até ao PR #214 (texto completo e provas históricas) em `docs/history/CHANGELOG-pre-217.md`.
+Atualizado em: 2026-09-20. Alterações anteriores até ao PR #214 (texto completo e provas históricas) em `docs/history/CHANGELOG-pre-217.md`.
+
+## 2026-09-20 — PR #223: adaptar visualmente Férias e Planeamento aos dois protótipos (em validação)
+
+- Duas imagens do utilizador orientaram o desenho para desktop e móvel: separadores, paisagem, quatro métricas, evolução mês a mês em gráfico/tabela, indicadores e planeamento em etapas. Os números, nomes de colaboradores e botão de submissão presentes no mockup são ilustrativos; não foram importados para o produto nem foi criada uma aprovação fictícia.
+- `vacation-coast.svg` é uma paisagem costeira vetorial local e original; `vacation-prototype.css` aplica a linguagem visual às duas rotas, com cartões compactos, hero contido, foco, alto contraste e movimento reduzido. `vacation-month-visual.css` dá largura/altura adaptativas ao gráfico e tabela de meses. Sem imagens externas, dados inventados ou alterações ao AppShell global.
+- `VacationMonthlyVisualization` permite alternar Gráfico/Tabela alimentados pelo **mesmo** `monthlyAccrualSchedule` e meta real de `VacationBalance`; valor do mês em curso usa `liveCumulativeDays` e não soma arredondamentos. Os doze cartões e quatro métricas detalhadas permanecem disponíveis num `details` expansível, não apagados. `VacationBalancePage` conserva cofre, registos, cálculo, relógio por minuto, configuração, referência laboral, fontes, precisão e simulação.
+- `VacationJointPlanner` conserva mês/dias, julho por omissão no ano seguinte, bloqueios declarados de novembro/dezembro, propostas, calendário opcional e checklist efémera por cenário. Não há API de submissão à ILUNION nem confirmação da parceira/empresa verificada automaticamente. Meta pessoal de 28 dias continua separada do direito contratual.
+- Testes `VacationMonthlyVisualization.test.tsx` e `vacation-prototype.test.ts` verificam valores recebidos do domínio, comutação, rotas, assets locais, responsividade e ausência de submissão; Qualidade preliminar #1244 passou auditoria de dependências, TypeScript, lint, testes, build, Worker dry-run e smoke Chromium. **Estado:** CI final, merge, Pages e validação física do iPhone ainda por confirmar. Ver `docs/VACATION-PROTOTYPE-2026.md`.
 
 ## 2026-09-19 — PR #222: auditoria de espaços e refinamento das secções (integrado e publicado)
 
