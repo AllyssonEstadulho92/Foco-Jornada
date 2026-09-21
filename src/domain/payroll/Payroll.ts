@@ -11,6 +11,8 @@ export interface PayrollDayPlan {
   date: string
   kind: PayrollDayKind
   overtimeHours: number
+  /** Horas efetivamente trabalhadas no turno normal, sem pausas. Ausente: estimativa contratual. */
+  workedHours?: number
   /** Horas de ausência não remunerada apuradas ao minuto. Quando omitido num dia de falta integral, usa a duração diária contratual. */
   unpaidAbsenceHours?: number
   note?: string
@@ -28,6 +30,9 @@ export interface PayrollConfig {
   irsProfile: IrsProfile2026
   dependents: number
   overtimeHoursBeforeMonth: number
+  /** Acréscimos contratuais sobre horas normais de sábado e domingo, em percentagem; 0 até confirmação. */
+  saturdayPremiumRate: number
+  sundayPremiumRate: number
   vacationSubsidy: number
   christmasSubsidy: number
   otherTaxableAllowances: number
@@ -56,6 +61,12 @@ export interface PayrollResult {
   hourlyRate: number
   absenceDeduction: number
   overtimePay: number
+  /** Horas normais de fim de semana, sem horas suplementares. */
+  saturdayWorkHours: number
+  sundayWorkHours: number
+  saturdayPremiumPay: number
+  sundayPremiumPay: number
+  weekendPremiumPay: number
   mealAllowanceGross: number
   mealAllowanceTaxable: number
   normalTaxableGross: number
@@ -79,6 +90,8 @@ export const defaultPayrollConfig: PayrollConfig = {
   irsProfile: 'table-1',
   dependents: 0,
   overtimeHoursBeforeMonth: 0,
+  saturdayPremiumRate: 0,
+  sundayPremiumRate: 0,
   vacationSubsidy: 0,
   christmasSubsidy: 0,
   otherTaxableAllowances: 0,
