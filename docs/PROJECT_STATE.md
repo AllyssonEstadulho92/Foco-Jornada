@@ -1,6 +1,14 @@
 # Estado do Projeto
 
-Atualizado em: 2026-09-20. **PR #223 integrado e publicado**; visualização física no iPhone ainda por confirmar. A atualização não aparecia ao utilizador porque o PR permanecia em rascunho e fora de `main`; esta pendência foi resolvida nesta sessão.
+Atualizado em: 2026-09-21. **PR #226 em revisão, ainda não integrado nem publicado.** A última versão publicada permanece a do PR #223.
+
+## Alteração em preparação — PR #226: cálculo de trabalho normal ao fim de semana
+
+**Objetivo:** na página Vencimento, mostrar e calcular automaticamente horas e acréscimos de sábado e domingo com taxas contratuais separadas e configuráveis. A imagem fornecida mostra 920 € de base, 22 dias de alimentação e nenhum acréscimo identificado; não prova a taxa de sábado ou domingo.
+
+**Código proposto:** `PayrollConfig.saturdayPremiumRate/sundayPremiumRate` começam em `null` (por confirmar). `calculateWeekendPremium` usa horas normais com turno válido e pausa descontada do Mapa de turnos, ou duração diária contratual como estimativa quando faltar horário. O suplemento não é aplicado a folgas ou horas suplementares já remuneradas por `calculateOvertimePay`; entra no bruto, base de Segurança Social, IRS e líquido estimados. A página de resumo apresenta duas rubricas e editor responsivo de percentagens; a configuração permanece na chave existente. Testes específicos e especificação em `docs/WEEKEND-PAY.md`.
+
+**Riscos/pendências:** confirmar percentagens, regras contratuais e classificação do serviço no recibo/CCT antes de preencher; dividir turnos que atravessem a meia-noite por data civil numa melhoria posterior. CI e testes visuais em dispositivo físico ainda por confirmar; **não declarar a funcionalidade publicada enquanto PR e deploy não terminarem**.
 
 ## Última alteração publicada — PR #223: protótipo de Férias e Planeamento
 
@@ -16,13 +24,13 @@ Atualizado em: 2026-09-20. **PR #223 integrado e publicado**; visualização fí
 
 O PDF do iPhone de 19/09 mostrou grandes hiatos entre os títulos e os valores de «Evolução por mês» e «O que tens, o que falta e o que vem a seguir». A auditoria do código confirmou que, em <=640px, `.vacationPanelHeader` mudava de linha para coluna, enquanto bases `flex:1 1 240px` e `flex:1 1 260px` passavam a alturas verticais. `vacation-workspace.css` também usava `flex-basis:100%` <=560px. A correção usa `flex:0 0 auto`, largura 100% e altura intrínseca, compacta os cartões e conserva valores e quebras de texto. `vacation-insights.css` distingue progresso/marco de indicadores secundários e `vacation-planning-structure.css` distribui escolha/comparação em colunas a partir de 1100px sem mudar a ordem móvel. Ver `docs/VACATION-MOBILE-SPACING-AUDIT-2026.md`.
 
-**Entrega verificada:** PR #222 integrado, merge `b5f34b9b8adf8e2ecacd210ecfbeb7f9d6c0614a`. Qualidade #1240/#1241, Publicar #261, build `112d2dbb7a56925d8a42dec2aaf0d9bae967a0fe` e Pages #869 passaram. Alterações só de CSS, testes e documentação; não se confirmou visualmente em dispositivo físico.
+**Entrega verificada:** PR #222 integrado, merge `b5f34b9b8adf8e2ecacd210ecfbeb7f9d6c0614a`. Qualidade #1240/#1241, Publicar #261, build `112d2dbb7a56925d8a42dec2aaf0d9bae967a0fe` e GitHub Pages #869: todos com sucesso. Alterações só de CSS, testes e documentação; não se confirmou visualmente em dispositivo físico.
 
 ## Entrega anterior — PR #221
 
 No planeamento do ano seguinte, `VacationJointPlanner` aparece antes do resumo de 2026 em `<details>` opcional, sem sugerir transferência de saldo. No ano corrente, resumo vivo antecede sugestões. Percurso de quatro passos (escolher, comparar, simular, confirmar); alternativas compactas e metodologia expansível. Mantidas datas, restrição comunicada de novembro/dezembro, confirmações locais por cenário, cálculo e cofre.
 
-**Entrega verificada:** PR #221 integrado, merge `9e9d267fd7a9ed7de3a9afdc68cbc8a8d2b708b9`; Qualidade #1227/#1228, Publicar #260, build `4074f203c6788d30a4f542c951a6b94b62f86fad`, Pages #866 com sucesso.
+**Entrega verificada:** PR #221 integrado, merge `9e9d267fd7a9ed7de3a9afdc68cbc8a8d2b708b9`, Qualidade #1227/#1228, Publicar #260, build `4074f203c6788d30a4f542c951a6b94b62f86fad`, Pages #866 com sucesso.
 
 ## Entregas anteriores — PRs #217–#220
 

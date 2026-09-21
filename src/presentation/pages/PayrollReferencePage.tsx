@@ -5,9 +5,12 @@ import { calculatePayroll } from '../../application/payroll/calculatePayroll'
 import { defaultPayrollConfig, type PayrollConfig, type PayrollDayPlan } from '../../domain/payroll/Payroll'
 import { AppIcon, type AppIconName } from '../components/ui/AppIcon'
 import { pushAppNotification } from '../store/useNotificationStore'
+import '../../styles/weekend-pay.css'
 
 const CONFIG_KEY = 'foco-jornada-payroll-config-v1'
 const PLAN_PREFIX = 'foco-jornada-payroll-plan-v1-'
+
+type WeekendRateKey = 'saturdayPremiumRate' | 'sundayPremiumRate'
 
 function currentMonthKey() {
   const now = new Date()
@@ -71,15 +74,24 @@ function PayrollRow({ icon, label, hint, value, positive = false, negative = fal
 
 export function PayrollReferencePage() {
   const [month, setMonth] = useState(currentMonthKey)
+  const [config, setConfig] = useState(readConfig)
   const [, forceRefresh] = useState(0)
-  const config = readConfig()
   const plan = readPlan(month)
   const result = calculatePayroll(config, plan)
 
   const otherAllowances = config.vacationSubsidy + config.christmasSubsidy + config.otherTaxableAllowances + config.otherExemptAllowances
   const totalDiscounts = result.socialSecurity + result.irsTotal + config.otherDeductions
 
+  function updateWeekendRate(key: WeekendRateKey, raw: string) {
+    const normalized = raw.trim().replace(',', '.')
+    if (normalized !== '' && (!Number.isFinite(Number(normalized)) || Number(normalized) < 0 || Number(normalized) > 1000)) return
+    const next = { ...config, [key]: normalized === '' ? null : Number(normalized) }
+    secureStorage.setItem(CONFIG_KEY, JSON.stringify(next))
+    setConfig(next)
+  }
+
   function refreshCalculation() {
+    setConfig(readConfig())
     forceRefresh((value) => value + 1)
     pushAppNotification('success', 'Cálculo atualizado', `Estimativa de ${monthLabel(month)} atualizada com os dados guardados.`)
   }
@@ -111,12 +123,30 @@ export function PayrollReferencePage() {
           <PayrollRow icon="wallet" label="Salário base" value={money(config.baseSalary)} positive />
           <PayrollRow icon="meal" label="Subsídio de alimentação" hint={`${result.mealDays} dias`} value={money(result.mealAllowanceGross)} positive />
           <PayrollRow icon="clock" label="Horas extra" hint={`${result.overtimeHours.toFixed(2)} h`} value={money(result.overtimePay)} positive={result.overtimePay > 0} />
+          <PayrollRow icon="clock" label="Acréscimo de sábado" hint={`${result.saturdayWorkHours.toFixed(2)} h normais · ${config.saturdayPremiumRate === null ? 'taxa por confirmar' : `${config.saturdayPremiumRate}%`}`} value={money(result.saturdayPremiumPay)} positive={result.saturdayPremiumPay > 0} />
+          <PayrollRow icon="clock" label="Acréscimo de domingo" hint={`${result.sundayWorkHours.toFixed(2)} h normais · ${config.sundayPremiumRate === null ? 'taxa por confirmar' : `${config.sundayPremiumRate}%`}`} value={money(result.sundayPremiumPay)} positive={result.sundayPremiumPay > 0} />
           <PayrollRow icon="minus-circle" label="Faltas/ausências" hint={`${result.unpaidAbsenceHours.toFixed(2)} h não remuneradas`} value={result.absenceDeduction > 0 ? `−${money(result.absenceDeduction)}` : money(0)} negative={result.absenceDeduction > 0} />
           <PayrollRow icon="shield" label="Segurança Social" hint={`${config.socialSecurityRate.toFixed(2)}%`} value={`−${money(result.socialSecurity)}`} negative />
           <PayrollRow icon="document" label="IRS" hint="retenção" value={`−${money(result.irsTotal)}`} negative={result.irsTotal > 0} />
           <PayrollRow icon="plus" label="Outros abonos" value={money(otherAllowances)} positive={otherAllowances > 0} />
           <PayrollRow icon="minus-circle" label="Outros descontos" value={config.otherDeductions > 0 ? `−${money(config.otherDeductions)}` : money(0)} negative={config.otherDeductions > 0} />
         </div>
+
+        <details className="referenceWeekendSettings">
+          <summary>Configurar percentagens de sábado e domingo</summary>
+          <p>Indica apenas as percentagens confirmadas no teu recibo, contrato ou acordo coletivo. Não existe um acréscimo único para todos os turnos de fim de semana.</p>
+          <div className="referenceWeekendFields">
+            <label>
+              <span>Acréscimo de sábado (%)</span>
+              <input type="number" inputMode="decimal" min="0" max="1000" step="0.01" placeholder="Por confirmar" value={config.saturdayPremiumRate ?? ''} onChange={(event) => updateWeekendRate('saturdayPremiumRate', event.target.value)} />
+            </label>
+            <label>
+              <span>Acréscimo de domingo (%)</span>
+              <input type="number" inputMode="decimal" min="0" max="1000" step="0.01" placeholder="Por confirmar" value={config.sundayPremiumRate ?? ''} onChange={(event) => updateWeekendRate('sundayPremiumRate', event.target.value)} />
+            </label>
+          </div>
+          <p>As horas normais marcadas como Trabalho são contadas automaticamente. As horas lançadas como trabalho suplementar continuam exclusivamente na rubrica Horas extra, sem duplicar o acréscimo.</p>
+        </details>
 
         <div className="referencePayrollTotals">
           <span><small>Bruto</small><strong>{money(result.grossTotal)}</strong></span>
@@ -127,7 +157,7 @@ export function PayrollReferencePage() {
 
       <div className="referencePayrollNotice">
         <span aria-hidden="true"><AppIcon name="info" /></span>
-        <p>Estimativa baseada nos turnos e nos dados fiscais guardados. Compara com o recibo quando o receberes.</p>
+        <p>Estimativa baseada nos turnos e nos dados fiscais guardados. Confirma as taxas de fim de semana e compara com o recibo quando o receberes.</p>
       </div>
 
       <div className="referencePayrollActions">

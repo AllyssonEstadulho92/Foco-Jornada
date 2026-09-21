@@ -1,6 +1,10 @@
 # Decisões técnicas
 
-Atualizado em: 2026-09-20. Decisões D-001 a D-033, com texto integral, preservadas em `docs/history/DECISIONS-pre-217.md`. Este documento indexa decisões recentes.
+Atualizado em: 2026-09-21. Decisões D-001 a D-033, com texto integral, preservadas em `docs/history/DECISIONS-pre-217.md`. Este documento indexa decisões recentes.
+
+## D-044 — Taxas de fim de semana explícitas sem inferir direitos contratuais
+
+**Estado:** implementação em revisão no PR #226. **Evidência:** a captura da página Vencimento não mostra suplementos de sábado ou domingo e não identifica a taxa praticada pela entidade empregadora. O Código do Trabalho, artigo 268.º, regula **trabalho suplementar**, que não equivale automaticamente a um turno normal de sábado ou domingo. **Decisão:** configurar taxas separadas de sábado e domingo em `PayrollConfig`, usando `null` enquanto não houver recibo/contrato/CCT que as confirme; zero preenchido representa uma decisão explícita. Calcular o suplemento apenas sobre horas normais com `kind='work'` no dia civil, preferindo horas efetivas do mapa sem pausas, e usar duração contratual apenas como estimativa em planos sem horário medido. `overtimeHours` continua exclusivamente no motor existente de trabalho suplementar. Acrescentar o resultado ao bruto e às bases de descontos sem duplicar a remuneração base. Guardar na chave salarial atual sem migração destrutiva. **Limites:** não reconhecer automaticamente aprovação de horas ou percentagem devida, feriados mantêm regras próprias, turnos a atravessar a meia-noite exigem futura repartição por data. **QA:** testes dedicados, CI e comparação futura com recibo real; ver `docs/WEEKEND-PAY.md`.
 
 ## D-043 — Transpor o protótipo para o produto real sem falsear o estado
 

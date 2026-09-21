@@ -1,0 +1,54 @@
+.referenceWeekendSettings {
+  margin: 1rem 0 0;
+  padding: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  background: var(--surface);
+}
+
+.referenceWeekendSettings summary {
+  cursor: pointer;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.referenceWeekendSettings summary:focus-visible,
+.referenceWeekendFields input:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 3px;
+}
+
+.referenceWeekendSettings p {
+  margin: .8rem 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.referenceWeekendFields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.referenceWeekendFields label {
+  display: grid;
+  gap: .4rem;
+  min-width: 0;
+  font-weight: 600;
+}
+
+.referenceWeekendFields input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 2.75rem;
+  border: 1px solid var(--line);
+  border-radius: .65rem;
+  padding: .5rem .75rem;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+}
+
+@media (max-width: 480px) {
+  .referenceWeekendFields { grid-template-columns: minmax(0, 1fr); }
+}
