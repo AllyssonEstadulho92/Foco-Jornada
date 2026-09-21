@@ -870,6 +870,24 @@ export function PayrollPage() {
             <span>{money(result.overtimePay)}</span>
             <span>—</span>
           </div>
+          {result.saturdayWorkHours > 0 ? (
+            <div className="payrollReceiptRow">
+              <strong>Acréscimo de sábado</strong>
+              <span>{result.saturdayWorkHours.toFixed(2)} h</span>
+              <span>{config.saturdayPremiumRate === null ? 'Por confirmar' : `${config.saturdayPremiumRate}%`}</span>
+              <span>{money(result.saturdayPremiumPay)}</span>
+              <span>—</span>
+            </div>
+          ) : null}
+          {result.sundayWorkHours > 0 ? (
+            <div className="payrollReceiptRow">
+              <strong>Acréscimo de domingo</strong>
+              <span>{result.sundayWorkHours.toFixed(2)} h</span>
+              <span>{config.sundayPremiumRate === null ? 'Por confirmar' : `${config.sundayPremiumRate}%`}</span>
+              <span>{money(result.sundayPremiumPay)}</span>
+              <span>—</span>
+            </div>
+          ) : null}
           {config.vacationSubsidy > 0 ? (
             <div className="payrollReceiptRow">
               <strong>Subsídio de férias</strong>
@@ -927,12 +945,14 @@ export function PayrollPage() {
               <strong>{config.irsOverride !== null ? 'IRS — valor manual' : 'IRS — total'}</strong>
               <span>—</span>
               <span>—</span>
+              <span>—</span>
               <span>{money(result.irsTotal)}</span>
             </div>
           ) : null}
           {config.otherDeductions > 0 ? (
             <div className="payrollReceiptRow payrollReceiptDeduction">
               <strong>Outros descontos</strong>
+              <span>—</span>
               <span>—</span>
               <span>—</span>
               <span>{money(config.otherDeductions)}</span>
