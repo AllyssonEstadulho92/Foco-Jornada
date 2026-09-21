@@ -75,7 +75,9 @@
   .shiftMapCalendarScroll {
     width: 100%;
     max-width: 100%;
-    overflow-x: hidden;
+    /* Se o texto ampliado impedir sete colunas, permitir chegar ao sábado/domingo. */
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   /*

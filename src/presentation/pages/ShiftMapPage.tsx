@@ -20,6 +20,7 @@ import {
 } from '../../domain/shifts/ShiftMap'
 import type { AppSettings } from '../../domain/settings/AppSettings'
 import { secureStorage } from '../../security/secureStorage'
+import { PayrollDayKindSelect, payrollSelection } from '../components/payroll/PayrollDayKindSelect'
 import { useSettingsController } from '../hooks/useSettingsController'
 import { pushAppNotification } from '../store/useNotificationStore'
 
@@ -331,6 +332,8 @@ export function ShiftMapPage() {
             {days.map((day) => {
               const meta = kindMeta(day.kind)
               const effective = getShiftEffectiveMinutes(day)
+              const situation = payrollSelection(day.kind, day.date)
+              const situationLabel = situation === 'weekend-saturday' ? 'Trabalho ao sábado' : situation === 'weekend-sunday' ? 'Trabalho ao domingo' : meta.label
               return (
                 <button
                   type="button"
@@ -338,7 +341,7 @@ export function ShiftMapPage() {
                   className={`shiftMapDay shiftMapDay-${day.kind}${selectedDate === day.date ? ' shiftMapDaySelected' : ''}`}
                   onClick={() => setSelectedDate(day.date)}
                   aria-pressed={selectedDate === day.date}
-                  aria-label={`${dateLabel(day.date)}: ${meta.label}, ${shiftTimeLabel(day)}`}
+                  aria-label={`${dateLabel(day.date)}: ${situationLabel}, ${shiftTimeLabel(day)}`}
                 >
                   <span className="shiftMapDayNumber">{Number(day.date.slice(-2))}</span>
                   <strong>{meta.code}</strong>
@@ -370,10 +373,19 @@ export function ShiftMapPage() {
 
           <div className="shiftMapEditorGrid">
             <label>
+              <span>Escolher dia do mês</span>
+              <input type="date" min={days[0]?.date} max={days[days.length - 1]?.date} value={selectedDate} onChange={(event) => {
+                if (days.some((day) => day.date === event.target.value)) setSelectedDate(event.target.value)
+              }} />
+            </label>
+            <label>
               <span>Situação RH</span>
-              <select value={selectedDay.kind} onChange={(event) => updateSelectedKind(event.target.value as PayrollDayKind)}>
-                {dayKinds.map((item) => <option value={item.value} key={item.value}>{item.label}</option>)}
-              </select>
+              <PayrollDayKindSelect
+                date={selectedDay.date}
+                kind={selectedDay.kind}
+                options={dayKinds}
+                onChange={updateSelectedKind}
+              />
             </label>
             <label>
               <span>Entrada</span>
@@ -407,6 +419,7 @@ export function ShiftMapPage() {
             <button type="button" onClick={applyBaseToSelected}>Usar horário base</button>
             <button type="button" onClick={copySelectedShiftToWorkDays} disabled={!selectedDay.startTime || !selectedDay.endTime}>Aplicar a dias de trabalho</button>
           </div>
+          <p>Escolhe um sábado ou domingo no calendário ou no campo de data e marca «Sábado (trabalho normal)» ou «Domingo (trabalho normal)». Confirma entrada, saída e pausas; depois guarda o mapa. As percentagens são configuradas no Vencimento.</p>
         </section>
       ) : null}
 
@@ -435,6 +448,8 @@ export function ShiftMapPage() {
             <div><span>Bruto</span><strong>{money(payrollResult.grossTotal)}</strong></div>
             <div><span>Subsídio refeição</span><strong>{money(payrollResult.mealAllowanceGross)}</strong></div>
             <div><span>Horas extra</span><strong>{money(payrollResult.overtimePay)}</strong></div>
+            <div><span>Acréscimo sábado</span><strong>{payrollConfig.saturdayPremiumRate === null ? 'Taxa por confirmar' : money(payrollResult.saturdayPremiumPay)}</strong></div>
+            <div><span>Acréscimo domingo</span><strong>{payrollConfig.sundayPremiumRate === null ? 'Taxa por confirmar' : money(payrollResult.sundayPremiumPay)}</strong></div>
             <div><span>Ausências não pagas</span><strong>-{money(payrollResult.absenceDeduction)}</strong></div>
             <div><span>Segurança Social</span><strong>-{money(payrollResult.socialSecurity)}</strong></div>
             <div><span>IRS</span><strong>-{money(payrollResult.irsTotal)}</strong></div>
