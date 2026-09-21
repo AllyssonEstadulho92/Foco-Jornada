@@ -9,6 +9,7 @@ import {
   type PayrollDayKind,
   type PayrollDayPlan,
 } from '../../domain/payroll/Payroll'
+import { PayrollDayKindSelect, payrollSelection } from '../components/payroll/PayrollDayKindSelect'
 import { pushAppNotification } from '../store/useNotificationStore'
 
 const CONFIG_KEY = 'foco-jornada-payroll-config-v1'
@@ -366,13 +367,15 @@ export function PayrollPage() {
             {plans.map((day) => {
               const meta = kindMeta(day.kind)
               const dayNumber = Number(day.date.slice(-2))
+              const weekendSelection = payrollSelection(day.kind, day.date)
+              const situation = weekendSelection === 'weekend-saturday' ? 'Trabalho ao sábado' : weekendSelection === 'weekend-sunday' ? 'Trabalho ao domingo' : meta.label
               return (
                 <button
                   type="button"
                   key={day.date}
                   className={`payrollDay payrollDay-${day.kind}${selectedDate === day.date ? ' payrollDaySelected' : ''}`}
                   onClick={() => setSelectedDate(day.date)}
-                  aria-label={`${dayNumber}, ${meta.label}`}
+                  aria-label={`${dayNumber}, ${situation}`}
                 >
                   <span>{dayNumber}</span>
                   <small>{meta.short}</small>
@@ -404,19 +407,13 @@ export function PayrollPage() {
             <div className="payrollFormGrid payrollFormGridSingle">
               <label>
                 <span>Situação do dia</span>
-                <select
-                  value={selectedPlan.kind}
-                  onChange={(event) =>
-                    updateSelectedPlan({ kind: event.target.value as PayrollDayKind })
-                  }
-                >
-                  {dayKinds.map((item) => (
-                    <option key={item.value} value={item.value}>
-                      {item.label}
-                    </option>
-                  ))}
-                </select>
-                <FieldHelp>Ex.: Trabalho, Folga, Feriado, Férias ou tipo de falta.</FieldHelp>
+                <PayrollDayKindSelect
+                  date={selectedPlan.date}
+                  kind={selectedPlan.kind}
+                  options={dayKinds}
+                  onChange={(kind) => updateSelectedPlan({ kind })}
+                />
+                <FieldHelp>Seleciona Sábado ou Domingo no dia correspondente para registar trabalho normal. Folga com horas extra continua separada.</FieldHelp>
               </label>
 
               <label>
@@ -449,6 +446,7 @@ export function PayrollPage() {
 
               <p className="payrollHint">
                 Em folga ou feriado, as horas registadas são tratadas como trabalho suplementar nesses dias.
+                Trabalho normal ao sábado ou domingo é calculado com a taxa configurada no Vencimento; não registes as mesmas horas como extra.
               </p>
             </div>
           ) : null}
@@ -929,14 +927,12 @@ export function PayrollPage() {
               <strong>{config.irsOverride !== null ? 'IRS — valor manual' : 'IRS — total'}</strong>
               <span>—</span>
               <span>—</span>
-              <span>—</span>
               <span>{money(result.irsTotal)}</span>
             </div>
           ) : null}
           {config.otherDeductions > 0 ? (
             <div className="payrollReceiptRow payrollReceiptDeduction">
               <strong>Outros descontos</strong>
-              <span>—</span>
               <span>—</span>
               <span>—</span>
               <span>{money(config.otherDeductions)}</span>
