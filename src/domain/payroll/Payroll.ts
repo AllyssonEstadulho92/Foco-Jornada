@@ -30,9 +30,9 @@ export interface PayrollConfig {
   irsProfile: IrsProfile2026
   dependents: number
   overtimeHoursBeforeMonth: number
-  /** Acréscimos contratuais sobre horas normais de sábado e domingo, em percentagem; 0 até confirmação. */
-  saturdayPremiumRate: number
-  sundayPremiumRate: number
+  /** Acréscimo sobre horas normais do dia; null indica que a taxa contratual ainda não foi confirmada. */
+  saturdayPremiumRate: number | null
+  sundayPremiumRate: number | null
   vacationSubsidy: number
   christmasSubsidy: number
   otherTaxableAllowances: number
@@ -90,8 +90,8 @@ export const defaultPayrollConfig: PayrollConfig = {
   irsProfile: 'table-1',
   dependents: 0,
   overtimeHoursBeforeMonth: 0,
-  saturdayPremiumRate: 0,
-  sundayPremiumRate: 0,
+  saturdayPremiumRate: null,
+  sundayPremiumRate: null,
   vacationSubsidy: 0,
   christmasSubsidy: 0,
   otherTaxableAllowances: 0,
