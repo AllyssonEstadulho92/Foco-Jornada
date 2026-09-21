@@ -1,5 +1,5 @@
-import { fireEvent, render, screen } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { PayrollDayKind } from '../../../domain/payroll/Payroll'
 import { PayrollDayKindSelect, payrollSelection, payrollWeekday } from './PayrollDayKindSelect'
 
@@ -8,6 +8,8 @@ const options: { value: PayrollDayKind; label: string }[] = [
   { value: 'rest', label: 'Folga' },
   { value: 'holiday', label: 'Feriado' },
 ]
+
+afterEach(cleanup)
 
 describe('PayrollDayKindSelect', () => {
   it('classifica sábado e domingo em data civil independentemente do fuso', () => {
