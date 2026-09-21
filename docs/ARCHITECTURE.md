@@ -1,6 +1,14 @@
 # Arquitetura
 
-Atualizado em: 2026-09-20. Histórico integral anterior preservado em `docs/history/ARCHITECTURE-pre-217.md`.
+Atualizado em: 2026-09-21. Histórico integral anterior preservado em `docs/history/ARCHITECTURE-pre-217.md`.
+
+## PR #226 — suplementos de sábado e domingo, em revisão
+
+`#/vencimento` renderiza `PayrollReferencePage`, lê `PayrollConfig` e `PayrollDayPlan` do `secureStorage`, chama `calculatePayroll` e apresenta duas novas rubricas de trabalho normal aos fins de semana. As percentagens `saturdayPremiumRate` e `sundayPremiumRate` estão guardadas na configuração já existente `foco-jornada-payroll-config-v1`, iniciam em `null` até confirmação documental e podem ser ajustadas no `<details>` de configuração, com controlo de valores entre 0 e 1000. `weekend-pay.css` é importado apenas na página de referência e apresenta grelha responsiva e foco visível.
+
+`ShiftMapPage` gera `ShiftMapDay`, converte cada dia com `toPayrollDayPlan` e guarda o plano na chave já existente `foco-jornada-payroll-plan-v1-AAAA-MM`. Aos sábados e domingos com turno válido do tipo `work`, a conversão adiciona `workedHours` com `getShiftEffectiveMinutes(day)/60` e subtrai pausas; em planos antigos sem horário medido, `calculateWeekendPremium` estima `weeklyHours/5` menos ausência parcial. O helper classifica datas civis por UTC e separa horas normais de sábado e domingo. Aplica percentagens independentes sobre o valor hora exato do motor, arredonda abonos a cêntimos e não aplica a rubrica de trabalho normal aos dias de folga, férias, feriado ou às `overtimeHours`. Estas horas continuam em `calculateOvertimePay`, que também contabiliza o acumulado anual. `calculatePayroll` soma os novos abonos ao bruto, rendimento normal tributável, base contributiva e aos cálculos de Segurança Social/IRS/líquido existentes; o mapa e a página de configuração partilham esse motor.
+
+Sem alteração de schema, chaves de persistência, API, Worker, cofre, autenticação, dependências ou permissões. Pendentes: taxa contratual real, divisão de turnos que cruzam meia-noite em datas civis, testes físicos e confronto com recibo. Testes dedicados `calculateWeekendPremium.test.ts` e `ShiftMap.weekend.test.ts`. Especificação e critérios de aceitação em `docs/WEEKEND-PAY.md`.
 
 ## PR #223 — protótipo aplicado às duas rotas com valores reais
 
