@@ -1,6 +1,6 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it } from 'vitest'
 import { InMemoryActivityRepository } from '../../test/InMemoryActivityRepository'
 import { InMemoryBreakRepository } from '../../test/InMemoryBreakRepository'
 import { InMemoryCoffeeRepository } from '../../test/InMemoryCoffeeRepository'
@@ -28,6 +28,8 @@ function renderMap() {
     </AppServicesProvider>,
   )
 }
+
+afterEach(() => cleanup())
 
 describe('ShiftMapPage', () => {
   it('abre o mapa de turnos e apresenta a estimativa do vencimento sem erro', async () => {
