@@ -4,6 +4,7 @@ import type {
   PayrollDayPlan,
   PayrollResult,
 } from '../../domain/payroll/Payroll'
+import { calculateWeekendPremium } from './calculateWeekendPremium'
 
 type IrsRow = {
   max: number
@@ -131,6 +132,13 @@ export function calculatePayroll(config: PayrollConfig, plans: PayrollDayPlan[])
       : nonNegative(config.hourlyRateOverride)
   const hourlyRate = round2(hourlyRateForCalculation)
   const dailyHours = weeklyHours / 5
+  const weekendPremium = calculateWeekendPremium(
+    plans,
+    hourlyRateForCalculation,
+    dailyHours,
+    config.saturdayPremiumRate,
+    config.sundayPremiumRate,
+  )
 
   const workDays = plans.filter((day) => day.kind === 'work').length
   const automaticMealDays = plans.filter(
@@ -185,6 +193,7 @@ export function calculatePayroll(config: PayrollConfig, plans: PayrollDayPlan[])
 
   const normalTaxableGross = round2(
     Math.max(0, baseSalary - absenceDeduction) +
+      weekendPremium.weekendPremiumPay +
       nonNegative(config.otherTaxableAllowances) +
       mealAllowanceTaxable,
   )
@@ -229,6 +238,7 @@ export function calculatePayroll(config: PayrollConfig, plans: PayrollDayPlan[])
     Math.max(0, baseSalary - absenceDeduction) +
       mealAllowanceGross +
       overtimePay +
+      weekendPremium.weekendPremiumPay +
       vacationSubsidy +
       christmasSubsidy +
       nonNegative(config.otherTaxableAllowances) +
@@ -253,6 +263,7 @@ export function calculatePayroll(config: PayrollConfig, plans: PayrollDayPlan[])
     hourlyRate,
     absenceDeduction,
     overtimePay,
+    ...weekendPremium,
     mealAllowanceGross,
     mealAllowanceTaxable,
     normalTaxableGross,
