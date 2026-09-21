@@ -8,7 +8,7 @@ export interface WeekendPremiumResult {
   weekendPremiumPay: number
 }
 
-function nonNegative(value: number | undefined): number {
+function nonNegative(value: number | null | undefined): number {
   return typeof value === 'number' && Number.isFinite(value) ? Math.max(0, value) : 0
 }
 
@@ -34,8 +34,8 @@ export function calculateWeekendPremium(
   plans: PayrollDayPlan[],
   hourlyRate: number,
   dailyHours: number,
-  saturdayRate: number,
-  sundayRate: number,
+  saturdayRate: number | null,
+  sundayRate: number | null,
 ): WeekendPremiumResult {
   let saturdayHours = 0
   let sundayHours = 0
