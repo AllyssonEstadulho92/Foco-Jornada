@@ -89,10 +89,18 @@ export function summarizeShiftMap(days: ShiftMapDay[]): ShiftMapSummary {
 }
 
 export function toPayrollDayPlan(day: ShiftMapDay): PayrollDayPlan {
+  const weekend = /^\d{4}-\d{2}-\d{2}$/.test(day.date) &&
+    [0, 6].includes(new Date(`${day.date}T12:00:00Z`).getUTCDay())
+  const hasMeasuredShift = getShiftDurationMinutes(day) > 0
   return {
     date: day.date,
     kind: day.kind,
     overtimeHours: Math.max(0, Number.isFinite(day.overtimeHours) ? day.overtimeHours : 0),
+    // O suplemento de trabalho normal usa o tempo efetivo, não a amplitude do turno.
+    // Em planos sem horas válidas, o cálculo salarial usa a duração diária contratual.
+    ...(day.kind === 'work' && weekend && hasMeasuredShift
+      ? { workedHours: getShiftEffectiveMinutes(day) / 60 }
+      : {}),
     note: day.note.trim() || undefined,
   }
 }
