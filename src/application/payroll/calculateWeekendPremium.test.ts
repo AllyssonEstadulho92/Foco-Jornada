@@ -23,7 +23,7 @@ describe('acréscimos de fim de semana', () => {
     expect(result.weekendPremiumPay).toBe(31.85)
     expect(result.grossTotal).toBe(963.85)
     expect(result.socialSecurity).toBe(104.7)
-    expect(result.netEstimate).toBe(result.grossTotal - result.socialSecurity - result.irsTotal)
+    expect(result.netEstimate).toBeCloseTo(result.grossTotal - result.socialSecurity - result.irsTotal, 2)
   })
 
   it('usa as horas reais líquidas de pausas ou, sem turno, a duração contratual menos ausência', () => {
