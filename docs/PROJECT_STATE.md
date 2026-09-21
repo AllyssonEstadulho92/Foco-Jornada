@@ -1,16 +1,18 @@
 # Estado do Projeto
 
-Atualizado em: 2026-09-21. **PR #226 em revisão, ainda não integrado nem publicado.** A última versão publicada permanece a do PR #223.
+Atualizado em: 2026-09-21. **PR #226 integrado e publicado.** A publicação anterior foi a do PR #223.
 
-## Alteração em preparação — PR #226: cálculo de trabalho normal ao fim de semana
+## Última alteração publicada — PR #226: cálculo de trabalho normal ao fim de semana
 
 **Objetivo:** na página Vencimento, mostrar e calcular automaticamente horas e acréscimos de sábado e domingo com taxas contratuais separadas e configuráveis. A imagem fornecida mostra 920 € de base, 22 dias de alimentação e nenhum acréscimo identificado; não prova a taxa de sábado ou domingo.
 
-**Código proposto:** `PayrollConfig.saturdayPremiumRate/sundayPremiumRate` começam em `null` (por confirmar). `calculateWeekendPremium` usa horas normais com turno válido e pausa descontada do Mapa de turnos, ou duração diária contratual como estimativa quando faltar horário. O suplemento não é aplicado a folgas ou horas suplementares já remuneradas por `calculateOvertimePay`; entra no bruto, base de Segurança Social, IRS e líquido estimados. A página de resumo apresenta duas rubricas e editor responsivo de percentagens; a configuração permanece na chave existente. Testes específicos e especificação em `docs/WEEKEND-PAY.md`.
+**Implementado:** `PayrollConfig.saturdayPremiumRate/sundayPremiumRate` começam em `null` (por confirmar). `calculateWeekendPremium` usa horas normais com turno válido e pausa descontada do Mapa de turnos, ou duração diária contratual como estimativa quando faltar horário. O suplemento não é aplicado a folgas ou horas suplementares já remuneradas por `calculateOvertimePay`; entra no bruto, base de Segurança Social, IRS e líquido estimados. A página de resumo apresenta duas rubricas e editor responsivo de percentagens. Em Vencimento > Editar dados, o campo «Situação do dia» apresenta sábado e domingo nas datas correspondentes, preservando o tipo `work` nos registos. A configuração permanece na chave existente. Testes específicos e especificação em `docs/WEEKEND-PAY.md`.
 
-**Riscos/pendências:** confirmar percentagens, regras contratuais e classificação do serviço no recibo/CCT antes de preencher; dividir turnos que atravessem a meia-noite por data civil numa melhoria posterior. CI e testes visuais em dispositivo físico ainda por confirmar; **não declarar a funcionalidade publicada enquanto PR e deploy não terminarem**.
+**Entrega verificada:** [PR #226](https://github.com/AllyssonEstadulho92/Foco-Jornada/pull/226) integrado, merge `38ff65e4b78be2807502099f96a6040118fa1673`. Qualidade #1275 (PR) e #1276 (`main`) passaram auditoria de dependências, TypeScript, lint, testes, build, Worker dry-run e smoke Chromium. Publicar Foco & Jornada #263 gerou o build `b29822c27b3722f2d80c07fbe57e930ef3424b42`; GitHub Pages #879 publicou-o com sucesso. URLs e critérios de aceitação em `docs/WEEKEND-PAY.md`.
 
-## Última alteração publicada — PR #223: protótipo de Férias e Planeamento
+**Riscos e próximo passo:** confirmar percentagens, regras contratuais e classificação do serviço no recibo/CCT antes de preencher; dividir turnos que atravessem a meia-noite por data civil numa melhoria posterior. Testes visuais em iPhone e confronto com recibo real continuam por realizar. Sem taxa confirmada, a aplicação conta as horas, mas não presume um suplemento monetário. Não limpar dados locais ao atualizar a PWA.
+
+## Entrega anterior — PR #223: protótipo de Férias e Planeamento
 
 **Objetivo:** aproximar as duas rotas das imagens entregues em 20/09, mantendo as funções e os valores reais. Comparados os cinco documentos, `VacationWorkspacePage`, `VacationBalancePage`, `VacationPlannerPanel`, `VacationJointPlanner`, `VacationEvidencePanel`, domínio, estilos, testes e PDF do iPhone. Os protótipos mostram fotografia, números demonstrativos, pessoas fictícias, gráfico/tabela e submissão à entidade empregadora; esses exemplos não são dados da aplicação.
 
@@ -22,7 +24,7 @@ Atualizado em: 2026-09-21. **PR #226 em revisão, ainda não integrado nem publi
 
 ## Entrega anterior — PR #222
 
-O PDF do iPhone de 19/09 mostrou grandes hiatos entre os títulos e os valores de «Evolução por mês» e «O que tens, o que falta e o que vem a seguir». A auditoria do código confirmou que, em <=640px, `.vacationPanelHeader` mudava de linha para coluna, enquanto bases `flex:1 1 240px` e `flex:1 1 260px` passavam a alturas verticais. `vacation-workspace.css` também usava `flex-basis:100%` <=560px. A correção usa `flex:0 0 auto`, largura 100% e altura intrínseca, compacta os cartões e conserva valores e quebras de texto. `vacation-insights.css` distingue progresso/marco de indicadores secundários e `vacation-planning-structure.css` distribui escolha/comparação em colunas a partir de 1100px sem mudar a ordem móvel. Ver `docs/VACATION-MOBILE-SPACING-AUDIT-2026.md`.
+O PDF do iPhone de 19/09 mostrou grandes hiatos entre os títulos e os valores de «Evolução por mês» e «O que tens, o que falta e o que vem a seguir». A auditoria do código confirmou que, em <=640px, `.vacationPanelHeader` mudava de linha para coluna, enquanto bases `flex:1 1 240px` e `flex:1 1 260px` passavam a alturas verticais. `vacation-workspace.css` também usava `flex-basis:100%` genérico que agravava o risco. A correção usa `flex:0 0 auto`, largura 100% e altura intrínseca, compacta os cartões e conserva valores e quebras de texto. `vacation-insights.css` distingue progresso/marco de indicadores secundários e `vacation-planning-structure.css` distribui escolha/comparação em colunas a partir de 1100px sem mudar a ordem móvel. Ver `docs/VACATION-MOBILE-SPACING-AUDIT-2026.md`.
 
 **Entrega verificada:** PR #222 integrado, merge `b5f34b9b8adf8e2ecacd210ecfbeb7f9d6c0614a`. Qualidade #1240/#1241, Publicar #261, build `112d2dbb7a56925d8a42dec2aaf0d9bae967a0fe` e GitHub Pages #869: todos com sucesso. Alterações só de CSS, testes e documentação; não se confirmou visualmente em dispositivo físico.
 
@@ -47,4 +49,4 @@ Meta anual de 28 dias é pessoal e configurável, não direito contratual autom�
 - Validar as duas rotas em iPhone real e depois Android/tablet/desktop: zoom, texto ampliado, orientação, teclado, VoiceOver/TalkBack, salto sem 404, alternância gráfico/tabela, expansão das 12 fichas, proveniência, filtros, ano, calendário e regresso após suspensão/sync.
 - Vista inativa permanece montada sob CSS; `VacationBalancePage` mantém coletor próprio distinto de `VacationYearRecords`. Comparar com dados reais antes de unificar e não inferir saldo quando o cofre estiver temporariamente indisponível.
 - Confirmar data de admissão 30/09/2026 e referência laboral zero no PDF de 20/09, sem corrigir por suposição.
-- Preservar os documentos históricos em `docs/history/PROJECT_STATE-pre-217.md` e associados; PRs #217–#223 e documentos dedicados guardam alterações recentes.
+- Preservar os documentos históricos em `docs/history/PROJECT_STATE-pre-217.md` e associados; PRs #217–#226 e documentos dedicados guardam alterações recentes.
