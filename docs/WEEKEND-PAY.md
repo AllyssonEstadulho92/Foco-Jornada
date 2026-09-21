@@ -4,7 +4,7 @@ Data: 2026-09-21. Implementação em revisão no PR #226.
 
 ## Objetivo e evidência
 
-O utilizador pediu que a página `#/vencimento` contasse automaticamente o valor associado ao trabalho ao sábado e domingo. A captura do ecrã mostra salário base de 920 €, 22 dias de alimentação, ausência de horas extra e nenhum suplemento próprio. **A captura não identifica a taxa de sábado, a taxa de domingo, o CCT aplicável nem a classificação dos turnos.** Não converter referência a percentagens de recibos anteriores em regra contratual sem o documento.
+O utilizador pediu que a página `#/vencimento` contasse automaticamente o valor associado ao trabalho ao sábado e domingo e que a lista «Situação do dia» da configuração incluísse sábado e domingo. A captura do ecrã mostra salário base de 920 €, 22 dias de alimentação, ausência de horas extra e nenhum suplemento próprio. **A captura não identifica a taxa de sábado, a taxa de domingo, o CCT aplicável nem a classificação dos turnos.** Não converter referência a percentagens de recibos anteriores em regra contratual sem o documento.
 
 ## Fontes e decisão laboral
 
@@ -17,6 +17,8 @@ O utilizador pediu que a página `#/vencimento` contasse automaticamente o valor
 O utilizador regista os dias como `work` no Mapa de turnos e guarda o mapa. A conversão `toPayrollDayPlan` transmite `workedHours` apenas para trabalho normal aos sábados/domingos com turno válido, usando `(saída - entrada - pausa) / 60`. Sem horas medidas, o motor estima `weeklyHours / 5`, abatendo eventual ausência parcial registada. Turnos que atravessem a meia-noite continuam a requerer divisão por data civil e não devem ser considerados apurados com exatidão.
 
 Na configuração salarial existente (`foco-jornada-payroll-config-v1`) existem `saturdayPremiumRate` e `sundayPremiumRate`, inicialmente `null`; o utilizador preenche a taxa confirmada, em percentagem. `0` representa taxa expressamente nula e é diferente de `null`. Não se guardam dados pessoais novos.
+
+Em `#/vencimento/configurar`, a lista «Situação do dia» contém agora **Sábado (trabalho normal)** e **Domingo (trabalho normal)**, para além de Trabalho, Folga, Feriado, Férias e faltas. Só se pode escolher a opção correspondente à data selecionada: sábado num sábado e domingo num domingo. Quando um plano existente já contém `kind='work'` numa destas datas, a lista mostra automaticamente a opção correspondente. A escolha grava o `kind='work'` já existente, sem criar novos códigos de faltas ou mudar chaves de armazenamento. A data civil é validada em UTC para evitar classificações dependentes do fuso do dispositivo. Folga não é convertida automaticamente em trabalho; trabalho suplementar em folga continua separado. O componente `PayrollDayKindSelect` tem testes específicos de sábado, domingo, compatibilidade e seleção inválida.
 
 Para cada dia civil elegível, acumular horas normais de sábado e domingo separadamente. Valor hora: o mesmo valor exato usado no motor salarial, respeitando o eventual ajuste manual. Acréscimo sábado = horas normais sábado × valor hora × taxa sábado / 100; domingo análogo. Arredondar a cêntimos os dois abonos e somá-los. **Não voltar a remunerar a parcela de horas já incluída no salário base**. Não aplicar o suplemento de horas normais a dias `rest`, `holiday`, `vacation` ou ausências. `overtimeHours` mantém a remuneração própria, existente em `calculateOvertimePay`, incluindo as taxas legais para horas suplementares em descanso.
 
