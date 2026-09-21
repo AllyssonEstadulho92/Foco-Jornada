@@ -1,9 +1,9 @@
 .referenceWeekendSettings {
   margin: 1rem 0 0;
   padding: 1rem;
-  border: 1px solid var(--border-color, #dce6e2);
+  border: 1px solid var(--line);
   border-radius: 1rem;
-  background: var(--surface, #fff);
+  background: var(--surface);
 }
 
 .referenceWeekendSettings summary {
@@ -14,13 +14,13 @@
 
 .referenceWeekendSettings summary:focus-visible,
 .referenceWeekendFields input:focus-visible {
-  outline: 3px solid #268b61;
+  outline: 3px solid var(--primary);
   outline-offset: 3px;
 }
 
 .referenceWeekendSettings p {
   margin: .8rem 0;
-  color: var(--text-muted, #586765);
+  color: var(--muted);
   line-height: 1.5;
 }
 
@@ -41,11 +41,11 @@
   box-sizing: border-box;
   width: 100%;
   min-height: 2.75rem;
-  border: 1px solid #aebfba;
+  border: 1px solid var(--line);
   border-radius: .65rem;
   padding: .5rem .75rem;
-  background: var(--surface, #fff);
-  color: inherit;
+  background: var(--surface);
+  color: var(--text);
   font: inherit;
 }
 
