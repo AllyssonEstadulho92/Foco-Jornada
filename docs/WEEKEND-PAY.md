@@ -1,6 +1,13 @@
 # Acréscimos de fim de semana no Vencimento
 
-Data: 2026-09-21. Implementação em revisão no PR #226.
+Data: 2026-09-21. **PR #226 integrado e publicado.**
+
+## Entrega verificada
+
+- PR #226 integrado na `main` pelo commit `38ff65e4b78be2807502099f96a6040118fa1673`: https://github.com/AllyssonEstadulho92/Foco-Jornada/pull/226.
+- Qualidade do PR #1275 e da `main` #1276 passaram auditoria, TypeScript, lint, testes, build, verificação do Worker e smoke Chromium: https://github.com/AllyssonEstadulho92/Foco-Jornada/actions/runs/35643688697 e https://github.com/AllyssonEstadulho92/Foco-Jornada/actions/runs/35644126506.
+- Publicação #263 gerou o build `b29822c27b3722f2d80c07fbe57e930ef3424b42` e GitHub Pages #879 confirmou o deploy com sucesso: https://github.com/AllyssonEstadulho92/Foco-Jornada/actions/runs/35644126531 e https://github.com/AllyssonEstadulho92/Foco-Jornada/actions/runs/35644223406.
+- Aplicação: https://allyssonestadulho92.github.io/Foco-Jornada/#/vencimento. A verificação automática não equivale a um teste visual no iPhone nem a uma validação do valor efetivamente devido.
 
 ## Objetivo e evidência
 
