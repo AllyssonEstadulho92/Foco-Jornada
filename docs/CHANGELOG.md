@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-15 — Medicação: organização e consulta prioritária (em revisão)
+
+- Auditadas `MedicationsStockPage`, `MedicationPrototypeWorkspace`, estilos sobrepostos, IDs do temporizador e serviços de registo de tomas/stock.
+- A secção de tomas do dia passa a anteceder a lista de medicamentos na ordem real de leitura e foco; atalhos usam botões sem afetar a rota hash.
+- Resumo e pesquisa com hierarquia renovada, cartões de informação adicional em `details` e previsão de autonomia recolhida, mantendo informação e cálculos acessíveis.
+- Nova camada `medication-refinement.css` com largura responsiva, foco visível, melhor leitura e suporte a movimento reduzido. Adicionados testes estáticos de regressão e `docs/MEDICATION-REFINEMENT-2026.md`.
+- Sem migração, dependências ou modificação ao cofre, prescrições, horários, eventos, doses, stock e sincronização. CI, merge, publicação e validação física ainda por confirmar.
+
 Atualizado em: 2026-09-20. Alterações anteriores até ao PR #214 (texto completo e provas históricas) em `docs/history/CHANGELOG-pre-217.md`.
 
 ## 2026-09-20 — PR #223: adaptar visualmente Férias e Planeamento aos dois protótipos (em validação)
