@@ -420,7 +420,12 @@ export function MedicationsStockPage() {
   function jumpToMedicationSection(id: string) {
     const section = document.getElementById(id)
     if (!section) return
-    section.focus({ preventScroll: true })
+    if (section instanceof HTMLDetailsElement) {
+      section.open = true
+      section.querySelector('summary')?.focus({ preventScroll: true })
+    } else {
+      section.focus({ preventScroll: true })
+    }
     section.scrollIntoView({ block: 'start' })
   }
 
