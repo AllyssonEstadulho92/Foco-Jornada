@@ -289,6 +289,13 @@ export function MedicationPrototypeWorkspace({
 
   return (
     <section className="medProtoWorkspace" aria-label="Resumo e detalhes dos medicamentos">
+      <div className="medProtoIntro">
+        <div>
+          <span className="medProtoKicker">REGISTOS GUARDADOS</span>
+          <h2>Os meus medicamentos</h2>
+          <p>Pesquisa, escolhe um medicamento e consulta os respetivos dados e histórico.</p>
+        </div>
+      </div>
       <div className="medProtoSummary">
         <article><strong>{dashboard.medicationCount}</strong><span>Medicamentos em uso</span></article>
         <article>
@@ -306,7 +313,8 @@ export function MedicationPrototypeWorkspace({
           <input
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder="Pesquisar medicamento, dosagem, prescritor ou observação"
+            aria-label="Pesquisar medicamentos"
+            placeholder="Pesquisar pelo nome, dosagem ou nota"
           />
         </label>
         <label className="medProtoFilterSelect">
@@ -335,11 +343,12 @@ export function MedicationPrototypeWorkspace({
                 key={item.medication.id}
                 className={`medProtoMedicationCard${isSelected ? ' selected' : ''}`}
                 onClick={() => onSelect(item.medication.id)}
+                aria-pressed={isSelected}
               >
                 <span className="medProtoPill" aria-hidden="true">●</span>
                 <span className="medProtoMedicationText">
                   <strong>{item.medication.name} {item.medication.dosage}</strong>
-                  <small>{item.stock} {item.medication.unit} em stock · código protegido</small>
+                  <small>{item.stock} {item.medication.unit} em stock</small>
                 </span>
                 <span className={statusClass(profile.status)}>{statusLabel(profile.status)}</span>
                 <span className="medProtoChevron" aria-hidden="true"><AppIcon name="chevron-right" /></span>
@@ -367,15 +376,21 @@ export function MedicationPrototypeWorkspace({
               <div><span>Dose programada</span><strong>{doseLabel}</strong></div>
               <div><span>Frequência ativa</span><strong>{frequencyLabel}</strong></div>
               <div><span>Horários de hoje</span><strong>{scheduleLabel}</strong></div>
-              <div><span>Início registado</span><strong>{formatDate(selected.medication.startDate)}</strong></div>
-              <div><span>Prescrito por</span><strong>{selectedProfile?.prescribedBy || 'Não registado'}</strong></div>
-              <div><span>Observação</span><strong>{selectedProfile?.observation || 'Sem observação protegida'}</strong></div>
             </div>
 
+            <details className="medProtoAdditionalInfo">
+              <summary>Ver informação adicional</summary>
+              <div className="medProtoInformationGrid medProtoInformationGridExtra">
+                <div><span>Início registado</span><strong>{formatDate(selected.medication.startDate)}</strong></div>
+                <div><span>Prescrito por</span><strong>{selectedProfile?.prescribedBy || 'Não registado'}</strong></div>
+                <div><span>Observação</span><strong>{selectedProfile?.observation || 'Sem observação protegida'}</strong></div>
+              </div>
+            </details>
+
             <nav className="medProtoTabs" aria-label="Detalhes do medicamento">
-              <button type="button" className={tab === 'history' ? 'active' : ''} onClick={() => setTab('history')}>Histórico</button>
-              <button type="button" className={tab === 'evolution' ? 'active' : ''} onClick={() => setTab('evolution')}>Evolução</button>
-              <button type="button" className={tab === 'information' ? 'active' : ''} onClick={() => setTab('information')}>Informações</button>
+              <button type="button" className={tab === 'history' ? 'active' : ''} aria-pressed={tab === 'history'} onClick={() => setTab('history')}>Histórico</button>
+              <button type="button" className={tab === 'evolution' ? 'active' : ''} aria-pressed={tab === 'evolution'} onClick={() => setTab('evolution')}>Evolução</button>
+              <button type="button" className={tab === 'information' ? 'active' : ''} aria-pressed={tab === 'information'} onClick={() => setTab('information')}>Informações</button>
             </nav>
 
             {tab === 'history' ? (
