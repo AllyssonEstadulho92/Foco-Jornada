@@ -1,5 +1,11 @@
 # Estado do Projeto
 
+## Em revisão — 2026-10-15: repaginação da Medicação
+
+**Objetivo:** organizar a rota `#/medicamentos` para apresentar primeiro tomas do dia, a seguir lista e detalhe de medicamentos e, em secções expansíveis, autonomia, horários e operações de stock. Auditoria, especificação, riscos e aceitação em `docs/MEDICATION-REFINEMENT-2026.md`.
+
+**Alteração proposta:** `MedicationsStockPage`, `MedicationPrototypeWorkspace`, a folha isolada `medication-refinement.css` e testes estáticos. Não há alterações de dados, cálculos, histórico, proteção, sync ou notificações. O ID usado pelo temporizador de próxima toma foi mantido. **Estado:** ramo `design/medicacao-organizacao-20261015`; CI, PR, publicação e validação física por confirmar. **Próximo passo:** validar CI e comportamento real em iPhone, Android e desktop, incluindo VoiceOver, estados de toma e atualização de stock, antes da integração.
+
 Atualizado em: 2026-09-21. **PR #226 integrado e publicado.** A publicação anterior foi a do PR #223.
 
 ## Última alteração publicada — PR #226: cálculo de trabalho normal ao fim de semana
