@@ -19,6 +19,8 @@ describe('medicação — organização e acessibilidade', () => {
 
   it('mantém navegação por foco sem perturbar a rota hash', () => {
     expect(page).toContain("section.focus({ preventScroll: true })")
+    expect(page).toContain('section.open = true')
+    expect(page).toContain("section.querySelector('summary')?.focus({ preventScroll: true })")
     expect(page).toContain("section.scrollIntoView({ block: 'start' })")
     expect(page).toContain('id="medication-today-doses" tabIndex={-1}')
     expect(page).toContain('<div id="medication-workspace" tabIndex={-1}>')
