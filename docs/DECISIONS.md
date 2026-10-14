@@ -1,5 +1,9 @@
 # Decisões técnicas
 
+## D-045 — Hierarquia da Medicação orientada à ação diária
+
+**Estado:** proposto em ramificação, 2026-10-15. **Problema observado no código:** lista, informação extensa e previsão de stock antecediam as tomas programadas. **Decisão:** ordenar o DOM por tomas do dia, medicamentos e operações secundárias; usar navegação por foco em vez de âncoras hash, `details` para previsão e informação não imediata, e uma folha de estilos final escopada. **Motivo:** reduzir pesquisa visual e manter navegação acessível entre móvel e desktop. **Condição:** não modificar prescrições, agenda configurada, eventos, stock, perfis, cifragem, notificações ou backend. **Risco:** alterações de hierarquia visual exigem testes em navegador real e no leitor de ecrã. Ver `docs/MEDICATION-REFINEMENT-2026.md`.
+
 Atualizado em: 2026-09-21. Decisões D-001 a D-033, com texto integral, preservadas em `docs/history/DECISIONS-pre-217.md`. Este documento indexa decisões recentes.
 
 ## D-044 — Taxas de fim de semana explícitas sem inferir direitos contratuais
