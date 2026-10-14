@@ -75,6 +75,7 @@ import './styles/mobile-shell.css'
 import './styles/focus.css'
 import './styles/mobile-bottom-nav-stability.css'
 import './styles/sync-status.css'
+import './styles/medication-refinement.css'
 
 const root = document.getElementById('root')
 if (!root) throw new Error('Elemento #root não encontrado.')
