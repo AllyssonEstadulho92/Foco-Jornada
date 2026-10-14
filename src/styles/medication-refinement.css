@@ -1,5 +1,6 @@
 /* Medicação · camada de apresentação isolada. Sem alterações a dados ou regras clínicas. */
 .medicationLinearPage {
+  width: min(100%, 1080px);
   max-width: 1080px;
   gap: clamp(14px, 2vw, 22px);
 }
