@@ -33,9 +33,9 @@
 
 .medicationLinearPage > .personalStockHeader > button {
   align-self: center;
-  background: var(--primary);
-  color: var(--surface);
-  border-color: var(--primary);
+  background: #146440;
+  color: #fff;
+  border-color: #146440;
 }
 
 .medicationQuickNav {
