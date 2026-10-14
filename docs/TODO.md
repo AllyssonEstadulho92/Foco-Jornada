@@ -1,5 +1,14 @@
 # TODO
 
+## P0 — Medicação: repaginação e auditoria (ramificação 2026-10-15)
+
+- [x] Localizar estrutura, componentes, histórico, serviços de stock, estilos e contrato de navegação por hash.
+- [x] Priorizar tomas de hoje antes da biblioteca, introduzir navegação por foco, recolher previsão e informação adicional.
+- [x] Criar CSS de escopo restrito, testes estruturais e especificação em `docs/MEDICATION-REFINEMENT-2026.md`.
+- [ ] Executar e confirmar TypeScript, lint, Vitest, build, workflows e smoke reais. Corrigir falhas antes de integrar.
+- [ ] Testar com dados não sensíveis no iPhone (320–430px), Android, tablet e desktop, incluindo modo escuro, 200% zoom, VoiceOver/TalkBack, foco, horário futuro e tomas adiadas.
+- [ ] Confirmar cálculo e persistência, prevenir duplicação de stock/tomas, rever inserção DOM do temporizador, verificar PWA e publicação após aprovação.
+
 Atualizado em: 2026-09-21. Histórico completo anterior em `docs/history/TODO-pre-217.md`; não considerar pendências físicas resolvidas por omissão.
 
 ## P0 — Cálculo de fim de semana, PR #226 (em revisão)
