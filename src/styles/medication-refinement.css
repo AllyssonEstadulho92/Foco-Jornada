@@ -1,0 +1,461 @@
+/* Medicação · camada de apresentação isolada. Sem alterações a dados ou regras clínicas. */
+.medicationLinearPage {
+  width: min(100%, 1080px);
+  max-width: 1080px;
+  gap: clamp(14px, 2vw, 22px);
+}
+
+.medicationLinearPage > .personalStockHeader {
+  padding: clamp(18px, 3vw, 30px);
+  margin-bottom: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--primary) 8%, var(--surface)),
+    var(--surface) 58%
+  );
+}
+
+.medicationLinearPage > .personalStockHeader .eyebrow {
+  display: inline-block;
+  margin-bottom: 5px;
+}
+
+.medicationLinearPage > .personalStockHeader h1 {
+  font-size: clamp(1.8rem, 4vw, 2.65rem);
+  letter-spacing: -.04em;
+}
+
+.medicationLinearPage > .personalStockHeader p {
+  max-width: 65ch;
+  line-height: 1.55;
+}
+
+.medicationLinearPage > .personalStockHeader > button {
+  align-self: center;
+  background: #146440;
+  color: #fff;
+  border-color: #146440;
+}
+
+.medicationQuickNav {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.medicationQuickNav button {
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color .15s ease, border-color .15s ease, transform .15s ease;
+}
+
+.medicationQuickNav button:not(:disabled):hover {
+  border-color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 6%, var(--surface));
+  transform: translateY(-1px);
+}
+.medicationQuickNav button:disabled { opacity: .48; cursor: not-allowed; }
+.medicationQuickNav button:first-child {
+  border-color: color-mix(in srgb, var(--primary) 40%, var(--line));
+  background: color-mix(in srgb, var(--primary) 9%, var(--surface));
+}
+
+.medicationLinearPage :is(
+  #medication-today-doses,
+  #medication-workspace,
+  #medication-settings
+) {
+  scroll-margin-top: 96px;
+}
+
+.medicationLinearPage .medicationLinearToday {
+  border: 1px solid color-mix(in srgb, var(--primary) 32%, var(--line));
+  box-shadow: var(--shadow-sm);
+}
+.medicationLinearPage .medicationLinearToday .stockPanelHeading {
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+.medicationLinearPage .medicationLinearToday .stockPanelTag {
+  color: var(--primary) !important;
+}
+.medicationLinearPage .medicationLinearToday .stockDoseCard {
+  border-radius: var(--radius-md);
+}
+.medicationLinearPage .stockDoseQuickActions button {
+  min-height: 44px;
+}
+
+.medicationLinearPage .medProtoWorkspace {
+  gap: 18px;
+  box-shadow: var(--shadow-sm);
+}
+.medProtoIntro {
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line);
+}
+.medProtoKicker {
+  color: var(--primary);
+  font-size: .72rem;
+  font-weight: 800;
+  letter-spacing: .08em;
+}
+.medProtoIntro h2 {
+  margin: 5px 0;
+  color: var(--text);
+  font-size: clamp(1.15rem, 2.5vw, 1.45rem);
+  line-height: 1.25;
+}
+.medProtoIntro p {
+  margin: 0;
+  color: var(--muted);
+  font-size: .875rem;
+  line-height: 1.5;
+}
+
+.medicationLinearPage .medProtoSummary {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+.medicationLinearPage .medProtoSummary article {
+  padding: 15px;
+  border-color: var(--line);
+}
+.medicationLinearPage .medProtoSummary strong {
+  font-size: clamp(1.15rem, 2vw, 1.55rem);
+  font-variant-numeric: tabular-nums;
+}
+.medicationLinearPage .medProtoSummary span {
+  font-size: .78rem;
+}
+
+.medicationLinearPage .medProtoListTools {
+  grid-template-columns: minmax(0, 1fr) minmax(145px, 200px);
+  align-items: end;
+  gap: 12px;
+}
+.medicationLinearPage .medProtoSearch,
+.medicationLinearPage .medProtoFilterSelect select { min-width: 0; }
+.medicationLinearPage .medProtoMedicationCard {
+  min-height: 70px;
+  text-align: left;
+  transition: border-color .15s ease, background-color .15s ease;
+}
+.medicationLinearPage .medProtoMedicationCard.selected {
+  border-color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 7%, var(--surface));
+  box-shadow: inset 3px 0 0 var(--primary);
+}
+.medicationLinearPage .medProtoMedicationText strong {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.medicationLinearPage .medProtoMedicationText small {
+  white-space: normal;
+}
+.medicationLinearPage .medProtoDetail {
+  box-shadow: none;
+  border-color: var(--line);
+}
+.medicationLinearPage .medProtoInformationGrid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.medProtoAdditionalInfo {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--surface);
+}
+.medProtoAdditionalInfo > summary {
+  min-height: 44px;
+  padding: 12px 15px;
+  color: var(--text);
+  font-size: .875rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.medProtoAdditionalInfo[open] > summary {
+  border-bottom: 1px solid var(--line);
+}
+.medicationLinearPage .medProtoInformationGridExtra {
+  padding: 12px;
+}
+.medicationLinearPage .medProtoTabs button {
+  min-height: 44px;
+  font-size: .875rem;
+}
+.medicationLinearPage .medProtoTabs button.active {
+  font-weight: 800;
+}
+
+.medicationForecastDisclosure {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  overflow: hidden;
+}
+.medicationForecastDisclosure > summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 15px;
+  align-items: center;
+  min-height: 76px;
+  padding: 16px 20px;
+  cursor: pointer;
+  list-style: none;
+}
+.medicationForecastDisclosure > summary::-webkit-details-marker { display: none; }
+.medicationForecastDisclosure > summary > span {
+  grid-column: 1;
+  font-size: .71rem;
+  font-weight: 800;
+  letter-spacing: .06em;
+  color: var(--muted);
+}
+.medicationForecastDisclosure > summary > strong {
+  grid-column: 1;
+  overflow-wrap: anywhere;
+  color: var(--text);
+  font-size: 1rem;
+}
+.medicationForecastDisclosure > summary > small {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  color: var(--primary);
+  font-size: .8rem;
+  font-weight: 700;
+}
+.medicationForecastDisclosure[open] > summary { border-bottom: 1px solid var(--line); }
+.medicationForecastDisclosure .medicationLinearForecast {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.medicationLinearPage :is(
+  .medicationQuickNav button,
+  .medProtoMedicationCard,
+  .medProtoTabs button,
+  .medProtoAdditionalInfo > summary,
+  .medicationForecastDisclosure > summary,
+  .medicationLinearAdvanced > summary
+):focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 3px;
+}
+
+@media (max-width: 900px) {
+  .medicationLinearPage .medProtoBody { grid-template-columns: minmax(0, 1fr); }
+  .medicationLinearPage .medProtoMedicationList { grid-template-columns: 1fr; max-height: none; }
+}
+
+@media (max-width: 700px) {
+  .medicationLinearPage > .personalStockHeader { padding: 20px 16px; }
+  .medicationQuickNav { grid-template-columns: 1fr 1fr; }
+  .medicationQuickNav button { padding: 9px 10px; font-size: .85rem; }
+  .medicationQuickNav button:last-child { grid-column: 1 / -1; }
+  .medicationLinearPage .medProtoListTools { grid-template-columns: minmax(0, 1fr); }
+  .medicationLinearPage .medProtoInformationGrid { grid-template-columns: 1fr; }
+  .medicationForecastDisclosure > summary { padding: 15px; grid-template-columns: 1fr; }
+  .medicationForecastDisclosure > summary > small { grid-column: 1; grid-row: auto; }
+}
+
+@media (max-width: 420px) {
+  .medicationLinearPage .medProtoSummary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .medicationLinearPage .medProtoSummary article:last-child { grid-column: 1 / -1; }
+  .medicationLinearPage .medProtoTabs {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 5px;
+    border-bottom: none;
+  }
+  .medicationLinearPage .medProtoTabs button {
+    padding-inline: 5px;
+    font-size: .8rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .medicationLinearPage .medProtoMedicationCard,
+  .medicationQuickNav button { transition: none; }
+  .medicationQuickNav button:hover { transform: none; }
+}
+
+/* Histórico de medicação: agrupamento por dia e ações auditáveis. */
+.medicationLinearPage .medHistoryHeader {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 6px;
+}
+.medicationLinearPage .medHistoryHeader > div { display: grid; gap: 4px; }
+.medicationLinearPage .medHistoryHeader strong { color: var(--text); font-size: 1rem; }
+.medicationLinearPage .medHistoryHeader span { color: var(--muted); font-size: .8rem; }
+.medicationLinearPage .medHistoryHeader label {
+  display: grid;
+  gap: 5px;
+  color: var(--muted);
+  font-size: .8rem;
+  font-weight: 700;
+  min-width: 150px;
+}
+.medicationLinearPage .medHistoryHeader select,
+.medicationLinearPage .medHistoryDialog :is(select, input) {
+  min-height: 44px;
+  min-width: 0;
+  width: 100%;
+  padding: 9px 12px;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  font: inherit;
+}
+.medicationLinearPage .medProtoTimelineNotice {
+  margin: 0 0 10px;
+  line-height: 1.5;
+}
+.medicationLinearPage .medHistoryDate {
+  margin: 14px 0 3px;
+  color: var(--muted);
+  font-size: .8rem;
+  line-height: 1.5;
+  font-weight: 800;
+  text-transform: capitalize;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 8px;
+}
+.medicationLinearPage .medHistoryRecord {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr);
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  margin: 7px 0;
+}
+.medicationLinearPage .medHistoryRecordBody { min-width: 0; display: grid; gap: 8px; }
+.medicationLinearPage .medHistoryRecordTop {
+  display: flex;
+  gap: 6px 12px;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  align-items: baseline;
+}
+.medicationLinearPage .medHistoryRecordTop strong { font-size: .9rem; color: var(--text); }
+.medicationLinearPage .medHistoryRecordTop small { color: var(--muted); font-size: .75rem; }
+.medicationLinearPage .medHistoryRecordBody p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.5;
+  font-size: .82rem;
+  overflow-wrap: anywhere;
+}
+.medicationLinearPage .medHistoryActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 7px;
+  border-top: 1px solid var(--line);
+}
+.medicationLinearPage .medHistoryActions button,
+.medicationLinearPage .medicationScheduleRowActions button {
+  border: 1px solid var(--line-strong);
+  color: var(--text);
+  background: var(--surface);
+  border-radius: 10px;
+  min-height: 44px;
+  padding: 9px 15px;
+  font-size: .82rem;
+  font-weight: 750;
+}
+.medicationLinearPage .medHistoryActions .medHistoryDanger,
+.medicationLinearPage .medicationScheduleRowActions .medicationScheduleDelete {
+  border-color: #cb7373;
+  color: #a32626;
+  background: var(--surface);
+}
+.medicationLinearPage .medicationScheduleRowActions {
+  display: flex;
+  gap: 9px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  border-top: 1px solid var(--line);
+  padding: 9px 0 4px;
+}
+.medicationLinearPage .medHistoryActions button:disabled,
+.medicationLinearPage .medicationScheduleRowActions button:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+.medHistoryDialogBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(10, 20, 15, .66);
+  display: grid;
+  place-items: center;
+  padding: 16px;
+}
+.medHistoryDialog {
+  display: grid;
+  gap: 15px;
+  width: min(100%, 450px);
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 22px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow-lg);
+}
+.medHistoryDialog h3 { margin: 0; font-size: 1.2rem; }
+.medHistoryDialog p { margin: 0; color: var(--muted); line-height: 1.55; font-size: .9rem; }
+.medHistoryDialogFields { display: grid; gap: 11px; }
+.medHistoryDialogFields label { display: grid; gap: 5px; color: var(--text); font-size: .85rem; font-weight: 700; }
+.medHistoryDialogActions { display: flex; justify-content: flex-end; gap: 9px; flex-wrap: wrap; }
+.medHistoryDialogActions button {
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  min-height: 44px;
+  padding: 10px 15px;
+  background: var(--surface-2);
+  color: var(--text);
+  font-weight: 700;
+}
+.medHistoryDialogActions .medHistorySave { background: #146440; color: #fff; border-color: #146440; }
+.medHistoryDialogActions .medHistoryDanger { color: #fff; border-color: #a32626; background: #a32626; }
+.medHistoryDialogActions button:disabled { opacity: .5; cursor: not-allowed; }
+.medicationLinearPage :is(
+  .medHistoryActions button,
+  .medicationScheduleRowActions button,
+  .medHistoryHeader select,
+  .medHistoryDialog input,
+  .medHistoryDialog select,
+  .medHistoryDialogActions button
+):focus-visible { outline: 3px solid var(--primary); outline-offset: 3px; }
+@media(max-width: 620px) {
+  .medicationLinearPage .medHistoryHeader { align-items: stretch; }
+  .medicationLinearPage .medHistoryHeader label { width: 100%; }
+  .medicationLinearPage .medHistoryRecord { grid-template-columns: 30px minmax(0, 1fr); gap: 8px; padding: 12px; }
+  .medicationLinearPage .medHistoryActions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .medicationLinearPage .medHistoryActions button { min-width: 0; padding-inline: 6px; }
+  .medicationLinearPage .medicationScheduleRowActions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .medHistoryDialogActions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

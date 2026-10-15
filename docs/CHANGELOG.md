@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026-10-15 — Histórico de Medicação com edição e eliminação segura (em revisão)
+
+- O histórico apresenta separadores Resumo/Detalhes técnicos, filtro por tipo, datas agrupadas e cartões compactos responsivos.
+- Nos horários ativos há Editar e Eliminar; na lista de tomas programadas, as ações são visíveis sem gesto obrigatório. Nas tomas registadas, Editar utiliza versões de estado e Eliminar cria anulação auditável; o stock de uma toma confirmada é reposto por correção do ledger.
+- Eventos substituídos deixam de poluir o Resumo, continuando visíveis em Detalhes técnicos. Movimentos de stock, dados históricos e checkpoints não são apagados.
+- Foram acrescentados estilos escopados, diálogos de confirmação, testes estruturais e `docs/MEDICATION-HISTORY-AUDIT-2026.md`.
+- QA funcional, segurança de dependências do Issue #229, publicação e teste em equipamentos reais pendentes.
+
+## 2026-10-15 — Medicação: organização e consulta prioritária (em revisão)
+
+- Auditadas `MedicationsStockPage`, `MedicationPrototypeWorkspace`, estilos sobrepostos, IDs do temporizador e serviços de registo de tomas/stock.
+- A secção de tomas do dia passa a anteceder a lista de medicamentos na ordem real de leitura e foco; atalhos usam botões sem afetar a rota hash.
+- Resumo e pesquisa com hierarquia renovada, cartões de informação adicional em `details` e previsão de autonomia recolhida, mantendo informação e cálculos acessíveis.
+- Nova camada `medication-refinement.css` com largura responsiva, foco visível, melhor leitura e suporte a movimento reduzido. Adicionados testes estáticos de regressão e `docs/MEDICATION-REFINEMENT-2026.md`.
+- Sem migração, dependências ou modificação ao cofre, prescrições, horários, eventos, doses, stock e sincronização. CI, merge, publicação e validação física ainda por confirmar.
+
 Atualizado em: 2026-09-20. Alterações anteriores até ao PR #214 (texto completo e provas históricas) em `docs/history/CHANGELOG-pre-217.md`.
 
 ## 2026-09-20 — PR #223: adaptar visualmente Férias e Planeamento aos dois protótipos (em validação)

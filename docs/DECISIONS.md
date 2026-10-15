@@ -1,5 +1,13 @@
 # Decisões técnicas
 
+## D-046 — Editar e eliminar o estado atual sem destruir o histórico protegido
+
+**Estado:** em revisão, 15/10/2026. **Evidência:** a página Histórico não apresentava ações por registo nem agrupamento por data; o domínio já dispõe de serviços que acrescentam correções auditáveis. **Decisão:** mostrar ações apenas para horários ativos e eventos de dose atuais. «Editar» horário cria definição com efeito a partir de amanhã; «Eliminar» horário retira da agenda ativa. «Editar» adiamento/não tomada substitui o estado com nova versão; «Eliminar» evento retira-o do resumo e preserva correção técnica, repondo stock ao anular uma toma confirmada. **Não permitir:** eliminação física de movimentos, notas históricas ou checkpoints, nem reescrever doses passadas. O resumo oculta versões substituídas e a vista técnica mantém rastreabilidade. **Riscos:** confirmação, integridade referencial, foco e testes manuais com diferentes estados. Ver `docs/MEDICATION-HISTORY-AUDIT-2026.md`.
+
+## D-045 — Hierarquia da Medicação orientada à ação diária
+
+**Estado:** proposto em ramificação, 2026-10-15. **Problema observado no código:** lista, informação extensa e previsão de stock antecediam as tomas programadas. **Decisão:** ordenar o DOM por tomas do dia, medicamentos e operações secundárias; usar navegação por foco em vez de âncoras hash, `details` para previsão e informação não imediata, e uma folha de estilos final escopada. **Motivo:** reduzir pesquisa visual e manter navegação acessível entre móvel e desktop. **Condição:** não modificar prescrições, agenda configurada, eventos, stock, perfis, cifragem, notificações ou backend. **Risco:** alterações de hierarquia visual exigem testes em navegador real e no leitor de ecrã. Ver `docs/MEDICATION-REFINEMENT-2026.md`.
+
 Atualizado em: 2026-09-21. Decisões D-001 a D-033, com texto integral, preservadas em `docs/history/DECISIONS-pre-217.md`. Este documento indexa decisões recentes.
 
 ## D-044 — Taxas de fim de semana explícitas sem inferir direitos contratuais

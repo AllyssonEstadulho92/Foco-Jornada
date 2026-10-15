@@ -1,5 +1,17 @@
 # Estado do Projeto
 
+## Em revisão — 15/10/2026: ações e organização do Histórico de Medicação
+
+**Estado real da implementação:** o PR #228 passou a apresentar os registos por data, com filtro de tipos, Resumo de eventos ativos e vista técnica com correções originais. Horários ativos têm Editar/Eliminar; tomas têm Editar para estados operacionais e Eliminar com anulação auditável para o evento ativo. As tomas programadas também receberam botões explícitos para gerir horários. Sem apagamento físico do histórico, sem alterações a esquemas ou serviços de domínio. Testes acrescentados em `medication-history-actions.test.ts`; especificação em `docs/MEDICATION-HISTORY-AUDIT-2026.md`. **Pendente:** CI do novo head, remediação da auditoria de dependências (Issue #229) e validação real no iPhone antes da integração.
+
+**Validação parcial em 15/10/2026:** [Validação funcional da Medicação #38657775437](https://github.com/AllyssonEstadulho92/Foco-Jornada/actions/runs/38657775437) aprovada (TypeScript, lint, Vitest, build, Worker dry-run e existência do build). O fluxo obrigatório [Qualidade #38657775457](https://github.com/AllyssonEstadulho92/Foco-Jornada/actions/runs/38657775457) foi bloqueado pelo `npm audit`, que identificou 13 vulnerabilidades elevadas nas dependências. Correção acompanhada separadamente no [Issue #229](https://github.com/AllyssonEstadulho92/Foco-Jornada/issues/229). Foi acrescentado smoke Chromium ao workflow funcional para nova validação. O PR #228 mantém-se em rascunho, sem merge/publicação ou teste físico confirmado.
+
+## Em revisão — 2026-10-15: repaginação da Medicação
+
+**Objetivo:** organizar a rota `#/medicamentos` para apresentar primeiro tomas do dia, a seguir lista e detalhe de medicamentos e, em secções expansíveis, autonomia, horários e operações de stock. Auditoria, especificação, riscos e aceitação em `docs/MEDICATION-REFINEMENT-2026.md`.
+
+**Alteração proposta:** `MedicationsStockPage`, `MedicationPrototypeWorkspace`, a folha isolada `medication-refinement.css` e testes estáticos. Não há alterações de dados, cálculos, histórico, proteção, sync ou notificações. O ID usado pelo temporizador de próxima toma foi mantido. **Estado:** ramo `design/medicacao-organizacao-20261015`; CI, PR, publicação e validação física por confirmar. **Próximo passo:** validar CI e comportamento real em iPhone, Android e desktop, incluindo VoiceOver, estados de toma e atualização de stock, antes da integração.
+
 Atualizado em: 2026-09-21. **PR #226 integrado e publicado.** A publicação anterior foi a do PR #223.
 
 ## Última alteração publicada — PR #226: cálculo de trabalho normal ao fim de semana

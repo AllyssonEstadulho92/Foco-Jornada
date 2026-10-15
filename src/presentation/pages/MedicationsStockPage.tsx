@@ -417,13 +417,25 @@ export function MedicationsStockPage() {
     setScheduleAction(null)
   }
 
+  function jumpToMedicationSection(id: string) {
+    const section = document.getElementById(id)
+    if (!section) return
+    if (section instanceof HTMLDetailsElement) {
+      section.open = true
+      section.querySelector('summary')?.focus({ preventScroll: true })
+    } else {
+      section.focus({ preventScroll: true })
+    }
+    section.scrollIntoView({ block: 'start' })
+  }
+
   return (
     <section className="personalStockPage medicationsStockPage medicationLinearPage" aria-labelledby="medications-title">
       <header className="personalStockHeader personalStockHeaderActions">
         <div>
           <span className="eyebrow">ORGANIZAÇÃO PESSOAL · MEDICAÇÃO</span>
           <h1 id="medications-title">Medicamentos</h1>
-          <p>Stock, horários e tomas baseados apenas nos registos configurados. A aplicação não altera nem inventa a prescrição.</p>
+          <p>Consulta as tomas, gere os teus medicamentos e mantém o stock organizado. Os horários seguem apenas os registos configurados, sem alterar a prescrição.</p>
         </div>
         <button
           type="button"
@@ -434,6 +446,12 @@ export function MedicationsStockPage() {
           {showCreate ? 'Fechar' : '+ Medicamento'}
         </button>
       </header>
+
+      <nav className="medicationQuickNav" aria-label="Acesso rápido à medicação">
+        <button type="button" disabled={!selected} onClick={() => jumpToMedicationSection('medication-today-doses')}>Tomas de hoje</button>
+        <button type="button" onClick={() => jumpToMedicationSection('medication-workspace')}>Medicamentos</button>
+        <button type="button" disabled={!selected} onClick={() => jumpToMedicationSection('medication-settings')}>Horários e stock</button>
+      </nav>
 
       {message ? <div className="stockMessage" role="status">{message}</div> : null}
 
@@ -460,60 +478,8 @@ export function MedicationsStockPage() {
         </section>
       ) : null}
 
-      <div id="medication-workspace">
-        <MedicationPrototypeWorkspace
-          medications={medications}
-          selectedId={selectedId}
-          today={today}
-          onSelect={setSelectedId}
-          onDataChanged={async () => {
-            await loadList(selectedId ?? undefined)
-            if (selectedId) await loadSelected(selectedId)
-          }}
-        />
-      </div>
-
       {selected ? (
-        <>
-          <section className="medicationLinearForecast" aria-labelledby="medication-forecast-title">
-            <div className="medicationLinearHeading">
-              <div>
-                <span className="stockPanelTag">PROJEÇÃO PROGRAMADA</span>
-                <h2 id="medication-forecast-title">Até onde pode chegar o stock configurado</h2>
-              </div>
-              <span className={forecast?.exact ? 'stockStatusOk' : 'stockStatusNeutral'}>
-                {forecast?.exact ? 'CÁLCULO DETERMINÍSTICO' : 'SEM PROJEÇÃO'}
-              </span>
-            </div>
-            {forecast ? (
-              <div className="medicationLinearForecastGrid">
-                <article>
-                  <span>Autonomia</span>
-                  <strong>{formatDuration(forecast.autonomySeconds)}</strong>
-                  <small>stock real aplicado cronologicamente aos horários configurados</small>
-                </article>
-                <article>
-                  <span>Última toma possível</span>
-                  <strong>{formatDateTime(forecast.lastPossibleDose?.scheduledAt)}</strong>
-                  <small>{forecast.stockAfterLastPossible} {selected.medication.unit} restantes depois dessa toma</small>
-                </article>
-                <article>
-                  <span>Primeira toma sem stock suficiente</span>
-                  <strong>{formatDateTime(forecast.firstImpossibleDose.scheduledAt)}</strong>
-                  <small>faltariam {forecast.missingQuantity} {selected.medication.unit}</small>
-                </article>
-              </div>
-            ) : (
-              <p className="medicationLinearNoForecast">
-                {forecastMessage || 'Configura pelo menos um horário válido para calcular a autonomia sem suposições.'}
-              </p>
-            )}
-            <p className="medicationLinearRule">
-              Esta projeção usa apenas stock real + horários e quantidades configuradas. O cálculo é determinístico, mas a data futura depende de as tomas ocorrerem conforme essa configuração.
-            </p>
-          </section>
-
-          <section className="stockPanel stockDosePanel medicationLinearToday" id="medication-today-doses">
+          <section className="stockPanel stockDosePanel medicationLinearToday" id="medication-today-doses" tabIndex={-1}>
             <div className="stockPanelHeading">
               <div><span className="stockPanelTag">HOJE</span><h2>Tomas programadas</h2></div>
               <span>{today}</span>
@@ -759,6 +725,11 @@ export function MedicationsStockPage() {
                           )}
                         </div>
 
+                        <div className="medicationScheduleRowActions" role="group" aria-label={`Gerir horário das ${schedule.localTime}`}>
+                          <button type="button" disabled={busy || scheduleEndingToday} onClick={() => openScheduleAction('define', schedule)}>Editar horário</button>
+                          <button type="button" className="medicationScheduleDelete" disabled={busy || scheduleEndingToday} onClick={() => openScheduleAction('delete', schedule)}>Eliminar</button>
+                        </div>
+
                         {detailsOpen ? (
                           <div className="stockDoseDetails" id={`dose-details-${schedule.id}`}>
                             <div className="stockDoseDetailsGrid">
@@ -804,8 +775,69 @@ export function MedicationsStockPage() {
               <p className="stockEmpty">Ainda não existem horários válidos para hoje. Configura um horário em “Configuração e stock”.</p>
             )}
           </section>
+      ) : null}
 
-          <details className="medicationLinearAdvanced">
+      <div id="medication-workspace" tabIndex={-1}>
+        <MedicationPrototypeWorkspace
+          medications={medications}
+          selectedId={selectedId}
+          today={today}
+          onSelect={setSelectedId}
+          onDataChanged={async () => {
+            await loadList(selectedId ?? undefined)
+            if (selectedId) await loadSelected(selectedId)
+          }}
+        />
+      </div>
+
+      {selected ? (
+        <>
+          <details className="medicationForecastDisclosure">
+            <summary>
+              <span>PREVISÃO DE STOCK</span>
+              <strong>{forecast ? `Autonomia calculada: ${formatDuration(forecast.autonomySeconds)}` : 'Autonomia por calcular'}</strong>
+              <small>Consultar estimativa e datas</small>
+            </summary>
+            <section className="medicationLinearForecast" aria-labelledby="medication-forecast-title">
+            <div className="medicationLinearHeading">
+              <div>
+                <span className="stockPanelTag">PROJEÇÃO PROGRAMADA</span>
+                <h2 id="medication-forecast-title">Autonomia e previsão de stock</h2>
+              </div>
+              <span className={forecast?.exact ? 'stockStatusOk' : 'stockStatusNeutral'}>
+                {forecast?.exact ? 'CÁLCULO DETERMINÍSTICO' : 'SEM PROJEÇÃO'}
+              </span>
+            </div>
+            {forecast ? (
+              <div className="medicationLinearForecastGrid">
+                <article>
+                  <span>Autonomia</span>
+                  <strong>{formatDuration(forecast.autonomySeconds)}</strong>
+                  <small>stock real aplicado cronologicamente aos horários configurados</small>
+                </article>
+                <article>
+                  <span>Última toma possível</span>
+                  <strong>{formatDateTime(forecast.lastPossibleDose?.scheduledAt)}</strong>
+                  <small>{forecast.stockAfterLastPossible} {selected.medication.unit} restantes depois dessa toma</small>
+                </article>
+                <article>
+                  <span>Primeira toma sem stock suficiente</span>
+                  <strong>{formatDateTime(forecast.firstImpossibleDose.scheduledAt)}</strong>
+                  <small>faltariam {forecast.missingQuantity} {selected.medication.unit}</small>
+                </article>
+              </div>
+            ) : (
+              <p className="medicationLinearNoForecast">
+                {forecastMessage || 'Configura pelo menos um horário válido para calcular a autonomia sem suposições.'}
+              </p>
+            )}
+            <p className="medicationLinearRule">
+              Esta projeção usa apenas stock real + horários e quantidades configuradas. O cálculo é determinístico, mas a data futura depende de as tomas ocorrerem conforme essa configuração.
+            </p>
+            </section>
+          </details>
+
+          <details className="medicationLinearAdvanced" id="medication-settings" tabIndex={-1}>
             <summary>Configuração e stock</summary>
             <div className="medicationLinearAdvancedBody">
               <section>

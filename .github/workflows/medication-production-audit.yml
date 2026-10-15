@@ -1,0 +1,27 @@
+name: Auditoria de dependências de produção
+
+on:
+  pull_request:
+    paths:
+      - 'package.json'
+      - 'src/**'
+      - '.github/workflows/medication-production-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  production-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - name: Fixar npm compatível
+        run: npm install -g npm@11.6.0 --no-audit --no-fund
+      - name: Instalar dependências sem alterar o manifesto
+        run: npm install --no-audit --no-fund
+      - name: Auditoria obrigatória da aplicação publicada
+        run: npm audit --omit=dev --audit-level=high

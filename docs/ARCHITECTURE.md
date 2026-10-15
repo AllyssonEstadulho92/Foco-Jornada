@@ -1,5 +1,15 @@
 # Arquitetura
 
+## Medicação: histórico por data e ações auditáveis (15/10/2026, em revisão)
+
+`MedicationPrototypeWorkspace` conserva `getMedicationTimeline` e dados do cofre. O histórico no Resumo apresenta apenas eventos de dose atuais, agrupados por data e filtráveis por tipo; a vista técnica usa `combinedTimeline` completo. Para horários ativos reutiliza `MedicationScheduleActionDialog` e `PersonalStockService.defineMedicationScheduleFromDate/endMedicationScheduleOnDate`. Para dose `not_taken/postponed` edita via `MedicationDoseStatusService.replaceMedicationDoseStatus`; para anular usa `correctMedicationDoseStatus` ou `PersonalStockService.undoMedicationDose` em tomas confirmadas, preservando movimentos corretivos do ledger. `MedicationsStockPage` disponibiliza Editar horário e Eliminar diretamente nas tomas programadas. Estilos em `medication-refinement.css`. Confirmação e proteção adicional por checkpoint/cópia redundante; sem alterações de modelo, Worker, autenticação ou sincronização. Ver `docs/MEDICATION-HISTORY-AUDIT-2026.md`.
+
+## Repaginação da Medicação — ramificação de revisão, 2026-10-15
+
+Na rota `#/medicamentos`, `MedicationsStockPage` mantém os serviços e estados originais, mas posiciona as tomas programadas antes de `MedicationPrototypeWorkspace`. A navegação rápida usa botões que colocam foco e deslocam o ecrã para os IDs existentes `medication-today-doses` e `medication-workspace`, e o novo `medication-settings`, sem alterar o hash do router. O temporizador DOM permanece associado ao mesmo `#medication-workspace`.
+
+`MedicationPrototypeWorkspace` mantém resumo, filtros, seleção, timeline e persistência de perfil protegido. Três métricas operacionais ficam expostas; metadados opcionais passam a `details`, sem deixar de estar no DOM. O cálculo de autonomia já existente passa a `details`, sem alteração do motor de previsão. `medication-refinement.css`, importado após as outras folhas em `main.tsx`, limita as alterações à página. O modelo de dados, o cofre, as chaves, eventos, reconciliação, notificações, Worker e sincronização não foram alterados. Testes e riscos em `docs/MEDICATION-REFINEMENT-2026.md`. Por validar em CI e em dispositivo real.
+
 Atualizado em: 2026-09-21. Histórico integral anterior preservado em `docs/history/ARCHITECTURE-pre-217.md`.
 
 ## PR #226 — suplementos de sábado e domingo, em revisão
