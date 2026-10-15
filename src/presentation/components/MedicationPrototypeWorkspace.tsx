@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useEffect, useMemo, useState } from 'react'
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type {
   MedicationDashboardSummary,
   MedicationLifecycleStatus,
@@ -137,6 +137,7 @@ export function MedicationPrototypeWorkspace({
   const [historyAction, setHistoryAction] = useState<HistoryAction | null>(null)
   const [historyDoseStatus, setHistoryDoseStatus] = useState<'not_taken' | 'postponed'>('not_taken')
   const [historyDoseTime, setHistoryDoseTime] = useState('')
+  const historyCancelRef = useRef<HTMLButtonElement>(null)
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState('')
 
@@ -195,6 +196,16 @@ export function MedicationPrototypeWorkspace({
     setHistoryFilter('all')
     setHistoryAction(null)
   }, [selectedId])
+
+  useEffect(() => {
+    if (historyAction?.kind !== 'dose') return
+    historyCancelRef.current?.focus()
+    const onEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && !busy) setHistoryAction(null)
+    }
+    document.addEventListener('keydown', onEscape)
+    return () => document.removeEventListener('keydown', onEscape)
+  }, [busy, historyAction])
 
   const filteredMedications = useMemo(() => {
     const normalizedSearch = search.trim().toLocaleLowerCase('pt-PT')
@@ -577,7 +588,7 @@ export function MedicationPrototypeWorkspace({
                                     <button type="button" disabled={busy} onClick={() => beginHistoryDoseAction('edit', event)}>Editar</button>
                                   ) : null}
                                   <button type="button" className="medHistoryDanger" disabled={busy} onClick={() => beginHistoryDoseAction('cancel', event)}>
-                                    {event.status === 'taken' ? 'Anular toma' : 'Anular registo'}
+                                    'Eliminar'
                                   </button>
                                 </>
                               ) : null}
@@ -709,13 +720,13 @@ export function MedicationPrototypeWorkspace({
           if (event.target === event.currentTarget && !busy) setHistoryAction(null)
         }}>
           <section className="medHistoryDialog" role="dialog" aria-modal="true" aria-labelledby="med-history-action-title">
-            <h3 id="med-history-action-title">{historyAction.mode === 'edit' ? 'Editar estado da toma' : 'Anular registo de toma'}</h3>
+            <h3 id="med-history-action-title">{historyAction.mode === 'edit' ? 'Editar estado da toma' : 'Eliminar registo da vista atual'}</h3>
             <p>
               {historyAction.mode === 'edit'
                 ? 'A alteração fica registada como nova versão, sem modificar a ocorrência original.'
                 : historyAction.event.status === 'taken'
-                  ? 'A confirmação será anulada e o stock descontado será reposto por um movimento de correção. O histórico original fica protegido.'
-                  : 'O estado atual será anulado, mantendo uma correção auditável no histórico técnico.'}
+                  ? 'O registo deixará de estar ativo no resumo e o stock descontado será reposto por um movimento de correção. O histórico original fica protegido.'
+                  : 'O estado atual será removido do resumo, mantendo uma correção auditável no histórico técnico.'}
             </p>
             {historyAction.mode === 'edit' ? (
               <div className="medHistoryDialogFields">
@@ -733,17 +744,17 @@ export function MedicationPrototypeWorkspace({
               </div>
             ) : null}
             <div className="medHistoryDialogActions">
-              <button type="button" disabled={busy} onClick={() => setHistoryAction(null)}>Cancelar</button>
+              <button type="button" ref={historyCancelRef} disabled={busy} onClick={() => setHistoryAction(null)}>Cancelar</button>
               <button
                 type="button"
                 className={historyAction.mode === 'cancel' ? 'medHistoryDanger' : 'medHistorySave'}
                 disabled={busy || (historyAction.mode === 'edit' && historyDoseStatus === 'postponed' && !historyDoseTime)}
                 onClick={() => void execute(
                   confirmHistoryDoseAction,
-                  historyAction.mode === 'edit' ? 'Estado editado. A versão anterior continua no histórico.' : 'Registo anulado através de correção auditável.',
+                  historyAction.mode === 'edit' ? 'Estado editado. A versão anterior continua no histórico.'  : 'Registo retirado do resumo através de correção auditável.',
                 )}
               >
-                {historyAction.mode === 'edit' ? 'Guardar alteração' : 'Confirmar anulação'}
+                {historyAction.mode === 'edit' ? 'Guardar alteração' : 'Confirmar eliminação'}
               </button>
             </div>
           </section>
