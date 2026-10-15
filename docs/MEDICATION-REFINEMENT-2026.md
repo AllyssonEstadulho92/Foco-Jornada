@@ -42,3 +42,9 @@ Sem alteração de esquema IndexedDB/Dexie, API, Worker, cofre AES-GCM, chaves d
 Ações Tomada/Adiar/Não tomada/Corrigir e gestão de horários permanecem funcionais; o stock só muda pelas mesmas operações anteriores. Alterar medicamento selecionado mantém detalhe e tomas sincronizados. A previsão completa é acessível sem perder registos. Em todas as larguras, não há recorte horizontal nem botões inacessíveis. As atualizações não pedem limpeza do armazenamento existente.
 
 **Estado em 2026-10-15:** alterações em ramificação para revisão; execução de CI, aprovação, merge, publicação e testes físicos por confirmar até verificação efetiva.
+
+## Resultado de testes e impedimento de publicação (15/10/2026)
+
+O workflow [Validação funcional da Medicação #38657775437](https://github.com/AllyssonEstadulho92/Foco-Jornada/actions/runs/38657775437) terminou com sucesso: TypeScript, ESLint, Vitest, build, `worker:check` e presença dos ficheiros de distribuição. Foi adicionado posteriormente um smoke Chromium, a aguardar verificação no SHA definitivo. O workflow [Qualidade #38657775457](https://github.com/AllyssonEstadulho92/Foco-Jornada/actions/runs/38657775457) bloqueia no `npm audit --audit-level=high` com 13 vulnerabilidades elevadas, antes dos testes funcionais. O problema de dependências está no [Issue #229](https://github.com/AllyssonEstadulho92/Foco-Jornada/issues/229), sem alterar nem desativar a auditoria existente.
+
+Esta evidência não demonstra experiência visual real em Safari iOS, ausência de overflow em todos os tamanhos, notificações de fundo ou integridade de dados de um utilizador específico. O PR permanece em rascunho até concluir segurança e QA físico.
