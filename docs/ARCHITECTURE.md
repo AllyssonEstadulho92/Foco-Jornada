@@ -1,5 +1,9 @@
 # Arquitetura
 
+## Medicação: histórico por data e ações auditáveis (15/10/2026, em revisão)
+
+`MedicationPrototypeWorkspace` conserva `getMedicationTimeline` e dados do cofre. O histórico no Resumo apresenta apenas eventos de dose atuais, agrupados por data e filtráveis por tipo; a vista técnica usa `combinedTimeline` completo. Para horários ativos reutiliza `MedicationScheduleActionDialog` e `PersonalStockService.defineMedicationScheduleFromDate/endMedicationScheduleOnDate`. Para dose `not_taken/postponed` edita via `MedicationDoseStatusService.replaceMedicationDoseStatus`; para anular usa `correctMedicationDoseStatus` ou `PersonalStockService.undoMedicationDose` em tomas confirmadas, preservando movimentos corretivos do ledger. `MedicationsStockPage` disponibiliza Editar horário e Eliminar diretamente nas tomas programadas. Estilos em `medication-refinement.css`. Confirmação e proteção adicional por checkpoint/cópia redundante; sem alterações de modelo, Worker, autenticação ou sincronização. Ver `docs/MEDICATION-HISTORY-AUDIT-2026.md`.
+
 ## Repaginação da Medicação — ramificação de revisão, 2026-10-15
 
 Na rota `#/medicamentos`, `MedicationsStockPage` mantém os serviços e estados originais, mas posiciona as tomas programadas antes de `MedicationPrototypeWorkspace`. A navegação rápida usa botões que colocam foco e deslocam o ecrã para os IDs existentes `medication-today-doses` e `medication-workspace`, e o novo `medication-settings`, sem alterar o hash do router. O temporizador DOM permanece associado ao mesmo `#medication-workspace`.
