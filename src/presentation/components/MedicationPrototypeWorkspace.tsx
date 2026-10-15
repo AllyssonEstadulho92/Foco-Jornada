@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { Fragment, useCallback, useEffect, useMemo, useState } from 'react'
 import type {
   MedicationDashboardSummary,
   MedicationLifecycleStatus,
@@ -7,14 +7,20 @@ import type {
   MedicationTimelineItem,
 } from '../../application/personalStock/MedicationDataProtectionService'
 import { minorToDecimal } from '../../application/personalStock/decimal'
+import { addCalendarDays } from '../../application/personalStock/time'
 import type { MedicationDoseEvent, MedicationSchedule, MedicationSummary } from '../../domain/personalStock/models'
 import '../../styles/medication-history-compact.css'
 import { AppIcon, type AppIconName } from './ui/AppIcon'
+import { MedicationScheduleActionDialog, type MedicationScheduleActionMode } from './MedicationDoseSwipeActions'
 import { useAppServices } from '../providers/AppServicesProvider'
 
 type WorkspaceTab = 'history' | 'evolution' | 'information'
 type StatusFilter = 'all' | MedicationLifecycleStatus
 type HistoryView = 'summary' | 'technical'
+type HistoryFilter = 'all' | 'dose' | 'schedule' | 'stock' | 'other'
+type HistoryAction =
+  | { kind: 'schedule'; mode: MedicationScheduleActionMode; schedule: MedicationSchedule }
+  | { kind: 'dose'; mode: 'edit' | 'cancel'; event: MedicationDoseEvent }
 
 interface MedicationPrototypeWorkspaceProps {
   medications: MedicationSummary[]
@@ -24,7 +30,7 @@ interface MedicationPrototypeWorkspaceProps {
   onDataChanged: () => Promise<void>
 }
 
-const HISTORY_STEP = 5
+const HISTORY_STEP = 8
 const EMPTY_DASHBOARD: MedicationDashboardSummary = {
   medicationCount: 0,
   scheduledDoseCount: 0,
@@ -54,6 +60,22 @@ function formatDateTime(value?: string): string {
     hour: '2-digit',
     minute: '2-digit',
   }).format(new Date(value))
+}
+
+function historyDay(value: string): string {
+  const timestamp = new Date(value)
+  if (Number.isNaN(timestamp.getTime())) return 'Data por confirmar'
+  return new Intl.DateTimeFormat('pt-PT', {
+    timeZone: 'Europe/Lisbon',
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  }).format(timestamp)
+}
+
+function operationId(): string {
+  return globalThis.crypto.randomUUID()
 }
 
 function formatDate(value?: string): string {
@@ -92,6 +114,7 @@ export function MedicationPrototypeWorkspace({
   const {
     personalStockService,
     medicationDataProtectionService,
+    medicationDoseStatusService,
   } = useAppServices()
   const [profiles, setProfiles] = useState<Record<string, MedicationProtectedProfile>>({})
   const [dashboard, setDashboard] = useState<MedicationDashboardSummary>(EMPTY_DASHBOARD)
@@ -110,6 +133,10 @@ export function MedicationPrototypeWorkspace({
   const [tab, setTab] = useState<WorkspaceTab>('history')
   const [historyView, setHistoryView] = useState<HistoryView>('summary')
   const [historyVisible, setHistoryVisible] = useState(HISTORY_STEP)
+  const [historyFilter, setHistoryFilter] = useState<HistoryFilter>('all')
+  const [historyAction, setHistoryAction] = useState<HistoryAction | null>(null)
+  const [historyDoseStatus, setHistoryDoseStatus] = useState<'not_taken' | 'postponed'>('not_taken')
+  const [historyDoseTime, setHistoryDoseTime] = useState('')
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState('')
 
@@ -165,6 +192,8 @@ export function MedicationPrototypeWorkspace({
   useEffect(() => {
     setHistoryView('summary')
     setHistoryVisible(HISTORY_STEP)
+    setHistoryFilter('all')
+    setHistoryAction(null)
   }, [selectedId])
 
   const filteredMedications = useMemo(() => {
@@ -229,15 +258,34 @@ export function MedicationPrototypeWorkspace({
       .sort((left, right) => right.createdAt.localeCompare(left.createdAt) || right.id.localeCompare(left.id))
   }, [scheduleHistory, selected?.medication.unit, timeline])
 
+  const activeHistoryDoseIds = useMemo(() => {
+    const correctedIds = new Set(doseEvents.filter((event) => event.status === 'corrected' && event.correctionOf).map((event) => event.correctionOf))
+    const activeByOccurrence = new Map<string, MedicationDoseEvent>()
+    for (const event of doseEvents) {
+      if (event.status === 'corrected' || correctedIds.has(event.id)) continue
+      const current = activeByOccurrence.get(event.occurrenceKey)
+      if (!current || event.createdAt > current.createdAt) activeByOccurrence.set(event.occurrenceKey, event)
+    }
+    return new Set([...activeByOccurrence.values()].map((event) => event.id))
+  }, [doseEvents])
+
   const summaryTimeline = useMemo(
-    () => combinedTimeline.filter((item) => item.kind !== 'protection'),
-    [combinedTimeline],
+    () => combinedTimeline.filter((item) => {
+      if (item.kind === 'protection') return false
+      if (item.kind === 'dose' && item.id.startsWith('dose:')) {
+        return activeHistoryDoseIds.has(item.id.slice('dose:'.length))
+      }
+      return true
+    }),
+    [activeHistoryDoseIds, combinedTimeline],
   )
-  const technicalTimeline = useMemo(
-    () => combinedTimeline.filter((item) => item.kind === 'protection'),
-    [combinedTimeline],
-  )
-  const activeTimeline = historyView === 'summary' ? summaryTimeline : technicalTimeline
+  const technicalTimeline = combinedTimeline
+  const timelineForView = historyView === 'summary' ? summaryTimeline : technicalTimeline
+  const activeTimeline = timelineForView.filter((item) => {
+    if (historyFilter === 'all') return true
+    if (historyFilter === 'other') return item.kind === 'profile' || item.kind === 'note' || item.kind === 'created' || item.kind === 'protection'
+    return item.kind === historyFilter
+  })
   const visibleTimeline = activeTimeline.slice(0, historyVisible)
 
   const lastSevenDays = useMemo(() => {
@@ -260,7 +308,15 @@ export function MedicationPrototypeWorkspace({
       await action()
       await onDataChanged()
       await loadWorkspace()
-      setMessage(success)
+      let protectionWarning = ''
+      try {
+        if (selectedId) await medicationDataProtectionService.recordCheckpoint(selectedId, 'alteração de registo de medicação')
+        const snapshot = await medicationDataProtectionService.syncRedundantSnapshot()
+        if (!snapshot.available) protectionWarning = ' A cópia redundante não está disponível neste navegador.'
+      } catch {
+        protectionWarning = ' Não foi possível atualizar a proteção adicional; verifica as cópias de segurança.'
+      }
+      setMessage(success + protectionWarning)
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'Não foi possível concluir a operação.')
     } finally {
@@ -274,8 +330,62 @@ export function MedicationPrototypeWorkspace({
     await medicationDataProtectionService.recordCheckpoint(selectedId, 'informação protegida atualizada')
   }
 
+
+  function beginHistoryDoseAction(mode: 'edit' | 'cancel', event: MedicationDoseEvent) {
+    setHistoryDoseStatus(event.status === 'postponed' ? 'postponed' : 'not_taken')
+    setHistoryDoseTime(event.postponedTo
+      ? new Intl.DateTimeFormat('pt-PT', { timeZone: 'Europe/Lisbon', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(new Date(event.postponedTo))
+      : '')
+    setHistoryAction({ kind: 'dose', mode, event })
+  }
+
+  async function confirmHistoryDoseAction() {
+    if (!historyAction || historyAction.kind !== 'dose') return
+    const { event, mode } = historyAction
+    if (mode === 'edit') {
+      await medicationDoseStatusService.replaceMedicationDoseStatus({
+        eventId: event.id,
+        operationId: operationId(),
+        status: historyDoseStatus,
+        postponedToLocalTime: historyDoseStatus === 'postponed' ? historyDoseTime : undefined,
+      })
+    } else if (event.status === 'taken') {
+      await personalStockService.undoMedicationDose(event.id, operationId())
+    } else {
+      await medicationDoseStatusService.correctMedicationDoseStatus(event.id, operationId())
+    }
+    setHistoryAction(null)
+  }
+
+  async function confirmHistoryScheduleEdit(localTime: string, quantity: string) {
+    if (!selectedId || !historyAction || historyAction.kind !== 'schedule') return
+    await personalStockService.defineMedicationScheduleFromDate({
+      medicationId: selectedId,
+      scheduleId: historyAction.schedule.id,
+      localTime,
+      quantity,
+      effectiveFrom: addCalendarDays(today, 1),
+    })
+    setHistoryAction(null)
+  }
+
+  async function confirmHistoryScheduleDelete() {
+    if (!selectedId || !historyAction || historyAction.kind !== 'schedule') return
+    await personalStockService.endMedicationScheduleOnDate({
+      medicationId: selectedId,
+      scheduleId: historyAction.schedule.id,
+      effectiveUntil: today,
+    })
+    setHistoryAction(null)
+  }
+
   function selectHistoryView(view: HistoryView) {
     setHistoryView(view)
+    setHistoryVisible(HISTORY_STEP)
+  }
+
+  function selectHistoryFilter(value: HistoryFilter) {
+    setHistoryFilter(value)
     setHistoryVisible(HISTORY_STEP)
   }
 
@@ -413,23 +523,73 @@ export function MedicationPrototypeWorkspace({
                     Detalhes técnicos
                   </button>
                 </div>
-                <div className="medProtoTimelineNotice">
-                  {historyView === 'summary'
-                    ? 'Mostramos apenas acontecimentos relevantes. Os registos técnicos continuam guardados.'
-                    : 'Pontos de proteção automáticos e verificações técnicas. Estes registos ficam ocultos no resumo.'}
-                </div>
-                {activeTimeline.length ? visibleTimeline.map((item) => (
-                  <div className={`medProtoTimelineRow${item.title === 'Horário eliminado' ? ' isDeleted' : ''}`} key={item.id}>
-                    <span className="medProtoTimelineIcon" aria-hidden="true"><AppIcon name={timelineItemIcon(item)} /></span>
-                    <div>
-                      <strong>{item.title}</strong>
-                      <span>{item.description}</span>
-                      <small>{formatDateTime(item.createdAt)}</small>
-                    </div>
+                <div className="medHistoryHeader">
+                  <div>
+                    <strong>Registos por data</strong>
+                    <span>{activeTimeline.length} registo(s) · mais recentes primeiro</span>
                   </div>
-                )) : (
+                  <label>
+                    Tipo de registo
+                    <select value={historyFilter} onChange={(event) => selectHistoryFilter(event.target.value as HistoryFilter)}>
+                      <option value="all">Todos</option>
+                      <option value="dose">Tomas</option>
+                      <option value="schedule">Horários</option>
+                      <option value="stock">Stock</option>
+                      <option value="other">Outros</option>
+                    </select>
+                  </label>
+                </div>
+                <p className="medProtoTimelineNotice">
+                  {historyView === 'summary'
+                    ? 'Registos atuais organizados por data. As correções e versões anteriores ficam na vista técnica.'
+                    : 'Histórico integral, incluindo versões anteriores, correções, proteção e rastreabilidade. Não é eliminado definitivamente.'}
+                </p>
+                {activeTimeline.length ? visibleTimeline.map((item, index) => {
+                  const scheduleId = item.id.startsWith('schedule:') ? item.id.slice('schedule:'.length) : ''
+                  const activeSchedule = item.kind === 'schedule' ? schedules.find((schedule) => schedule.id === scheduleId && !schedule.deletedAt && !schedule.effectiveUntil) : undefined
+                  const event = item.id.startsWith('dose:') ? doseEvents.find((dose) => dose.id === item.id.slice('dose:'.length)) : undefined
+                  const actionableEvent = event && activeHistoryDoseIds.has(event.id)
+                  const dateGroup = historyDay(item.createdAt)
+                  return (
+                    <Fragment key={item.id}>
+                      {index === 0 || historyDay(visibleTimeline[index - 1].createdAt) !== dateGroup ? (
+                        <h4 className="medHistoryDate">{dateGroup}</h4>
+                      ) : null}
+                      <article className={`medProtoTimelineRow medHistoryRecord${item.title === 'Horário eliminado' ? ' isDeleted' : ''}`}>
+                        <span className="medProtoTimelineIcon" aria-hidden="true"><AppIcon name={timelineItemIcon(item)} /></span>
+                        <div className="medHistoryRecordBody">
+                          <div className="medHistoryRecordTop">
+                            <strong>{item.title}</strong>
+                            <small>{formatDateTime(item.createdAt)}</small>
+                          </div>
+                          <p>{item.description}</p>
+                          {activeSchedule || actionableEvent ? (
+                            <div className="medHistoryActions" role="group" aria-label={`Ações para ${item.title}`}>
+                              {activeSchedule ? (
+                                <>
+                                  <button type="button" disabled={busy} onClick={() => setHistoryAction({ kind: 'schedule', mode: 'define', schedule: activeSchedule })}>Editar</button>
+                                  <button type="button" className="medHistoryDanger" disabled={busy} onClick={() => setHistoryAction({ kind: 'schedule', mode: 'delete', schedule: activeSchedule })}>Eliminar</button>
+                                </>
+                              ) : null}
+                              {actionableEvent && event ? (
+                                <>
+                                  {event.status !== 'taken' ? (
+                                    <button type="button" disabled={busy} onClick={() => beginHistoryDoseAction('edit', event)}>Editar</button>
+                                  ) : null}
+                                  <button type="button" className="medHistoryDanger" disabled={busy} onClick={() => beginHistoryDoseAction('cancel', event)}>
+                                    {event.status === 'taken' ? 'Anular toma' : 'Anular registo'}
+                                  </button>
+                                </>
+                              ) : null}
+                            </div>
+                          ) : null}
+                        </div>
+                      </article>
+                    </Fragment>
+                  )
+                }) : (
                   <p className="medProtoEmptyInline">
-                    {historyView === 'summary' ? 'Ainda não existem acontecimentos para mostrar.' : 'Ainda não existem detalhes técnicos.'}
+                    'Não existem registos para este filtro.'
                   </p>
                 )}
                 {activeTimeline.length > HISTORY_STEP ? (
@@ -524,6 +684,71 @@ export function MedicationPrototypeWorkspace({
           {protection ? ` ${protection.movementCount + protection.scheduleCount + protection.doseEventCount} registo(s) operacionais verificados.` : ''}
         </span>
       </div>
+
+      {historyAction?.kind === 'schedule' ? (
+        <MedicationScheduleActionDialog
+          key={historyAction.schedule.id + historyAction.mode}
+          mode={historyAction.mode}
+          schedule={historyAction.schedule}
+          unit={selected?.medication.unit ?? ''}
+          busy={busy}
+          onCancel={() => setHistoryAction(null)}
+          onDefine={(localTime, quantity) => void execute(
+            () => confirmHistoryScheduleEdit(localTime, quantity),
+            'Horário atualizado para amanhã. O histórico foi preservado.',
+          )}
+          onDelete={() => void execute(
+            confirmHistoryScheduleDelete,
+            'Horário eliminado da agenda ativa, sem apagar os registos anteriores.',
+          )}
+        />
+      ) : null}
+
+      {historyAction?.kind === 'dose' ? (
+        <div className="medHistoryDialogBackdrop" onPointerDown={(event) => {
+          if (event.target === event.currentTarget && !busy) setHistoryAction(null)
+        }}>
+          <section className="medHistoryDialog" role="dialog" aria-modal="true" aria-labelledby="med-history-action-title">
+            <h3 id="med-history-action-title">{historyAction.mode === 'edit' ? 'Editar estado da toma' : 'Anular registo de toma'}</h3>
+            <p>
+              {historyAction.mode === 'edit'
+                ? 'A alteração fica registada como nova versão, sem modificar a ocorrência original.'
+                : historyAction.event.status === 'taken'
+                  ? 'A confirmação será anulada e o stock descontado será reposto por um movimento de correção. O histórico original fica protegido.'
+                  : 'O estado atual será anulado, mantendo uma correção auditável no histórico técnico.'}
+            </p>
+            {historyAction.mode === 'edit' ? (
+              <div className="medHistoryDialogFields">
+                <label>Estado
+                  <select value={historyDoseStatus} disabled={busy} onChange={(event) => setHistoryDoseStatus(event.target.value as 'not_taken' | 'postponed')}>
+                    <option value="not_taken">Não tomada</option>
+                    <option value="postponed">Adiada</option>
+                  </select>
+                </label>
+                {historyDoseStatus === 'postponed' ? (
+                  <label>Nova hora
+                    <input type="time" required value={historyDoseTime} disabled={busy} onChange={(event) => setHistoryDoseTime(event.target.value)} />
+                  </label>
+                ) : null}
+              </div>
+            ) : null}
+            <div className="medHistoryDialogActions">
+              <button type="button" disabled={busy} onClick={() => setHistoryAction(null)}>Cancelar</button>
+              <button
+                type="button"
+                className={historyAction.mode === 'cancel' ? 'medHistoryDanger' : 'medHistorySave'}
+                disabled={busy || (historyAction.mode === 'edit' && historyDoseStatus === 'postponed' && !historyDoseTime)}
+                onClick={() => void execute(
+                  confirmHistoryDoseAction,
+                  historyAction.mode === 'edit' ? 'Estado editado. A versão anterior continua no histórico.' : 'Registo anulado através de correção auditável.',
+                )}
+              >
+                {historyAction.mode === 'edit' ? 'Guardar alteração' : 'Confirmar anulação'}
+              </button>
+            </div>
+          </section>
+        </div>
+      ) : null}
 
       {message ? <div className="medProtoMessage" role="status">{message}</div> : null}
 
