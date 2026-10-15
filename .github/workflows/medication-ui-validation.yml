@@ -1,0 +1,42 @@
+name: Validação funcional da Medicação
+
+on:
+  pull_request:
+    paths:
+      - 'src/presentation/pages/MedicationsStockPage.tsx'
+      - 'src/presentation/components/MedicationPrototypeWorkspace.tsx'
+      - 'src/styles/medication-refinement.css'
+      - 'src/styles/medication-refinement.test.ts'
+      - 'src/main.tsx'
+      - '.github/workflows/medication-ui-validation.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  medication-ui:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - name: Fixar npm compatível
+        run: npm install -g npm@11.6.0 --no-audit --no-fund
+      - name: Instalar dependências
+        run: npm install --no-audit --no-fund
+      - name: Verificar TypeScript
+        run: npm run typecheck
+      - name: Verificar lint
+        run: npm run lint
+      - name: Executar testes
+        run: npm test
+      - name: Compilar aplicação
+        run: npm run build
+      - name: Validar Worker sem publicar
+        run: npm run worker:check
+      - name: Verificar existência da aplicação no build
+        shell: bash
+        run: |
+          test -s dist/index.html
+          test -d dist/assets
