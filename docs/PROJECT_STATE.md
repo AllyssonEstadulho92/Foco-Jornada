@@ -1,5 +1,7 @@
 # Estado do Projeto
 
+**Validação parcial em 15/10/2026:** [Validação funcional da Medicação #38657775437](https://github.com/AllyssonEstadulho92/Foco-Jornada/actions/runs/38657775437) aprovada (TypeScript, lint, Vitest, build, Worker dry-run e existência do build). O fluxo obrigatório [Qualidade #38657775457](https://github.com/AllyssonEstadulho92/Foco-Jornada/actions/runs/38657775457) foi bloqueado pelo `npm audit`, que identificou 13 vulnerabilidades elevadas nas dependências. Correção acompanhada separadamente no [Issue #229](https://github.com/AllyssonEstadulho92/Foco-Jornada/issues/229). Foi acrescentado smoke Chromium ao workflow funcional para nova validação. O PR #228 mantém-se em rascunho, sem merge/publicação ou teste físico confirmado.
+
 ## Em revisão — 2026-10-15: repaginação da Medicação
 
 **Objetivo:** organizar a rota `#/medicamentos` para apresentar primeiro tomas do dia, a seguir lista e detalhe de medicamentos e, em secções expansíveis, autonomia, horários e operações de stock. Auditoria, especificação, riscos e aceitação em `docs/MEDICATION-REFINEMENT-2026.md`.
