@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-15 — Medicação renovada, integrada e publicada (#228)
+
+- PR #228 integrado no commit `2b6d4de1059fae8b9cb5fbb016840919b7eaa058`; a página coloca Tomas programadas em primeiro plano, com botão de edição/eliminação de horários e atalhos de navegação.
+- Histórico organizado por dia e tipo, com Resumo de estados atuais e Detalhes técnicos completos. Editar ou Eliminar toma cria correção auditável, preservando dados originais e repondo stock em anulações de tomas confirmadas.
+- Validação funcional #38704412614 e auditoria de dependências de produção #38704412132 aprovadas; workflow de publicação #38704766641 e GitHub Pages #38704856081 concluídos com sucesso.
+- A auditoria integral do ambiente de desenvolvimento continua a falhar devido a dependências vulneráveis (Issue #229). Teste físico no iPhone/Android e validação operacional com dados reais permanecem pendentes. Sem migração de base de dados, alteração de autenticação ou publicação de dados pessoais.
+
 ## 2026-10-15 — Histórico de Medicação com edição e eliminação segura (em revisão)
 
 - O histórico apresenta separadores Resumo/Detalhes técnicos, filtro por tipo, datas agrupadas e cartões compactos responsivos.

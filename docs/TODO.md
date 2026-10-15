@@ -1,5 +1,14 @@
 # TODO
 
+## Pós-publicação da Medicação (15/10/2026)
+
+- [x] Integrar PR #228 em `main` com histórico por data, filtros e ações Editar/Eliminar e anulação auditável.
+- [x] Aprovar TypeScript, lint, Vitest, build, Worker e smoke Chromium; aprovar `npm audit --omit=dev --audit-level=high`.
+- [x] Confirmar Publicar #38704766641 e GitHub Pages #38704856081 como concluídos com sucesso.
+- [ ] Resolver vulnerabilidades de desenvolvimento do Issue #229 e restaurar o sucesso da auditoria integral do workflow Qualidade.
+- [ ] Verificar a versão em Safari iPhone e Android, PWA em cache/atualização, modo escuro, acessibilidade, edição/eliminação de horários, anulação de tomas e correções exatas de stock com dados de teste.
+- [ ] Verificar backup/restauro e histórico técnico após múltiplas correções e em ecrãs estreitos.
+
 ## P0 — Histórico de Medicação: organização e ações (15/10/2026)
 
 - [x] Auditar timeline, eventos, gestão de horários e invariantes do ledger de medicação.

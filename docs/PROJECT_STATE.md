@@ -1,5 +1,9 @@
 # Estado do Projeto
 
+## Publicado em 15/10/2026: página de Medicamentos e histórico renovados
+
+**Estado confirmado:** PR #228 integrado em `main` (merge `2b6d4de1059fae8b9cb5fbb016840919b7eaa058`). O workflow [Publicar #38704766641](https://github.com/AllyssonEstadulho92/Foco-Jornada/actions/runs/38704766641) e o [GitHub Pages #38704856081](https://github.com/AllyssonEstadulho92/Foco-Jornada/actions/runs/38704856081) concluíram com sucesso. Página: `https://allyssonestadulho92.github.io/Foco-Jornada/#/medicamentos`. **Validação:** CI funcional completa aprovada e auditoria de dependências de produção aprovada. **Risco residual:** auditoria integral de dependências de desenvolvimento falha, em tratamento no Issue #229; teste físico iPhone, sincronização/atualização PWA e operações reais com dados de ensaio ainda carecem de validação. Os esquemas e dados existentes não foram migrados. **Próximo passo:** validar iPhone/Android, ações Editar/Eliminar, histórico técnico, correção de stock e reduzir riscos na cadeia de desenvolvimento.
+
 ## Em revisão — 15/10/2026: ações e organização do Histórico de Medicação
 
 **Estado real da implementação:** o PR #228 passou a apresentar os registos por data, com filtro de tipos, Resumo de eventos ativos e vista técnica com correções originais. Horários ativos têm Editar/Eliminar; tomas têm Editar para estados operacionais e Eliminar com anulação auditável para o evento ativo. As tomas programadas também receberam botões explícitos para gerir horários. Sem apagamento físico do histórico, sem alterações a esquemas ou serviços de domínio. Testes acrescentados em `medication-history-actions.test.ts`; especificação em `docs/MEDICATION-HISTORY-AUDIT-2026.md`. **Pendente:** CI do novo head, remediação da auditoria de dependências (Issue #229) e validação real no iPhone antes da integração.

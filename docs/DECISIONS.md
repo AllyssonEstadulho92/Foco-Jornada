@@ -1,5 +1,9 @@
 # Decisões técnicas
 
+## D-047 — Publicar Medicação com auditoria de produção aprovada e risco de desenvolvimento pendente
+
+**Decisão de 15/10/2026:** integrar PR #228 e publicar a página Medicação a pedido explícito do utilizador. **Evidência:** workflow funcional #38704412614 aprovado (TypeScript, lint, testes, build, Worker e Chromium), auditoria de produção #38704412132 aprovada com `npm audit --omit=dev --audit-level=high`; publicação #38704766641 e GitHub Pages #38704856081 aprovados. **Risco residual:** o workflow geral Qualidade continua a falhar no `npm audit` integral, por vulnerabilidades em dependências de desenvolvimento, incluindo `braces` sem patch publicado; o controlo não foi removido. **Compromisso:** Issue #229 aberto, remediar e voltar a executar a auditoria global; não interpretar a auditoria de produção como prova de segurança absoluta. Teste em iPhone e ensaios do histórico em condições reais ainda pendentes.
+
 ## D-046 — Editar e eliminar o estado atual sem destruir o histórico protegido
 
 **Estado:** em revisão, 15/10/2026. **Evidência:** a página Histórico não apresentava ações por registo nem agrupamento por data; o domínio já dispõe de serviços que acrescentam correções auditáveis. **Decisão:** mostrar ações apenas para horários ativos e eventos de dose atuais. «Editar» horário cria definição com efeito a partir de amanhã; «Eliminar» horário retira da agenda ativa. «Editar» adiamento/não tomada substitui o estado com nova versão; «Eliminar» evento retira-o do resumo e preserva correção técnica, repondo stock ao anular uma toma confirmada. **Não permitir:** eliminação física de movimentos, notas históricas ou checkpoints, nem reescrever doses passadas. O resumo oculta versões substituídas e a vista técnica mantém rastreabilidade. **Riscos:** confirmação, integridade referencial, foco e testes manuais com diferentes estados. Ver `docs/MEDICATION-HISTORY-AUDIT-2026.md`.

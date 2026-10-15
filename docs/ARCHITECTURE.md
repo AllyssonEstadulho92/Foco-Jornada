@@ -1,5 +1,9 @@
 # Arquitetura
 
+## Publicação da área Medicação (15/10/2026)
+
+A composição e as operações descritas em D-045/D-046 foram integradas no PR #228 e publicadas no GitHub Pages. Mantêm-se os serviços existentes, a proteção local, o ledger e a distinção entre anulação lógica e eliminação física. Nenhum componente novo de backend foi introduzido. A versão distribuída usa os artefactos do workflow Publicar #38704766641; a validação de regressões funcionais e a auditoria exclusiva das dependências de produção passaram antes da integração. Persistem vulnerabilidades no tooling de desenvolvimento (Issue #229), fora das dependências de runtime, e validação visual/operacional em dispositivos móveis por executar.
+
 ## Medicação: histórico por data e ações auditáveis (15/10/2026, em revisão)
 
 `MedicationPrototypeWorkspace` conserva `getMedicationTimeline` e dados do cofre. O histórico no Resumo apresenta apenas eventos de dose atuais, agrupados por data e filtráveis por tipo; a vista técnica usa `combinedTimeline` completo. Para horários ativos reutiliza `MedicationScheduleActionDialog` e `PersonalStockService.defineMedicationScheduleFromDate/endMedicationScheduleOnDate`. Para dose `not_taken/postponed` edita via `MedicationDoseStatusService.replaceMedicationDoseStatus`; para anular usa `correctMedicationDoseStatus` ou `PersonalStockService.undoMedicationDose` em tomas confirmadas, preservando movimentos corretivos do ledger. `MedicationsStockPage` disponibiliza Editar horário e Eliminar diretamente nas tomas programadas. Estilos em `medication-refinement.css`. Confirmação e proteção adicional por checkpoint/cópia redundante; sem alterações de modelo, Worker, autenticação ou sincronização. Ver `docs/MEDICATION-HISTORY-AUDIT-2026.md`.
