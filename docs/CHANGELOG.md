@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-15 — Histórico de Medicação com edição e eliminação segura (em revisão)
+
+- O histórico apresenta separadores Resumo/Detalhes técnicos, filtro por tipo, datas agrupadas e cartões compactos responsivos.
+- Nos horários ativos há Editar e Eliminar; na lista de tomas programadas, as ações são visíveis sem gesto obrigatório. Nas tomas registadas, Editar utiliza versões de estado e Eliminar cria anulação auditável; o stock de uma toma confirmada é reposto por correção do ledger.
+- Eventos substituídos deixam de poluir o Resumo, continuando visíveis em Detalhes técnicos. Movimentos de stock, dados históricos e checkpoints não são apagados.
+- Foram acrescentados estilos escopados, diálogos de confirmação, testes estruturais e `docs/MEDICATION-HISTORY-AUDIT-2026.md`.
+- QA funcional, segurança de dependências do Issue #229, publicação e teste em equipamentos reais pendentes.
+
 ## 2026-10-15 — Medicação: organização e consulta prioritária (em revisão)
 
 - Auditadas `MedicationsStockPage`, `MedicationPrototypeWorkspace`, estilos sobrepostos, IDs do temporizador e serviços de registo de tomas/stock.
