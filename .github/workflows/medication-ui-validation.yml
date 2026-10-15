@@ -35,6 +35,32 @@ jobs:
         run: npm run build
       - name: Validar Worker sem publicar
         run: npm run worker:check
+      - name: Smoke test de arranque no Chromium
+        shell: bash
+        run: |
+          set -euo pipefail
+          CHROME_BIN="$(command -v google-chrome || command -v chromium || command -v chromium-browser || true)"
+          if [ -z "$CHROME_BIN" ]; then
+            echo "Nenhum browser Chromium disponível no runner."
+            exit 1
+          fi
+          mkdir -p .smoke/Foco-Jornada
+          cp -R dist/. .smoke/Foco-Jornada/
+          python3 -m http.server 4173 --directory .smoke >/tmp/foco-med-http.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID || true' EXIT
+          sleep 2
+          "$CHROME_BIN" --headless --no-sandbox --disable-gpu --virtual-time-budget=12000 \
+            --dump-dom http://127.0.0.1:4173/Foco-Jornada/ \
+            >/tmp/foco-med-dom.html 2>/tmp/foco-med-chrome.log || true
+          if grep -q 'id="app-boot-fallback"' /tmp/foco-med-dom.html; then
+            echo "ERRO: aplicação não substituiu fallback de arranque."
+            exit 1
+          fi
+          if ! grep -q 'id="root"' /tmp/foco-med-dom.html; then
+            echo "ERRO: documento final sem #root."
+            exit 1
+          fi
       - name: Verificar existência da aplicação no build
         shell: bash
         run: |
