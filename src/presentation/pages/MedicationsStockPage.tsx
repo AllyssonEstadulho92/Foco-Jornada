@@ -725,6 +725,11 @@ export function MedicationsStockPage() {
                           )}
                         </div>
 
+                        <div className="medicationScheduleRowActions" role="group" aria-label={`Gerir horário das ${schedule.localTime}`}>
+                          <button type="button" disabled={busy || scheduleEndingToday} onClick={() => openScheduleAction('define', schedule)}>Editar horário</button>
+                          <button type="button" className="medicationScheduleDelete" disabled={busy || scheduleEndingToday} onClick={() => openScheduleAction('delete', schedule)}>Eliminar</button>
+                        </div>
+
                         {detailsOpen ? (
                           <div className="stockDoseDetails" id={`dose-details-${schedule.id}`}>
                             <div className="stockDoseDetailsGrid">
