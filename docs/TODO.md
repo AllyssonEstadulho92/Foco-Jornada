@@ -1,5 +1,13 @@
 # TODO
 
+## P0 — Histórico de Medicação: organização e ações (15/10/2026)
+
+- [x] Auditar timeline, eventos, gestão de horários e invariantes do ledger de medicação.
+- [x] Agrupar por dia, filtrar por tipo, separar eventos atuais dos técnicos; adicionar botões Editar/Eliminar apenas onde o domínio tem ações seguras.
+- [x] Reutilizar diálogo de horários e serviços de correção de estados/stock, sem eliminação física; acrescentar confirmação, estados ocupados, acessibilidade e testes estruturais.
+- [ ] Verificar CI final do PR #228 e corrigir regressões; manter `npm audit` obrigatório e tratar Issue #229 numa intervenção de segurança separada.
+- [ ] Testar em iPhone e desktop com dados de ensaio: edição de adiamento, anulação de toma confirmada e reposição exata de stock, fim de horário, foco do modal, histórico técnico, filtros, PWA e preservação de dados.
+
 **Evidência atual (15/10):** TypeScript, lint, Vitest, build e Worker passaram no [workflow funcional #38657775437](https://github.com/AllyssonEstadulho92/Foco-Jornada/actions/runs/38657775437). O workflow «Qualidade» mantém falha em 13 vulnerabilidades elevadas detetadas pelo `npm audit`. Ver [Issue #229](https://github.com/AllyssonEstadulho92/Foco-Jornada/issues/229). Aguarda-se o smoke Chromium adicionado após esse resultado, a auditoria verde e teste em dispositivos reais, antes de integrar o PR #228.
 
 ## P0 — Medicação: repaginação e auditoria (ramificação 2026-10-15)
